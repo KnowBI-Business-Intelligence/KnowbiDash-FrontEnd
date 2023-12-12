@@ -23,8 +23,8 @@ import { LayoutModule } from './layout/layout.module';
     BoardAdminComponent,
     BoardModeratorComponent,
     BoardUserComponent,
-    RegisterComponent,
     ProfileComponent,
+    RegisterComponent,
   ],
   imports: [
     BrowserModule,
