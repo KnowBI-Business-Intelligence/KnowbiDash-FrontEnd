@@ -2,20 +2,21 @@ import {
   HTTP_INTERCEPTORS,
   HttpEvent,
   HttpErrorResponse,
+  HttpInterceptorFn,
+  HttpClient,
 } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {
   HttpInterceptor,
   HttpHandler,
   HttpRequest,
 } from '@angular/common/http';
 
-import { StorageService } from '../_services/storage.service';
+import { TokenStorageService } from '../_services/storage.service';
 import { AuthService } from '../_services/auth.service';
 
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, filter, switchMap, take } from 'rxjs/operators';
-import { error } from 'console';
 
 const TOKEN_HEADER_KEY = 'Authorization';
 
@@ -27,14 +28,14 @@ export class AuthInterceptor implements HttpInterceptor {
   );
 
   constructor(
-    private tokenService: StorageService,
+    private tokenService: TokenStorageService,
     private authService: AuthService
   ) {}
 
   intercept(
     req: HttpRequest<any>,
     next: HttpHandler
-  ): Observable<HttpEvent<Object>> {
+  ): Observable<HttpEvent<any>> {
     let authReq = req;
     const token = this.tokenService.getToken();
     if (token != null) {
@@ -50,7 +51,6 @@ export class AuthInterceptor implements HttpInterceptor {
         ) {
           return this.handle401Error(authReq, next);
         }
-
         return throwError(error);
       })
     );
@@ -67,7 +67,7 @@ export class AuthInterceptor implements HttpInterceptor {
         return this.authService.refreshToken(token).pipe(
           switchMap((token: any) => {
             this.isRefreshing = false;
-
+            console.log(token);
             this.tokenService.saveToken(token.accessToken);
             this.refreshTokenSubject.next(token.accessToken);
 
@@ -77,7 +77,7 @@ export class AuthInterceptor implements HttpInterceptor {
             this.isRefreshing = false;
 
             this.tokenService.signOut();
-            return throwError(() => error);
+            return throwError(() => err);
           })
         );
     }
@@ -99,3 +99,37 @@ export class AuthInterceptor implements HttpInterceptor {
 export const authInterceptorProviders = [
   { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
 ];
+
+/*export const authInterceptorProviders: HttpInterceptorFn = (req, next) => {
+  const token = localStorage.getItem('token');
+  let router = inject(Router);
+  let httpClient = inject(HttpClient);
+  if (token) {
+    let decodedToken = jwtDecode(token);
+    const isExpired =
+      decodedToken && decodedToken.exp
+        ? decodedToken.exp < Date.now() / 1000
+        : false;
+
+    if (isExpired) {
+      console.log('token expired');
+      localStorage.removeItem('token');
+      //router.navigateByUrl('/login');
+      httpClient
+        .post('http://localhost:8080/api/auth/refreshtoken', {})
+        .subscribe((newToken: any) => {
+          localStorage.setItem('token', newToken);
+          req.clone({
+            setHeaders: {
+              Authorization: `Bearer ${newToken}`,
+            },
+          });
+
+          return next(req);
+        });
+    } else {
+      console.log('token not expired');
+    }
+  }
+  return next(req);
+};*/

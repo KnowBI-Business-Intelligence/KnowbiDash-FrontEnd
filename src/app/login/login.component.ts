@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../_services/auth.service';
-import { StorageService } from '../_services/storage.service';
+import { TokenStorageService } from '../_services/storage.service';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
+import { UserService } from '../_services/user.service';
 
 @Component({
   selector: 'app-login',
@@ -22,7 +23,8 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private storageService: StorageService
+    private storageService: TokenStorageService,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -37,13 +39,21 @@ export class LoginComponent implements OnInit {
     console.log({ aliasName, passWord });
     this.authService.login(aliasName, passWord).subscribe({
       next: (data) => {
-        this.storageService.saveToken(data.accessToken);
+        this.storageService.saveToken(data.token);
         this.storageService.saveRefreshToken(data.refreshToken);
         this.storageService.saveUser(data);
 
         this.isLoginFailed = false;
         this.isLoggedIn = true;
         this.roles = this.storageService.getUser().roles;
+        console.log(this.storageService.getRefreshToken());
+        console.log(
+          this.userService.getAdminBoard().subscribe({
+            next: (data) => {
+              console.log(data);
+            },
+          })
+        );
         this.reloadPage();
       },
       error: (err) => {
