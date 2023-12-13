@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { EventBusService } from './_shared/event.bus.service';
-import { StorageService } from './_services/storage.service';
+import { StorageService } from './core/services/service/storage.service';
+import { EventBusService } from './core/services/shared/event.bus.service';
 
 @Component({
   selector: 'app-root',

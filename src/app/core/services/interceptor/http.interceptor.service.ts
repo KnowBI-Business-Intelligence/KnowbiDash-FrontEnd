@@ -10,8 +10,8 @@ import {
   HttpRequest,
 } from '@angular/common/http';
 
-import { StorageService } from '../_services/storage.service';
-import { AuthService } from '../_services/auth.service';
+import { StorageService } from '../service/storage.service';
+import { AuthService } from '../service/auth.service';
 
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, filter, switchMap, take } from 'rxjs/operators';

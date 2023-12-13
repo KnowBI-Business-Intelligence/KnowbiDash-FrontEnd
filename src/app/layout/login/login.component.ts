@@ -1,9 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from '../_services/auth.service';
-import { StorageService } from '../_services/storage.service';
-import { FormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
-import { RouterModule } from '@angular/router';
+import { AuthService } from '../../core/services/service/auth.service';
+import { StorageService } from '../../core/services/service/storage.service';
+import { AuthNotifyService } from '../../shared/auth-notify.service';
 
 @Component({
   selector: 'app-login',
@@ -22,7 +20,8 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private storageService: StorageService
+    private storageService: StorageService,
+    private authNotify: AuthNotifyService
   ) {}
 
   ngOnInit(): void {
@@ -44,10 +43,14 @@ export class LoginComponent implements OnInit {
         this.isLoginFailed = false;
         this.isLoggedIn = true;
         this.roles = this.storageService.getUser().roles;
+
         this.reloadPage();
       },
       error: (err) => {
-        this.errorMessage = err.error.message;
+        console.log(err.error.message);
+
+        this.authNotify.VerifyErroCode(err.error.message);
+
         this.isLoginFailed = true;
       },
     });
