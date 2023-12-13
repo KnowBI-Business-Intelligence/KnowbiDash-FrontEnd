@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '../../core/services/service/user.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-home',
@@ -9,7 +10,7 @@ import { UserService } from '../../core/services/service/user.service';
 export class HomeComponent implements OnInit {
   content?: string;
 
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService, private toast: ToastrService) {}
 
   ngOnInit(): void {
     this.userService.getPublicContent().subscribe({
@@ -17,6 +18,8 @@ export class HomeComponent implements OnInit {
         this.content = data;
       },
       error: (err) => {
+        console.log(err.error);
+
         if (err.error) {
           try {
             const res = JSON.parse(err.error);

@@ -14,17 +14,19 @@ import { ProfileComponent } from './layout/profile/profile.component';
 import { CoreModule } from './core/core.module';
 import { FeaturesModule } from './features/features.module';
 import { LayoutModule } from './layout/layout.module';
+import { ToastrModule } from 'ngx-toastr';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
-    LoginComponent,
     BoardAdminComponent,
     BoardModeratorComponent,
     BoardUserComponent,
     ProfileComponent,
     RegisterComponent,
+    LoginComponent,
   ],
   imports: [
     BrowserModule,
@@ -34,6 +36,8 @@ import { LayoutModule } from './layout/layout.module';
     CoreModule,
     FeaturesModule,
     LayoutModule,
+    BrowserAnimationsModule,
+    ToastrModule.forRoot({ preventDuplicates: true }),
   ],
   providers: [],
   bootstrap: [AppComponent],

@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../core/services/service/auth.service';
-import { FormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
-import { RouterModule } from '@angular/router';
+import { AuthNotifyService } from '../../shared/auth-notify.service';
 
 @Component({
   selector: 'app-register',
@@ -19,7 +17,10 @@ export class RegisterComponent implements OnInit {
   isSignUpFailed = false;
   errorMessage = '';
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private authNotify: AuthNotifyService
+  ) {}
 
   ngOnInit(): void {}
 
@@ -33,8 +34,7 @@ export class RegisterComponent implements OnInit {
         this.isSignUpFailed = false;
       },
       error: (err) => {
-        this.errorMessage = err.error.message;
-        this.isSignUpFailed = true;
+        this.authNotify.VerifyErroCode(err.error.message);
       },
     });
   }
