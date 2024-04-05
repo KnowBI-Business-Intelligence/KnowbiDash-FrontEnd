@@ -1,0 +1,26 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.container > h1 {
+  font-size: 7rem;
+  font-weight: 700;
+  color: #2d2c2c;
+}
+.container > p {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #3c3c3c;
+}
+
+svg {
+  height: 20rem;
+  width: 50rem;
+}
+
+a {
+  text-decoration: none;
+}

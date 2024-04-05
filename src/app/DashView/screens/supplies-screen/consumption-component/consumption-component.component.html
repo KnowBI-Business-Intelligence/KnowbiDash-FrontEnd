@@ -1,0 +1,82 @@
+<p-skeleton width="93vw" height="86vh" *ngIf="loadingScreen"> </p-skeleton>
+
+<div class="container" *ngIf="!loadingScreen">
+  <div class="top">
+    <highcharts-chart
+      style="width: 28rem; height: 22rem"
+      [Highcharts]="Highcharts"
+      [options]="chartBar_One"
+    >
+    </highcharts-chart>
+    <highcharts-chart
+      style="width: 28rem; height: 22rem"
+      [Highcharts]="Highcharts"
+      [options]="chartBar_Two"
+    >
+    </highcharts-chart>
+    <highcharts-chart
+      style="width: 28rem; height: 22rem"
+      [Highcharts]="Highcharts"
+      [options]="chartBar_Three"
+    >
+    </highcharts-chart>
+  </div>
+
+  <div class="bottom">
+    <section class="example-container mat-elevation-z8" tabindex="0">
+      <mat-table #table [dataSource]="dataSource" matSort>
+        <ng-container matColumnDef="grupo">
+          <mat-header-cell class="header-cell" *matHeaderCellDef
+            >Grupo</mat-header-cell
+          >
+          <mat-cell *matCellDef="let element">{{ element.grupo }}</mat-cell>
+          <mat-footer-cell *matFooterCellDef>GRUPO</mat-footer-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="tipo">
+          <mat-header-cell *matHeaderCellDef>Tipo</mat-header-cell>
+          <mat-cell *matCellDef="let element">{{ element.tipo }}</mat-cell>
+          <mat-footer-cell *matFooterCellDef>GRUPO</mat-footer-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="material_estoque">
+          <mat-header-cell *matHeaderCellDef>Material Estoque</mat-header-cell>
+          <mat-cell *matCellDef="let element">{{
+            element.material_estoque
+          }}</mat-cell>
+          <mat-footer-cell *matFooterCellDef>GRUPO</mat-footer-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="qt_consumo">
+          <mat-header-cell *matHeaderCellDef>Qt. Consumo</mat-header-cell>
+          <mat-cell *matCellDef="let element">{{
+            element.qt_consumo
+          }}</mat-cell>
+          <mat-footer-cell *matFooterCellDef>GRUPO</mat-footer-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="un_medida">
+          <mat-header-cell *matHeaderCellDef>Un. Medida</mat-header-cell>
+          <mat-cell *matCellDef="let element">{{ element.un_medida }}</mat-cell>
+          <mat-footer-cell *matFooterCellDef>GRUPO</mat-footer-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="valor_consumo">
+          <mat-header-cell *matHeaderCellDef>Valor Consumo</mat-header-cell>
+          <mat-cell *matCellDef="let element">{{
+            element.valor_consumo
+          }}</mat-cell>
+          <mat-footer-cell *matFooterCellDef>GRUPO</mat-footer-cell>
+        </ng-container>
+
+        <mat-header-row
+          *matHeaderRowDef="displayedColumns; sticky: true"
+        ></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+        <mat-footer-row
+          *matFooterWorDef="displayedColumns; sticky: true"
+        ></mat-footer-row>
+      </mat-table>
+    </section>
+  </div>
+</div>

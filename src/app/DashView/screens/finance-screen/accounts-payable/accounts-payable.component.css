@@ -1,0 +1,66 @@
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.container-charts {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.charts-column {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+}
+
+.charts-column highcharts-chart {
+  width: 15rem;
+  height: 15rem;
+}
+
+.content-down {
+  margin-top: 2rem;
+}
+
+.filter {
+  display: flex;
+  justify-content: start;
+}
+
+.filter button {
+  padding: 0.6rem;
+  border: none;
+  margin-right: 1rem;
+  border-radius: 0.2rem;
+  margin-right: 0.4rem;
+}
+
+.filter input {
+  padding: 0.6rem;
+  border-radius: 0.2rem;
+  border: none;
+  width: 15rem;
+  margin-right: 0.8rem;
+}
+
+.tr {
+  display: flex;
+  flex-direction: row;
+}
+
+.table {
+  margin-bottom: 2rem;
+}
+
+.caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  font-size: 1rem;
+}

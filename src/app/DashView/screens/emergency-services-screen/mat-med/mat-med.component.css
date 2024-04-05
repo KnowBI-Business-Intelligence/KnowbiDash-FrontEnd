@@ -1,0 +1,29 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: column;
+  height: 90vh;
+  width: 98%;
+  margin: 0 0.5rem;
+}
+
+.top,
+.bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.bottom {
+  flex-direction: column;
+  justify-content: space-around;
+  height: 100%;
+}
+
+highcharts-chart {
+  border-radius: 0.5rem;
+  box-shadow: 8px 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0px 10px 15px -3px rgba(0, 0, 0, 0.1);
+}

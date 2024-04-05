@@ -1,0 +1,55 @@
+<div class="container">
+  <header>
+    <h2>Configuração com o banco</h2>
+  </header>
+  <form class="form" #f="ngForm" *ngIf="!showForm">
+    <div class="form-group">
+      <label for="username">Nome de usuário</label>
+      <input
+        required=""
+        name="username"
+        id="username"
+        type="text"
+        [(ngModel)]="form.username"
+      />
+    </div>
+    <div class="form-group">
+      <label for="password">Senha</label>
+      <input
+        required=""
+        name="password"
+        id="password"
+        type="password"
+        [(ngModel)]="form.password"
+      />
+    </div>
+    <div class="form-group">
+      <label for="url">Database URL</label>
+      <input
+        required=""
+        name="url"
+        id="url"
+        type="text"
+        [(ngModel)]="form.url"
+      />
+    </div>
+    <div class="buttons">
+      <button [routerLink]="['../']" routerLinkActive="router-link-active">
+        <p>Cancelar</p>
+      </button>
+      <button (click)="connectDatabase()">
+        <p>Conectar</p>
+      </button>
+    </div>
+  </form>
+  <div class="db-conected" *ngIf="showForm">
+    <img
+      src="assets/images/database.svg"
+      alt="Imagem banco de dados conectado"
+    />
+    <h2>O banco está conectado!</h2>
+  </div>
+</div>
+<div class="message">
+  <p-toast [life]="1500"></p-toast>
+</div>

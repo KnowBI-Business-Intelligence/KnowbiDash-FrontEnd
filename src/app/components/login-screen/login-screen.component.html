@@ -1,0 +1,80 @@
+<div class="container">
+  <div class="col-md-12">
+    <div class="card card-container">
+      <h1 class="title">Acessar</h1>
+      <form name="form" #f="ngForm" novalidate>
+        <div class="form-group">
+          <label for="username">Usuário</label>
+          <input
+            type="text"
+            class="form-control"
+            name="username"
+            [(ngModel)]="form.username"
+            required
+            #username="ngModel"
+            [ngClass]="{ 'is-invalid': f.submitted && username.errors }"
+          />
+        </div>
+        <div class="form-group">
+          <label for="password">Senha</label>
+          <input
+            type="password"
+            class="form-control"
+            name="password"
+            [(ngModel)]="form.password"
+            required
+            minlength="6"
+            #password="ngModel"
+            [ngClass]="{ 'is-invalid': f.submitted && password.errors }"
+          />
+        </div>
+
+        <div class="form-button">
+          <button
+            (click)="onSubmit()"
+            pButton
+            pRipple
+            type="button"
+            class="btn btn-primary btn-block"
+          >
+            Entrar
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <img
+      class="one"
+      srcset="../../../../assets/images/one.svg"
+      alt="shape one"
+    />
+    <img
+      class="two"
+      srcset="../../../../assets/images/two.svg"
+      alt="shape two"
+    />
+    <img
+      class="three"
+      srcset="../../../../assets/images/three.svg"
+      alt="shape three"
+    />
+    <img
+      class="four"
+      srcset="../../../../assets/images/four.svg"
+      alt="shape four"
+    />
+    <img
+      class="five"
+      srcset="../../../../assets/images/five.svg"
+      alt="shape five"
+    />
+
+    <div class="message">
+      <p-toast [life]="1500"></p-toast>
+    </div>
+  </div>
+  <footer>
+    <span>V 0.0.1</span>
+    <img src="assets/icons/Logo_principal_horizontal.svg" alt="" />
+  </footer>
+</div>

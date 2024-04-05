@@ -1,0 +1,34 @@
+<p-skeleton width="90vw" height="86vh" *ngIf="loadingScreen"> </p-skeleton>
+
+<div class="container" *ngIf="!loadingScreen">
+  <div class="left">
+    <highcharts-chart
+      style="width: 60rem; height: 15rem"
+      [Highcharts]="Highcharts"
+      [options]="chartTop_One"
+    >
+    </highcharts-chart>
+
+    <mat-card>
+      <mat-card-content
+        ><p>Atendimentos no período</p>
+        <span>3.924</span></mat-card-content
+      >
+    </mat-card>
+  </div>
+  <div class="rigth">
+    <highcharts-chart
+      style="width: 40rem; height: 24rem"
+      [Highcharts]="Highcharts"
+      [options]="chartBottom_One"
+    >
+    </highcharts-chart>
+
+    <highcharts-chart
+      style="width: 40rem; height: 24rem"
+      [Highcharts]="Highcharts"
+      [options]="chartBottom_Two"
+    >
+    </highcharts-chart>
+  </div>
+</div>

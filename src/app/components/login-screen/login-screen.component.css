@@ -1,0 +1,141 @@
+.one {
+  position: fixed;
+  width: 45rem;
+  top: -10rem;
+  left: -10rem;
+  z-index: -1;
+}
+
+.two {
+  position: fixed;
+  width: 45rem;
+  top: -10rem;
+  right: -10rem;
+  z-index: -1;
+}
+
+.three {
+  position: fixed;
+  width: 35rem;
+  bottom: -15rem;
+  left: -10rem;
+  z-index: -1;
+}
+
+.four {
+  position: fixed;
+  width: 30rem;
+  bottom: -15rem;
+  left: 35rem;
+  z-index: -1;
+}
+
+.five {
+  position: fixed;
+  width: 35rem;
+  bottom: -10rem;
+  right: -10rem;
+  z-index: -1;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 98vh;
+}
+
+.col-md-12 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 32rem;
+  height: 32rem;
+  flex-shrink: 0;
+  border-radius: 0.25rem;
+  background-color: #fff;
+  box-shadow: 0px 2px 20px 0px #abbac0;
+}
+
+.form-group {
+  margin-top: 2rem;
+}
+
+h1 {
+  margin-top: -1rem;
+  font-weight: bold;
+  font-size: 2.5rem;
+  color: #090238;
+}
+
+label {
+  color: #2a2d2e;
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 500;
+}
+
+input {
+  display: flex;
+  gap: 0.625rem;
+  width: 22rem;
+  padding: 0.625rem;
+  align-items: center;
+  border-radius: 0.25rem;
+  border: 1px solid #737b7f;
+  background-color: #eaeaea;
+  margin-top: 0.5rem;
+}
+
+.form-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 20rem;
+  padding: 0.5rem 1.415rem;
+  border: 0.25rem solid #090238;
+  border-radius: 0.75rem;
+  background-color: #090238;
+  box-shadow: 0px 2px 2px 0px #2a2d2e;
+  color: #d9dee0;
+  font-size: 1.125rem;
+  font-style: normal;
+  font-weight: bold;
+  line-height: 1.75rem; /* 155.556% */
+  margin-top: 3rem;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #090238;
+  border: 0.25rem solid #090238;
+  opacity: 0.85;
+}
+
+footer img {
+  position: fixed;
+  bottom: 1rem;
+  right: 1.5rem;
+  width: 6rem;
+}
+
+footer span {
+  position: fixed;
+  bottom: 1rem;
+  left: 1.5rem;
+  font-size: 0.8rem;
+}

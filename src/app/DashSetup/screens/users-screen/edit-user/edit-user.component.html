@@ -1,0 +1,150 @@
+<div class="conteiner">
+  <div class="register-user">
+    <h2>Editar Usuário</h2>
+    <div class="forms">
+      <form class="form-register" name="form-create-user" #f="ngForm">
+        <div class="form-create-user">
+          <label for="fullnameuser">Nome do funcionário: </label>
+          <input
+            autocomplete="off"
+            type="text"
+            name="fullusernameer"
+            [(ngModel)]="form.fullusername"
+            #fullusername="ngModel"
+            [ngClass]="{ 'is-invalid': f.submitted && fullusername.errors }"
+            [placeholder]="item.fullUserName"
+          />
+        </div>
+
+        <div class="form-create-user">
+          <label for="username">Nome de usuário: </label>
+          <input
+            autocomplete="off"
+            type="text"
+            name="username"
+            [(ngModel)]="form.username"
+            #username="ngModel"
+            [ngClass]="{ 'is-invalid': f.submitted && username.errors }"
+            [placeholder]="item.userName"
+          />
+        </div>
+
+        <div class="form-create-user">
+          <label for="password">Senha: </label>
+          <input
+            autocomplete="off"
+            type="password"
+            name="password"
+            [(ngModel)]="form.password"
+            autocomplete="off"
+            required
+            minlength="6"
+            #password="ngModel"
+            [ngClass]="{ 'is-invalid': f.submitted && password.errors }"
+            placeholder="******"
+          />
+        </div>
+
+        <div class="form-create-user">
+          <label for="occupation">Ocupação: </label>
+          <input
+            autocomplete="off"
+            type="text"
+            name="occupation"
+            [(ngModel)]="form.occupation"
+            required
+            minlength="6"
+            #occupation="ngModel"
+            [ngClass]="{ 'is-invalid': f.submitted && occupation.errors }"
+            [placeholder]="item.cargo"
+          />
+        </div>
+
+        <div class="form-create-user">
+          <label for="email">E-mail: </label>
+          <input
+            autocomplete="off"
+            type="email"
+            name="email"
+            autocomplete="off"
+            [(ngModel)]="form.email"
+            required
+            minlength="6"
+            #email="ngModel"
+            [ngClass]="{ 'is-invalid': f.submitted && email.errors }"
+            [placeholder]="item.email"
+          />
+        </div>
+
+        <div class="form-create-user">
+          <label for="access_level">Nível de acesso: </label>
+          <p-dropdown
+            name="access_level"
+            [options]="rolesOptions"
+            [(ngModel)]="form.access_level"
+            [placeholder]="getRoles(item.roles[0].name)"
+            optionLabel="name"
+            #access_level="ngModel"
+            [ngClass]="{ 'is-invalid': f.submitted && access_level.errors }"
+          ></p-dropdown>
+        </div>
+
+        <mat-form-field class="form-create-user">
+          <mat-label>Adicione um perfil</mat-label>
+          <mat-chip-grid #chipGrid aria-label="Profile selection">
+            @for (profile of profiles; track profile) {
+            <mat-chip-row (removed)="removeProfile(profile)">
+              {{ profile }}
+              <button matChipRemove [attr.aria-label]="'remover ' + profile">
+                <mat-icon>cancel</mat-icon>
+              </button>
+            </mat-chip-row>
+            }
+          </mat-chip-grid>
+          <input
+            placeholder="Novo perfil..."
+            #profileInput
+            [(ngModel)]="form.profiles"
+            [formControl]="profilesCtrl"
+            [matChipInputFor]="chipGrid"
+            [matAutocomplete]="auto"
+            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+            (matChipInputTokenEnd)="addProfiles($event)"
+          />
+          <mat-autocomplete
+            #auto="matAutocomplete"
+            (optionSelected)="selectedProfiles($event)"
+          >
+            @for (profile of filteredProfiles | async; track profile) {
+            <mat-option [value]="profile">{{ profile }}</mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
+      </form>
+    </div>
+
+    <div class="buttons">
+      <button
+        pButton
+        pRipple
+        type="button"
+        class="button-form"
+        [routerLink]="['../']"
+      >
+        Cancelar
+      </button>
+      <button
+        pButton
+        pRipple
+        type="button"
+        class="button-form"
+        (click)="onSubmit()"
+      >
+        Alterar
+      </button>
+    </div>
+    <div class="message">
+      <p-toast [life]="1500"></p-toast>
+    </div>
+  </div>
+</div>

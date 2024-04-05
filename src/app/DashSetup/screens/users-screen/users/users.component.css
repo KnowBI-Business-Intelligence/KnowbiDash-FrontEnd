@@ -1,0 +1,105 @@
+.container {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  margin: 1rem;
+  width: 85svw;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 95%;
+}
+
+.content {
+  width: 84svw;
+  margin-top: 2rem;
+}
+
+.button-header {
+  align-items: center;
+  appearance: none;
+  background-color: #fcfcfd;
+  border-radius: 4px;
+  border-width: 0;
+  box-shadow: #2d234233 0 2px 2px, #2d234226 0 7px 13px -3px,
+    #d6d6e7 0 -3px 0 inset;
+  box-sizing: border-box;
+  color: #36395a;
+  cursor: pointer;
+  display: inline-flex;
+  height: 2.5rem;
+  justify-content: center;
+  line-height: 1;
+  list-style: none;
+  overflow: hidden;
+  padding: 0 1rem;
+  position: relative;
+  text-align: left;
+  text-decoration: none;
+  transition: box-shadow 0.15s, transform 0.15s;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  white-space: nowrap;
+  will-change: box-shadow, transform;
+  font-size: 0.9rem;
+}
+
+.button-header:focus {
+  box-shadow: #d6d6e7 0 0 0 1px inset, #2d234266 0 2px 4px,
+    #2d23424d 0 7px 10px -4px, #d6d6e7 0 -3px 0 inset;
+}
+
+.button-header:hover {
+  transform: translateY(-2px);
+}
+
+.button-header:active {
+  box-shadow: #d6d6e7 0 3px 7px inset;
+  transform: translateY(2px);
+}
+
+:host ::ng-deep .p-progressbar {
+  height: 0.5rem;
+  background-color: #d8dadc;
+}
+
+:host ::ng-deep .p-progressbar-value {
+  background-color: #607d8b;
+}
+
+:host ::ng-deep .p-table {
+  height: 20rem;
+}
+
+.card {
+  height: 10%;
+  margin-top: 1rem;
+}
+
+.filter {
+  display: flex;
+  justify-content: start;
+}
+
+.filter button {
+  padding: 0.6rem;
+  border: none;
+  margin-right: 1rem;
+  border-radius: 0.2rem;
+}
+
+.filter input {
+  padding: 0.6rem;
+  border-radius: 0.2rem;
+  border: none;
+}
+
+.tr {
+  display: flex;
+  flex-direction: row;
+}

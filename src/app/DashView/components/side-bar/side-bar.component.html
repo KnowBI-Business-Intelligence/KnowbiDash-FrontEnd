@@ -1,0 +1,232 @@
+<mat-sidenav-container>
+  <mat-sidenav #sidenav mode="side" opened="isExpanded">
+    <mat-nav-list class="menu-item-container">
+      <mat-list-item (click)="toggleExpandedCollapsed()">
+        <fa-icon
+          class="button"
+          [icon]="
+            isExpanded ? icons.buttonNavExpanded : icons.buttonNavCollapsed
+          "
+          [size]="'xl'"
+        ></fa-icon>
+      </mat-list-item>
+
+      <mat-list-item
+        pRipple
+        routerLink="main"
+        routerLinkActive="active"
+        ariaCurrentWhenActive="page"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <div (click)="toggleCollapsed()" class="container-icon-icon">
+          <div class="container-icon" *ngIf="!isExpanded">
+            <fa-icon
+              class="icon"
+              [icon]="icons.home"
+              [size]="'xl'"
+              title="Início"
+            ></fa-icon>
+          </div>
+        </div>
+        <div (click)="toggleCollapsed()" class="container-icon-span">
+          <div class="container-text" *ngIf="isExpanded">
+            <fa-icon
+              class="icon"
+              [icon]="icons.home"
+              [size]="'xl'"
+              title="Início"
+            ></fa-icon>
+            <span class="menu-item">Início</span>
+          </div>
+        </div>
+      </mat-list-item>
+
+      <mat-list-item
+        pRipple
+        routerLink="assistant"
+        routerLinkActive="active"
+        ariaCurrentWhenActive="page"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <div (click)="toggleCollapsed()" class="container-icon-icon">
+          <div class="container-icon" *ngIf="!isExpanded">
+            <fa-icon
+              class="icon"
+              title="Assistente"
+              [icon]="icons.assistant"
+              [size]="'xl'"
+            ></fa-icon>
+          </div>
+        </div>
+        <div (click)="toggleCollapsed()" class="container-icon-span">
+          <div class="container-text" *ngIf="isExpanded">
+            <fa-icon
+              class="icon"
+              title="Assistente"
+              [icon]="icons.assistant"
+              [size]="'xl'"
+            ></fa-icon>
+            <span class="menu-item">Assistente</span>
+          </div>
+        </div>
+      </mat-list-item>
+
+      <mat-list-item
+        pRipple
+        routerLink="dash"
+        routerLinkActive="active"
+        ariaCurrentWhenActive="page"
+        [routerLinkActiveOptions]="{ exact: true }"
+        ><div (click)="toggleCollapsed()" class="container-icon-icon">
+          <div class="container-icon" *ngIf="!isExpanded">
+            <fa-icon
+              class="icon"
+              title="Dashboards"
+              [icon]="icons.dash"
+              [size]="'xl'"
+            ></fa-icon>
+          </div>
+        </div>
+        <div (click)="toggleCollapsed()" class="container-icon-span">
+          <div class="container-text" *ngIf="isExpanded">
+            <fa-icon
+              class="icon"
+              [icon]="icons.dash"
+              [size]="'xl'"
+              title="Dashboards"
+            ></fa-icon>
+            <span class="menu-item">Dashboards</span>
+          </div>
+        </div>
+      </mat-list-item>
+
+      <!-- NAV User -->
+
+      <mat-list-item
+        pRipple
+        *ngIf="showPanelUser"
+        routerLink="default_user"
+        routerLinkActive="active"
+        ariaCurrentWhenActive="page"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <div (click)="toggleCollapsed()" class="container-icon-icon">
+          <div class="container-icon" *ngIf="!isExpanded">
+            <fa-icon
+              class="icon"
+              title="Usuário"
+              [icon]="icons.user"
+              [size]="'xl'"
+            ></fa-icon>
+          </div>
+        </div>
+        <div (click)="toggleCollapsed()" class="container-icon-span">
+          <div class="container-text" *ngIf="isExpanded">
+            <fa-icon
+              class="icon"
+              [icon]="icons.user"
+              [size]="'xl'"
+              title="Usuário"
+            ></fa-icon>
+            <span class="menu-item">Usuário</span>
+          </div>
+        </div>
+      </mat-list-item>
+
+      <mat-list-item
+        pRipple
+        routerLink="login"
+        routerLinkActive="active"
+        ariaCurrentWhenActive="page"
+        [routerLinkActiveOptions]="{ exact: true }"
+        (click)="logout()"
+        *ngIf="isExpanded"
+      >
+        <fa-icon class="icon" [icon]="icons.logout" [size]="'xl'"></fa-icon>
+        <span *ngIf="isExpanded" class="menu-item">Sair</span>
+      </mat-list-item>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <mat-toolbar>
+      <div class="breadcrumbs-menu">
+        <app-breadcrumbs></app-breadcrumbs>
+      </div>
+
+      <div class="profile-menu">
+        <button
+          mat-icon-button
+          [matMenuTriggerFor]="menu"
+          aria-label="menu"
+          class="button-profile-menu"
+        >
+          <div *ngIf="showInitials" class="initials">
+            <p>
+              {{ userFirstName }}
+            </p>
+            <fa-icon [icon]="icons.profile" aria-hidden="true"></fa-icon>
+          </div>
+        </button>
+
+        <mat-menu #menu="matMenu" xPosition="before">
+          <p class="container-profile">{{ user?.fullUserName }}</p>
+
+          <mat-divider></mat-divider>
+          <!--  -->
+          <button
+            *ngIf="showPanelUser"
+            mat-menu-item
+            [routerLink]="['default_user']"
+          >
+            <span class="mat-menu-item"> Meu Cadastro </span>
+          </button>
+
+          <button
+            *ngIf="showPanelModerator"
+            mat-menu-item
+            [routerLink]="['user_moderator']"
+          >
+            <span class="mat-menu-item"> Meu Cadastro </span>
+          </button>
+
+          <button mat-menu-item [matMenuTriggerFor]="profile">
+            <span class="mat-menu-item">
+              Perfil:
+              {{
+                user?.profiles.length > 0
+                  ? user?.profiles[0].name
+                  : "Sem perfil"
+              }}
+            </span>
+          </button>
+
+          <mat-divider></mat-divider>
+
+          <button mat-menu-item (click)="logout()">
+            <span class="mat-menu-item">Sair</span>
+          </button>
+        </mat-menu>
+
+        <mat-menu #profile="matMenu" yPosition="above">
+          <button mat-menu-item *ngFor="let profile of user?.profiles">
+            <span class="mat-menu-item">{{ profile.name }}</span>
+          </button>
+          <button
+            mat-menu-item
+            *ngIf="!user?.profiles || user?.profiles.length === 0"
+          >
+            <span class="mat-menu-item">Sem perfil</span>
+          </button>
+        </mat-menu>
+
+        <mat-menu #section="matMenu" yPosition="above">
+          <button mat-menu-item>
+            <span class="mat-menu-item"> Tecnologia da Informação </span>
+          </button>
+        </mat-menu>
+      </div>
+    </mat-toolbar>
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>

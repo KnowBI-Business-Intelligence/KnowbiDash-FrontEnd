@@ -1,0 +1,91 @@
+<div class="container">
+  <div class="content" *ngIf="!chatContent">
+    <div class="greetings">
+      <span>✨</span>
+      <h1>Olá, amigo!</h1>
+      <p>Diga o que está pensando ou escolha uma sugestão.</p>
+    </div>
+
+    <div class="suggestion">
+      <div class="card-seggestion">
+        <p>Entender</p>
+        <div class="text-suggestion">
+          <span>Como funciona o financeiro?</span>
+          <span>Como funciona a controladoria?</span>
+        </div>
+      </div>
+
+      <div class="card-seggestion">
+        <p>Explorar</p>
+        <div class="text-suggestion">
+          <span>Quantos atendimentos tivemos?</span>
+          <span>Qual o médico com mais atendimentos?</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-history" #chatHistory *ngIf="chatContent">
+    <div
+      *ngFor="let message of messagesArray"
+      class="message"
+      [ngClass]="{
+        'user-message': message.from === getUser(),
+        'bot-message': message.from === 'Koios'
+      }"
+    >
+      <div class="chat-header">
+        <p>{{ message.from }}</p>
+        <span>às {{ message.hour }}</span>
+      </div>
+      <mat-divider></mat-divider>
+      <div class="chat-body">
+        <p>
+          {{ message.text }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="messageFooter">
+    <div class="input">
+      <input
+        title="Digite uma pergunta"
+        pattern="/d+"
+        tabindex="i"
+        type="text"
+        class="questions"
+        [(ngModel)]="messageInput"
+        placeholder="Digite uma pergunta ou um comando"
+        (keyup.enter)="sendMessageRequest()"
+      />
+      <button class="buttonSend" (click)="sendMessageRequest()">
+        <div class="svg-wrapper-1">
+          <div class="svg-wrapper">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              width="24"
+              height="24"
+            >
+              <path fill="none" d="M0 0h24v24H0z"></path>
+              <path
+                fill="currentColor"
+                d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"
+              ></path>
+            </svg>
+          </div>
+        </div>
+      </button>
+    </div>
+  </footer>
+
+  <span class="info-koios">
+    Koios pode apresentar informações imprecisas, incluindo dados sobre pessoas.
+    Por isso, verifique as respostas dele.
+  </span>
+</div>
+
+<div class="watermark">
+  <img src="assets/icons/Padrão 7.svg" alt="Marca d'água" />
+</div>

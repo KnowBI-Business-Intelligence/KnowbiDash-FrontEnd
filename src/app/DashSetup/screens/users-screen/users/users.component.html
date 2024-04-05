@@ -1,0 +1,145 @@
+<div class="container">
+  <header>
+    <h2>Usuários</h2>
+    <button
+      role="button"
+      class="button-header"
+      routerLink="create_users"
+      routerLinkActive="router-link-active"
+    >
+      Adicionar
+    </button>
+  </header>
+  <div class="content">
+    <div class="card">
+      <p-table
+        #tableReference
+        dataKey="id"
+        selectionMode="single"
+        currentPageReportTemplate="Exibindo de {first} a {last} de {totalRecords} registros"
+        scrollHeight="65vh"
+        [value]="customers"
+        [rows]="10"
+        [showCurrentPageReport]="true"
+        [rowsPerPageOptions]="[10, 25, 50]"
+        [loading]="loading"
+        [paginator]="true"
+        [scrollable]="true"
+        [tableStyle]="{ 'min-width': '50rem' }"
+        [globalFilterFields]="[
+          'fullUserName',
+          'userName',
+          'email',
+          'cargo',
+          'perfis',
+          'role'
+        ]"
+      >
+        <ng-template pTemplate="caption">
+          <div class="filter">
+            <button
+              pButton
+              label="Limpar"
+              class="p-button-outlined"
+              (click)="clear(tableReference)"
+            >
+              <fa-icon [icon]="icons.filter"></fa-icon>
+            </button>
+            <span class="p-input-icon-left">
+              <input
+                pInputText
+                type="text"
+                [(ngModel)]="searchValue"
+                (input)="onInputChange($event, tableReference)"
+                placeholder="Pesquisar.."
+              />
+            </span>
+          </div>
+        </ng-template>
+
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="min-width: 15rem" pSortableColumn="fullUserName">
+              <div class="flex align-items-center">Nome</div>
+            </th>
+            <th style="min-width: 12rem" pSortableColumn="userName">
+              <div class="flex align-items-center">Usuário</div>
+            </th>
+            <th style="min-width: 12rem" pSortableColumn="cargo">
+              <div class="flex align-items-center">Cargo</div>
+            </th>
+
+            <th style="min-width: 12rem" pSortableColumn="email">
+              <div class="flex align-items-center">E-mail</div>
+            </th>
+
+            <th style="min-width: 12rem" pSortableColumn="perfis">
+              <div class="flex align-items-center">Perfil</div>
+            </th>
+
+            <th style="min-width: 12rem" pSortableColumn="role">
+              <div class="flex align-items-center">
+                Regra de Acesso
+                <ng-template pTemplate="filter" let-filter="filterCallback">
+                  <p-slider
+                    [ngModel]="roles"
+                    [range]="true"
+                    (onSlideEnd)="filter($event.values)"
+                    styleClass="m-3"
+                  ></p-slider>
+                  <div class="flex align-items-center px-2">
+                    <span>{{ roles[0] }}</span>
+                  </div>
+                </ng-template>
+              </div>
+            </th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-customer>
+          <tr
+            [pSelectableRow]="customer"
+            [routerLink]="['edit_users']"
+            [state]="{ item: customer }"
+          >
+            <td>
+              {{ customer.fullUserName }}
+            </td>
+            <td>
+              {{ customer.userName }}
+            </td>
+            <td>
+              {{ customer.cargo }}
+            </td>
+
+            <td>
+              {{ customer.email.toLowerCase() }}
+            </td>
+
+            <td>
+              {{
+                customer.perfis && customer.perfis.length > 0
+                  ? customer.perfis[0]?.name
+                  : "Sem perfil"
+              }}
+            </td>
+
+            <td>
+              {{ getRoles(customer.roles[0].name) }}
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="7">Sem registros encontrados</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <div class="message">
+      <p-toast [life]="1500"></p-toast>
+    </div>
+  </div>
+</div>

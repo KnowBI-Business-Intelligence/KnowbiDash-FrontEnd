@@ -1,0 +1,35 @@
+<p-skeleton width="90vw" height="86vh" *ngIf="loadingScreen"> </p-skeleton>
+
+<div class="container" *ngIf="!loadingScreen">
+  <div class="top">
+    <highcharts-chart
+      style="width: 42rem; height: 14rem"
+      [Highcharts]="Highcharts"
+      [options]="chartTop_One"
+    >
+    </highcharts-chart>
+
+    <highcharts-chart
+      style="width: 42rem; height: 14rem"
+      [Highcharts]="Highcharts"
+      [options]="chartTop_Two"
+    >
+    </highcharts-chart>
+  </div>
+
+  <div class="bottom">
+    <highcharts-chart
+      style="width: 85rem; height: 12rem"
+      [Highcharts]="Highcharts"
+      [options]="chartBottom_Two"
+    >
+    </highcharts-chart>
+
+    <highcharts-chart
+      style="width: 85rem; height: 12rem"
+      [Highcharts]="Highcharts"
+      [options]="chartBottom_One"
+    >
+    </highcharts-chart>
+  </div>
+</div>

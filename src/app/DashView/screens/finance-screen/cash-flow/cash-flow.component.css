@@ -1,0 +1,96 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.top {
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.card-top {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  width: 14rem;
+  border-radius: 1rem;
+  margin-bottom: 1rem;
+}
+
+.card-top p {
+  border-top-right-radius: 1rem;
+  border-top-left-radius: 1rem;
+  width: 100%;
+  text-align: center;
+  padding: 0.8rem 0.6rem 0.6rem 0.6rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: -0.6rem;
+}
+
+.card-top span {
+  width: 100%;
+  padding: 0.4rem;
+  text-align: center;
+  font-size: 1.4rem;
+  margin-top: -0.6rem;
+  margin-bottom: 0.6rem;
+  font-weight: bold;
+}
+
+.blue {
+  background-color: #50a8ff;
+}
+
+.green {
+  background-color: #5effaf;
+}
+
+.red {
+  background-color: #ff5353;
+}
+
+.gray {
+  background-color: #9b9b9b;
+}
+
+.aquablue {
+  background-color: #00bbbb;
+}
+
+.pink {
+  background-color: #ff9595;
+}
+
+.blue p {
+  background-color: #3299ff;
+}
+
+.green p {
+  background-color: #35ff9a;
+}
+
+.red p {
+  background-color: #ff2a2a;
+}
+
+.gray p {
+  background-color: #5a5959;
+}
+
+.aquablue p {
+  background-color: #018686;
+}
+
+.pink p {
+  background-color: #f65e5e;
+}

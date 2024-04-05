@@ -1,0 +1,46 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  width: 100%;
+}
+
+.info h1 {
+  font-size: 2.4rem;
+  color: #19191b;
+  margin-bottom: 4rem;
+}
+
+.info p {
+  font-size: 1.2rem;
+  color: #19191b;
+  line-height: 2rem;
+  margin-bottom: 2rem;
+}
+
+.text {
+  width: 70vw;
+  text-align: justify;
+}
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  margin-top: 5rem;
+}
+
+.footer span {
+  display: block;
+  font-weight: bold;
+  margin-top: 20px;
+  color: #807b7b;
+}

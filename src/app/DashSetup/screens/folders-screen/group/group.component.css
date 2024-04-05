@@ -1,0 +1,135 @@
+.container {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  margin: 1rem;
+  width: 85svw;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 95%;
+}
+
+.content-filter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  column-gap: 2rem;
+}
+
+.filter svg {
+  width: 1.2rem;
+}
+
+.button-folder {
+  align-items: center;
+  appearance: none;
+  background-color: #fcfcfd;
+  border-radius: 4px;
+  border-width: 0;
+  box-shadow: #2d234233 0 2px 2px, #2d234226 0 7px 13px -3px,
+    #d6d6e7 0 -3px 0 inset;
+  box-sizing: border-box;
+  color: #36395a;
+  cursor: pointer;
+  display: inline-flex;
+  height: 2.5rem;
+  justify-content: center;
+  line-height: 1;
+  list-style: none;
+  overflow: hidden;
+  padding: 0 1rem;
+  position: relative;
+  text-align: left;
+  text-decoration: none;
+  transition: box-shadow 0.15s, transform 0.15s;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  white-space: nowrap;
+  will-change: box-shadow, transform;
+  font-size: 0.9rem;
+}
+
+.button-folder:focus {
+  box-shadow: #d6d6e7 0 0 0 1px inset, #2d234266 0 2px 4px,
+    #2d23424d 0 7px 10px -4px, #d6d6e7 0 -3px 0 inset;
+}
+
+.button-folder:hover {
+  transform: translateY(-2px);
+}
+
+.button-folder:active {
+  box-shadow: #d6d6e7 0 3px 7px inset;
+  transform: translateY(2px);
+}
+
+.content {
+  display: flex;
+  justify-content: start;
+  align-content: start;
+  flex-direction: column;
+  width: 90%;
+  height: 50svh;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+
+.card {
+  min-width: 20rem;
+  width: 22rem;
+  max-width: 22rem;
+  padding: 1.6rem 2rem;
+  border-radius: 5px;
+  background-color: #f1f2f5;
+  box-shadow: 10px 10px 10px -5px #dddddd;
+  text-decoration: none;
+  margin: 0 1rem 1rem 0;
+}
+
+.card-content {
+  display: flex;
+  align-items: center;
+  justify-content: stretch;
+  font-weight: bold;
+}
+
+.card-content p {
+  font-size: 1.6;
+  color: #5f65a5;
+}
+
+.card-content:hover p {
+  color: #431a7e;
+  transition: 1s ease-out;
+}
+
+.filter {
+  display: flex;
+  justify-content: start;
+}
+
+.filter button {
+  padding: 0.6rem;
+  border: none;
+  margin-right: 1rem;
+  border-radius: 0.2rem;
+}
+
+.filter input {
+  padding: 0.6rem;
+  border-radius: 0.2rem;
+  border: none;
+}
+
+.content-nochart {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 5rem;
+}

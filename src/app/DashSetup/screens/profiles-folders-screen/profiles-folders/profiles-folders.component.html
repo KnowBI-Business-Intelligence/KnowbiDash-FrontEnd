@@ -1,0 +1,134 @@
+<div class="container">
+  <form class="expansion">
+    <mat-accordion>
+      <!-- expansion perfil -->
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>Perfis</mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="expansion-class">
+          <form class="form-expansion" [formGroup]="firstFormGroup" #f="ngForm">
+            <label for="">Nome do perfil</label>
+
+            <input
+              type="text"
+              name="profile"
+              formControlName="profile"
+              required
+              placeholder="Ex: Administrador do Sistema"
+            />
+            <label for="">Observação</label>
+
+            <input
+              type="text"
+              name="observation"
+              formControlName="observationProfile"
+              required
+              placeholder="Ex: Perfil usado pelo administrador"
+            />
+
+            <button mat-button (click)="createProfile()">Adicionar</button>
+          </form>
+          <div class="list-form">
+            <p>Perfis cadastrados</p>
+            <div class="itens-list" *ngFor="let profile of listProfiles">
+              <p>{{ profile.name }}</p>
+            </div>
+          </div>
+        </div>
+      </mat-expansion-panel>
+
+      <!-- expansiosn pasta -->
+      <mat-expansion-panel
+        (opened)="panelOpenState = true"
+        (closed)="panelOpenState = false"
+      >
+        <mat-expansion-panel-header>
+          <mat-panel-title> Pastas </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="expansion-class">
+          <form class="form-expansion" [formGroup]="firstFormGroup" #f="ngForm">
+            <label for="">Nome da pasta</label>
+
+            <input
+              type="text"
+              name="folder"
+              formControlName="chartPath"
+              required
+              placeholder="Ex: Faturamento"
+            />
+
+            <label for="">Perfil vinculado</label>
+            <mat-form-field>
+              <mat-label>Perfil</mat-label>
+              <mat-select formControlName="profileSelected">
+                <mat-option
+                  *ngFor="let profile of listProfiles"
+                  [value]="profile"
+                >
+                  {{ profile.name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <button mat-button (click)="createChartPath()">Adicionar</button>
+          </form>
+
+          <div class="list-form">
+            <p>Perfis cadastrados</p>
+            <div class="itens-list" *ngFor="let folder of listPaths">
+              <p>{{ folder.name }}</p>
+            </div>
+          </div>
+        </div>
+      </mat-expansion-panel>
+
+      <!-- expansion grupo -->
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>Grupo de gráficos </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="expansion-class">
+          <form class="form-expansion" [formGroup]="firstFormGroup" #f="ngForm">
+            <label for="">Nome do grupo</label>
+
+            <input
+              type="text"
+              name="chartGroup"
+              formControlName="chartGroup"
+              required
+              placeholder="Ex: Faturamento"
+            />
+
+            <label for="">Nome da tabela</label>
+
+            <input
+              type="text"
+              name="chartGroupTable"
+              formControlName="chartGroupTable"
+              required
+              placeholder="Ex: Faturamento"
+            />
+
+            <mat-form-field>
+              <mat-label>Vincular pasta</mat-label>
+              <mat-select formControlName="pathSelected">
+                <mat-option *ngFor="let path of listPaths" [value]="path">
+                  {{ path.name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <button mat-button (click)="createChartGroup()">Adicionar</button>
+          </form>
+          <div class="list-form">
+            <p>Grupos cadastrados</p>
+            <div class="itens-list" *ngFor="let group of listChartGroups">
+              <p>{{ group.name }}</p>
+            </div>
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </form>
+</div>

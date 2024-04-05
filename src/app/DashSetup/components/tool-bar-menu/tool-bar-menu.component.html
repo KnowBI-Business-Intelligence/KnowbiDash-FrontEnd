@@ -1,0 +1,136 @@
+<mat-sidenav-container>
+  <mat-sidenav mode="side" opened>
+    <mat-nav-list class="menu-item-container">
+      <div class="logo">
+        <img src="assets/icons/Logo_principal_horizontal.svg" alt="" />
+      </div>
+
+      <mat-list-item
+        pRipple
+        [routerLink]="['/admin']"
+        routerLinkActive="active"
+        ariaCurrentWhenActive="page"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <div class="container-icon">
+          <fa-icon
+            class="icon"
+            [icon]="icons.home"
+            [size]="'xl'"
+            title="Início"
+          ></fa-icon>
+          <span class="menu-item">Dashboards</span>
+        </div>
+      </mat-list-item>
+
+      <mat-list-item
+        pRipple
+        routerLink="folders"
+        routerLinkActive="active"
+        ariaCurrentWhenActive="page"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <div class="container-icon">
+          <fa-icon
+            class="icon"
+            [icon]="icons.chart"
+            [size]="'xl'"
+            title="Início"
+          ></fa-icon>
+          <span class="menu-item">Gráficos</span>
+        </div>
+      </mat-list-item>
+
+      <mat-list-item
+        pRipple
+        routerLink="users_panel"
+        routerLinkActive="active"
+        ariaCurrentWhenActive="page"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <div class="container-icon">
+          <fa-icon
+            class="icon"
+            [icon]="icons.user"
+            [size]="'xl'"
+            title="Início"
+          ></fa-icon>
+          <span class="menu-item">Usuários</span>
+        </div>
+      </mat-list-item>
+
+      <mat-list-item
+        pRipple
+        routerLink="cofig_db"
+        routerLinkActive="active"
+        ariaCurrentWhenActive="page"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <div class="container-icon">
+          <fa-icon
+            class="icon"
+            [icon]="icons.database"
+            [size]="'xl'"
+            title="Início"
+          ></fa-icon>
+          <span class="menu-item">Database</span>
+        </div>
+      </mat-list-item>
+
+      <mat-list-item
+        pRipple
+        routerLink="profiles_folders"
+        routerLinkActive="active"
+        ariaCurrentWhenActive="page"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <div class="container-icon">
+          <fa-icon
+            class="icon"
+            [icon]="icons.profiles"
+            [size]="'xl'"
+            title="Início"
+          ></fa-icon>
+          <span class="menu-item">Pastas/Perfis</span>
+        </div>
+      </mat-list-item>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <mat-toolbar>
+      <div class="breadcrumbs-menu">
+        <app-breadcrumbs></app-breadcrumbs>
+      </div>
+      <span class="example-spacer"></span>
+
+      <div class="profile-menu">
+        <button
+          mat-icon-button
+          [matMenuTriggerFor]="menu_profile"
+          class="button-profile-menu"
+        >
+          <div *ngIf="showInitials" class="initials">
+            <p>
+              {{ userFirstName }}
+            </p>
+          </div>
+        </button>
+
+        <mat-menu #menu_profile="matMenu" xPosition="before">
+          <p class="container-profile">
+            {{ user?.fullUserName }}
+          </p>
+
+          <mat-divider></mat-divider>
+
+          <button mat-menu-item (click)="logout()">
+            <span class="mat-menu-item">Sair</span>
+          </button>
+        </mat-menu>
+      </div>
+    </mat-toolbar>
+
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>
