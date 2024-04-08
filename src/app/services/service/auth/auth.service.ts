@@ -28,37 +28,16 @@ export class AuthService {
     return credentials;
   }
 
-  register(
-    username: string,
-    occupation: string,
-    email: string,
-    fullusername: string,
-    password: string,
-    access_level: [],
-    profiles: string,
-    headers: HttpHeaders
-  ): Observable<any> {
-    const requestBody = {
-      userName: username,
-      cargo: occupation,
-      email: email,
-      fullUserName: fullusername,
-      passWord: password,
-      roles: [access_level],
-      profiles: [profiles],
-    };
-
-    const headersRgister = {
+  register(userData: any, headers: HttpHeaders): Observable<any> {
+    const headersRegister = {
       headers: headers,
     };
 
-    return this.http
-      .post(`${API_USER}/create`, requestBody, headersRgister)
-      .pipe(
-        catchError((error) => {
-          throw error;
-        })
-      );
+    return this.http.post(`${API_USER}/create`, userData, headersRegister).pipe(
+      catchError((error) => {
+        throw error;
+      })
+    );
   }
 
   edit(

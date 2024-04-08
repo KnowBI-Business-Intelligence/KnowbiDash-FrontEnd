@@ -1,3 +1,9 @@
+<div class="container-nav-line">
+  <span>Início > Usuários</span>
+  <button (click)="backScreen()">
+    <span> x </span>
+  </button>
+</div>
 <div class="container">
   <header>
     <h2>Usuários</h2>
@@ -17,7 +23,7 @@
         dataKey="id"
         selectionMode="single"
         currentPageReportTemplate="Exibindo de {first} a {last} de {totalRecords} registros"
-        scrollHeight="65vh"
+        scrollHeight="60vh"
         [value]="customers"
         [rows]="10"
         [showCurrentPageReport]="true"
@@ -103,22 +109,40 @@
             [state]="{ item: customer }"
           >
             <td>
-              {{ customer.fullUserName }}
+              {{
+                customer.fullUserName.length > 15
+                  ? customer.fullUserName.slice(0, 15) + "..."
+                  : customer.fullUserName
+              }}
             </td>
-            <td>
-              {{ customer.userName }}
-            </td>
-            <td>
-              {{ customer.cargo }}
-            </td>
-
-            <td>
-              {{ customer.email.toLowerCase() }}
-            </td>
-
             <td>
               {{
-                customer.perfis && customer.perfis.length > 0
+                customer.userName.length > 15
+                  ? customer.userName.slice(0, 15) + "..."
+                  : customer.userName
+              }}
+            </td>
+            <td>
+              {{
+                customer.cargo.length > 15
+                  ? customer.cargo.slice(0, 15) + "..."
+                  : customer.cargo
+              }}
+            </td>
+            <td>
+              {{
+                customer.email.toLowerCase().length > 15
+                  ? customer.email.toLowerCase().slice(0, 15) + "..."
+                  : customer.email.toLowerCase()
+              }}
+            </td>
+            <td>
+              {{
+                customer.perfis &&
+                customer.perfis.length > 0 &&
+                customer.perfis[0]?.name.length > 15
+                  ? customer.perfis[0]?.name.slice(0, 15) + "..."
+                  : customer.perfis && customer.perfis.length > 0
                   ? customer.perfis[0]?.name
                   : "Sem perfil"
               }}

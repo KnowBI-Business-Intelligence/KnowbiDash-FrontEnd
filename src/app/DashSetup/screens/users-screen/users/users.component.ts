@@ -21,6 +21,7 @@ import { UserData } from '../../../../../assets/data/users';
 import { AuthService } from '../../../../services/service/auth/auth.service';
 import { StorageService } from '../../../../services/service/user/storage.service';
 import { UserService } from '../../../../services/service/user/user.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-users',
@@ -74,7 +75,8 @@ export class UsersComponent implements OnInit {
     private storageService: StorageService,
     private messageService: MessageService,
     private authService: AuthService,
-    private userService: UserService
+    private userService: UserService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -174,5 +176,9 @@ export class UsersComponent implements OnInit {
     } catch (error) {
       throw error;
     }
+  }
+
+  backScreen() {
+    this.router.navigate(['/admin']);
   }
 }

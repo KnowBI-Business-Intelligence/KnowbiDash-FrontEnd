@@ -2,16 +2,47 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: calc(100svh - 7rem);
+  height: calc(100% - 7rem);
+}
+
+.container-nav-line {
+  width: 60%;
+  padding: 5px 10px;
+  position: relative;
+  top: -48px;
+  left: 19px;
+  align-self: baseline;
+  display: flex;
+}
+
+.container-nav-line span {
+  color: #00000074;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.container-nav-line button {
+  border-radius: 50px;
+  border: solid 0.5px #00000074;
+  color: #00000074;
+  cursor: pointer;
+  margin-left: 5px;
+  height: 20px;
+  width: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .register-user {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
+  align-items: baseline;
+  justify-content: flex-start;
+  width: 100vw;
   height: 100%;
+  padding: 0 30px;
+  margin-top: -40px;
 }
 
 .register-user > h2 {
@@ -24,7 +55,7 @@
 
 .forms {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
 }
 
@@ -33,15 +64,26 @@
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  row-gap: 1.8rem;
-  width: 70%;
-  padding: 2rem 0;
+  row-gap: 1rem;
 }
 
 .form-create-user {
   display: flex;
   flex-direction: column;
   width: 20rem;
+}
+
+.form-create-user-profiles {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 130px;
+}
+
+.mdc-evolution-chip-set__chips {
+  min-width: 100%;
+  flex-wrap: nowrap;
+  overflow: auto;
 }
 
 .form-create-user > label {
@@ -65,24 +107,36 @@
   background-color: #eaeaea;
 }
 
-.button-form {
-  border: none;
-  padding: 0.6rem;
-  font-size: 1.2rem;
-  border-radius: 0.4rem;
+.button-form-cancel {
+  border-radius: 50px;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 15rem;
+  padding: 0.4rem 0.6rem;
+  border: 0.25rem solid transparent;
+  background-color: transparent;
+  color: #000000;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 300;
+  line-height: 1.2rem;
+  margin-right: 1rem;
+  cursor: pointer;
+}
+
+.button-form {
+  border-radius: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 0.4rem 0.6rem;
   border: 0.25rem solid #090238;
   background-color: #090238;
-  box-shadow: 0px 2px 2px 0px #2a2d2e;
   color: #d9dee0;
-  font-size: 1.125rem;
+  font-size: 14px;
   font-style: normal;
-  font-weight: 400;
-  line-height: 1.75rem;
+  font-weight: 300;
+  line-height: 1.2rem;
   margin-top: 3rem;
   cursor: pointer;
 }
@@ -97,5 +151,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 70%;
+  height: 40%;
+  align-self: flex-end;
+  align-items: end;
 }
