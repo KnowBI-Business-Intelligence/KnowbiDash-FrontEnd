@@ -72,11 +72,12 @@ mat-drawer-content {
 
 .container-icon .icon {
   margin-right: 1rem;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .container-icon span {
-  font-size: 0.9rem;
+  font-size: 13px;
+  font-weight: 400;
 }
 
 .container-icon {

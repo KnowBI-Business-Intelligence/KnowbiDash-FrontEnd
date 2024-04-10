@@ -28,6 +28,10 @@ export class AuthService {
     return credentials;
   }
 
+  getById(id_user: number, headers: any): Observable<any> {
+    return this.http.get(`${API_USER}/get/${id_user}`, { headers: headers });
+  }
+
   register(userData: any, headers: HttpHeaders): Observable<any> {
     const headersRegister = {
       headers: headers,
@@ -40,33 +44,12 @@ export class AuthService {
     );
   }
 
-  edit(
-    id_user: number,
-    username: string,
-    occupation: string,
-    email: string,
-    fullusername: string,
-    password: string,
-    access_level: [],
-    profiles: string,
-    headers: any
-  ): Observable<any> {
+  edit(id: number, userData: any, headers: any): Observable<any> {
     const headersRgister = {
       headers: headers,
     };
-
-    const requestBody = {
-      userName: username,
-      cargo: occupation,
-      email: email,
-      fullUserName: fullusername,
-      passWord: password,
-      roles: [access_level],
-      profiles: [profiles],
-    };
-
     return this.http
-      .patch(`${API_USER}/update/${id_user}`, requestBody, headersRgister)
+      .patch(`${API_USER}/update/${id}`, userData, headersRgister)
       .pipe(
         catchError((error) => {
           throw error;

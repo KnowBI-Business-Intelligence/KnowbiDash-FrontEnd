@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { MatListModule } from '@angular/material/list';
 import { RouterModule } from '@angular/router';
@@ -22,6 +22,8 @@ import { AuthService } from '../../../../services/service/auth/auth.service';
 import { StorageService } from '../../../../services/service/user/storage.service';
 import { UserService } from '../../../../services/service/user/user.service';
 import { Router } from '@angular/router';
+import { ContextMenuModule } from 'primeng/contextmenu';
+import { MenuItem } from 'primeng/api';
 
 @Component({
   selector: 'app-users',
@@ -36,6 +38,7 @@ import { Router } from '@angular/router';
     FontAwesomeModule,
     MatListModule,
     RouterModule,
+    ContextMenuModule,
   ],
   providers: [CustomerService, MessageService],
   templateUrl: './users.component.html',
@@ -45,30 +48,31 @@ export class UsersComponent implements OnInit {
   @ViewChild('f') f!: NgForm;
   @ViewChild('customers') tabela!: Table;
 
+  modalVisible: boolean = false;
+  mouseEventPosition: { x: number; y: number } = { x: 0, y: 0 };
+
+  user = this.storageService.getUser();
+  modal: HTMLElement | undefined;
   roles?: any;
   statuses!: any[];
   searchValue?: string;
   users!: Observable<any>;
   rolesOptions: Roles[] | undefined;
-
   customers!: UserData[];
   clonedUsers: { [s: string]: UserData } = {};
   selectedCustomers!: UserData;
-
   loading: boolean = true;
+  items: MenuItem[] | undefined;
+  showModal: boolean = false;
+  isLoginLoading: boolean = false;
+  userName = '';
 
   icons = {
     filter: faFilterCircleXmark,
     closed: faClose,
   };
 
-  allProfiles: string[] = [
-    'Administrador do Sistema',
-    'Faturamento',
-    'Recepção',
-    'Farmácia',
-    'Médico',
-  ];
+  allProfiles: string[] = [];
 
   constructor(
     private customerService: CustomerService,
@@ -76,12 +80,18 @@ export class UsersComponent implements OnInit {
     private messageService: MessageService,
     private authService: AuthService,
     private userService: UserService,
-    private router: Router
+    private router: Router,
+    private elementRef: ElementRef
   ) {}
 
   ngOnInit() {
     this.getInformations();
-
+    this.items = [
+      {
+        label: 'Excluir',
+        command: () => this.openModal(),
+      },
+    ];
     this.rolesOptions = [
       { id: 'user', name: 'Usuário Padrão' },
       { id: 'admin', name: 'Usuário Administrador' },
@@ -180,5 +190,68 @@ export class UsersComponent implements OnInit {
 
   backScreen() {
     this.router.navigate(['/admin']);
+  }
+
+  onRowClick(item: any) {
+    this.router.navigate(['/admin/users_panel/edit_users'], {
+      state: { item: item },
+    });
+  }
+
+  onRowSelect(event: MouseEvent, customer: any) {
+    event.preventDefault();
+    this.selectedCustomers = customer;
+    this.userName = this.selectedCustomers.userName;
+    console.log(this.selectedCustomers);
+  }
+
+  excludeUser() {
+    const userId = this.selectedCustomers.id;
+    console.log(userId);
+    this.isLoginLoading = true;
+    setTimeout(() => {
+      this.isLoginLoading = false;
+    }, 2500);
+
+    if (!this.user || !this.user.token) {
+      console.error('Token não disponível');
+      return;
+    }
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.user.token}`,
+    });
+
+    this.authService.delete(userId, headers).subscribe({
+      next: () => {
+        setTimeout(() => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Sucesso',
+            detail: `Usuário ${this.userName} Excluído`,
+            life: 2500,
+          });
+          this.closeModal();
+          this.isLoginLoading = false;
+        }, 2500);
+      },
+      error: (err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Ocorreu um erro durante a atualização.',
+          life: 2500,
+        });
+        console.error(err);
+      },
+    });
+  }
+
+  openModal(): void {
+    this.showModal = true;
+  }
+
+  closeModal(): void {
+    this.showModal = false;
   }
 }

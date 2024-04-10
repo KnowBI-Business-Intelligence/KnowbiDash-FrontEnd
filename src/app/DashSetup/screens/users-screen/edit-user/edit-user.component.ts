@@ -30,6 +30,8 @@ import { map, Observable, startWith } from 'rxjs';
 import { Roles } from '../../../../../assets/data/roles';
 import { AuthService } from '../../../../services/service/auth/auth.service';
 import { StorageService } from '../../../../services/service/user/storage.service';
+import { ActivatedRoute } from '@angular/router';
+import { ProfilesService } from '../../../../services/service/profiles/profiles.service';
 
 @Component({
   selector: 'app-edit-user',
@@ -56,10 +58,9 @@ export class EditUserComponent implements OnInit {
   announcer = inject(LiveAnnouncer);
 
   item: any;
-
   rolesOptions: Roles[] | undefined;
   role: Roles | undefined;
-
+  isLoginLoading: boolean = false;
   form: any = {
     fullusername: null,
     username: null,
@@ -71,32 +72,34 @@ export class EditUserComponent implements OnInit {
   };
 
   separatorKeysCodes: number[] = [ENTER, COMMA];
-
   filteredProfiles!: Observable<string[]>;
   profiles: string[] = [];
-
-  allProfiles: string[] = ['Administração do Sistema', 'Faturamento'];
-
+  profileIds: string[] = [];
+  allProfiles: { name: string; id: string }[] = [];
   profilesCtrl = new FormControl('');
+  user = this.storageService.getUser();
 
   constructor(
     private authService: AuthService,
     private storageService: StorageService,
     private messageService: MessageService,
+    private profileService: ProfilesService,
     private router: Router
   ) {
     this.filteredProfiles = this.profilesCtrl.valueChanges.pipe(
       startWith(null),
       map((profile: string | null) =>
-        profile ? this._filter(profile) : this.allProfiles.slice()
+        profile
+          ? this._filter(profile)
+          : this.allProfiles.map((profile) => profile.name)
       )
     );
   }
 
   ngOnInit(): void {
-    this.item = this.router.getCurrentNavigation()?.extras.state?.['item'];
-    console.log(this.item);
-
+    this.item = history.state.item;
+    this.loadUserData(this.item.id);
+    this.getProfiles();
     this.rolesOptions = [
       { id: 'user', name: 'Usuário Padrão' },
       { id: 'admin', name: 'Usuário Administrador' },
@@ -106,9 +109,9 @@ export class EditUserComponent implements OnInit {
   private _filter(value: string): string[] {
     const filterValue = value.toLowerCase();
 
-    return this.allProfiles.filter((profiles) =>
-      profiles.toLowerCase().includes(filterValue)
-    );
+    return this.allProfiles
+      .map((profile) => profile.name)
+      .filter((name) => name.toLowerCase().includes(filterValue));
   }
 
   getRolesUp(roles: string | undefined): string {
@@ -146,17 +149,29 @@ export class EditUserComponent implements OnInit {
   }
 
   selectedProfiles($event: MatAutocompleteSelectedEvent) {
-    this.profiles.push($event.option.viewValue);
+    const selectedProfile = this.allProfiles.find(
+      (profile) => profile.name === $event.option.viewValue
+    );
+    if (selectedProfile) {
+      if (!this.profiles.includes(selectedProfile.name)) {
+        this.profiles.push(selectedProfile.name);
+        this.profileIds.push(selectedProfile.id);
+      }
+      console.log(this.profiles);
+      console.log('id ', this.profileIds);
+      const index = this.allProfiles.findIndex(
+        (profile) => profile.name === selectedProfile.name
+      );
+      if (index !== -1) {
+        this.allProfiles.splice(index, 1);
+      }
+    }
     this.profileInput.nativeElement.value = '';
     this.profilesCtrl.setValue(null);
   }
 
   addProfiles($event: MatChipInputEvent) {
     const value = ($event?.value || '').trim();
-
-    if (this.allProfiles.includes(value)) {
-      this.profiles.push(value);
-    }
 
     $event.chipInput!.clear();
 
@@ -167,17 +182,56 @@ export class EditUserComponent implements OnInit {
     const index = this.profiles.indexOf(profile);
 
     if (index >= 0) {
-      this.profiles.splice(index, 1);
+      const removedProfile = this.profiles.splice(index, 1)[0];
+      const removedProfileId = this.profileIds.splice(index, 1)[0];
+
+      const removedProfileObject = {
+        name: removedProfile,
+        id: removedProfileId,
+      };
+
+      this.allProfiles.push(removedProfileObject);
+
+      console.log(
+        `Perfil removido: ${removedProfile}, ID: ${removedProfileId}`
+      );
+
+      console.log('adicionado a todos os perfis', removedProfileObject);
 
       this.announcer.announce(`Removed ${profile}`);
+
+      this.filteredProfiles = this.profilesCtrl.valueChanges.pipe(
+        startWith(null),
+        map((profile: string | null) =>
+          profile
+            ? this._filter(profile)
+            : this.allProfiles.map((profile) => profile.name)
+        )
+      );
     }
   }
 
   onSubmit() {
-    this.editUser();
+    console.log(this.item.id);
+    this.editUser(this.item.id);
   }
 
-  private editUser() {
+  private editUser(id: number) {
+    this.isLoginLoading = true;
+    setTimeout(() => {
+      this.isLoginLoading = false;
+    }, 2500);
+
+    if (this.areRequiredFieldsEmpty()) {
+      this.isLoginLoading = false;
+      this.messageService.add({
+        severity: 'error',
+        summary: '',
+        detail: 'Por favor, preencha todos os campos obrigatórios.',
+      });
+      return;
+    }
+
     const {
       fullusername,
       username,
@@ -185,94 +239,131 @@ export class EditUserComponent implements OnInit {
       email,
       occupation,
       access_level,
-      profiles,
     } = this.form;
 
-    const user = this.storageService.getUser();
-
-    if (!user || !user.token) {
+    if (!this.user || !this.user.token) {
       console.error('Token não disponível');
       return;
     }
 
     const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.user.token}`,
+    });
+
+    const profileIds = this.profileIds.map((profileIds) => profileIds);
+    console.log(profileIds);
+
+    const userData = {
+      fullUserName: fullusername,
+      cargo: occupation,
+      email: email,
+      userName: username,
+      passWord: password,
+      roles: [access_level.id],
+      perfis: profileIds,
+    };
+
+    this.authService.edit(id, userData, headers).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Sucesso',
+          detail: 'Usuário Atualizado!',
+        });
+        setTimeout(() => {
+          this.router.navigate(['/admin/users_panel']);
+          this.isLoginLoading = false;
+        }, 2500);
+        this.f.reset();
+      },
+      error: (err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Ocorreu um erro durante a atualização.',
+        });
+        console.error(err);
+      },
+    });
+  }
+
+  loadUserData(id: number) {
+    if (!this.user || !this.user.token) {
+      console.error('Token não disponível');
+      return;
+    }
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.user.token}`,
+    });
+
+    console.log(headers);
+    this.authService.getById(id, headers).subscribe({
+      next: (userData) => {
+        console.log(userData);
+        this.form.fullusername = userData.fullUserName;
+        this.form.username = userData.userName;
+        this.form.password = userData.password;
+        this.form.email = userData.email;
+        this.form.occupation = userData.cargo;
+        if (userData.perfis && userData.perfis.length > 0) {
+          this.profiles = userData.perfis.map((perfil: any) => perfil.name);
+        } else {
+          this.profiles = [];
+        }
+      },
+      error: (error) => {
+        console.error('Erro ao carregar dados do usuário:', error);
+      },
+    });
+  }
+
+  getProfiles() {
+    const user = this.storageService.getUser();
+    const headers = new HttpHeaders({
       Authorization: `Bearer ${user.token}`,
     });
 
-    this.authService
-      .edit(
-        this.item?.id,
-        !username ? this.item?.userName : username,
-        !occupation ? this.item?.cargo : occupation,
-        !email ? this.item?.email : email,
-        !fullusername ? this.item?.fullUserName : fullusername,
-        !password ? this.item?.password : password,
-        !access_level
-          ? this.getRolesUp(this.item?.roles?.[0])
-          : access_level.id,
-        profiles,
-        headers
-      )
-      .subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Sucesso',
-            detail: 'Usuário Atualizado!',
-          });
+    this.profileService.getProfiles(headers).subscribe({
+      next: (data) => {
+        this.allProfiles = data.map((item: any) => ({
+          name: item.name,
+          id: item.id,
+        }));
+        console.log(this.allProfiles);
 
-          this.f.reset();
-        },
-        error: (err) => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Erro',
-            detail: 'Ocorreu um erro durante a atualização.',
-          });
-          console.error(err);
-        },
-      });
+        this.filteredProfiles = this.profilesCtrl.valueChanges.pipe(
+          startWith(null),
+          map((profile: string | null) =>
+            profile
+              ? this._filter(profile)
+              : this.allProfiles.map((profile) => profile.name)
+          )
+        );
+      },
+    });
+  }
+
+  areRequiredFieldsEmpty(): boolean {
+    const requiredFields = [
+      'fullusername',
+      'username',
+      'password',
+      'access_level',
+    ];
+    for (const key of requiredFields) {
+      if (
+        this.form[key] === null ||
+        this.form[key] === undefined ||
+        this.form[key] === ''
+      ) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  backScreen() {
+    this.router.navigate(['/admin/users_panel']);
   }
 }
-
-// onDeleteDelete() {
-//   const isAdmin = this.infoUsersUserSession.roles[0];
-
-//   if (isAdmin === 'ROLE_ADMIN') {
-//     const user = this.storageService.getUser();
-
-//     if (!user || !user.token) {
-//       console.error('Token não disponível');
-//       return;
-//     }
-
-//     const headers = new HttpHeaders({
-//       Authorization: `Bearer ${user.token}`,
-//     });
-
-//     this.authService.delete(this.infoUsersData?.id, headers).subscribe({
-//       next: () => {
-//         this.messageService.add({
-//           severity: 'success',
-//           summary: 'Sucesso',
-//           detail: 'Usuário Excluído!',
-//         });
-//         this.buttonDeleteCancel = !this.buttonDeleteCancel;
-//         this.buttonDeleteDelete = !this.buttonDeleteDelete;
-//         this.buttonEdit = !this.buttonEdit;
-//         this.buttonDelete = !this.buttonDelete;
-//         this.tabela.reset();
-//       },
-//       error: (err) => {
-//         this.messageService.add({
-//           severity: 'error',
-//           summary: 'Erro',
-//           detail: 'Ocorreu um erro durante a ooperação.',
-//         });
-//         console.error(err);
-//       },
-//     });
-//   } else {
-//     window.alert('não adm');
-//   }
-// }

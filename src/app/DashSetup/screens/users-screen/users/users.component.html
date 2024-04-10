@@ -32,6 +32,8 @@
         [paginator]="true"
         [scrollable]="true"
         [tableStyle]="{ 'min-width': '50rem' }"
+        [(contextMenuSelection)]="selectedCustomers"
+        [contextMenu]="cm"
         [globalFilterFields]="[
           'fullUserName',
           'userName',
@@ -104,9 +106,13 @@
 
         <ng-template pTemplate="body" let-customer>
           <tr
+            #tr
             [pSelectableRow]="customer"
+            (click)="onRowClick(customer)"
+            (contextmenu)="onRowSelect($event, customer)"
             [routerLink]="['edit_users']"
             [state]="{ item: customer }"
+            pContextMenuRow="customer"
           >
             <td>
               {{
@@ -153,17 +159,39 @@
             </td>
           </tr>
         </ng-template>
-
         <ng-template pTemplate="emptymessage">
           <tr>
             <td colspan="7">Sem registros encontrados</td>
           </tr>
         </ng-template>
       </p-table>
+      <p-toast></p-toast>
+      <p-contextMenu #cm [model]="items"></p-contextMenu>
     </div>
-
     <div class="message">
       <p-toast [life]="1500"></p-toast>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal"
+  *ngIf="showModal"
+  id="modal"
+  [style.display]="showModal ? 'flex' : 'none'"
+>
+  <div class="modal-content">
+    <span class="close" (click)="closeModal()">&times;</span>
+    <div>
+      <h2>Tem certeza que deseja excluir o usuário {{ userName }} ?</h2>
+      <p>Esta ação não pode ser desfeita</p>
+      <div class="modal-buttons">
+        <button class="cancel" (click)="closeModal()">cancelar</button>
+        <button class="exclude" (click)="excludeUser()">
+          <span *ngIf="!isLoginLoading">Excluir</span>
+          <span *ngIf="isLoginLoading"><div class="login-spinner"></div></span>
+        </button>
+      </div>
     </div>
   </div>
 </div>

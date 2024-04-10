@@ -60,7 +60,7 @@ export class CreateUserComponent implements OnInit {
 
   rolesOptions: Roles[] | undefined;
   role: Roles | undefined;
-
+  isLoginLoading: boolean = false;
   form: any = {
     fullusername: null,
     username: null,
@@ -115,8 +115,6 @@ export class CreateUserComponent implements OnInit {
       }
       console.log(this.profiles);
       console.log('id ', this.profileIds);
-
-      // Remover o perfil selecionado do array allProfiles
       const index = this.allProfiles.findIndex(
         (profile) => profile.name === selectedProfile.name
       );
@@ -204,6 +202,21 @@ export class CreateUserComponent implements OnInit {
   }
 
   onSubmit() {
+    this.isLoginLoading = true;
+    setTimeout(() => {
+      this.isLoginLoading = false;
+    }, 2500);
+
+    if (this.areRequiredFieldsEmpty()) {
+      this.isLoginLoading = false;
+      this.messageService.add({
+        severity: 'error',
+        summary: '',
+        detail: 'Por favor, preencha todos os campos obrigatórios.',
+      });
+      return;
+    }
+
     const {
       fullusername,
       username,
@@ -235,9 +248,6 @@ export class CreateUserComponent implements OnInit {
       roles: [access_level.id],
       perfis: profileIds,
     };
-
-    console.log('Dados do usuário:', userData);
-
     this.authService.register(userData, headers).subscribe({
       next: () => {
         this.messageService.add({
@@ -246,6 +256,10 @@ export class CreateUserComponent implements OnInit {
           detail: 'Usuário Cadastrado!',
         });
         this.f.reset();
+        setTimeout(() => {
+          this.router.navigate(['/admin/users_panel']);
+          this.isLoginLoading = false;
+        }, 2500);
       },
       error: (err) => {
         this.messageService.add({
@@ -257,6 +271,26 @@ export class CreateUserComponent implements OnInit {
       },
     });
   }
+
+  areRequiredFieldsEmpty(): boolean {
+    const requiredFields = [
+      'fullusername',
+      'username',
+      'password',
+      'access_level',
+    ];
+    for (const key of requiredFields) {
+      if (
+        this.form[key] === null ||
+        this.form[key] === undefined ||
+        this.form[key] === ''
+      ) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   backScreen() {
     this.router.navigate(['/admin/users_panel']);
   }

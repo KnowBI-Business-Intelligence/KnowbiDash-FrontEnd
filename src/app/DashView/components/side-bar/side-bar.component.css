@@ -16,8 +16,6 @@
 }
 
 .mat-sidenav {
-  border-top-right-radius: 0.6rem;
-  border-bottom-right-radius: 0.6rem;
   box-shadow: 6px 7px 10px -1px #e1e1e1bf;
   background-color: #220351;
   display: flex;
@@ -54,6 +52,7 @@
 .icon {
   margin: 0 0.5rem;
   color: #a3a7cb;
+  font-size: 14px;
 }
 .container-icon span,
 .menu-item:hover,

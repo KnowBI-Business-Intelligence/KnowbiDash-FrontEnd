@@ -146,11 +146,12 @@
         class="button-form"
         (click)="onSubmit()"
       >
-        Cadastrar
+        <span *ngIf="!isLoginLoading">Cadastrar</span>
+        <span *ngIf="isLoginLoading"><div class="login-spinner"></div></span>
       </button>
     </div>
     <div class="message">
-      <p-toast [life]="1500"></p-toast>
+      <p-toast [life]="2500"></p-toast>
     </div>
   </div>
 </div>
