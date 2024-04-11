@@ -61,6 +61,7 @@ import { TIComponent } from './DashView/screens/ti-screen/ti-component/ti-compon
 import { TIScreenComponent } from './DashView/screens/ti-screen/ti-screen.component';
 import { WorkOrdersComponent } from './DashView/screens/ti-screen/work-orders/work-orders.component';
 import { AuthGuard } from './services/guards/auth-guard.guard';
+import { ChartGroupsComponent } from './DashView/screens/chart-groups/chart-groups.component';
 
 export const routes: Routes = [
   {
@@ -560,8 +561,18 @@ export const routes: Routes = [
       },
       {
         path: 'main',
-        title: 'Koios - Painel',
-        component: MainScreenComponent,
+        children: [
+          {
+            path: '',
+            title: 'Koios - Painel',
+            component: MainScreenComponent,
+          },
+          {
+            path: 'chartgroup',
+            title: 'Koios - grupos',
+            component: ChartGroupsComponent,
+          },
+        ],
       },
       {
         path: 'assistant',

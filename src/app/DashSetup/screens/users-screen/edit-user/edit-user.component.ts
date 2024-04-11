@@ -77,6 +77,7 @@ export class EditUserComponent implements OnInit {
   profileIds: string[] = [];
   allProfiles: { name: string; id: string }[] = [];
   profilesCtrl = new FormControl('');
+  placeholder: string = '';
   user = this.storageService.getUser();
 
   constructor(
@@ -114,41 +115,8 @@ export class EditUserComponent implements OnInit {
       .filter((name) => name.toLowerCase().includes(filterValue));
   }
 
-  getRolesUp(roles: string | undefined): string {
-    try {
-      switch (roles) {
-        case 'ROLE_ADMIN':
-          return 'admin';
-
-        case 'ROLE_MOD':
-          return 'mod';
-
-        default:
-          return 'user';
-      }
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  getRoles(roles: string): string {
-    try {
-      switch (roles) {
-        case 'ROLE_ADMIN':
-          return 'Usuário Administrador';
-
-        case 'ROLE_MODERATOR':
-          return 'Usuário Moderador';
-
-        default:
-          return 'Usuário Padrão';
-      }
-    } catch (error) {
-      throw error;
-    }
-  }
-
   selectedProfiles($event: MatAutocompleteSelectedEvent) {
+    console.log('teste');
     const selectedProfile = this.allProfiles.find(
       (profile) => profile.name === $event.option.viewValue
     );
@@ -259,9 +227,11 @@ export class EditUserComponent implements OnInit {
       email: email,
       userName: username,
       passWord: password,
-      roles: [access_level.id],
+      roles: [access_level],
       perfis: profileIds,
     };
+
+    console.log(userData);
 
     this.authService.edit(id, userData, headers).subscribe({
       next: () => {
@@ -297,7 +267,6 @@ export class EditUserComponent implements OnInit {
       Authorization: `Bearer ${this.user.token}`,
     });
 
-    console.log(headers);
     this.authService.getById(id, headers).subscribe({
       next: (userData) => {
         console.log(userData);
@@ -306,11 +275,24 @@ export class EditUserComponent implements OnInit {
         this.form.password = userData.password;
         this.form.email = userData.email;
         this.form.occupation = userData.cargo;
+        this.placeholder = userData.roles[0].name;
+
+        if (this.placeholder == 'ROLE_USER') {
+          this.placeholder = 'Usuário Padrão';
+          this.form.access_level = 'user';
+        } else if (this.placeholder == 'ROLE_ADMIN') {
+          this.placeholder = 'Usuário Administrador';
+          this.form.access_level = 'admin';
+        }
+
         if (userData.perfis && userData.perfis.length > 0) {
           this.profiles = userData.perfis.map((perfil: any) => perfil.name);
+          this.profileIds = userData.perfis.map((perfil: any) => perfil.id);
         } else {
           this.profiles = [];
+          this.profileIds = [];
         }
+        console.log(this.form.access_level);
       },
       error: (error) => {
         console.error('Erro ao carregar dados do usuário:', error);
@@ -330,7 +312,6 @@ export class EditUserComponent implements OnInit {
           name: item.name,
           id: item.id,
         }));
-        console.log(this.allProfiles);
 
         this.filteredProfiles = this.profilesCtrl.valueChanges.pipe(
           startWith(null),

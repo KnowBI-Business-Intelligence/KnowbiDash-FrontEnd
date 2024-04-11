@@ -1,5 +1,32 @@
 <div class="container">
-  <div class="info">
+  <div class="container-path">
+    <div class="container-path-header">
+      <img src="../../../../assets/icons/icone_solido_6.png" alt="" />
+      <span>Pastas</span>
+    </div>
+    <div *ngFor="let perfil of perfis">
+      <div class="container-path-body-profile-label">
+        <span
+          >Do perfil <strong>{{ perfil }}</strong></span
+        >
+        <div class="container-path-body">
+          <button
+            class="container-path-button"
+            *ngFor="let path of pathsByProfile[perfil]"
+            (click)="openChartGroup(path.chartGroups)"
+          >
+            <img src="../../../../assets/icons/folder.svg" alt="" />
+            <span>{{
+              path.name.length > 25
+                ? path.name.substring(0, 25) + "..."
+                : path.name
+            }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--<div class="info">
     <h1>Bem-vindo à Koios</h1>
     <p>Nossa ferramenta para dashboards em versão beta!</p>
     <div class="text">
@@ -20,5 +47,5 @@
         satisfatória!
       </p>
     </div>
-  </div>
+  </div>-->
 </div>

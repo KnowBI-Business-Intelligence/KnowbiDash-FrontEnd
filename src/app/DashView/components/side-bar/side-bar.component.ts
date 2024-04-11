@@ -97,7 +97,7 @@ export class SideBarComponent implements OnInit {
 
     if (this.user) {
       const name = this.user.fullUserName.split(' ');
-      this.userFirstName = name[0];
+      this.userFirstName = name[0].charAt(0).toUpperCase();
     }
 
     this.eventSearch.on('logout', () => {
