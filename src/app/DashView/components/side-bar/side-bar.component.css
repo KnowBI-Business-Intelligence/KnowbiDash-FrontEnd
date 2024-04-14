@@ -71,11 +71,9 @@
 }
 
 .button {
-  margin: 0 0.6rem;
   color: #fff;
   transition: 300ms ease-in-out;
   transform: rotate(0deg);
-
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -102,6 +100,8 @@
 .dashboard-label {
   font-size: 14px;
   color: #00000095;
+  border-right: solid 0.5px #e7e7e7;
+  padding-right: 20px;
 }
 
 .dashboard-label img {

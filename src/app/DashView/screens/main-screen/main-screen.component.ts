@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { StorageService } from '../../../services/service/user/storage.service';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../services/service/auth/auth.service';
+import { HttpHeaders } from '@angular/common/http';
 
 @Component({
   selector: 'app-main-screen',
@@ -15,7 +17,12 @@ export class MainScreenComponent implements OnInit {
   perfis: string[] = [];
   pathsByProfile: { [key: string]: any[] } = {};
 
-  constructor(private token: StorageService, private router: Router) {}
+  constructor(
+    private token: StorageService,
+    private router: Router,
+    private authService: AuthService,
+    private storageService: StorageService
+  ) {}
 
   ngOnInit(): void {
     this.initUserData();
@@ -23,12 +30,28 @@ export class MainScreenComponent implements OnInit {
 
   initUserData() {
     this.user = this.token.getUser();
+    this.getUserById(this.user.id, this.user.token);
+    console.log(this.user);
+  }
 
-    this.user.profiles.forEach((profile: any) => {
+  getUserById(id: number, token: any) {
+    const user = this.storageService.getUser();
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${user.token}`,
+    });
+
+    this.authService.getById(id, headers).subscribe({
+      next: (data) => {
+        this.processData(data);
+      },
+    });
+  }
+
+  processData(data: any) {
+    data.perfis.forEach((profile: any) => {
       const paths: string[] = [];
       if (profile && profile.chartPaths) {
         profile.chartPaths.forEach((chartPath: any) => {
-          console.log('Chart Path:', chartPath);
           paths.push(chartPath);
         });
       }
@@ -38,7 +61,8 @@ export class MainScreenComponent implements OnInit {
   }
 
   openChartGroup(pathObj: any) {
-    localStorage.setItem('selectedChartPath', JSON.stringify(pathObj));
+    console.log('pathOBJ ', pathObj);
+    localStorage.setItem('selectedChartPath', JSON.stringify(pathObj.id));
     this.router.navigate(['/content/main/chartgroup']);
   }
 }

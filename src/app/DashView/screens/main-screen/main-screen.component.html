@@ -1,7 +1,9 @@
 <div class="container">
   <div class="container-path">
     <div class="container-path-header">
-      <img src="../../../../assets/icons/icone_solido_6.png" alt="" />
+      <span>Pastas</span>
+    </div>
+    <div class="container-path-header-two">
       <span>Pastas</span>
     </div>
     <div *ngFor="let perfil of perfis">
@@ -13,7 +15,7 @@
           <button
             class="container-path-button"
             *ngFor="let path of pathsByProfile[perfil]"
-            (click)="openChartGroup(path.chartGroups)"
+            (click)="openChartGroup(path)"
           >
             <img src="../../../../assets/icons/folder.svg" alt="" />
             <span>{{

@@ -28,8 +28,20 @@ export class AuthService {
     return credentials;
   }
 
-  getById(id_user: number, headers: any): Observable<any> {
-    return this.http.get(`${API_USER}/get/${id_user}`, { headers: headers });
+  getUsersInfo(headers: HttpHeaders): Observable<any> {
+    const myHeaders = {
+      headers: headers,
+    };
+
+    return this.http.get(`${API_USER}/get`, myHeaders);
+  }
+
+  getById(id: any, headers: HttpHeaders): Observable<any> {
+    const myHeaders = {
+      headers: headers,
+    };
+
+    return this.http.get(`${API_USER}/get/${id}`, myHeaders);
   }
 
   register(userData: any, headers: HttpHeaders): Observable<any> {

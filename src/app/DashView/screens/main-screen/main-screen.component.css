@@ -19,10 +19,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-.container-path-header img {
-  width: 35px;
+  position: fixed;
+  top: 17px;
+  left: 244px;
 }
 
 .container-path-header span {

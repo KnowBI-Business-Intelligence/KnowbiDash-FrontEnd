@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
@@ -46,6 +46,7 @@ import { BreadcrumbsComponent } from '../breadcrumbs/breadcrumbs.component';
   styleUrl: './side-bar.component.css',
 })
 export class SideBarComponent implements OnInit {
+  matsidenav: HTMLElement | null = null;
   private roles: string[] = [];
 
   isLoggedIn: boolean = false;
@@ -77,12 +78,13 @@ export class SideBarComponent implements OnInit {
     private tokenService: StorageService,
     private eventSearch: EventSearchService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private elementRef: ElementRef
   ) {}
 
   ngOnInit(): void {
     this.isLoggedIn = !!this.tokenService.getToken();
-
+    this.sidenavToggleWidth(this.isExpanded);
     if (this.isLoggedIn) {
       this.user = this.tokenService.getUser();
 
@@ -119,9 +121,21 @@ export class SideBarComponent implements OnInit {
 
   toggleExpandedCollapsed() {
     this.isExpanded = !this.isExpanded;
+    this.sidenavToggleWidth(this.isExpanded);
   }
 
   toggleCollapsed() {
     this.isExpanded = false;
+    this.sidenavToggleWidth(this.isExpanded);
+  }
+
+  sidenavToggleWidth(isExpanded: boolean) {
+    this.matsidenav =
+      this.elementRef.nativeElement.querySelector('#matsidenav');
+    if (this.isExpanded) {
+      this.matsidenav!.style.width = '200px';
+    } else {
+      this.matsidenav!.style.width = '56px';
+    }
   }
 }

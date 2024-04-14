@@ -1,0 +1,56 @@
+<div class="container">
+  <div class="container-path">
+    <div class="container-path-header">
+      <span>Pastas > grupos > Gráficos</span>
+      <button (click)="backScreen()">
+        <span> x </span>
+      </button>
+    </div>
+    <div class="container-path-body"></div>
+  </div>
+  <div class="container-charts">
+    <div class="left">
+      <div class="l-top">
+        <div
+          *ngFor="let chartConfig of chartGroupsData"
+          class="chart-container"
+        >
+          <highcharts-chart
+            [Highcharts]="Highcharts"
+            [options]="chartConfig"
+          ></highcharts-chart>
+        </div>
+      </div>
+      <!--<div class="l-bottom">
+        <highcharts-chart
+          style="width: 18rem; height: 16rem"
+          [Highcharts]="Highcharts"
+          [options]="chartLeftBottom_One"
+        >
+        </highcharts-chart>
+        <highcharts-chart
+          style="width: 18rem; height: 16rem"
+          [Highcharts]="Highcharts"
+          [options]="chartLeftBottom_Two"
+        >
+        </highcharts-chart>
+      </div>-->
+    </div>
+    <!--<div class="right">
+      <highcharts-chart
+        style="width: 20rem; height: 38rem"
+        [Highcharts]="Highcharts"
+        [options]="chartRigth_One"
+      >
+      </highcharts-chart>
+    </div>
+    <div class="right">
+      <highcharts-chart
+        style="width: 20rem; height: 38rem"
+        [Highcharts]="Highcharts"
+        [options]="chartRigth_One"
+      >
+      </highcharts-chart>
+    </div>-->
+  </div>
+</div>

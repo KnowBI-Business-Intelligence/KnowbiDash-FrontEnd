@@ -1,5 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { ChartsService } from '../../../services/service/charts/charts.service';
+import { StorageService } from '../../../services/service/user/storage.service';
+import { HttpHeaders } from '@angular/common/http';
+
+interface Group {
+  id: string; // Adjust the type of id if necessary (could be number or string based on your actual data)
+  name: string;
+}
+
 @Component({
   selector: 'app-chart-groups',
   standalone: true,
@@ -9,36 +19,55 @@ import { CommonModule } from '@angular/common';
 })
 export class ChartGroupsComponent implements OnInit {
   selectedChartPath: any;
-  groups: string[] = [];
+  groups: Group[] = [];
   chartgroups: { [key: string]: any[] } = {};
 
-  constructor() {}
+  constructor(
+    private router: Router,
+    private chartService: ChartsService,
+    private storageService: StorageService
+  ) {}
 
   ngOnInit(): void {
-    /*this.selectedChartPath = JSON.parse(
-      localStorage.getItem('selectedChartPath') || 'null'
-    );
-    console.log('armazenado', this.selectedChartPath);*/
-    this.initData();
+    this.getChartGroups();
   }
 
-  initData() {
+  getChartGroups(): void {
+    const user = this.storageService.getUser();
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${user.token}`,
+    });
+
+    this.chartService.getChartGroup(headers).subscribe({
+      next: (data) => {
+        this.initData(data);
+      },
+    });
+  }
+
+  initData(data: any) {
     this.selectedChartPath = JSON.parse(
       localStorage.getItem('selectedChartPath') || 'null'
     );
-    console.log(this.selectedChartPath);
 
-    this.selectedChartPath.forEach((chartGroups: any) => {
-      const group: any[] = []; // Criar um novo array para cada grupo
+    data.forEach((dataItem: any) => {
+      const group: any[] = [];
+      if (dataItem.chartPath.id == this.selectedChartPath) {
+        group.push(dataItem);
 
-      group.push(chartGroups);
-
-      this.chartgroups[chartGroups.name] = group;
-      this.groups.push(chartGroups.name);
+        this.chartgroups[dataItem.name] = group;
+        this.groups.push(dataItem);
+      }
     });
   }
 
   callCharts(groupName: any) {
     console.log(groupName);
+    localStorage.setItem('chartGroup', JSON.stringify(groupName));
+    this.router.navigate(['/content/main/charts']);
+  }
+
+  backScreen() {
+    this.router.navigate(['/content/main']);
   }
 }

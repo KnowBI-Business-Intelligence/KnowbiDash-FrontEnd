@@ -1,17 +1,21 @@
 <div class="container">
   <div class="container-path">
     <div class="container-path-header">
-      <img src="../../../../assets/icons/icone_solido_6.png" alt="" />
-      <span>Pastas > Grupos</span>
-    </div>
-    <ng-container *ngFor="let group of groups">
-      <button
-        class="container-path-button"
-        (click)="callCharts(chartgroups[group])"
-      >
-        <img src="../../../../assets/icons/folder.svg" alt="" />
-        <span>{{ group }}</span>
+      <span>Pastas > grupos</span>
+      <button (click)="backScreen()">
+        <span> x </span>
       </button>
-    </ng-container>
+    </div>
+    <div class="container-path-header-two">
+      <span>Grupos</span>
+    </div>
+    <div class="container-path-body">
+      <ng-container *ngFor="let group of groups">
+        <button class="container-path-button" (click)="callCharts(group.id)">
+          <img src="../../../../assets/icons/folder.svg" alt="" />
+          <span>{{ group.name }}</span>
+        </button>
+      </ng-container>
+    </div>
   </div>
 </div>
