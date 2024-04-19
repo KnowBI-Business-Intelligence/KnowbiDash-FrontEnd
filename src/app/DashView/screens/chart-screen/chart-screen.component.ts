@@ -9,6 +9,19 @@ import { HttpHeaders } from '@angular/common/http';
 import { ChartsService } from '../../../services/service/charts/charts.service';
 import { FormsModule } from '@angular/forms';
 
+interface ChartData {
+  id: string;
+  title: string;
+  graphType: string;
+  xAxisColumns: any[];
+  yAxisColumns: any[];
+  filters: any[];
+}
+
+interface ExtendedOptions extends Highcharts.Options {
+  filters?: any;
+}
+
 @Component({
   selector: 'app-chart-screen',
   standalone: true,
@@ -26,6 +39,10 @@ export class ChartScreenComponent implements AfterViewInit {
   chartObject: any;
   checkedValues: any = {};
 
+  originalChartData: ChartData[] = [];
+  chartData: ChartData[] = [];
+  copydataJSON: any[] = [];
+
   showModal: boolean = false;
   isLoginLoading: boolean = false;
 
@@ -37,6 +54,10 @@ export class ChartScreenComponent implements AfterViewInit {
     this.loadingScreen = true;
   }
 
+  ngAfterViewInit(): void {
+    this.getCharts();
+  }
+
   getCharts(): void {
     const user = this.storageService.getUser();
     const headers = new HttpHeaders({
@@ -45,18 +66,21 @@ export class ChartScreenComponent implements AfterViewInit {
 
     this.chartService.getCharts(headers).subscribe({
       next: (data) => {
+        this.originalChartData = data;
         this.loadData(data);
       },
     });
   }
 
-  loadData(chartData: any) {
+  loadData(chartData: ChartData[]) {
     this.chartObject = JSON.parse(localStorage.getItem('chartGroup') || 'null');
     this.chartGroupsData = [];
+    this.copydataJSON = [];
     this.filters = [];
 
     chartData.forEach((chart: any) => {
-      if (chart.chartGroup.id == this.chartObject) {
+      if (chart.chartGroup && chart.chartGroup.id == this.chartObject) {
+        // Verificação de nulidade adicionada
         chart.filters.forEach((filter: any) => {
           const existingFilter = this.filters.find(
             (f) => f.column === filter.column[0]
@@ -69,7 +93,8 @@ export class ChartScreenComponent implements AfterViewInit {
             this.filters.push({
               column: filter.column[0],
               values: filter.value,
-              dataType: 'string', // Aqui você pode determinar o tipo de dados do filtro
+              dataType: 'string',
+              identifiers: filter.identifiers,
             });
           }
         });
@@ -79,7 +104,7 @@ export class ChartScreenComponent implements AfterViewInit {
     chartData.forEach((dataItem: any) => {
       if (dataItem.chartGroup.id == this.chartObject) {
         const seriesData: any[] = [];
-
+        this.copydataJSON.push(dataItem);
         dataItem.xAxisColumns.forEach((xAxisColumn: any, index: number) => {
           const yAxisColumn = dataItem.yAxisColumns[index];
           const seriesName = yAxisColumn ? yAxisColumn.name[0] : '';
@@ -99,7 +124,7 @@ export class ChartScreenComponent implements AfterViewInit {
           });
         });
 
-        const chartConfig: Highcharts.Options = {
+        const chartConfig: ExtendedOptions = {
           chart: {
             type: dataItem.graphType,
           },
@@ -124,11 +149,14 @@ export class ChartScreenComponent implements AfterViewInit {
           tooltip: {
             shared: true,
           },
+          filters: dataItem.filters,
         };
 
         this.chartGroupsData.push(chartConfig);
       }
     });
+
+    console.log(this.copydataJSON);
   }
 
   onCheckboxChange(column: string, value: string) {
@@ -150,18 +178,115 @@ export class ChartScreenComponent implements AfterViewInit {
   updateDropdownLabel(column: string): void {
     if (this.checkedValues[column] && this.checkedValues[column].length > 0) {
       this.selectedFilters[column] = this.checkedValues[column].join(', ');
-      console.log('column: ', this.selectedFilters);
     } else {
       this.selectedFilters[column] = 'Todos';
-      console.log('column: ', this.selectedFilters);
     }
   }
 
-  backScreen() {
-    this.router.navigate(['/content/main/chartgroup']);
+  executeFilter() {
+    if (this.copydataJSON.length > 0) {
+      const filteredChartData = JSON.parse(JSON.stringify(this.copydataJSON));
+      for (const chartGroup of filteredChartData) {
+        if (chartGroup.filters) {
+          for (const filter of chartGroup.filters) {
+            const selectedValue = this.selectedFilters[filter.column[0]];
+            if (selectedValue && selectedValue !== 'Todos') {
+              filter.value = [selectedValue];
+            }
+          }
+        }
+      }
+      this.updateChartGroupsData(filteredChartData);
+    }
+  }
+
+  updateChartGroupsData(filteredChartData: any[]) {
+    filteredChartData.forEach((data: any) => {
+      data.xAxisColumns.forEach((dat: any) => {
+        dat.data = [];
+      });
+      this.updateChart(
+        data.id,
+        data.sql,
+        data.xAxisColumns,
+        data.yAxisColumns,
+        data.filters
+      );
+    });
+  }
+
+  updateChart(
+    id: string,
+    sql: string,
+    xAxisColumns: any[],
+    yAxisColumns: any[],
+    filters: any[]
+  ) {
+    console.log(id, sql, xAxisColumns, yAxisColumns, filters);
+
+    const formattedXAxisColumns = xAxisColumns.map((column) => ({
+      name: column.column,
+      identifiers: column.name,
+    }));
+
+    const formattedYAxisColumns = yAxisColumns.map((column) => ({
+      name: column.column,
+      identifiers: column.name,
+    }));
+
+    const formattedFilters = filters.map((filter) => ({
+      column: filter.column,
+      operator: filter.operator,
+      value: filter.value,
+      identifiers: filter.identifiers,
+    }));
+
+    const requestData = {
+      sql: sql,
+      xAxisColumns: formattedXAxisColumns,
+      yAxisColumns: formattedYAxisColumns,
+      filters: formattedFilters,
+    };
+
+    console.log('Dados formatados:', requestData);
+
+    const user = this.storageService.getUser();
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${user.token}`,
+    });
+    this.chartService.updateCharts(id, requestData, headers).subscribe({
+      next: (data) => {
+        console.log('Gráfico atualizado:', data);
+        this.getCharts();
+        this.chartGroupsData = [];
+        this.copydataJSON = [];
+      },
+      error: (error) => {
+        console.error('Erro ao atualizar o gráfico:', error);
+      },
+    });
   }
 
   openModal(): void {
+    let filterValuesByColumn: { [key: string]: string[] } = {};
+
+    this.chartGroupsData.forEach((data: any) => {
+      data.filters.forEach((filter: any) => {
+        if (!(filter.column[0] in filterValuesByColumn)) {
+          filterValuesByColumn[filter.column[0]] = [];
+        }
+        filter.value.forEach((value: string) => {
+          if (!filterValuesByColumn[filter.column[0]].includes(value)) {
+            filterValuesByColumn[filter.column[0]].push(value);
+          }
+        });
+      });
+    });
+
+    this.filters.forEach((filter: any) => {
+      filter.values = filterValuesByColumn[filter.column];
+    });
+
     this.showModal = true;
   }
 
@@ -169,15 +294,7 @@ export class ChartScreenComponent implements AfterViewInit {
     this.showModal = false;
   }
 
-  executeFilter() {
-    this.isLoginLoading = true;
-    setTimeout(() => {
-      this.isLoginLoading = false;
-    }, 2500);
-    alert('tanka');
-  }
-
-  ngAfterViewInit(): void {
-    this.getCharts();
+  backScreen() {
+    this.router.navigate(['/content/main/chartgroup']);
   }
 }

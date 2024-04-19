@@ -61,7 +61,7 @@
     </div>
     <div class="modal-body">
       <div class="modal-fields" *ngFor="let filter of filters">
-        <label for="filter.column">{{ filter.column }}</label>
+        <label for="filter.column">{{ filter.identifiers }}</label>
         <div class="dropdown">
           <button class="dropbtn">
             {{ selectedFilters[filter.column] || "Todos" }}

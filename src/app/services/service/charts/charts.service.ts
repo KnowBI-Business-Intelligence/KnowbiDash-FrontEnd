@@ -136,18 +136,14 @@ export class ChartsService {
 
   updateCharts(
     id: string,
-    name: string,
-    pgTableName: string,
-    chartPath: {},
+    data: any, // Alterado para aceitar um objeto de dados
     headers: HttpHeaders
   ) {
-    const myHeaders = {
+    const options = {
       headers: headers,
     };
 
-    const body = { name, pgTableName, chartPath };
-
-    return this.http.patch(`${this.ENV_CHARTS}/update/${id}`, body, myHeaders);
+    return this.http.patch(`${this.ENV_CHARTS}/update/${id}`, data, options);
   }
 
   updateChartGroupSQL(
