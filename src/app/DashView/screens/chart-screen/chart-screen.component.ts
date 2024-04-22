@@ -29,7 +29,7 @@ interface ExtendedOptions extends Highcharts.Options {
   templateUrl: './chart-screen.component.html',
   styleUrl: './chart-screen.component.css',
 })
-export class ChartScreenComponent implements AfterViewInit {
+export class ChartScreenComponent implements OnInit {
   loadingScreen!: boolean;
   Highcharts: typeof Highcharts = Highcharts;
 
@@ -54,7 +54,7 @@ export class ChartScreenComponent implements AfterViewInit {
     this.loadingScreen = true;
   }
 
-  ngAfterViewInit(): void {
+  ngOnInit(): void {
     this.getCharts();
   }
 
@@ -80,7 +80,6 @@ export class ChartScreenComponent implements AfterViewInit {
 
     chartData.forEach((chart: any) => {
       if (chart.chartGroup && chart.chartGroup.id == this.chartObject) {
-        // Verificação de nulidade adicionada
         chart.filters.forEach((filter: any) => {
           const existingFilter = this.filters.find(
             (f) => f.column === filter.column[0]
@@ -93,8 +92,8 @@ export class ChartScreenComponent implements AfterViewInit {
             this.filters.push({
               column: filter.column[0],
               values: filter.value,
-              dataType: 'string',
               identifiers: filter.identifiers,
+              allfilters: filter.allfilters,
             });
           }
         });
@@ -160,19 +159,24 @@ export class ChartScreenComponent implements AfterViewInit {
   }
 
   onCheckboxChange(column: string, value: string) {
-    if (this.checkedValues[column] === undefined) {
+    if (!this.checkedValues[column]) {
       this.checkedValues[column] = [];
     }
 
     const index = this.checkedValues[column].indexOf(value);
     if (index === -1) {
       this.checkedValues[column].push(value);
-      console.log(`Checkbox marcado para ${value}`);
     } else {
       this.checkedValues[column].splice(index, 1);
-      console.log(`Checkbox desmarcado para ${value}`);
     }
+
     this.updateDropdownLabel(column);
+  }
+
+  isChecked(column: string, value: string): boolean {
+    return (
+      this.checkedValues[column] && this.checkedValues[column].includes(value)
+    );
   }
 
   updateDropdownLabel(column: string): void {
@@ -183,6 +187,11 @@ export class ChartScreenComponent implements AfterViewInit {
     }
   }
 
+  allValuesMatchAllFilters(values: any[], allFilters: any[]): boolean {
+    console.log(values, allFilters);
+    return values.every((value) => allFilters.includes(value));
+  }
+
   executeFilter() {
     if (this.copydataJSON.length > 0) {
       const filteredChartData = JSON.parse(JSON.stringify(this.copydataJSON));
@@ -191,7 +200,7 @@ export class ChartScreenComponent implements AfterViewInit {
           for (const filter of chartGroup.filters) {
             const selectedValue = this.selectedFilters[filter.column[0]];
             if (selectedValue && selectedValue !== 'Todos') {
-              filter.value = [selectedValue];
+              filter.value = selectedValue.split(', ');
             }
           }
         }
@@ -222,8 +231,6 @@ export class ChartScreenComponent implements AfterViewInit {
     yAxisColumns: any[],
     filters: any[]
   ) {
-    console.log(id, sql, xAxisColumns, yAxisColumns, filters);
-
     const formattedXAxisColumns = xAxisColumns.map((column) => ({
       name: column.column,
       identifiers: column.name,

@@ -51,6 +51,10 @@
 .filter-filters-data span {
   font-size: 10px;
   margin-left: 5px;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .kill-filter {
@@ -170,12 +174,12 @@ strong {
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
+  flex-wrap: wrap;
   height: 95%;
   width: 100%;
 }
 
 .chart-container {
-  width: 100%;
   display: flex;
 }
 
@@ -185,7 +189,7 @@ strong {
   z-index: 999;
   right: 0;
   top: 90px;
-  height: 80%;
+  height: 86.6%;
   max-width: 80%;
   overflow: hidden;
   display: flex;

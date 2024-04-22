@@ -8,16 +8,8 @@
   <div class="filter-container">
     <div class="filter-filters" *ngFor="let filter of filters">
       <div class="filter-filters-data">
-        <h3>{{ filter.column }}</h3>
-        <span>Todos</span>
-        <!-- Aqui você pode adicionar o valor padrão para cada filtro -->
-      </div>
-      <div>
-        <button class="kill-filter">
-          <span class="material-symbols-outlined kill-filter-icon">
-            close
-          </span>
-        </button>
+        <h3>{{ filter.identifiers }}</h3>
+        <span [title]="filter.values">{{ filter.values }}</span>
       </div>
     </div>
   </div>
@@ -37,7 +29,7 @@
     <div class="left">
       <div *ngFor="let chartConfig of chartGroupsData" class="chart-container">
         <highcharts-chart
-          style="width: 25rem; height: 20rem; margin: 10px"
+          style="width: 20rem; height: 20rem; margin: 5px"
           [Highcharts]="Highcharts"
           [options]="chartConfig"
         ></highcharts-chart>
@@ -67,11 +59,11 @@
             {{ selectedFilters[filter.column] || "Todos" }}
           </button>
           <div class="dropdown-content">
-            <!-- Valor padrão -->
-            <div class="dropdown-cl" *ngFor="let value of filter.values">
+            <div class="dropdown-cl" *ngFor="let value of filter.allfilters">
               <div>
                 <input
                   type="checkbox"
+                  [checked]="isChecked(filter.column, value)"
                   (change)="onCheckboxChange(filter.column, value)"
                 />
               </div>
