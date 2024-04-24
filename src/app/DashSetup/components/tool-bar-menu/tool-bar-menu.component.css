@@ -1,5 +1,23 @@
+.example-container {
+  width: 400px;
+  height: 200px;
+  margin: 12px;
+  border: 1px solid #555;
+}
+
+mat-drawer-content {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
 .mat-sidenav-container {
   height: 100vh;
+}
+
+.mat-drawer-inner-container {
+  overflow: hidden;
 }
 
 .mat-sidenav {
@@ -7,18 +25,27 @@
   align-items: center;
   justify-content: space-between;
   flex-direction: column;
-  width: 12rem;
+  width: 4.5rem;
   border-right-width: 2px;
   background-color: #fafafa;
   border-right-color: #e6e6e6;
+  transition: 0.5s;
+  overflow: hidden;
+}
+
+.sidenav-collapsed {
+  width: 12rem;
 }
 
 .logo {
   margin: 1rem auto;
+  position: absolute;
+  top: -5px;
+  left: 15px;
 }
 
 .logo img {
-  width: 6rem;
+  width: 7.5rem;
 }
 
 .menu-item-container {
@@ -27,6 +54,8 @@
   align-items: center;
   justify-content: space-between;
   row-gap: 0.6rem;
+  overflow: hidden;
+  margin-top: 70px;
 }
 
 .menu-item-content {
@@ -43,10 +72,12 @@
 
 .container-icon .icon {
   margin-right: 1rem;
+  font-size: 12px;
 }
 
 .container-icon span {
-  font-size: 0.9rem;
+  font-size: 13px;
+  font-weight: 400;
 }
 
 .container-icon {
@@ -62,6 +93,24 @@
   font-size: 1rem;
   font-weight: bold;
   margin-right: 2rem;
+}
+
+.open-close-sidenav {
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  border-radius: 50px;
+  transition: 0.5s;
+  background-color: #e8e9f2;
+  padding: 8px;
+  height: 40px;
+  position: fixed;
+  bottom: 10px;
+  left: 17px;
+}
+
+.open-close-sidenav:hover {
+  background-color: #a3a7cb;
 }
 
 .active .icon,
@@ -91,6 +140,7 @@
   align-items: center;
   background-color: transparent;
   height: 4rem;
+  border-bottom: solid 0.2px #e6e6e6;
 }
 
 .profile-menu {
@@ -109,12 +159,12 @@
   align-items: center;
   border: 1px solid #ced4d7;
   background-color: #abbac015;
-  width: 9rem;
-  height: 2rem;
-  border-radius: 1rem;
-  margin-right: 1rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50px;
+  margin-right: 0.5rem;
   cursor: pointer;
-  padding: 1rem;
+  padding: 0px;
 }
 
 .button-profile-menu:active {
@@ -129,12 +179,12 @@
 
 .initials {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   color: #08051c;
   width: 100%;
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: 20px;
+  font-weight: 400;
   line-height: 1.2rem;
   margin: 10px;
 }

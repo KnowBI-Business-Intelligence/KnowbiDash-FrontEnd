@@ -1,5 +1,5 @@
 <mat-sidenav-container>
-  <mat-sidenav #sidenav mode="side" opened="isExpanded">
+  <mat-sidenav id="matsidenav" #sidenav mode="side" opened="isExpanded">
     <mat-nav-list class="menu-item-container">
       <mat-list-item (click)="toggleExpandedCollapsed()">
         <fa-icon
@@ -107,10 +107,12 @@
 
   <mat-sidenav-content>
     <mat-toolbar>
-      <div class="breadcrumbs-menu">
-        <app-breadcrumbs></app-breadcrumbs>
-      </div>
-
+      <span class="dashboard-label">
+        <img
+          src="../../../../assets/images/logo_principal_reduzida.png"
+          alt=""
+        />
+      </span>
       <div class="profile-menu">
         <button
           mat-icon-button
@@ -122,7 +124,6 @@
             <p>
               {{ userFirstName }}
             </p>
-            <fa-icon [icon]="icons.profile" aria-hidden="true"></fa-icon>
           </div>
         </button>
 

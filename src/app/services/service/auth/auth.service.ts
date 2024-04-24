@@ -28,66 +28,40 @@ export class AuthService {
     return credentials;
   }
 
-  register(
-    username: string,
-    occupation: string,
-    email: string,
-    fullusername: string,
-    password: string,
-    access_level: [],
-    profiles: string,
-    headers: HttpHeaders
-  ): Observable<any> {
-    const requestBody = {
-      userName: username,
-      cargo: occupation,
-      email: email,
-      fullUserName: fullusername,
-      passWord: password,
-      roles: [access_level],
-      profiles: [profiles],
-    };
-
-    const headersRgister = {
+  getUsersInfo(headers: HttpHeaders): Observable<any> {
+    const myHeaders = {
       headers: headers,
     };
 
-    return this.http
-      .post(`${API_USER}/create`, requestBody, headersRgister)
-      .pipe(
-        catchError((error) => {
-          throw error;
-        })
-      );
+    return this.http.get(`${API_USER}/get`, myHeaders);
   }
 
-  edit(
-    id_user: number,
-    username: string,
-    occupation: string,
-    email: string,
-    fullusername: string,
-    password: string,
-    access_level: [],
-    profiles: string,
-    headers: any
-  ): Observable<any> {
-    const headersRgister = {
+  getById(id: any, headers: HttpHeaders): Observable<any> {
+    const myHeaders = {
       headers: headers,
     };
 
-    const requestBody = {
-      userName: username,
-      cargo: occupation,
-      email: email,
-      fullUserName: fullusername,
-      passWord: password,
-      roles: [access_level],
-      profiles: [profiles],
+    return this.http.get(`${API_USER}/get/${id}`, myHeaders);
+  }
+
+  register(userData: any, headers: HttpHeaders): Observable<any> {
+    const headersRegister = {
+      headers: headers,
     };
 
+    return this.http.post(`${API_USER}/create`, userData, headersRegister).pipe(
+      catchError((error) => {
+        throw error;
+      })
+    );
+  }
+
+  edit(id: number, userData: any, headers: any): Observable<any> {
+    const headersRgister = {
+      headers: headers,
+    };
     return this.http
-      .patch(`${API_USER}/update/${id_user}`, requestBody, headersRgister)
+      .patch(`${API_USER}/update/${id}`, userData, headersRgister)
       .pipe(
         catchError((error) => {
           throw error;

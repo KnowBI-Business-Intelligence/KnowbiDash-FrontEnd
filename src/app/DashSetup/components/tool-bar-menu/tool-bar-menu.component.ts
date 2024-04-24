@@ -1,9 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  OnInit,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -22,6 +29,12 @@ import { BreadcrumbsComponent } from '../../../DashView/components/breadcrumbs/b
 import { AuthService } from '../../../services/service/auth/auth.service';
 import { BreadrumbsService } from '../../../services/service/breadcrumb/breadrumbs.service';
 import { StorageService } from '../../../services/service/user/storage.service';
+import { MatIconModule } from '@angular/material/icon';
+
+interface SideNavTogle {
+  screenWidth: number;
+  collapsed: boolean;
+}
 
 @Component({
   selector: 'app-tool-bar-menu',
@@ -37,12 +50,16 @@ import { StorageService } from '../../../services/service/user/storage.service';
     MatSidenavModule,
     MatListModule,
     BreadcrumbsComponent,
+    MatIconModule,
   ],
   providers: [MessageService, BreadrumbsService, CustomerService],
   templateUrl: './tool-bar-menu.component.html',
   styleUrl: './tool-bar-menu.component.css',
 })
 export class ToolBarMenuComponent implements OnInit {
+  @Output() onToggleSideNav: EventEmitter<SideNavTogle> = new EventEmitter();
+  collapsed = false;
+  screenWidth = 0;
   private roles: string[] = [];
 
   isLoggedIn: boolean = false;
@@ -65,7 +82,8 @@ export class ToolBarMenuComponent implements OnInit {
   constructor(
     private auth: AuthService,
     private token: StorageService,
-    private router: Router
+    private router: Router,
+    private elementref: ElementRef
   ) {}
 
   ngOnInit(): void {
@@ -81,8 +99,9 @@ export class ToolBarMenuComponent implements OnInit {
 
     if (this.user) {
       const name = this.user.fullUserName.split(' ');
-      this.userFirstName = name[0];
+      this.userFirstName = name[0].charAt(0).toUpperCase();
     }
+    console.log(this.user);
   }
 
   logout() {
@@ -95,5 +114,17 @@ export class ToolBarMenuComponent implements OnInit {
         console.error('erro logout', e);
       },
     });
+  }
+
+  toggleCollapse(): void {
+    this.collapsed = !this.collapsed;
+    this.onToggleSideNav.emit({
+      collapsed: this.collapsed,
+      screenWidth: this.screenWidth,
+    });
+  }
+
+  toggleClose() {
+    this.collapsed = false;
   }
 }

@@ -15,13 +15,32 @@
 }
 
 .container-path-header {
-  width: 75.3px;
+  width: 117px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   position: fixed;
   top: 17px;
   left: 244px;
+}
+
+.container-path-header span {
+  color: #00000074;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.container-path-header button {
+  border-radius: 50px;
+  border: solid 0.5px #00000074;
+  color: #00000074;
+  cursor: pointer;
+  margin-left: 5px;
+  height: 20px;
+  width: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .container-path-header span {
@@ -76,42 +95,7 @@ strong {
   font-size: 13px;
 }
 
-.info {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-around;
-  width: 100%;
-}
-
-.info h1 {
-  font-size: 2.4rem;
-  color: #19191b;
-  margin-bottom: 4rem;
-}
-
-.info p {
-  font-size: 1.2rem;
-  color: #19191b;
-  line-height: 2rem;
-  margin-bottom: 2rem;
-}
-
-.text {
-  width: 70vw;
-  text-align: justify;
-}
-
-.footer {
-  display: flex;
-  flex-direction: column;
-  justify-content: start;
-  margin-top: 5rem;
-}
-
-.footer span {
-  display: block;
-  font-weight: bold;
-  margin-top: 20px;
-  color: #807b7b;
+.chart-container {
+  width: 300px;
+  height: 300px;
 }

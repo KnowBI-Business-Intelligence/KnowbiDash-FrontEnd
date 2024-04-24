@@ -39,12 +39,20 @@ export class ChartsService {
     return this.http.get(`${this.ENV_CHARTPATH}/get`, myHeaders);
   }
 
+  getChartsPathById(id: number, headers: any): Observable<any> {
+    return this.http.get(`${API_CHARTPATH}/get/${id}`, { headers: headers });
+  }
+
   getChartGroup(headers: HttpHeaders): Observable<any> {
     const myHeaders = {
       headers: headers,
     };
 
     return this.http.get(`${this.ENV_CHARTGROUP}/get`, myHeaders);
+  }
+
+  getChartsGroupById(id: number, headers: any): Observable<any> {
+    return this.http.get(`${API_CHARTGROUP}/get/${id}`, { headers: headers });
   }
 
   // CREATES
@@ -128,18 +136,14 @@ export class ChartsService {
 
   updateCharts(
     id: string,
-    name: string,
-    pgTableName: string,
-    chartPath: {},
+    data: any, // Alterado para aceitar um objeto de dados
     headers: HttpHeaders
   ) {
-    const myHeaders = {
+    const options = {
       headers: headers,
     };
 
-    const body = { name, pgTableName, chartPath };
-
-    return this.http.patch(`${this.ENV_CHARTS}/update/${id}`, body, myHeaders);
+    return this.http.patch(`${this.ENV_CHARTS}/update/${id}`, data, options);
   }
 
   updateChartGroupSQL(

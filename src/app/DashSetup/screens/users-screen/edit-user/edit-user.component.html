@@ -1,10 +1,21 @@
+<div class="container-nav-line">
+  <span>Início > Usuários > Editar</span>
+  <button (click)="backScreen()">
+    <span> x </span>
+  </button>
+</div>
 <div class="conteiner">
   <div class="register-user">
     <h2>Editar Usuário</h2>
     <div class="forms">
-      <form class="form-register" name="form-create-user" #f="ngForm">
+      <form
+        autocomplete="off"
+        class="form-register"
+        name="form-create-user"
+        #f="ngForm"
+      >
         <div class="form-create-user">
-          <label for="fullnameuser">Nome do funcionário: </label>
+          <label for="fullnameuser">Nome Completo: </label>
           <input
             autocomplete="off"
             type="text"
@@ -12,7 +23,7 @@
             [(ngModel)]="form.fullusername"
             #fullusername="ngModel"
             [ngClass]="{ 'is-invalid': f.submitted && fullusername.errors }"
-            [placeholder]="item.fullUserName"
+            placeholder="Ex: João da Silva"
           />
         </div>
 
@@ -25,7 +36,7 @@
             [(ngModel)]="form.username"
             #username="ngModel"
             [ngClass]="{ 'is-invalid': f.submitted && username.errors }"
-            [placeholder]="item.userName"
+            placeholder="Ex: NomeUsuario"
           />
         </div>
 
@@ -56,7 +67,7 @@
             minlength="6"
             #occupation="ngModel"
             [ngClass]="{ 'is-invalid': f.submitted && occupation.errors }"
-            [placeholder]="item.cargo"
+            placeholder="Ex: Analista Jr"
           />
         </div>
 
@@ -72,7 +83,7 @@
             minlength="6"
             #email="ngModel"
             [ngClass]="{ 'is-invalid': f.submitted && email.errors }"
-            [placeholder]="item.email"
+            placeholder="Ex: email@email.com"
           />
         </div>
 
@@ -82,15 +93,15 @@
             name="access_level"
             [options]="rolesOptions"
             [(ngModel)]="form.access_level"
-            [placeholder]="getRoles(item.roles[0].name)"
+            placeholder="{{ placeholder }}"
             optionLabel="name"
             #access_level="ngModel"
             [ngClass]="{ 'is-invalid': f.submitted && access_level.errors }"
           ></p-dropdown>
         </div>
 
-        <mat-form-field class="form-create-user">
-          <mat-label>Adicione um perfil</mat-label>
+        <mat-form-field class="form-create-user-profiles">
+          <mat-label>Adicione perfis</mat-label>
           <mat-chip-grid #chipGrid aria-label="Profile selection">
             @for (profile of profiles; track profile) {
             <mat-chip-row (removed)="removeProfile(profile)">
@@ -128,7 +139,7 @@
         pButton
         pRipple
         type="button"
-        class="button-form"
+        class="button-form-cancel"
         [routerLink]="['../']"
       >
         Cancelar
@@ -140,11 +151,12 @@
         class="button-form"
         (click)="onSubmit()"
       >
-        Alterar
+        <span *ngIf="!isLoginLoading">Atualizar</span>
+        <span *ngIf="isLoginLoading"><div class="login-spinner"></div></span>
       </button>
     </div>
     <div class="message">
-      <p-toast [life]="1500"></p-toast>
+      <p-toast [life]="2500"></p-toast>
     </div>
   </div>
 </div>

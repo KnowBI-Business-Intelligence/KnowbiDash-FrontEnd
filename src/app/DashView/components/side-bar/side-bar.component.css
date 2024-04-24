@@ -16,8 +16,6 @@
 }
 
 .mat-sidenav {
-  border-top-right-radius: 0.6rem;
-  border-bottom-right-radius: 0.6rem;
   box-shadow: 6px 7px 10px -1px #e1e1e1bf;
   background-color: #220351;
   display: flex;
@@ -54,6 +52,7 @@
 .icon {
   margin: 0 0.5rem;
   color: #a3a7cb;
+  font-size: 14px;
 }
 .container-icon span,
 .menu-item:hover,
@@ -72,11 +71,9 @@
 }
 
 .button {
-  margin: 0 0.6rem;
   color: #fff;
   transition: 300ms ease-in-out;
   transform: rotate(0deg);
-
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -88,11 +85,27 @@
 }
 
 .mat-toolbar {
+  padding: 0 25px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   background-color: transparent;
-  height: 4rem;
+  height: 3.5rem;
+  background-color: #ffffff;
+  box-shadow: -1px 0px 5px 1px rgba(211, 211, 211, 0.51);
+  -webkit-box-shadow: -1px 0px 5px 1px rgba(211, 211, 211, 0.51);
+  -moz-box-shadow: -1px 0px 5px 1px rgba(211, 211, 211, 0.51);
+}
+
+.dashboard-label {
+  font-size: 14px;
+  color: #00000095;
+  border-right: solid 0.5px #e7e7e7;
+  padding-right: 20px;
+}
+
+.dashboard-label img {
+  width: 100px;
 }
 
 .profile-menu {
@@ -109,14 +122,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 1px solid #ced4d7;
-  background-color: #abbac015;
-  width: 9rem;
-  height: 2rem;
+  border: 1px solid #22035145;
+  background-color: #ffffff;
+  width: 32px;
+  height: 32px;
   border-radius: 1rem;
-  margin-right: 1rem;
   cursor: pointer;
-  padding: 1rem;
 }
 
 .button-profile-menu:active {
@@ -133,7 +144,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: #08051c;
+  color: #00000095;
   width: 100%;
   font-size: 0.9rem;
   font-weight: 500;

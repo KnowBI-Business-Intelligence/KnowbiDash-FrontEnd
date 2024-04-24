@@ -203,6 +203,7 @@ export const routes: Routes = [
           breadcrumb: '',
         },
       },
+
       {
         path: 'main',
         title: 'Koios - Painel',

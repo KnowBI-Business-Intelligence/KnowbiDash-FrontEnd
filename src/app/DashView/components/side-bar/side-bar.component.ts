@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit } from '@angular/core';
 import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -41,6 +41,7 @@ import { BreadcrumbsComponent } from '../breadcrumbs/breadcrumbs.component';
   styleUrl: './side-bar.component.css',
 })
 export class SideBarComponent implements OnInit {
+  matsidenav: HTMLElement | null = null;
   private roles: string[] = [];
 
   isLoggedIn: boolean = false;
@@ -72,12 +73,13 @@ export class SideBarComponent implements OnInit {
     private tokenService: StorageService,
     private eventSearch: EventSearchService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private elementRef: ElementRef
   ) {}
 
   ngOnInit(): void {
     this.isLoggedIn = !!this.tokenService.getToken();
-
+    this.sidenavToggleWidth(this.isExpanded);
     if (this.isLoggedIn) {
       this.user = this.tokenService.getUser();
       this.roles = this.user.roles;
@@ -90,7 +92,7 @@ export class SideBarComponent implements OnInit {
 
     if (this.user) {
       const name = this.user.fullUserName.split(' ');
-      this.userFirstName = name[0];
+      this.userFirstName = name[0].charAt(0).toUpperCase();
     }
 
     this.eventSearch.on('logout', () => {
@@ -112,9 +114,21 @@ export class SideBarComponent implements OnInit {
 
   toggleExpandedCollapsed() {
     this.isExpanded = !this.isExpanded;
+    this.sidenavToggleWidth(this.isExpanded);
   }
 
   toggleCollapsed() {
     this.isExpanded = false;
+    this.sidenavToggleWidth(this.isExpanded);
+  }
+
+  sidenavToggleWidth(isExpanded: boolean) {
+    this.matsidenav =
+      this.elementRef.nativeElement.querySelector('#matsidenav');
+    if (this.isExpanded) {
+      this.matsidenav!.style.width = '200px';
+    } else {
+      this.matsidenav!.style.width = '56px';
+    }
   }
 }
