@@ -21,13 +21,13 @@ import { MessageService } from 'primeng/api';
 import { DropdownModule } from 'primeng/dropdown';
 import { ToastModule } from 'primeng/toast';
 import { Observable } from 'rxjs';
-import { Roles } from '../../../../../assets/data/roles';
-import { AuthService } from '../../../../services/service/auth/auth.service';
-import { StorageService } from '../../../../services/service/user/storage.service';
-import { UserService } from '../../../../services/service/user/user.service';
+import { Roles } from '../../../../assets/data/roles';
+import { AuthService } from '../../../services/service/auth/auth.service';
+import { StorageService } from '../../../services/service/user/storage.service';
+import { UserService } from '../../../services/service/user/user.service';
 
 @Component({
-  selector: 'app-settings-adm',
+  selector: 'app-settings-user',
   standalone: true,
   imports: [
     CommonModule,
@@ -43,10 +43,10 @@ import { UserService } from '../../../../services/service/user/user.service';
     AsyncPipe,
   ],
   providers: [MessageService],
-  templateUrl: './settings-adm.component.html',
-  styleUrl: './settings-adm.component.css',
+  templateUrl: './settings-user.component.html',
+  styleUrl: './settings-user.component.css',
 })
-export class SettingsAdmComponent implements OnInit {
+export class SettingsUserComponent implements OnInit {
   @ViewChild('profileInput') profileInput!: ElementRef<HTMLInputElement>;
 
   rolesOptions: Roles[] | undefined;

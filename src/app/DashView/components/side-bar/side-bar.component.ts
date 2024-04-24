@@ -1,11 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { Router, RouterModule, RouterOutlet } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faAtom,
@@ -18,7 +17,6 @@ import {
   faUser,
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
-import { RippleModule } from 'primeng/ripple';
 import { AuthService } from '../../../services/service/auth/auth.service';
 import { BreadrumbsService } from '../../../services/service/breadcrumb/breadrumbs.service';
 import { EventSearchService } from '../../../services/service/event/event-search.service';
@@ -30,13 +28,10 @@ import { BreadcrumbsComponent } from '../breadcrumbs/breadcrumbs.component';
   standalone: true,
   imports: [
     RouterModule,
-    RippleModule,
     CommonModule,
-    RouterOutlet,
     FontAwesomeModule,
     MatMenuModule,
     MatSidenavModule,
-    MatIconModule,
     MatListModule,
     MatToolbarModule,
     BreadcrumbsComponent,
@@ -85,9 +80,7 @@ export class SideBarComponent implements OnInit {
 
     if (this.isLoggedIn) {
       this.user = this.tokenService.getUser();
-
       this.roles = this.user.roles;
-
       this.showPanelAdmin = this.roles.includes('ROLE_ADMIN');
       this.showPanelModerator = this.roles.includes('ROLE_MODERATOR');
       this.showPanelUser = this.roles.includes('ROLE_USER');

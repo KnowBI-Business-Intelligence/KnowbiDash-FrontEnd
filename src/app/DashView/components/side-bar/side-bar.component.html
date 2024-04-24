@@ -71,41 +71,11 @@
         </div>
       </mat-list-item>
 
-      <mat-list-item
-        pRipple
-        routerLink="dash"
-        routerLinkActive="active"
-        ariaCurrentWhenActive="page"
-        [routerLinkActiveOptions]="{ exact: true }"
-        ><div (click)="toggleCollapsed()" class="container-icon-icon">
-          <div class="container-icon" *ngIf="!isExpanded">
-            <fa-icon
-              class="icon"
-              title="Dashboards"
-              [icon]="icons.dash"
-              [size]="'xl'"
-            ></fa-icon>
-          </div>
-        </div>
-        <div (click)="toggleCollapsed()" class="container-icon-span">
-          <div class="container-text" *ngIf="isExpanded">
-            <fa-icon
-              class="icon"
-              [icon]="icons.dash"
-              [size]="'xl'"
-              title="Dashboards"
-            ></fa-icon>
-            <span class="menu-item">Dashboards</span>
-          </div>
-        </div>
-      </mat-list-item>
-
       <!-- NAV User -->
 
       <mat-list-item
         pRipple
-        *ngIf="showPanelUser"
-        routerLink="default_user"
+        routerLink="settings"
         routerLinkActive="active"
         ariaCurrentWhenActive="page"
         [routerLinkActiveOptions]="{ exact: true }"
@@ -131,19 +101,6 @@
             <span class="menu-item">Usuário</span>
           </div>
         </div>
-      </mat-list-item>
-
-      <mat-list-item
-        pRipple
-        routerLink="login"
-        routerLinkActive="active"
-        ariaCurrentWhenActive="page"
-        [routerLinkActiveOptions]="{ exact: true }"
-        (click)="logout()"
-        *ngIf="isExpanded"
-      >
-        <fa-icon class="icon" [icon]="icons.logout" [size]="'xl'"></fa-icon>
-        <span *ngIf="isExpanded" class="menu-item">Sair</span>
       </mat-list-item>
     </mat-nav-list>
   </mat-sidenav>
