@@ -1,9 +1,10 @@
 <div *ngIf="isLoading" id="loading-screen">
   <div class="spinner"></div>
 </div>
+
 <div class="container">
   <div class="col-md-12">
-    <div class="card card-container">
+    <div class="card card-container" *ngIf="isModal">
       <div class="card-logo">
         <img
           class="card-logo-icon"
@@ -89,4 +90,14 @@
   <footer>
     <span>Todos os direitos reservados &copy;2024</span>
   </footer>
+
+  <div class="modal-choice-view" *ngIf="!isModal">
+    <div class="content-modal">
+      <span>Você deseja entrar em qual aplicação?</span>
+      <div class="buttons">
+        <button (click)="defaultOrAdm(false)">Padrão</button>
+        <button (click)="defaultOrAdm(true)">Administrador</button>
+      </div>
+    </div>
+  </div>
 </div>

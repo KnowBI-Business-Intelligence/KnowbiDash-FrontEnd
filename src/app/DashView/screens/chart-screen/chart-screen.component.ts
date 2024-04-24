@@ -1,13 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { HttpHeaders } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { SkeletonModule } from 'primeng/skeleton';
-import { StorageService } from '../../../services/service/user/storage.service';
-import { HttpHeaders } from '@angular/common/http';
 import { ChartsService } from '../../../services/service/charts/charts.service';
-import { FormsModule } from '@angular/forms';
+import { StorageService } from '../../../services/service/user/storage.service';
 
 interface ChartData {
   id: string;
@@ -295,10 +295,6 @@ export class ChartScreenComponent implements OnInit {
     });
 
     this.showModal = true;
-  }
-
-  closeModal(): void {
-    this.showModal = false;
   }
 
   backScreen() {

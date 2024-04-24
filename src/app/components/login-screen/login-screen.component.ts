@@ -26,8 +26,11 @@ import { StorageService } from '../../services/service/user/storage.service';
   styleUrl: './login-screen.component.css',
 })
 export class LoginScreenComponent implements OnInit {
+  isADM!: boolean;
   isLoading: boolean = true;
+  isModal: boolean = true;
   isLoginLoading: boolean = false;
+
   form: any = {
     username: null,
     password: null,
@@ -49,7 +52,29 @@ export class LoginScreenComponent implements OnInit {
 
     setTimeout(() => {
       this.isLoading = false;
-    }, 3000);
+    }, 1000); // padrão: 3000
+  }
+
+  defaultOrAdm(isAdmin: boolean): void {
+    if (isAdmin) {
+      this.redirectUser(isAdmin);
+    } else {
+      this.redirectUser(isAdmin);
+    }
+  }
+
+  redirectUser(isAdmin: boolean): void {
+    if (isAdmin == true) {
+      setTimeout(() => {
+        this.routes.navigate(['admin']);
+        this.isLoginLoading = false;
+      }, 1000); // padrão: 2000
+    } else if (isAdmin == false) {
+      setTimeout(() => {
+        this.routes.navigate(['content']);
+        this.isLoginLoading = false;
+      }, 1000); // padrão: 2000
+    }
   }
 
   onSubmit(): void {
@@ -63,14 +88,14 @@ export class LoginScreenComponent implements OnInit {
         this.roles = this.storageService.getUser().roles;
         if (this.roles.includes('ROLE_ADMIN')) {
           setTimeout(() => {
-            this.routes.navigate(['admin']);
             this.isLoginLoading = false;
-          }, 2000);
+            this.isModal = false;
+          }, 1000); // padrão: 2000
         } else {
           setTimeout(() => {
             this.routes.navigate(['content']);
             this.isLoginLoading = false;
-          }, 2000);
+          }, 1000); // padrão: 2000
         }
       },
       error: (err) => {
@@ -78,7 +103,7 @@ export class LoginScreenComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Erro',
-          detail: 'Erro na autenticação. ',
+          detail: 'Erro na autenticação.',
         });
         throw err;
       },
