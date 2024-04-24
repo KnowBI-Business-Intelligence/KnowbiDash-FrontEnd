@@ -188,10 +188,6 @@ export class UsersComponent implements OnInit {
     }
   }
 
-  backScreen() {
-    this.router.navigate(['/admin']);
-  }
-
   onRowClick(item: any) {
     this.router.navigate(['/admin/users_panel/edit_users'], {
       state: { item: item },
@@ -253,5 +249,9 @@ export class UsersComponent implements OnInit {
 
   closeModal(): void {
     this.showModal = false;
+  }
+
+  backScreen() {
+    this.router.navigate(['/admin']);
   }
 }

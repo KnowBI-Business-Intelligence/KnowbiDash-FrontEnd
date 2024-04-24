@@ -102,27 +102,29 @@ export class ChartScreenComponent implements OnInit {
 
     chartData.forEach((dataItem: any) => {
       if (dataItem.chartGroup.id == this.chartObject) {
-        const seriesData: any[] = [];
         this.copydataJSON.push(dataItem);
-        dataItem.xAxisColumns.forEach((xAxisColumn: any, index: number) => {
-          const yAxisColumn = dataItem.yAxisColumns[index];
-          const seriesName = yAxisColumn ? yAxisColumn.name[0] : '';
+        const uniqueCategories: any = Array.from(
+          new Set(dataItem.xAxisColumns[0].data)
+        );
 
-          const seriesValues = xAxisColumn.data.map((value: any, i: number) => {
-            const yValue = yAxisColumn ? parseFloat(yAxisColumn.data[i]) : null;
+        const uniqueSubgroups = Array.from(new Set(dataItem.series[0].data));
 
-            return {
-              name: value,
-              y: yValue,
-            };
+        const seriesData = uniqueSubgroups.map((subgrupo: any) => {
+          const seriesValues: { name: string; y: any }[] = [];
+          dataItem.xAxisColumns[0].data.forEach((date: string, i: number) => {
+            if (dataItem.series[0].data[i] === subgrupo) {
+              seriesValues.push({
+                name: date,
+                y: dataItem.yAxisColumns[0].data[i],
+              });
+            }
           });
-
-          seriesData.push({
-            name: seriesName,
+          return {
+            type: dataItem.graphType,
+            name: subgrupo,
             data: seriesValues,
-          });
+          };
         });
-
         const chartConfig: ExtendedOptions = {
           chart: {
             type: dataItem.graphType,
@@ -134,7 +136,7 @@ export class ChartScreenComponent implements OnInit {
             },
           },
           xAxis: {
-            categories: dataItem.xAxisColumns[0].data,
+            categories: uniqueCategories,
             title: {
               text: dataItem.xAxisColumns[0].name[0],
             },
@@ -147,6 +149,18 @@ export class ChartScreenComponent implements OnInit {
           series: seriesData,
           tooltip: {
             shared: true,
+          },
+          plotOptions: {
+            series: {
+              cursor: 'pointer',
+              point: {
+                events: {
+                  click: function () {
+                    console.log('Coluna clicada:', this.category, this.y);
+                  },
+                },
+              },
+            },
           },
           filters: dataItem.filters,
         };

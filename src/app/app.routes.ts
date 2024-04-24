@@ -18,51 +18,18 @@ import { EditUserComponent } from './DashSetup/screens/users-screen/edit-user/ed
 import { UsersScreenComponent } from './DashSetup/screens/users-screen/users-screen.component';
 import { UsersComponent } from './DashSetup/screens/users-screen/users/users.component';
 import { AssistantScreenComponent } from './DashView/screens/assistant-screen/assistant-screen.component';
-import { BillingComponentsComponent } from './DashView/screens/billing-screen/billing-components/billing-components.component';
-import { BillingScreenComponent } from './DashView/screens/billing-screen/billing-screen.component';
-import { RecipeComponent } from './DashView/screens/billing-screen/recipe/recipe.component';
 import { ContentDashComponent } from './DashView/screens/content-dash/content-dash.component';
 import { ContentScreenComponent } from './DashView/screens/content-screen/content-screen.component';
 import { DashboardsScreenComponent } from './DashView/screens/dashboards-screen/dashboards-screen.component';
-import { EmergencyServicesComponentComponent } from './DashView/screens/emergency-services-screen/emergency-services-component/emergency-services-component.component';
-import { EmergencyServicesScreenComponent } from './DashView/screens/emergency-services-screen/emergency-services-screen.component';
-import { MatMedComponent } from './DashView/screens/emergency-services-screen/mat-med/mat-med.component';
-import { ServiceComponent } from './DashView/screens/emergency-services-screen/service-care/service.component';
-import { TimeComponent } from './DashView/screens/emergency-services-screen/time/time.component';
-import { AccountsPayableComponent } from './DashView/screens/finance-screen/accounts-payable/accounts-payable.component';
-import { AccountsReceivableComponent } from './DashView/screens/finance-screen/accounts-receivable/accounts-receivable.component';
-import { BankControlComponent } from './DashView/screens/finance-screen/bank-control/bank-control.component';
-import { CashFlowComponent } from './DashView/screens/finance-screen/cash-flow/cash-flow.component';
-import { FinanceComponentsComponent } from './DashView/screens/finance-screen/finance-components/finance-components.component';
-import { FinanceScreenComponent } from './DashView/screens/finance-screen/finance-screen.component';
-import { ReturnOfAgreementsComponent } from './DashView/screens/finance-screen/return-of-agreements/return-of-agreements.component';
-import { TransferThirdPartiesComponent } from './DashView/screens/finance-screen/transfer-third-parties/transfer-third-parties.component';
-import { TreasuryComponent } from './DashView/screens/finance-screen/treasury/treasury.component';
 import { MainScreenComponent } from './DashView/screens/main-screen/main-screen.component';
 import { PageNotFoundComponent } from './DashView/screens/page-not-found/page-not-found.component';
-import { EmployeeProductivityComponentComponent } from './DashView/screens/pharmacy-screen/employee-productivity-component/employee-productivity-component.component';
-import { GeneralProductivityComponentComponent } from './DashView/screens/pharmacy-screen/general-productivity-component/general-productivity-component.component';
-import { InventoryComponentComponent } from './DashView/screens/pharmacy-screen/inventory-component/inventory-component.component';
-import { LossOfStockComponentComponent } from './DashView/screens/pharmacy-screen/loss-of-stock-component/loss-of-stock-component.component';
-import { NonStandardComponentComponent } from './DashView/screens/pharmacy-screen/non-standard-component/non-standard-component.component';
-import { PharmacyCompomentComponent } from './DashView/screens/pharmacy-screen/pharmacy-compoment/pharmacy-compoment.component';
-import { PharmacyScreenComponent } from './DashView/screens/pharmacy-screen/pharmacy-screen.component';
-import { PrescribedUsedComponentComponent } from './DashView/screens/pharmacy-screen/prescribed-used-component/prescribed-used-component.component';
-import { ProductionTimeComponentComponent } from './DashView/screens/pharmacy-screen/production-time-component/production-time-component.component';
-import { NotificationComponent } from './DashView/screens/quality-screen/notification/notification.component';
-import { QualityComponentComponent } from './DashView/screens/quality-screen/quality-component/quality-component.component';
-import { QualityScreenComponent } from './DashView/screens/quality-screen/quality-screen.component';
-import { ServiceQualityComponent } from './DashView/screens/quality-screen/service-quality/service-quality.component';
-import { ConsumptionComponentComponent } from './DashView/screens/supplies-screen/consumption-component/consumption-component.component';
-import { SuppliesComponentComponent } from './DashView/screens/supplies-screen/supplies-component/supplies-component.component';
-import { SuppliesScreenComponent } from './DashView/screens/supplies-screen/supplies-screen.component';
-import { ProductivityComponent } from './DashView/screens/ti-screen/productivity/productivity.component';
-import { TIComponent } from './DashView/screens/ti-screen/ti-component/ti-component.component';
-import { TIScreenComponent } from './DashView/screens/ti-screen/ti-screen.component';
-import { WorkOrdersComponent } from './DashView/screens/ti-screen/work-orders/work-orders.component';
 import { AuthGuard } from './services/guards/auth-guard.guard';
 import { ChartGroupsComponent } from './DashView/screens/chart-groups/chart-groups.component';
 import { ChartScreenComponent } from './DashView/screens/chart-screen/chart-screen.component';
+import { DashboardsComponent } from './DashSetup/screens/dashboards/dashboards.component';
+import { DashboardsViewComponent } from './DashSetup/screens/dashboards/dashboards-view/dashboards-view.component';
+import { ViewCreateComponent } from './DashSetup/screens/dashboards/view-create/view-create.component';
+import { ViewEditComponent } from './DashSetup/screens/dashboards/view-edit/view-edit.component';
 
 export const routes: Routes = [
   {
@@ -121,54 +88,78 @@ export const routes: Routes = [
         ],
       },
       {
-        path: 'folders',
-        component: FoldersScreenComponent,
-        title: 'Koios - Pastas',
+        path: 'dashboards',
+        component: DashboardsComponent,
+        title: 'Koios - Dashboards',
         data: {
-          breadcrumb: 'Pastas',
+          breadcrumb: 'Dashboards',
         },
         children: [
           {
             path: '',
-            component: FoldersComponent,
-            title: 'Koios - Criar Pastas',
+            component: DashboardsViewComponent,
+            title: 'Koios - Dashboards',
             data: {
-              breadcrumb: '',
+              breadcrumb: 'Dashboards',
             },
           },
           {
-            path: 'create_group',
-            component: CreateFoldersComponent,
-            title: 'Koios - Criar Grupo',
+            path: 'create_view',
+            component: ViewCreateComponent,
+            title: 'Koios - Criar Visualização',
             data: {
-              breadcrumb: 'Criar Grupo',
+              breadcrumb: 'Criar visualização',
             },
           },
           {
-            path: 'groups',
-            component: GroupComponent,
-            title: 'Koios - Grupos',
+            path: 'edit_view',
+            component: ViewEditComponent,
+            title: 'Koios - editar Visualização',
             data: {
-              breadcrumb: 'Grupos',
-            },
-          },
-          {
-            path: 'sql_update',
-            component: SQLRunnerUpdateComponent,
-            title: 'Koios - Atualizar',
-            data: {
-              breadcrumb: 'Injetar SQL',
-            },
-          },
-          {
-            path: 'charts',
-            component: ChartsComponent,
-            title: 'Koios - Gráficos',
-            data: {
-              breadcrumb: 'Gráficos',
+              breadcrumb: 'Editar visualização',
             },
           },
         ],
+      },
+      {
+        path: '',
+        component: FoldersComponent,
+        title: 'Koios - Dashboards',
+        data: {
+          breadcrumb: '',
+        },
+      },
+      {
+        path: 'create_group',
+        component: CreateFoldersComponent,
+        title: 'Koios - Criar Grupo',
+        data: {
+          breadcrumb: 'Criar Grupo',
+        },
+      },
+      {
+        path: 'groups',
+        component: GroupComponent,
+        title: 'Koios - Grupos',
+        data: {
+          breadcrumb: 'Grupos',
+        },
+      },
+      {
+        path: 'sql_update',
+        component: SQLRunnerUpdateComponent,
+        title: 'Koios - Atualizar',
+        data: {
+          breadcrumb: 'Injetar SQL',
+        },
+      },
+      {
+        path: 'charts',
+        component: ChartsComponent,
+        title: 'Koios - Gráficos',
+        data: {
+          breadcrumb: 'Gráficos',
+        },
       },
       {
         path: 'users_panel',
@@ -207,9 +198,9 @@ export const routes: Routes = [
       {
         path: 'profiles_folders',
         component: ProfilesFoldersScreenComponent,
-        title: 'Koios - Pastas/Perfis',
+        title: 'Koios - Estrutura',
         data: {
-          breadcrumb: 'Pastas e Perfis',
+          breadcrumb: 'Estrutura',
         },
         children: [
           {

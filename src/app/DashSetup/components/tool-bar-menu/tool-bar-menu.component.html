@@ -6,6 +6,13 @@
   >
     <mat-nav-list class="menu-item-container">
       <div class="logo">
+        <button
+          class="open-close-sidenav"
+          mat-icon-button
+          (click)="toggleCollapse()"
+        >
+          <mat-icon>menu</mat-icon>
+        </button>
         <img
           src="../../../../assets/images/logo_principal_reduzida.png"
           alt=""
@@ -27,26 +34,7 @@
             [size]="'xl'"
             title="Início"
           ></fa-icon>
-          <span class="menu-item">Dashboards</span>
-        </div>
-      </mat-list-item>
-
-      <mat-list-item
-        pRipple
-        routerLink="folders"
-        routerLinkActive="active"
-        ariaCurrentWhenActive="page"
-        [routerLinkActiveOptions]="{ exact: true }"
-        (click)="toggleClose()"
-      >
-        <div class="container-icon">
-          <fa-icon
-            class="icon"
-            [icon]="icons.chart"
-            [size]="'xl'"
-            title="Início"
-          ></fa-icon>
-          <span class="menu-item">Gráficos</span>
+          <span class="menu-item">Home</span>
         </div>
       </mat-list-item>
 
@@ -84,9 +72,29 @@
             [size]="'xl'"
             title="Início"
           ></fa-icon>
-          <span class="menu-item">Pastas/Perfis</span>
+          <span class="menu-item">Estrutura</span>
         </div>
       </mat-list-item>
+
+      <mat-list-item
+        pRipple
+        routerLink="dashboards"
+        routerLinkActive="active"
+        ariaCurrentWhenActive="page"
+        [routerLinkActiveOptions]="{ exact: true }"
+        (click)="toggleClose()"
+      >
+        <div class="container-icon">
+          <fa-icon
+            class="icon"
+            [icon]="icons.chart"
+            [size]="'xl'"
+            title="Início"
+          ></fa-icon>
+          <span class="menu-item">Dashboards</span>
+        </div>
+      </mat-list-item>
+
       <mat-list-item
         pRipple
         routerLink="cofig_db"
@@ -105,13 +113,6 @@
           <span class="menu-item">Database</span>
         </div>
       </mat-list-item>
-      <button
-        class="open-close-sidenav"
-        mat-icon-button
-        (click)="toggleCollapse()"
-      >
-        <mat-icon>menu</mat-icon>
-      </button>
     </mat-nav-list>
   </mat-sidenav>
 
