@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
-import { LoginScreenComponent } from './components/login-screen/login-screen.component';
+
+import { AuthGuard } from './core/guards/auth-guard.guard';
 import { ADMMainScreenComponent } from './DashSetup/screens/adm-main-screen/adm-main-screen.component';
 import { ADMContentScreenComponent } from './DashSetup/screens/admcontent-screen/admcontent-screen.component';
 import { DatabaseComponentComponent } from './DashSetup/screens/database-screen/database-component/database-component.component';
@@ -22,7 +23,7 @@ import { ContentScreenComponent } from './DashView/screens/content-screen/conten
 import { MainScreenComponent } from './DashView/screens/main-screen/main-screen.component';
 import { PageNotFoundComponent } from './DashView/screens/page-not-found/page-not-found.component';
 import { SettingsUserComponent } from './DashView/screens/settings-user/settings-user.component';
-import { AuthGuard } from './services/guards/auth-guard.guard';
+import { LoginScreenComponent } from './shared/login-screen/login-screen.component';
 
 export const routes: Routes = [
   {

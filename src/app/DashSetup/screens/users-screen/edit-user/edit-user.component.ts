@@ -28,10 +28,9 @@ import { DropdownModule } from 'primeng/dropdown';
 import { ToastModule } from 'primeng/toast';
 import { map, Observable, startWith } from 'rxjs';
 import { Roles } from '../../../../../assets/data/roles';
-import { AuthService } from '../../../../services/service/auth/auth.service';
-import { StorageService } from '../../../../services/service/user/storage.service';
-import { ActivatedRoute } from '@angular/router';
-import { ProfilesService } from '../../../../services/service/profiles/profiles.service';
+import { AuthService } from '../../../../core/services/auth/auth.service';
+import { ProfilesService } from '../../../../core/services/profiles/profiles.service';
+import { StorageService } from '../../../../core/services/user/storage.service';
 
 @Component({
   selector: 'app-edit-user',
@@ -246,7 +245,7 @@ export class EditUserComponent implements OnInit {
         }, 2500);
         this.f.reset();
       },
-      error: (err) => {
+      error: (err: Error) => {
         this.messageService.add({
           severity: 'error',
           summary: 'Erro',
@@ -268,7 +267,7 @@ export class EditUserComponent implements OnInit {
     });
 
     this.authService.getById(id, headers).subscribe({
-      next: (userData) => {
+      next: (userData: any) => {
         console.log(userData);
         this.form.fullusername = userData.fullUserName;
         this.form.username = userData.userName;
@@ -294,7 +293,7 @@ export class EditUserComponent implements OnInit {
         }
         console.log(this.form.access_level);
       },
-      error: (error) => {
+      error: (error: Error) => {
         console.error('Erro ao carregar dados do usuário:', error);
       },
     });
@@ -307,7 +306,7 @@ export class EditUserComponent implements OnInit {
     });
 
     this.profileService.getProfiles(headers).subscribe({
-      next: (data) => {
+      next: (data: any) => {
         this.allProfiles = data.map((item: any) => ({
           name: item.name,
           id: item.id,

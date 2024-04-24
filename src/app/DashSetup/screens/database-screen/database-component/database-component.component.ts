@@ -13,8 +13,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
-import { BreadrumbsService } from '../../../../services/service/breadcrumb/breadrumbs.service';
-import { DatabaseConnectionService } from '../../../../services/service/database/database-connection.service';
+import { BreadrumbsService } from '../../../../core/services/breadcrumb/breadrumbs.service';
+import { DatabaseConnectionService } from '../../../../core/services/database/database-connection.service';
 
 @Component({
   selector: 'app-database-component',

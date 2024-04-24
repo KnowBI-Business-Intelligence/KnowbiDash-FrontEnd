@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { TEST_API, USERS_API } from '../../environments/environment';
+import { TEST_API, USERS_API } from '../../../../env/environment';
 
 const API_TEST = TEST_API;
 const API_USERS = USERS_API;

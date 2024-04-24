@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { API_CHAT } from '../../environments/environment';
+import { API_CHAT } from '../../../../env/environment';
 
 @Injectable({
   providedIn: 'root',

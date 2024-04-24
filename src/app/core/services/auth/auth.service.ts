@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, catchError } from 'rxjs';
-import { AUTH_API, USERS_API } from '../../environments/environment';
+import { AUTH_API, USERS_API } from '../../../../env/environment';
 
 const API_USER = USERS_API;
 const API_AUTH = AUTH_API;

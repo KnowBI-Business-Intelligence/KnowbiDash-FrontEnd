@@ -16,8 +16,8 @@ import { RouterModule } from '@angular/router';
 import { FilterMetadata, MessageService } from 'primeng/api';
 import { Table, TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
-import { ChartsService } from '../../../../services/service/charts/charts.service';
-import { StorageService } from '../../../../services/service/user/storage.service';
+import { ChartsService } from '../../../../core/services/charts/charts.service';
+import { StorageService } from '../../../../core/services/user/storage.service';
 
 @Component({
   selector: 'app-create-folders',
@@ -90,10 +90,10 @@ export class CreateFoldersComponent {
     const that = this;
 
     this.charts.getChartsPath(this.headers).subscribe({
-      next(value) {
+      next(value: any) {
         that.folderControl = value;
       },
-      error(err) {
+      error(err: Error) {
         console.error(err);
       },
     });
@@ -119,10 +119,10 @@ export class CreateFoldersComponent {
     this.charts
       .updateChartGroupSQL(this.SQL_code, this.chartGroupNameID, this.headers)
       .subscribe({
-        next(value) {
+        next(value: any) {
           console.log('value', value);
         },
-        error(err) {
+        error(err: Error) {
           console.error(err);
         },
       });
@@ -147,7 +147,7 @@ export class CreateFoldersComponent {
         next(value: any) {
           that.chartGroupNameID = value?.id;
         },
-        error(err) {
+        error(err: Error) {
           console.error(err);
         },
       });
@@ -171,7 +171,7 @@ export class CreateFoldersComponent {
             SQL_Chart: '',
           });
         },
-        error(err) {
+        error(err: Error) {
           console.error(err);
         },
       });

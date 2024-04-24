@@ -3,8 +3,8 @@ import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatDivider } from '@angular/material/divider';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { ChatbotService } from '../../../services/service/chatbot/chatbot.service';
-import { StorageService } from '../../../services/service/user/storage.service';
+import { ChatbotService } from '../../../core/services/chatbot/chatbot.service';
+import { StorageService } from '../../../core/services/user/storage.service';
 
 @Component({
   selector: 'app-assistant-screen',
@@ -72,7 +72,7 @@ export class AssistantScreenComponent implements AfterViewInit {
     });
 
     this.chatService.sendMessage(this.messageInput).subscribe({
-      next(value) {
+      next: (value: any) => {
         console.log(value);
 
         self.chatContent = true;
@@ -86,7 +86,7 @@ export class AssistantScreenComponent implements AfterViewInit {
 
         self.messageInput = '';
       },
-      error(err) {
+      error(err: any) {
         console.error('Erro ao enviar mensagem:', err);
       },
     });

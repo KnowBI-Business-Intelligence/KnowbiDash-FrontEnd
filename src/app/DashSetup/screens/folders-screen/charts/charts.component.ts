@@ -12,8 +12,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { Router, RouterModule } from '@angular/router';
 import { MessageService } from 'primeng/api';
-import { ChartsService } from '../../../../services/service/charts/charts.service';
-import { StorageService } from '../../../../services/service/user/storage.service';
+import { ChartsService } from '../../../../core/services/charts/charts.service';
+import { StorageService } from '../../../../core/services/user/storage.service';
 
 @Component({
   selector: 'app-charts',
@@ -88,7 +88,7 @@ export class ChartsComponent implements OnInit {
           SQL_Chart: '',
         });
       },
-      error(err) {
+      error(err: Error) {
         that.messageService.add({
           severity: 'error',
           summary: 'Erro',

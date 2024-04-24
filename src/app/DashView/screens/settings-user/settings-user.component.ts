@@ -22,9 +22,9 @@ import { DropdownModule } from 'primeng/dropdown';
 import { ToastModule } from 'primeng/toast';
 import { Observable } from 'rxjs';
 import { Roles } from '../../../../assets/data/roles';
-import { AuthService } from '../../../services/service/auth/auth.service';
-import { StorageService } from '../../../services/service/user/storage.service';
-import { UserService } from '../../../services/service/user/user.service';
+import { AuthService } from '../../../core/services/auth/auth.service';
+import { StorageService } from '../../../core/services/user/storage.service';
+import { UserService } from '../../../core/services/user/user.service';
 
 @Component({
   selector: 'app-settings-user',

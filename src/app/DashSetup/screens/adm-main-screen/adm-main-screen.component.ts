@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { BreadcrumbsComponent } from '../../../DashView/components/breadcrumbs/breadcrumbs.component';
-import { BreadrumbsService } from '../../../services/service/breadcrumb/breadrumbs.service';
+import { BreadrumbsService } from '../../../core/services/breadcrumb/breadrumbs.service';
+import { BreadcrumbsComponent } from '../../../shared/breadcrumbs/breadcrumbs.component';
 
 @Component({
   selector: 'app-adm-main-screen',

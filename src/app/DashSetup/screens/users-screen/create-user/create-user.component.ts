@@ -22,16 +22,15 @@ import {
 import { MatChipInputEvent, MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { Message, MessageService } from 'primeng/api';
 import { DropdownModule } from 'primeng/dropdown';
 import { ToastModule } from 'primeng/toast';
 import { map, Observable, startWith } from 'rxjs';
 import { Roles } from '../../../../../assets/data/roles';
-import { AuthService } from '../../../../services/service/auth/auth.service';
-import { StorageService } from '../../../../services/service/user/storage.service';
-import { ProfilesService } from '../../../../services/service/profiles/profiles.service';
-import { Router } from '@angular/router';
+import { AuthService } from '../../../../core/services/auth/auth.service';
+import { ProfilesService } from '../../../../core/services/profiles/profiles.service';
+import { StorageService } from '../../../../core/services/user/storage.service';
 
 @Component({
   selector: 'app-create-user',
@@ -182,7 +181,7 @@ export class CreateUserComponent implements OnInit {
     });
 
     this.profileService.getProfiles(headers).subscribe({
-      next: (data) => {
+      next: (data: any) => {
         this.allProfiles = data.map((item: any) => ({
           name: item.name,
           id: item.id,
@@ -261,7 +260,7 @@ export class CreateUserComponent implements OnInit {
           this.isLoginLoading = false;
         }, 2500);
       },
-      error: (err) => {
+      error: (err: any) => {
         this.messageService.add({
           severity: 'error',
           summary: 'Erro',

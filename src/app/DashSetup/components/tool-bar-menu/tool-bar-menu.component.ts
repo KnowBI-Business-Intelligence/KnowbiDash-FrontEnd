@@ -5,12 +5,12 @@ import {
   EventEmitter,
   OnInit,
   Output,
-  ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
+import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -25,11 +25,10 @@ import {
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { CustomerService } from '../../../../assets/data/costumer-data';
-import { BreadcrumbsComponent } from '../../../DashView/components/breadcrumbs/breadcrumbs.component';
-import { AuthService } from '../../../services/service/auth/auth.service';
-import { BreadrumbsService } from '../../../services/service/breadcrumb/breadrumbs.service';
-import { StorageService } from '../../../services/service/user/storage.service';
-import { MatIconModule } from '@angular/material/icon';
+import { AuthService } from '../../../core/services/auth/auth.service';
+import { BreadrumbsService } from '../../../core/services/breadcrumb/breadrumbs.service';
+import { StorageService } from '../../../core/services/user/storage.service';
+import { BreadcrumbsComponent } from '../../../shared/breadcrumbs/breadcrumbs.component';
 
 interface SideNavTogle {
   screenWidth: number;

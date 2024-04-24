@@ -6,9 +6,10 @@ import { MessageService } from 'primeng/api';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { MessagesModule } from 'primeng/messages';
 import { ToastModule } from 'primeng/toast';
-import { BreadcrumbsComponent } from '../../DashView/components/breadcrumbs/breadcrumbs.component';
-import { AuthService } from '../../services/service/auth/auth.service';
-import { StorageService } from '../../services/service/user/storage.service';
+import { AuthService } from '../../core/services/auth/auth.service';
+import { StorageService } from '../../core/services/user/storage.service';
+import { BreadcrumbsComponent } from '../breadcrumbs/breadcrumbs.component';
+
 @Component({
   selector: 'app-login-screen',
   standalone: true,

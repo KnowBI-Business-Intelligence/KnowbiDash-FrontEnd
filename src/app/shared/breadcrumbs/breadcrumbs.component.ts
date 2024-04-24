@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { BreadcrumbModule } from 'primeng/breadcrumb';
-import { BreadrumbsService } from '../../../services/service/breadcrumb/breadrumbs.service';
+import { BreadrumbsService } from '../../core/services/breadcrumb/breadrumbs.service';
 
 @Component({
   selector: 'app-breadcrumbs',

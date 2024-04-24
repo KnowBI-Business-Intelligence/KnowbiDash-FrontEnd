@@ -17,11 +17,11 @@ import {
   faUser,
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
-import { AuthService } from '../../../services/service/auth/auth.service';
-import { BreadrumbsService } from '../../../services/service/breadcrumb/breadrumbs.service';
-import { EventSearchService } from '../../../services/service/event/event-search.service';
-import { StorageService } from '../../../services/service/user/storage.service';
-import { BreadcrumbsComponent } from '../breadcrumbs/breadcrumbs.component';
+import { AuthService } from '../../../core/services/auth/auth.service';
+import { BreadrumbsService } from '../../../core/services/breadcrumb/breadrumbs.service';
+import { EventSearchService } from '../../../core/services/event/event-search.service';
+import { StorageService } from '../../../core/services/user/storage.service';
+import { BreadcrumbsComponent } from '../../../shared/breadcrumbs/breadcrumbs.component';
 
 @Component({
   selector: 'app-side-bar',

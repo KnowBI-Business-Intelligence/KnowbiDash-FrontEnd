@@ -9,7 +9,7 @@ import {
   API_CHARTGROUP,
   API_CHARTPATH,
   API_CHARTS,
-} from '../../environments/environment';
+} from '../../../../env/environment';
 
 @Injectable({
   providedIn: 'root',

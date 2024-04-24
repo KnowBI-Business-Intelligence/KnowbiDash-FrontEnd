@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { StorageService } from '../../../services/service/user/storage.service';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import { AuthService } from '../../../services/service/auth/auth.service';
 import { HttpHeaders } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthService } from '../../../core/services/auth/auth.service';
+import { StorageService } from '../../../core/services/user/storage.service';
 
 @Component({
   selector: 'app-main-screen',
@@ -41,7 +41,7 @@ export class MainScreenComponent implements OnInit {
     });
 
     this.authService.getById(id, headers).subscribe({
-      next: (data) => {
+      next: (data: any) => {
         this.processData(data);
       },
     });

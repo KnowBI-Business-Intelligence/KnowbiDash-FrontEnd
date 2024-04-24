@@ -3,8 +3,8 @@ import { HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { ChartsService } from '../../../../services/service/charts/charts.service';
-import { StorageService } from '../../../../services/service/user/storage.service';
+import { ChartsService } from '../../../../core/services/charts/charts.service';
+import { StorageService } from '../../../../core/services/user/storage.service';
 
 @Component({
   selector: 'app-folders',
@@ -58,11 +58,11 @@ export class FoldersComponent implements OnInit {
     const that = this;
 
     this.charts.getChartsPath(headers).subscribe({
-      next(value) {
+      next(value: any) {
         that.listpages = value;
         that.filteredItems = value;
       },
-      error(err) {
+      error(err: Error) {
         console.error(err);
       },
     });

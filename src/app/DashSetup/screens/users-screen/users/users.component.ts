@@ -3,13 +3,14 @@ import { HttpHeaders } from '@angular/common/http';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { MatListModule } from '@angular/material/list';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faClose,
   faFilterCircleXmark,
 } from '@fortawesome/free-solid-svg-icons';
-import { FilterMetadata, MessageService } from 'primeng/api';
+import { FilterMetadata, MenuItem, MessageService } from 'primeng/api';
+import { ContextMenuModule } from 'primeng/contextmenu';
 import { DropdownModule } from 'primeng/dropdown';
 import { SliderModule } from 'primeng/slider';
 import { Table, TableModule } from 'primeng/table';
@@ -18,12 +19,9 @@ import { Observable } from 'rxjs';
 import { CustomerService } from '../../../../../assets/data/costumer-data';
 import { Roles } from '../../../../../assets/data/roles';
 import { UserData } from '../../../../../assets/data/users';
-import { AuthService } from '../../../../services/service/auth/auth.service';
-import { StorageService } from '../../../../services/service/user/storage.service';
-import { UserService } from '../../../../services/service/user/user.service';
-import { Router } from '@angular/router';
-import { ContextMenuModule } from 'primeng/contextmenu';
-import { MenuItem } from 'primeng/api';
+import { AuthService } from '../../../../core/services/auth/auth.service';
+import { StorageService } from '../../../../core/services/user/storage.service';
+import { UserService } from '../../../../core/services/user/user.service';
 
 @Component({
   selector: 'app-users',
@@ -111,7 +109,7 @@ export class UsersComponent implements OnInit {
     });
 
     this.userService.getUsersInfo({ headers: headers }).subscribe({
-      next: (data) => {
+      next: (data: any) => {
         this.customerService.processUserData(data);
         this.roles = data.roles;
 
@@ -120,7 +118,7 @@ export class UsersComponent implements OnInit {
           this.loading = false;
         });
       },
-      error: (error) => {
+      error: (error: Error) => {
         console.error('ErrgetInformations:', error);
       },
     });
@@ -235,7 +233,7 @@ export class UsersComponent implements OnInit {
           this.isLoginLoading = false;
         }, 2500);
       },
-      error: (err) => {
+      error: (err: Error) => {
         this.messageService.add({
           severity: 'error',
           summary: 'Erro',

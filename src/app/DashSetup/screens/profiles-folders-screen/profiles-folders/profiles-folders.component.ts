@@ -17,9 +17,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatStepperModule } from '@angular/material/stepper';
 import { TableModule } from 'primeng/table';
-import { ChartsService } from '../../../../services/service/charts/charts.service';
-import { ProfilesService } from '../../../../services/service/profiles/profiles.service';
-import { StorageService } from '../../../../services/service/user/storage.service';
+import { ChartsService } from '../../../../core/services/charts/charts.service';
+import { ProfilesService } from '../../../../core/services/profiles/profiles.service';
+import { StorageService } from '../../../../core/services/user/storage.service';
 
 @Component({
   selector: 'app-profiles-folders',
@@ -97,10 +97,10 @@ export class ProfilesFoldersComponent {
     const that = this;
 
     this.profiles.getProfiles(this.headers).subscribe({
-      next(value) {
+      next(value: any) {
         that.listProfiles = value;
       },
-      error(err) {
+      error(err: Error) {
         console.error(err);
       },
     });
@@ -110,10 +110,10 @@ export class ProfilesFoldersComponent {
     const that = this;
 
     this.charts.getChartsPath(this.headers).subscribe({
-      next(value) {
+      next(value: any) {
         that.listPaths = value;
       },
-      error(err) {
+      error(err: Error) {
         console.error(err);
       },
     });
@@ -123,10 +123,10 @@ export class ProfilesFoldersComponent {
     const that = this;
 
     this.charts.getChartGroup(this.headers).subscribe({
-      next(value) {
+      next(value: any) {
         that.listChartGroups = value;
       },
-      error(err) {
+      error(err: Error) {
         console.error(err);
       },
     });
@@ -144,7 +144,7 @@ export class ProfilesFoldersComponent {
           that.getProfiles();
           that.f.reset();
         },
-        error(err) {
+        error(err: Error) {
           console.error(err);
         },
       });
@@ -160,7 +160,7 @@ export class ProfilesFoldersComponent {
           that.getChartPath();
           that.f.reset();
         },
-        error(err) {
+        error(err: Error) {
           console.error(err);
         },
       });
@@ -181,7 +181,7 @@ export class ProfilesFoldersComponent {
           that.getChartGroup();
           that.f.reset();
         },
-        error(err) {
+        error(err: Error) {
           console.error(err);
         },
       });
