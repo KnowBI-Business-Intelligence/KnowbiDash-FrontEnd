@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import { ChartsService } from '../../../services/service/charts/charts.service';
-import { StorageService } from '../../../services/service/user/storage.service';
 import { HttpHeaders } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { ChartsService } from '../../../core/services/charts/charts.service';
+import { StorageService } from '../../../core/services/user/storage.service';
 
 interface Group {
   id: string; // Adjust the type of id if necessary (could be number or string based on your actual data)
@@ -18,9 +18,9 @@ interface Group {
   styleUrl: './chart-groups.component.css',
 })
 export class ChartGroupsComponent implements OnInit {
-  selectedChartPath: any;
   groups: Group[] = [];
   chartgroups: { [key: string]: any[] } = {};
+  selectedChartPath: any;
 
   constructor(
     private router: Router,
@@ -62,7 +62,6 @@ export class ChartGroupsComponent implements OnInit {
   }
 
   callCharts(groupName: any) {
-    console.log(groupName);
     localStorage.setItem('chartGroup', JSON.stringify(groupName));
     this.router.navigate(['/content/main/charts']);
   }

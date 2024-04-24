@@ -1,7 +1,7 @@
 <div class="container">
   <div class="container-path">
     <div class="container-path-header">
-      <span>Pastas > grupos</span>
+      <span>Pastas > Grupos</span>
       <button (click)="backScreen()">
         <span> x </span>
       </button>
@@ -12,7 +12,7 @@
     <div class="container-path-body">
       <ng-container *ngFor="let group of groups">
         <button class="container-path-button" (click)="callCharts(group.id)">
-          <img src="../../../../assets/icons/folder.svg" alt="" />
+          <img src="assets/icons/folder.svg" alt="" />
           <span>{{ group.name }}</span>
         </button>
       </ng-container>

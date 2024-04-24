@@ -245,7 +245,7 @@ export class EditUserComponent implements OnInit {
         }, 2500);
         this.f.reset();
       },
-      error: (err: Error) => {
+      error: (err) => {
         this.messageService.add({
           severity: 'error',
           summary: 'Erro',
@@ -293,7 +293,7 @@ export class EditUserComponent implements OnInit {
         }
         console.log(this.form.access_level);
       },
-      error: (error: Error) => {
+      error: (error) => {
         console.error('Erro ao carregar dados do usuário:', error);
       },
     });

@@ -88,7 +88,7 @@ export class ChartsComponent implements OnInit {
           SQL_Chart: '',
         });
       },
-      error(err: Error) {
+      error() {
         that.messageService.add({
           severity: 'error',
           summary: 'Erro',

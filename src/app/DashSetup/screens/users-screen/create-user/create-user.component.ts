@@ -260,7 +260,7 @@ export class CreateUserComponent implements OnInit {
           this.isLoginLoading = false;
         }, 2500);
       },
-      error: (err: any) => {
+      error: (err) => {
         this.messageService.add({
           severity: 'error',
           summary: 'Erro',

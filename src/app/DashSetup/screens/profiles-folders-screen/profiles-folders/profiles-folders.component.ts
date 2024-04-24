@@ -97,10 +97,10 @@ export class ProfilesFoldersComponent {
     const that = this;
 
     this.profiles.getProfiles(this.headers).subscribe({
-      next(value: any) {
+      next(value) {
         that.listProfiles = value;
       },
-      error(err: Error) {
+      error(err) {
         console.error(err);
       },
     });
@@ -110,7 +110,7 @@ export class ProfilesFoldersComponent {
     const that = this;
 
     this.charts.getChartsPath(this.headers).subscribe({
-      next(value: any) {
+      next(value) {
         that.listPaths = value;
       },
       error(err: Error) {

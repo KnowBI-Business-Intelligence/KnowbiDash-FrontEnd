@@ -1,7 +1,17 @@
+<div *ngIf="isLoading" id="loading-screen">
+  <div class="spinner"></div>
+</div>
 <div class="container">
   <div class="col-md-12">
     <div class="card card-container" *ngIf="isModal">
-      <h1 class="title">Acessar</h1>
+      <div class="card-logo">
+        <img
+          class="card-logo-icon"
+          src="assets/icons/Logo_principal_horizontal.svg"
+          alt=""
+        />
+        <span class="version">V0.0.1</span>
+      </div>
       <form name="form" #f="ngForm" novalidate>
         <div class="form-group">
           <label for="username">Usuário</label>
@@ -37,7 +47,10 @@
             type="button"
             class="btn btn-primary btn-block"
           >
-            Entrar
+            <span *ngIf="!isLoginLoading">Entrar</span>
+            <span *ngIf="isLoginLoading"
+              ><div class="login-spinner"></div
+            ></span>
           </button>
         </div>
       </form>
@@ -74,8 +87,7 @@
     </div>
   </div>
   <footer>
-    <span>V 0.0.1</span>
-    <img src="assets/icons/Logo_principal_horizontal.svg" alt="" />
+    <span>Todos os direitos reservados &copy;2024</span>
   </footer>
 
   <div class="modal-choice-view" *ngIf="!isModal">

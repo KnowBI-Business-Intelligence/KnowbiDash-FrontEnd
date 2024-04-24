@@ -58,7 +58,7 @@ export const routes: Routes = [
       {
         path: 'graphic_editing',
         component: GraphicEditingComponent,
-        title: 'Koios - Editor Gráfico',
+        title: 'Koios - Administrador',
         data: {
           breadcrumb: 'Koios - Editor Gráfico',
         },
@@ -66,7 +66,7 @@ export const routes: Routes = [
       {
         path: 'cofig_db',
         component: DatabaseScreenComponent,
-        title: 'Koios - Configurar DB',
+        title: 'Koios - Administrador',
         data: {
           breadcrumb: 'Configurar Database',
         },
@@ -74,7 +74,7 @@ export const routes: Routes = [
           {
             path: '',
             component: DatabaseComponentComponent,
-            title: 'Koios - Configurar DB',
+            title: 'Koios - Administrador',
             data: {
               breadcrumb: '',
             },
@@ -84,7 +84,7 @@ export const routes: Routes = [
       {
         path: 'folders',
         component: FoldersScreenComponent,
-        title: 'Koios - Pastas',
+        title: 'Koios - Administrador',
         data: {
           breadcrumb: 'Pastas',
         },
@@ -92,7 +92,7 @@ export const routes: Routes = [
           {
             path: '',
             component: FoldersComponent,
-            title: 'Koios - Criar Pastas',
+            title: 'Koios - Administrador',
             data: {
               breadcrumb: '',
             },
@@ -100,7 +100,7 @@ export const routes: Routes = [
           {
             path: 'create_group',
             component: CreateFoldersComponent,
-            title: 'Koios - Criar Grupo',
+            title: 'Koios - Administrador',
             data: {
               breadcrumb: 'Criar Grupo',
             },
@@ -108,7 +108,7 @@ export const routes: Routes = [
           {
             path: 'groups',
             component: GroupComponent,
-            title: 'Koios - Grupos',
+            title: 'Koios - Administrador',
             data: {
               breadcrumb: 'Grupos',
             },
@@ -116,7 +116,7 @@ export const routes: Routes = [
           {
             path: 'sql_update',
             component: SQLRunnerUpdateComponent,
-            title: 'Koios - Atualizar',
+            title: 'Koios - Administrador',
             data: {
               breadcrumb: 'Injetar SQL',
             },
@@ -124,7 +124,7 @@ export const routes: Routes = [
           {
             path: 'charts',
             component: ChartsComponent,
-            title: 'Koios - Gráficos',
+            title: 'Koios - Administrador',
             data: {
               breadcrumb: 'Gráficos',
             },
@@ -134,7 +134,7 @@ export const routes: Routes = [
       {
         path: 'users_panel',
         component: UsersScreenComponent,
-        title: 'Koios - Usuários',
+        title: 'Koios - Administrador',
         data: {
           breadcrumb: 'Usuários',
         },
@@ -142,7 +142,7 @@ export const routes: Routes = [
           {
             path: '',
             component: UsersComponent,
-            title: 'Koios - Usuários',
+            title: 'Koios - Administrador',
             data: {
               breadcrumb: '',
             },
@@ -150,7 +150,7 @@ export const routes: Routes = [
           {
             path: 'create_users',
             component: CreateUserComponent,
-            title: 'Koios - Cadastro',
+            title: 'Koios - Administrador',
             data: {
               breadcrumb: 'Adicionar Usuário',
             },
@@ -158,7 +158,7 @@ export const routes: Routes = [
           {
             path: 'edit_users',
             component: EditUserComponent,
-            title: 'Koios - Edição',
+            title: 'Koios - Administrador',
             data: {
               breadcrumb: 'Editar Usuário',
             },
@@ -168,7 +168,7 @@ export const routes: Routes = [
       {
         path: 'profiles_folders',
         component: ProfilesFoldersScreenComponent,
-        title: 'Koios - Pastas/Perfis',
+        title: 'Koios - Administrador',
         data: {
           breadcrumb: 'Pastas e Perfis',
         },
@@ -176,7 +176,7 @@ export const routes: Routes = [
           {
             path: '',
             component: ProfilesFoldersComponent,
-            title: 'Koios - Pastas/Perfis',
+            title: 'Koios - Administrador',
             data: {
               breadcrumb: '',
             },
@@ -190,7 +190,7 @@ export const routes: Routes = [
   {
     path: 'content',
     component: ContentScreenComponent,
-    title: 'Koios - Inicio',
+    title: 'Koios - Padrão',
     canActivate: [AuthGuard],
     data: {
       breadcrumb: '',
@@ -198,21 +198,20 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        title: 'Koios - Painel',
+        title: 'Koios - Painel Usuário',
         component: MainScreenComponent,
         data: {
           breadcrumb: '',
         },
       },
-
       {
         path: 'main',
-        title: 'Koios - Painel',
+        title: 'Koios - Painel Usuário',
         component: MainScreenComponent,
       },
       {
         path: 'assistant',
-        title: 'Koios - Assistente',
+        title: 'Koios - Painel Usuário',
         component: AssistantScreenComponent,
         data: {
           breadcrumb: 'Koios Assistente',
@@ -220,7 +219,7 @@ export const routes: Routes = [
       },
       {
         path: 'settings',
-        title: 'Koios - Usuário',
+        title: 'Koios - Painel Usuário',
         component: SettingsUserComponent,
         data: {
           breadcrumb: 'Informações do Usuário',
@@ -228,10 +227,9 @@ export const routes: Routes = [
       },
     ],
   },
-
   {
     path: '**',
-    title: 'Page Not Found! 😥',
+    title: 'Opss! 😥',
     component: PageNotFoundComponent,
   },
 ];
