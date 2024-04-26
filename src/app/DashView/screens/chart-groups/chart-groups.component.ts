@@ -6,7 +6,7 @@ import { StorageService } from '../../../services/service/user/storage.service';
 import { HttpHeaders } from '@angular/common/http';
 
 interface Group {
-  id: string; // Adjust the type of id if necessary (could be number or string based on your actual data)
+  id: string;
   name: string;
 }
 

@@ -70,6 +70,14 @@ export const routes: Routes = [
         },
       },
       {
+        path: 'assistant',
+        title: 'Koios - Assistente',
+        component: AssistantScreenComponent,
+        data: {
+          breadcrumb: 'Koios Assistente',
+        },
+      },
+      {
         path: 'cofig_db',
         component: DatabaseScreenComponent,
         title: 'Koios - Configurar DB',
