@@ -22,6 +22,7 @@ import {
   faHome,
   faUser,
   faAtom,
+  faDiagramProject,
 } from '@fortawesome/free-solid-svg-icons';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
@@ -77,7 +78,7 @@ export class ToolBarMenuComponent implements OnInit {
     logout: faArrowRightFromBracket,
     database: faDatabase,
     user: faUser,
-    profiles: faFolder,
+    profiles: faDiagramProject,
     assistant: faAtom,
   };
 

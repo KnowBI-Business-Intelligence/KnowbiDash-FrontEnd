@@ -1,14 +1,15 @@
 .container {
   display: flex;
   position: fixed;
-  top: 65px;
+  top: 46px;
+  width: calc(97% - 5px);
 }
 
 .container-nav-line {
   width: 60%;
   padding: 5px 10px;
   position: relative;
-  top: -48px;
+  top: -39px;
   left: 19px;
   align-self: baseline;
   display: flex;
@@ -35,10 +36,10 @@
 
 .list-dashboards {
   display: flex;
-  padding: 12px 18px;
+  padding: 7px 15px;
   flex-direction: column;
-  width: 250px;
-  height: calc(92vh - 5px);
+  width: 243px;
+  height: calc(94vh - 5px);
   overscroll-behavior-y: auto;
   border-right: solid 1px #e6e6e6;
 }
@@ -236,14 +237,58 @@ time {
   margin-bottom: 6px;
 }
 
-.dashview {
-  width: calc(80vw - 2px);
-  height: calc(92vh - 5px);
+.views {
   display: flex;
-  padding: 0 8px;
+  flex-direction: row;
+  width: 100%;
+}
+
+.createview {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.createview span {
+  padding: 5px 0;
+}
+
+.createview button {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  cursor: pointer;
+  border: dashed 2px #00000020;
+  background-color: #ffffff;
+  padding: 9px;
+  margin: 3px;
+  font-size: 10px;
+  color: #0000007c;
+  transition: 0.5s;
+  width: 75px;
+}
+
+.createview button:hover {
+  background-color: transparent;
+  color: #00000096;
+}
+
+.iconview {
+  color: #5f65a5;
+  margin-right: 5px;
+}
+
+.dashview {
+  width: 80%;
+  height: calc(94vh - 5px);
+  display: flex;
   flex-direction: column;
   overscroll-behavior-y: auto;
   border-right: solid 1px #e6e6e6;
+}
+
+.groupname {
+  padding: 5px 8px;
 }
 
 .filter {
@@ -254,6 +299,7 @@ time {
   flex-direction: row-reverse;
   justify-content: space-between;
   align-items: center;
+  z-index: 99;
 }
 
 .filter-button button {
@@ -279,7 +325,7 @@ time {
   display: flex;
   align-items: center;
   background-color: #ffffff;
-  margin-left: 4px;
+  margin-left: 2px;
   height: 30px;
 }
 
@@ -299,7 +345,7 @@ time {
 .filter-filters-data span {
   font-size: 10px;
   margin-left: 5px;
-  max-width: 200px;
+  max-width: 100px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -328,7 +374,7 @@ time {
   align-items: baseline;
   max-width: 100%;
   height: calc(95vh - 5px);
-  overflow-x: auto;
+  overflow-x: hidden;
 }
 
 .container-charts {
@@ -337,7 +383,6 @@ time {
   justify-content: space-between;
   height: 100%;
   width: 100%;
-  margin: 0 1rem;
 }
 
 .left {
@@ -345,7 +390,7 @@ time {
   justify-content: flex-start;
   align-items: flex-start;
   flex-wrap: wrap;
-  height: 95%;
+  height: 100%;
   width: 100%;
 }
 
@@ -358,8 +403,8 @@ time {
   position: fixed;
   z-index: 999;
   right: 0;
-  top: 90px;
-  height: 86.6%;
+  top: 95px;
+  height: calc(87vh - 5px);
   max-width: 80%;
   overflow: hidden;
   display: flex;
@@ -468,17 +513,6 @@ time {
   justify-content: flex-end;
 }
 
-.login-spinner {
-  transform: translate(-50%, -50%);
-  border: 3px solid #f3f3f3;
-  border-radius: 50%;
-  border-top: 3px solid #751a7e;
-  width: 19px;
-  height: 19px;
-  -webkit-animation: spin 1s linear infinite;
-  animation: spin 1s linear infinite;
-}
-
 .modal-fields {
   display: flex;
   flex-direction: column;
@@ -542,7 +576,6 @@ time {
   align-items: baseline;
 }
 
-/* Checkbox styling */
 .dropdown-content input[type="checkbox"] {
   margin-right: 5px;
   cursor: pointer;
@@ -580,22 +613,4 @@ time {
 
 .material-symbols-outlined {
   font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 20;
-}
-
-@-webkit-keyframes spin {
-  0% {
-    -webkit-transform: rotate(0deg);
-  }
-  100% {
-    -webkit-transform: rotate(360deg);
-  }
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
 }

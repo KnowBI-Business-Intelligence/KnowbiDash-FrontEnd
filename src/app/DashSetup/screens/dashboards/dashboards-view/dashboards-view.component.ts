@@ -1,7 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ChartsService } from '../../../../services/service/charts/charts.service';
-import { faChartPie } from '@fortawesome/free-solid-svg-icons';
+import {
+  faChartPie,
+  faChartLine,
+  faRectangleList,
+  faTableList,
+} from '@fortawesome/free-solid-svg-icons';
 import { MatIconModule } from '@angular/material/icon';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { StorageService } from '../../../../services/service/user/storage.service';
@@ -46,7 +51,14 @@ interface ExtendedOptions extends Highcharts.Options {
 export class DashboardsViewComponent implements OnInit {
   icons = {
     dash: faChartPie,
+    chartview: faChartLine,
+    cardview: faRectangleList,
+    tableview: faTableList,
   };
+
+  groupName: string = '';
+
+  changeBg: HTMLElement | null = null;
   paths: { [key: string]: Group[] } = {};
   pathNames: { [key: string]: string } = {};
   Highcharts: typeof Highcharts = Highcharts;
@@ -55,6 +67,7 @@ export class DashboardsViewComponent implements OnInit {
   filters: any[] = [];
   selectedFilters: any = {};
   checkedValues: any = {};
+  selectedGroupId: any = null;
 
   originalChartData: ChartData[] = [];
   chartData: ChartData[] = [];
@@ -67,15 +80,21 @@ export class DashboardsViewComponent implements OnInit {
   constructor(
     private router: Router,
     private chartsService: ChartsService,
-    private storageService: StorageService
+    private storageService: StorageService,
+    private elementRef: ElementRef
   ) {}
-
-  backScreen() {
-    this.router.navigate(['/admin']);
-  }
 
   ngOnInit(): void {
     this.loadDataInit();
+    const groupIdFromLocalStorage = JSON.parse(
+      localStorage.getItem('chartGroupview') || 'null'
+    );
+    this.getCharts(groupIdFromLocalStorage.id);
+    const simulatedEvent = {
+      currentTarget:
+        this.elementRef.nativeElement.querySelector('.selected-group'),
+    };
+    this.clickPress(groupIdFromLocalStorage, simulatedEvent);
   }
 
   loadDataInit() {
@@ -137,7 +156,6 @@ export class DashboardsViewComponent implements OnInit {
   }
 
   loadData(chartData: ChartData[], groupId: any) {
-    console.log(groupId);
     this.chartGroupsData = [];
     this.copydataJSON = [];
     this.filters = [];
@@ -265,7 +283,7 @@ export class DashboardsViewComponent implements OnInit {
     }
   }
 
-  /*allValuesMatchAllFilters(values: any[], allFilters: any[]): boolean {
+  allValuesMatchAllFilters(values: any[], allFilters: any[]): boolean {
     console.log(values, allFilters);
     return values.every((value) => allFilters.includes(value));
   }
@@ -373,9 +391,42 @@ export class DashboardsViewComponent implements OnInit {
     });
 
     this.showModal = true;
-  }*/
+  }
 
   closeModal(): void {
     this.showModal = false;
+  }
+
+  backScreen() {
+    this.router.navigate(['/admin']);
+  }
+
+  clickPress(group: any, event: any) {
+    this.selectedGroupId = group;
+    const clickedButton = event ? event.currentTarget : null;
+    const allButtons =
+      this.elementRef.nativeElement.querySelectorAll('.dashboardbtn');
+    allButtons.forEach((button: any) => {
+      button.style.backgroundColor = '';
+    });
+    if (clickedButton) {
+      clickedButton.style.backgroundColor = '#00000015';
+    }
+    this.groupName = group.name;
+  }
+
+  addView(buttonId: string) {
+    const groupId = this.selectedGroupId;
+    console.log(groupId);
+    console.log(buttonId);
+
+    localStorage.setItem('chartGroupview', JSON.stringify(groupId));
+    if (buttonId == 'chart') {
+      this.router.navigate(['/admin/dashboards/chart_view']);
+    } else if (buttonId == 'card') {
+      this.router.navigate(['/admin/dashboards/card_view']);
+    } else if (buttonId == 'table') {
+      this.router.navigate(['/admin/dashboards/table_view']);
+    }
   }
 }

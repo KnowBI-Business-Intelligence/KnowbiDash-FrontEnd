@@ -28,9 +28,9 @@ import { ChartGroupsComponent } from './DashView/screens/chart-groups/chart-grou
 import { ChartScreenComponent } from './DashView/screens/chart-screen/chart-screen.component';
 import { DashboardsComponent } from './DashSetup/screens/dashboards/dashboards.component';
 import { DashboardsViewComponent } from './DashSetup/screens/dashboards/dashboards-view/dashboards-view.component';
-import { ViewCreateComponent } from './DashSetup/screens/dashboards/view-create/view-create.component';
-import { ViewEditComponent } from './DashSetup/screens/dashboards/view-edit/view-edit.component';
-
+import { ChartComponent } from './DashSetup/screens/dashboards/chart/chart.component';
+import { CardsComponent } from './DashSetup/screens/dashboards/cards/cards.component';
+import { TableComponent } from './DashSetup/screens/dashboards/table/table.component';
 export const routes: Routes = [
   {
     path: '',
@@ -112,19 +112,27 @@ export const routes: Routes = [
             },
           },
           {
-            path: 'create_view',
-            component: ViewCreateComponent,
-            title: 'Koios - Criar Visualização',
+            path: 'chart_view',
+            component: ChartComponent,
+            title: 'Koios - Gráficos',
             data: {
-              breadcrumb: 'Criar visualização',
+              breadcrumb: 'Gráficos',
             },
           },
           {
-            path: 'edit_view',
-            component: ViewEditComponent,
-            title: 'Koios - editar Visualização',
+            path: 'card_view',
+            component: CardsComponent,
+            title: 'Koios - Cards',
             data: {
-              breadcrumb: 'Editar visualização',
+              breadcrumb: 'Cards',
+            },
+          },
+          {
+            path: 'table_view',
+            component: TableComponent,
+            title: 'Koios - Tables',
+            data: {
+              breadcrumb: 'Tables',
             },
           },
         ],
