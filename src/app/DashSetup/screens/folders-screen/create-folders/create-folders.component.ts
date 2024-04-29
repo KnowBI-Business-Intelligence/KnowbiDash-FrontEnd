@@ -114,10 +114,8 @@ export class CreateFoldersComponent {
 
   private updateSQLChartGroup() {
     this.getHeaders();
-    const that = this;
-
     this.charts
-      .updateChartGroupSQL(this.SQL_code, this.chartGroupNameID, this.headers)
+      .updateChartGroupSQL(this.headers, this.chartGroupNameID, this.SQL_code)
       .subscribe({
         next(value: any) {
           console.log('value', value);
@@ -138,10 +136,10 @@ export class CreateFoldersComponent {
 
     this.charts
       .createChartGroup(
+        this.headers,
         this.chartGroupName,
         this.tableName,
-        this.folderSelected.id,
-        this.headers
+        this.folderSelected.id
       )
       .subscribe({
         next(value: any) {

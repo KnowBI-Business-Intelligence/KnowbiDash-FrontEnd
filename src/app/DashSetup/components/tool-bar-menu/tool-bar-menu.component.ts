@@ -1,11 +1,5 @@
 import { CommonModule } from '@angular/common';
-import {
-  Component,
-  ElementRef,
-  EventEmitter,
-  OnInit,
-  Output,
-} from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
@@ -16,9 +10,10 @@ import { Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faArrowRightFromBracket,
+  faAtom,
   faChartSimple,
   faDatabase,
-  faFolder,
+  faDiagramProject,
   faHome,
   faUser,
 } from '@fortawesome/free-solid-svg-icons';
@@ -75,14 +70,14 @@ export class ToolBarMenuComponent implements OnInit {
     logout: faArrowRightFromBracket,
     database: faDatabase,
     user: faUser,
-    profiles: faFolder,
+    profiles: faDiagramProject,
+    assistant: faAtom,
   };
 
   constructor(
     private auth: AuthService,
     private token: StorageService,
-    private router: Router,
-    private elementref: ElementRef
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -90,9 +85,7 @@ export class ToolBarMenuComponent implements OnInit {
 
     if (this.isLoggedIn) {
       this.user = this.token.getUser();
-
       this.roles = this.user.roles;
-
       this.aliasName = this.user.aliasName;
     }
 
@@ -100,7 +93,6 @@ export class ToolBarMenuComponent implements OnInit {
       const name = this.user.fullUserName.split(' ');
       this.userFirstName = name[0].charAt(0).toUpperCase();
     }
-    console.log(this.user);
   }
 
   logout() {

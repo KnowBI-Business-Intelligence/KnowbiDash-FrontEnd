@@ -1,0 +1,191 @@
+<div class="container">
+  <div class="container-body" id="list">
+    <div class="container-content" id="body">
+      <div class="container-content-header">
+        <h2>Pastas</h2>
+        <div class="container-content-header-button-group" id="groupButton">
+          <button
+            [disabled]="actionButton"
+            class="action-button add"
+            id="addButton"
+            (click)="addRegister()"
+          >
+            Adicionar
+          </button>
+          <button
+            [disabled]="actionButton"
+            class="action-button"
+            id="deleteButton"
+            (click)="deleteRegister()"
+          >
+            Excluir
+          </button>
+        </div>
+      </div>
+      <section class="example-container mat-elevation-z8" tabindex="0">
+        <p-table
+          matSort
+          class="mat-elevation-z8 demo-table"
+          selectionMode="single"
+          [value]="dataSourceGroup"
+          (matSortChange)="announceSortChange($event)"
+          [rows]="10"
+          [showCurrentPageReport]="true"
+          [rowsPerPageOptions]="[10, 25, 50]"
+          [globalFilterFields]="['id', 'name', 'path']"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="min-width: 5rem" pSortableColumn="id">
+                <div class="flex align-items-center">Código</div>
+              </th>
+              <th style="min-width: 15rem" pSortableColumn="name">
+                <div class="flex align-items-center">Nome</div>
+              </th>
+              <th style="min-width: 15rem" pSortableColumn="path">
+                <div class="flex align-items-center">Dashboards</div>
+              </th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-dataSourceGroup>
+            <tr
+              #tr
+              pSelectableRow="dataSourceGroup"
+              pContextMenuRow="dataSourceGroup"
+              (click)="selectRow(dataSourceGroup)"
+              [pSelectableRow]="dataSourceGroup"
+            >
+              <td>
+                {{ dataSourceGroup.id }}
+              </td>
+              <td>
+                {{ dataSourceGroup.name }}
+              </td>
+              <td>
+                {{ dataSourceGroup.path }}
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="7">Sem registros encontrados</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </section>
+      <mat-paginator
+        [pageSize]="resultsLength"
+        [length]="resultsLength"
+      ></mat-paginator>
+    </div>
+  </div>
+
+  <div class="container-add" id="add">
+    <div class="container-content-add">
+      <h2>Cadastro de Pastas</h2>
+    </div>
+    <div class="container-add-body">
+      <form class="form-search" [formGroup]="createFolderForm">
+        <div class="form-group-input-side">
+          <div class="form-group-input">
+            <label for="name">Nome da pasta</label>
+            <input
+              type="text"
+              class="form-control"
+              name="name"
+              autocomplete="off"
+              formControlName="name"
+              required
+              maxlength="60"
+            />
+          </div>
+          <div class="form-group-input">
+            <label for="observation">Documentação da pasta</label>
+            <input
+              type="text"
+              class="form-control"
+              name="observation"
+              autocomplete="off"
+              formControlName="observation"
+              required
+              maxlength="250"
+            />
+          </div>
+        </div>
+        <div class="form-group-input-side">
+          <div class="form-group-input-drop">
+            <label for="profile">Perfil: </label>
+            <p-dropdown
+              class="drop"
+              name="profile"
+              placeholder="Vincule o perfil"
+              [options]="listProfiles"
+              optionLabel="name"
+              formControlName="profile"
+            ></p-dropdown>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="container-add-footer">
+      <button id="cancel" (click)="cancelRegister()">Cancelar</button>
+      <button (click)="createRegister()">Salvar</button>
+    </div>
+  </div>
+
+  <div class="message">
+    <p-toast [life]="1500"></p-toast>
+  </div>
+
+  <div class="modal-delete-profile" *ngIf="deleteProfile">
+    <div class="container_delete-profile">
+      <span>Tem certeza de que deseja excluir este registro?</span>
+      <div class="buttons_delete-profile">
+        <button
+          class="action-buttons_delete-profile yes"
+          (click)="confirmDelete()"
+        >
+          Sim
+        </button>
+        <button
+          class="action-buttons_delete-profile no"
+          (click)="cancelDelete()"
+        >
+          Não
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-view-profile" *ngIf="isViewProfile">
+    <div class="container_view-profile">
+      <span>Informações da pasta:</span>
+      <div class="container_profile-infos">
+        <div class="container_profile-left">
+          <span>Nome: </span>
+          <span> {{ selectedRow?.name }}</span>
+          <br />
+          <span>Documentação: </span>
+          <span>{{ selectedRow?.observation }}</span>
+        </div>
+
+        <div class="container_profile-rigth">
+          Pastas:
+          <div
+            class="content_profile-rigth"
+            *ngFor="let item of selectedRowChart"
+          >
+            <span>{{ item.id }}</span>
+            <span>{{ item.name }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="footer_view-profile">
+        <p></p>
+        <button (click)="notViewProfile()">Voltar</button>
+      </div>
+    </div>
+  </div>
+</div>

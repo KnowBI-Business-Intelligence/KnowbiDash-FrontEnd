@@ -1,0 +1,254 @@
+<div class="container">
+  <div class="container-body" id="list">
+    <div class="container-content" id="body">
+      <div class="container-content-header">
+        <h2>Dashboards</h2>
+        <div class="container-content-header-button-group" id="groupButton">
+          <button
+            [disabled]="actionButton"
+            class="action-button add"
+            id="addButton"
+            (click)="addRegister()"
+          >
+            Adicionar
+          </button>
+          <button
+            [disabled]="actionButton"
+            class="action-button"
+            id="deleteButton"
+            (click)="deleteRegister()"
+          >
+            Excluir
+          </button>
+          <button
+            [disabled]="actionButton"
+            class="action-button"
+            id="seeButton"
+            (click)="viewDashInfo()"
+          >
+            Ver
+          </button>
+        </div>
+      </div>
+      <section class="example-container mat-elevation-z8" tabindex="0">
+        <p-table
+          matSort
+          class="mat-elevation-z8 demo-table"
+          selectionMode="single"
+          [value]="dataSource"
+          (matSortChange)="announceSortChange($event)"
+          [contextMenu]="cm"
+          [(contextMenuSelection)]="selectedDash"
+          [rows]="10"
+          [showCurrentPageReport]="true"
+          [rowsPerPageOptions]="[10, 25, 50]"
+          [globalFilterFields]="[
+            'id',
+            'name',
+            'pgTableName',
+            'chartPath',
+            'sql'
+          ]"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="min-width: 5rem" pSortableColumn="id">
+                <div class="flex align-items-center">Código</div>
+              </th>
+              <th style="min-width: 15rem" pSortableColumn="name">
+                <div class="flex align-items-center">Nome</div>
+              </th>
+              <th style="min-width: 15rem" pSortableColumn="pgTableName">
+                <div class="flex align-items-center">Tabela</div>
+              </th>
+
+              <th style="min-width: 6rem" pSortableColumn="chartPath">
+                <div class="flex align-items-center">Pastas</div>
+              </th>
+
+              <th style="min-width: 15rem" pSortableColumn="sql">
+                <div class="flex align-items-center">Código SQL</div>
+              </th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-dataSource>
+            <tr
+              #tr
+              pSelectableRow="dataSource"
+              pContextMenuRow="dataSource"
+              (click)="selectRow(dataSource)"
+              (click)="onRowSelect($event, dataSource)"
+              (contextmenu)="onRowSelect($event, dataSource)"
+              [pSelectableRow]="dataSource"
+              style="
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+              "
+            >
+              <td>
+                {{ dataSource.id }}
+              </td>
+              <td>
+                {{ dataSource.name }}
+              </td>
+              <td>
+                {{ dataSource.pgTableName }}
+              </td>
+              <td>
+                {{ dataSource.chartPath ? "Sim" : "Não" }}
+              </td>
+              <td>
+                {{ dataSource.sql?.length > 0 ? dataSource.sql : "Sem código" }}
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="7">Sem registros encontrados</td>
+            </tr>
+          </ng-template>
+        </p-table>
+
+        <p-toast [life]="500"></p-toast>
+        <p-contextMenu #cm [model]="items"></p-contextMenu>
+      </section>
+      <mat-paginator
+        [pageSize]="resultsLength"
+        [length]="resultsLength"
+      ></mat-paginator>
+    </div>
+  </div>
+
+  <!-- todo -->
+  <div class="container-add" id="add">
+    <div class="container-content-add">
+      <h2 *ngIf="!isEditing">Cadastro de Dashboards</h2>
+      <h2 *ngIf="isEditing">Alterar Dashboards</h2>
+    </div>
+    <div class="container-add-body" *ngIf="isSQL">
+      <form class="form-search" [formGroup]="createRegisterForm">
+        <div class="form-group-input-side">
+          <div class="form-group-input">
+            <label for="name">Nome do dashboard</label>
+            <input
+              type="text"
+              class="form-control"
+              name="name"
+              autocomplete="off"
+              formControlName="name"
+              required
+              maxlength="60"
+            />
+          </div>
+          <div class="form-group-input">
+            <label for="pgTableName">Nome da tabela</label>
+            <input
+              type="text"
+              class="form-control"
+              name="pgTableName"
+              autocomplete="off"
+              formControlName="pgTableName"
+              required
+              maxlength="250"
+            />
+          </div>
+        </div>
+        <div class="form-group-input-side">
+          <div class="form-group-input-drop">
+            <label for="chartPath">Pasta: </label>
+            <p-dropdown
+              class="drop"
+              name="chartPath"
+              placeholder="Vincule e pasta"
+              [options]="chartPaths"
+              optionLabel="name"
+              formControlName="chartPath"
+            ></p-dropdown>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="container-add-body" *ngIf="!isSQL">
+      <form class="form-search-sql" [formGroup]="createRegisterForm">
+        <div class="form-group-input">
+          <label for="sql">Código SQL</label>
+          <textarea
+            type="text"
+            class="form-control form-control-sql"
+            name="sql"
+            autocomplete="off"
+            formControlName="sql"
+            required
+          ></textarea>
+        </div>
+        <mat-progress-bar
+          mode="indeterminate"
+          *ngIf="progressBar"
+        ></mat-progress-bar>
+      </form>
+    </div>
+    <div class="container-add-footer" *ngIf="isSQL">
+      <button id="cancel" (click)="cancelRegister()">Cancelar</button>
+      <button (click)="createRegister()">Próximo</button>
+    </div>
+    <div class="container-add-footer" *ngIf="!isSQL">
+      <button (click)="updateRegister()">Executar</button>
+      <button id="cancel" (click)="isSQL = !isSQL">Voltar</button>
+      <button (click)="finishProcess()">Finalizar</button>
+    </div>
+    <div class="result-SQL" *ngIf="ISSqlResult">
+      <span>{{ sqlResult }}</span>
+    </div>
+  </div>
+
+  <div class="modal-delete-profile" *ngIf="deleteProfile">
+    <div class="container_delete-profile">
+      <span>Tem certeza de que deseja excluir este registro?</span>
+      <div class="buttons_delete-profile">
+        <button
+          class="action-buttons_delete-profile yes"
+          (click)="confirmDelete()"
+        >
+          Sim
+        </button>
+        <button
+          class="action-buttons_delete-profile no"
+          (click)="cancelDelete()"
+        >
+          Não
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-view-profile" *ngIf="isViewDashboard">
+    <div class="container_view-profile">
+      <span>Informações do dashboard:</span>
+      <div class="container_profile-infos">
+        <div class="container_profile-left">
+          <span>Nome: </span>
+          <span> {{ selectedRow?.name }}</span>
+          <br />
+          <span>Tabela: </span>
+          <span>{{ selectedRow?.pgTableName }}</span>
+          <br />
+          <span>Pasta: </span>
+          <span>{{ selectedRowChartGroup.name }}</span>
+        </div>
+
+        <div class="container_profile-right">
+          <span>Código SQL: </span>
+          <br />
+          <span> {{ selectedRow?.sql }}</span>
+        </div>
+      </div>
+      <div class="footer_view-profile">
+        <p></p>
+        <button (click)="notViewDashInfo()">Voltar</button>
+      </div>
+    </div>
+  </div>
+</div>

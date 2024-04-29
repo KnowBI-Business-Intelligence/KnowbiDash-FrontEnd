@@ -79,9 +79,10 @@ export class ChartsService {
   }
 
   createChartsPath(
+    headers: HttpHeaders,
     name: string,
-    profile_id: {} = {},
-    headers: HttpHeaders
+    documentation: string,
+    profile_id: string
   ): Observable<any> {
     const myHeaders = {
       headers: headers,
@@ -89,17 +90,20 @@ export class ChartsService {
 
     const body = {
       name,
-      profile_id,
+      documentation,
+      profile: {
+        profile_id,
+      },
     };
 
     return this.http.post(`${this.ENV_CHARTPATH}/create`, body, myHeaders);
   }
 
   createChartGroup(
+    headers: any,
     name: string,
     pgTableName: string,
-    ID_chartPath: string,
-    headers: any
+    ID_chartPath: string
   ) {
     let headerObj: { [header: string]: string } = {};
 
@@ -147,9 +151,9 @@ export class ChartsService {
   }
 
   updateChartGroupSQL(
-    sql: string,
+    headers: HttpHeaders,
     ID_chartPath: string,
-    headers: HttpHeaders
+    sql: string
   ): Observable<any> {
     let headerObj: { [header: string]: string } = {};
 

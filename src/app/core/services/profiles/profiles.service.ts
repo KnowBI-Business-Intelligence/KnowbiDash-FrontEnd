@@ -47,10 +47,13 @@ export class ProfilesService {
     return this.http.get(`${this.ENV_PROFILES}/get`, headersRgister);
   }
 
-  deleteProfiles(headers: HttpHeaders): Observable<any> {
+  deleteProfiles(headers: HttpHeaders, profileID: string): Observable<any> {
     const headersRgister = {
       headers: headers,
     };
-    return this.http.get(`${this.ENV_PROFILES}/get`, headersRgister);
+    return this.http.delete(
+      `${this.ENV_PROFILES}/delete/${profileID}`,
+      headersRgister
+    );
   }
 }

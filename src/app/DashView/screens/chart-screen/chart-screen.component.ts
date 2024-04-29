@@ -6,8 +6,8 @@ import { Router } from '@angular/router';
 import Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { SkeletonModule } from 'primeng/skeleton';
-import { ChartsService } from '../../../services/service/charts/charts.service';
-import { StorageService } from '../../../services/service/user/storage.service';
+import { ChartsService } from '../../../core/services/charts/charts.service';
+import { StorageService } from '../../../core/services/user/storage.service';
 
 interface ChartData {
   id: string;
@@ -65,7 +65,7 @@ export class ChartScreenComponent implements OnInit {
     });
 
     this.chartService.getCharts(headers).subscribe({
-      next: (data) => {
+      next: (data: any) => {
         this.originalChartData = data;
         this.loadData(data);
       },
@@ -262,13 +262,13 @@ export class ChartScreenComponent implements OnInit {
       Authorization: `Bearer ${user.token}`,
     });
     this.chartService.updateCharts(id, requestData, headers).subscribe({
-      next: (data) => {
+      next: (data: any) => {
         console.log('Gráfico atualizado:', data);
         this.getCharts();
         this.chartGroupsData = [];
         this.copydataJSON = [];
       },
-      error: (error) => {
+      error: (error: Error) => {
         console.error('Erro ao atualizar o gráfico:', error);
       },
     });

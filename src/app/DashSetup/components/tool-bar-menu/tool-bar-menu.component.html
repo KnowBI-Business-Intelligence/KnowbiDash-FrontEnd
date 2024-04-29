@@ -32,7 +32,7 @@
             class="icon"
             [icon]="icons.home"
             [size]="'xl'"
-            title="Início"
+            title="Home"
           ></fa-icon>
           <span class="menu-item">Home</span>
         </div>
@@ -51,7 +51,7 @@
             class="icon"
             [icon]="icons.user"
             [size]="'xl'"
-            title="Início"
+            title="Usuários"
           ></fa-icon>
           <span class="menu-item">Usuários</span>
         </div>
@@ -70,7 +70,7 @@
             class="icon"
             [icon]="icons.profiles"
             [size]="'xl'"
-            title="Início"
+            title="Estrutura"
           ></fa-icon>
           <span class="menu-item">Estrutura</span>
         </div>
@@ -89,9 +89,27 @@
             class="icon"
             [icon]="icons.chart"
             [size]="'xl'"
-            title="Início"
+            title="Dashboard"
           ></fa-icon>
           <span class="menu-item">Dashboards</span>
+        </div>
+      </mat-list-item>
+      <mat-list-item
+        pRipple
+        routerLink="assistant"
+        routerLinkActive="active"
+        ariaCurrentWhenActive="page"
+        [routerLinkActiveOptions]="{ exact: true }"
+        (click)="toggleClose()"
+      >
+        <div class="container-icon">
+          <fa-icon
+            class="icon"
+            [icon]="icons.assistant"
+            [size]="'xl'"
+            title="Assistente"
+          ></fa-icon>
+          <span class="menu-item">Assistente</span>
         </div>
       </mat-list-item>
 
@@ -108,7 +126,7 @@
             class="icon"
             [icon]="icons.database"
             [size]="'xl'"
-            title="Início"
+            title="Database"
           ></fa-icon>
           <span class="menu-item">Database</span>
         </div>
