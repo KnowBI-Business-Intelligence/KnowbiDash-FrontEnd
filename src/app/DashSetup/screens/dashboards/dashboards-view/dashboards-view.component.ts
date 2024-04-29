@@ -16,6 +16,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { FormsModule } from '@angular/forms';
 import Highcharts from 'highcharts';
+import { LocalstorageService } from '../../../../services/service/localstorage/localstorage.service';
 interface Group {
   id: string;
   name: string;
@@ -81,14 +82,14 @@ export class DashboardsViewComponent implements OnInit {
     private router: Router,
     private chartsService: ChartsService,
     private storageService: StorageService,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
+    private localStorageService: LocalstorageService
   ) {}
 
   ngOnInit(): void {
     this.loadDataInit();
-    const groupIdFromLocalStorage = JSON.parse(
-      localStorage.getItem('chartGroupview') || 'null'
-    );
+    const groupIdFromLocalStorage =
+      this.localStorageService.getDecryptedItem('chartGroupview');
     this.getCharts(groupIdFromLocalStorage.id);
     const simulatedEvent = {
       currentTarget:
@@ -403,6 +404,10 @@ export class DashboardsViewComponent implements OnInit {
 
   clickPress(group: any, event: any) {
     this.selectedGroupId = group;
+    const encryptedData = {
+      id: group.id,
+      name: group.name,
+    };
     const clickedButton = event ? event.currentTarget : null;
     const allButtons =
       this.elementRef.nativeElement.querySelectorAll('.dashboardbtn');
@@ -413,14 +418,10 @@ export class DashboardsViewComponent implements OnInit {
       clickedButton.style.backgroundColor = '#00000015';
     }
     this.groupName = group.name;
+    this.localStorageService.setEncryptedItem('chartGroupview', encryptedData);
   }
 
   addView(buttonId: string) {
-    const groupId = this.selectedGroupId;
-    console.log(groupId);
-    console.log(buttonId);
-
-    localStorage.setItem('chartGroupview', JSON.stringify(groupId));
     if (buttonId == 'chart') {
       this.router.navigate(['/admin/dashboards/chart_view']);
     } else if (buttonId == 'card') {

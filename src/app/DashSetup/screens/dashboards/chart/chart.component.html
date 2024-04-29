@@ -5,7 +5,268 @@
   </button>
 </div>
 <div class="container">
-  <div class="container-data">drag and grop</div>
-  <div class="container-create">content</div>
-  <div class="container-pre-view">pre view</div>
+  <div cdkDropListGroup class="container-data-group">
+    <div class="container-data">
+      <span>Dados</span>
+      <div
+        cdkDropList
+        [cdkDropListData]="database"
+        class="data-list"
+        id="data-list"
+        (cdkDropListDropped)="drop($event)"
+      >
+        @for (item of database; track item) {
+        <div class="example-box" cdkDrag>
+          <fa-icon
+            class="icon"
+            [icon]="icons.database"
+            [size]="'xl'"
+            title="Dashboards"
+          ></fa-icon
+          >{{ item }}
+        </div>
+        }
+      </div>
+    </div>
+
+    <div class="container-create">
+      <span class="graph-label">Gráficos</span>
+      <div class="container-create-group">
+        <div class="title">
+          <span>Título</span>
+          <input type="text" [(ngModel)]="titulo" />
+        </div>
+        <div class="series">
+          <span class="serie-label"> Série base: </span>
+          <div class="serie-content">
+            <div *ngFor="let data of chartButtons">
+              <button>
+                <fa-icon
+                  class="iconChart"
+                  [icon]="data.icon"
+                  [size]="'xl'"
+                ></fa-icon>
+                {{ data.label }}
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="yaxis">
+          <span>Eixo y - Valores</span>
+          <div
+            id="yaxis"
+            cdkDropList
+            [cdkDropListData]="yaxis"
+            class="serie-list y"
+            [cdkDropListConnectedTo]="['data-list']"
+            (cdkDropListDropped)="drop($event)"
+          >
+            <div
+              *ngFor="let item of yaxis; let i = index"
+              class="series-box"
+              cdkDrag
+              cdkDragLockAxis="y"
+              cdkDragBoundary=".y"
+            >
+              <div>
+                <fa-icon
+                  class="icon"
+                  [icon]="icons.database"
+                  [size]="'xl'"
+                ></fa-icon>
+                {{ item }}
+              </div>
+              <button (click)="removeItem('yaxis', i)">
+                <fa-icon
+                  class="removedataicon"
+                  [icon]="icons.close"
+                  [size]="'xl'"
+                ></fa-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="xaxis">
+          <span>Eixo x - Rótulos</span>
+          <div
+            id="xaxis"
+            cdkDropList
+            [cdkDropListData]="xaxis"
+            class="serie-list x"
+            [cdkDropListConnectedTo]="['data-list']"
+            (cdkDropListDropped)="drop($event)"
+          >
+            <div
+              *ngFor="let item of xaxis; let i = index"
+              class="series-box"
+              cdkDrag
+              cdkDragLockAxis="y"
+              cdkDragBoundary=".x"
+            >
+              <div>
+                <fa-icon
+                  class="icon"
+                  [icon]="icons.database"
+                  [size]="'xl'"
+                ></fa-icon>
+                {{ item }}
+              </div>
+              <button (click)="removeItem('xaxis', i)">
+                <fa-icon
+                  class="removedataicon"
+                  [icon]="icons.close"
+                  [size]="'xl'"
+                ></fa-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="seriesdata">
+          <span>Series</span>
+          <div
+            cdkDropList
+            [cdkDropListData]="series"
+            class="serie-list s"
+            (cdkDropListDropped)="drop($event)"
+          >
+            <div
+              *ngFor="let item of series; let i = index"
+              class="series-box"
+              cdkDrag
+              cdkDragLockAxis="y"
+              cdkDragBoundary=".s"
+            >
+              <div>
+                <fa-icon
+                  class="icon"
+                  [icon]="icons.database"
+                  [size]="'xl'"
+                ></fa-icon>
+                {{ item }}
+              </div>
+              <button (click)="removeItem('series', i)">
+                <fa-icon
+                  class="removedataicon"
+                  [icon]="icons.close"
+                  [size]="'xl'"
+                ></fa-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="filters">
+          <span>Filtros</span>
+          <div
+            cdkDropList
+            [cdkDropListData]="filters"
+            class="serie-list f"
+            (cdkDropListDropped)="drop($event)"
+          >
+            <div
+              *ngFor="let item of filters; let i = index"
+              class="series-box"
+              cdkDrag
+              cdkDragLockAxis="y"
+              cdkDragBoundary=".f"
+            >
+              <div>
+                <fa-icon
+                  class="icon"
+                  [icon]="icons.database"
+                  [size]="'xl'"
+                ></fa-icon>
+                {{ item }}
+              </div>
+              <button (click)="removeItem('filters', i)">
+                <fa-icon
+                  class="removedataicon"
+                  [icon]="icons.close"
+                  [size]="'xl'"
+                ></fa-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="groupment">
+          <span>Agrupamento</span>
+          <div
+            cdkDropList
+            [cdkDropListData]="groupment"
+            class="serie-list a"
+            (cdkDropListDropped)="drop($event)"
+          >
+            <div
+              *ngFor="let item of groupment; let i = index"
+              class="series-box"
+              cdkDrag
+              cdkDragLockAxis="y"
+              cdkDragBoundary=".a"
+            >
+              <div>
+                <fa-icon
+                  class="icon"
+                  [icon]="icons.database"
+                  [size]="'xl'"
+                ></fa-icon>
+                {{ item }}
+              </div>
+              <button (click)="removeItem('groupment', i)">
+                <fa-icon
+                  class="removedataicon"
+                  [icon]="icons.close"
+                  [size]="'xl'"
+                ></fa-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="order">
+          <span>Ordenação</span>
+          <div
+            cdkDropList
+            [cdkDropListData]="order"
+            class="serie-list o"
+            (cdkDropListDropped)="drop($event)"
+          >
+            <div
+              *ngFor="let item of order; let i = index"
+              class="series-box"
+              cdkDrag
+              cdkDragLockAxis="y"
+              cdkDragBoundary=".o"
+            >
+              <div>
+                <fa-icon
+                  class="icon"
+                  [icon]="icons.database"
+                  [size]="'xl'"
+                ></fa-icon>
+                {{ item }}
+              </div>
+              <button (click)="removeItem('order', i)">
+                <fa-icon
+                  class="removedataicon"
+                  [icon]="icons.close"
+                  [size]="'xl'"
+                ></fa-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="visualize">
+        <button (click)="chartPreView()"><p>Visualizar</p></button>
+      </div>
+    </div>
+  </div>
+  <div class="container-pre-view">
+    <span>pré visualização</span>
+    <div class="chart-container">
+      <highcharts-chart
+        style="width: 30rem; height: 25rem; margin: 5px"
+        [Highcharts]="Highcharts"
+        [options]="chartConfig"
+      ></highcharts-chart>
+    </div>
+  </div>
 </div>
