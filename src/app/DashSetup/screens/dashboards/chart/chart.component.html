@@ -74,15 +74,39 @@
                   [icon]="icons.database"
                   [size]="'xl'"
                 ></fa-icon>
-                {{ item }}
+                {{ selectedAggregation ? selectedAggregation : item }}
               </div>
-              <button (click)="removeItem('yaxis', i)">
-                <fa-icon
-                  class="removedataicon"
-                  [icon]="icons.close"
-                  [size]="'xl'"
-                ></fa-icon>
-              </button>
+              <div class="series-buttons">
+                <button
+                  [cdkMenuTriggerFor]="menuautosum"
+                  class="example-standalone-item"
+                  (click)="openMenu(i)"
+                >
+                  <img
+                    class="autosum"
+                    src="../../../../../assets/icons/autosum.svg"
+                    alt=""
+                  />
+                </button>
+                <button
+                  [cdkMenuTriggerFor]="menuedit"
+                  class="example-standalone-item"
+                  (click)="YAxisValue(item)"
+                >
+                  <fa-icon
+                    class="commomicon"
+                    [icon]="icons.edit"
+                    [size]="'xl'"
+                  ></fa-icon>
+                </button>
+                <button (click)="removeItem('yaxis', i)">
+                  <fa-icon
+                    class="removedataicon"
+                    [icon]="icons.close"
+                    [size]="'xl'"
+                  ></fa-icon>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -111,13 +135,26 @@
                 ></fa-icon>
                 {{ item }}
               </div>
-              <button (click)="removeItem('xaxis', i)">
-                <fa-icon
-                  class="removedataicon"
-                  [icon]="icons.close"
-                  [size]="'xl'"
-                ></fa-icon>
-              </button>
+              <div class="series-buttons">
+                <button
+                  [cdkMenuTriggerFor]="menuedit"
+                  class="example-standalone-item"
+                  (click)="YAxisValue(item)"
+                >
+                  <fa-icon
+                    class="commomicon"
+                    [icon]="icons.edit"
+                    [size]="'xl'"
+                  ></fa-icon>
+                </button>
+                <button (click)="removeItem('xaxis', i)">
+                  <fa-icon
+                    class="removedataicon"
+                    [icon]="icons.close"
+                    [size]="'xl'"
+                  ></fa-icon>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -144,13 +181,26 @@
                 ></fa-icon>
                 {{ item }}
               </div>
-              <button (click)="removeItem('series', i)">
-                <fa-icon
-                  class="removedataicon"
-                  [icon]="icons.close"
-                  [size]="'xl'"
-                ></fa-icon>
-              </button>
+              <div class="series-buttons">
+                <button
+                  [cdkMenuTriggerFor]="menuedit"
+                  class="example-standalone-item"
+                  (click)="YAxisValue(item)"
+                >
+                  <fa-icon
+                    class="commomicon"
+                    [icon]="icons.edit"
+                    [size]="'xl'"
+                  ></fa-icon>
+                </button>
+                <button (click)="removeItem('series', i)">
+                  <fa-icon
+                    class="removedataicon"
+                    [icon]="icons.close"
+                    [size]="'xl'"
+                  ></fa-icon>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -177,13 +227,26 @@
                 ></fa-icon>
                 {{ item }}
               </div>
-              <button (click)="removeItem('filters', i)">
-                <fa-icon
-                  class="removedataicon"
-                  [icon]="icons.close"
-                  [size]="'xl'"
-                ></fa-icon>
-              </button>
+              <div class="series-buttons">
+                <button
+                  [cdkMenuTriggerFor]="menuedit"
+                  class="example-standalone-item"
+                  (click)="YAxisValue(item)"
+                >
+                  <fa-icon
+                    class="commomicon"
+                    [icon]="icons.edit"
+                    [size]="'xl'"
+                  ></fa-icon>
+                </button>
+                <button (click)="removeItem('filters', i)">
+                  <fa-icon
+                    class="removedataicon"
+                    [icon]="icons.close"
+                    [size]="'xl'"
+                  ></fa-icon>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -210,13 +273,26 @@
                 ></fa-icon>
                 {{ item }}
               </div>
-              <button (click)="removeItem('groupment', i)">
-                <fa-icon
-                  class="removedataicon"
-                  [icon]="icons.close"
-                  [size]="'xl'"
-                ></fa-icon>
-              </button>
+              <div class="series-buttons">
+                <button
+                  [cdkMenuTriggerFor]="menuedit"
+                  class="example-standalone-item"
+                  (click)="YAxisValue(item)"
+                >
+                  <fa-icon
+                    class="commomicon"
+                    [icon]="icons.edit"
+                    [size]="'xl'"
+                  ></fa-icon>
+                </button>
+                <button (click)="removeItem('groupment', i)">
+                  <fa-icon
+                    class="removedataicon"
+                    [icon]="icons.close"
+                    [size]="'xl'"
+                  ></fa-icon>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -243,13 +319,26 @@
                 ></fa-icon>
                 {{ item }}
               </div>
-              <button (click)="removeItem('order', i)">
-                <fa-icon
-                  class="removedataicon"
-                  [icon]="icons.close"
-                  [size]="'xl'"
-                ></fa-icon>
-              </button>
+              <div class="series-buttons">
+                <button
+                  [cdkMenuTriggerFor]="menuedit"
+                  class="example-standalone-item"
+                  (click)="YAxisValue(item)"
+                >
+                  <fa-icon
+                    class="commomicon"
+                    [icon]="icons.edit"
+                    [size]="'xl'"
+                  ></fa-icon>
+                </button>
+                <button (click)="removeItem('order', i)">
+                  <fa-icon
+                    class="removedataicon"
+                    [icon]="icons.close"
+                    [size]="'xl'"
+                  ></fa-icon>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -270,3 +359,41 @@
     </div>
   </div>
 </div>
+<ng-template #menuautosum>
+  <div class="example-menu" cdkMenu>
+    <button
+      class="example-menu-item"
+      cdkMenuItem
+      (click)="extractValue('AVG')"
+      [class.selected]="selectedAggregation === 'AVG(' + selectedYAxis + ')'"
+    >
+      AVG()
+    </button>
+    <button
+      class="example-menu-item"
+      cdkMenuItem
+      (click)="extractValue('COUNT')"
+      [class.selected]="selectedAggregation === 'COUNT(' + selectedYAxis + ')'"
+    >
+      COUNT()
+    </button>
+    <button
+      class="example-menu-item"
+      cdkMenuItem
+      (click)="extractValue('SUM')"
+      [class.selected]="selectedAggregation === 'SUM(' + selectedYAxis + ')'"
+    >
+      SUM()
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #menuedit let-i="index">
+  <div class="edit-menu" cdkMenu>
+    <div>
+      <label for="identifier">Identificador</label>
+      <input name="identifier" type="text" [(ngModel)]="identifier" />
+    </div>
+    <button class="edit-save" cdkMenuItem (click)="editSave(i)">Salvar</button>
+  </div>
+</ng-template>

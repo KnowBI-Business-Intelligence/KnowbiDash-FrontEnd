@@ -187,9 +187,6 @@
   align-items: center;
 }
 
-.data-list {
-}
-
 .serie-list {
   width: 60%;
 }
@@ -230,11 +227,29 @@
   justify-content: space-between;
 }
 
-.series-box button {
+.series-buttons {
+  display: flex;
+  align-items: center;
+}
+
+.series-buttons button {
   cursor: pointer;
   border: none;
   background-color: #ffffff;
   display: flex;
+  justify-content: center;
+  padding: 1px 4px;
+  height: 14px;
+  width: 18px;
+}
+
+.autosum {
+  width: 17px;
+}
+
+.commomicon {
+  color: #751a7e;
+  font-size: 8px;
 }
 
 .removedataicon {
@@ -297,4 +312,78 @@
 
 .material-symbols-outlined {
   font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 20;
+}
+
+.example-menu,
+.edit-menu {
+  display: inline-flex;
+  flex-direction: column;
+  min-width: 180px;
+  max-width: 280px;
+  background-color: rgb(255, 255, 255);
+  padding: 6px 0;
+}
+
+.edit-menu {
+  padding: 10px;
+}
+
+.edit-menu div {
+  display: flex;
+  flex-direction: column;
+}
+
+.edit-menu div label {
+  margin: 5px 0;
+  font-size: 10px;
+}
+
+.edit-menu div input {
+  outline: none;
+  font-size: 12px;
+  border: solid 0.5px #dbdbdb;
+  border-radius: 2px;
+  padding: 3px 10px;
+}
+
+.edit-save {
+  margin: 10px 0;
+  width: 40%;
+  background-color: #751a7e;
+  border-radius: 4px;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  height: 2rem;
+  font-size: 12px;
+  align-self: flex-end;
+}
+
+.example-menu .example-menu-item {
+  width: 100%;
+}
+
+.example-menu-item {
+  font-size: 10px !important;
+  border-bottom: solid 1px #000;
+}
+
+.example-menu-item,
+.example-standalone-item {
+  background-color: transparent;
+  cursor: pointer;
+  border: none;
+  user-select: none;
+  min-width: 23px;
+  line-height: 36px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  flex: 1;
+  outline: none;
+}
+
+.example-menu-item:hover {
+  background-color: rgb(208, 208, 208);
 }

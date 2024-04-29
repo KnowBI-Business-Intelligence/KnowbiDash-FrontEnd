@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { faDatabase, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faDatabase, faXmark, faGear } from '@fortawesome/free-solid-svg-icons';
 import {
   CdkDragDrop,
   CdkDrag,
@@ -9,6 +9,14 @@ import {
   moveItemInArray,
   copyArrayItem,
 } from '@angular/cdk/drag-drop';
+import {
+  CdkMenu,
+  CdkMenuItem,
+  CdkMenuItemRadio,
+  CdkMenuGroup,
+  CdkMenuItemCheckbox,
+  CdkMenuTrigger,
+} from '@angular/cdk/menu';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { HttpHeaders } from '@angular/common/http';
 import { StorageService } from '../../../../services/service/user/storage.service';
@@ -44,18 +52,30 @@ interface ExtendedOptions extends Highcharts.Options {
     CommonModule,
     HighchartsChartModule,
     FormsModule,
+    CdkMenuTrigger,
+    CdkMenu,
+    CdkMenuItemCheckbox,
+    CdkMenuGroup,
+    CdkMenuItemRadio,
+    CdkMenuItem,
   ],
   templateUrl: './chart.component.html',
   styleUrl: './chart.component.css',
 })
 export class ChartComponent implements OnInit {
+  selectedYAxis: string = '';
+  yAxisValueWithoutAggregation: string = '';
+  yaxisData: { [key: string]: string } = {};
+  identifier: string = '';
   titulo: string = '';
+  selectedAggregation: string = '';
   Highcharts: typeof Highcharts = Highcharts;
   chartConfig!: ExtendedOptions;
   group: any;
   icons = {
     database: faDatabase,
     close: faXmark,
+    edit: faGear,
   };
   chartButtons = chartButtonsData;
   user = this.storageService.getUser();
@@ -97,6 +117,29 @@ export class ChartComponent implements OnInit {
     this.chartPreView();
   }
 
+  YAxisValue(item: string) {
+    if (!this.yaxisData[item]) {
+      this.yaxisData[item] = item;
+    }
+
+    this.identifier = this.yaxisData[item];
+  }
+
+  extractValue(aggregation: string) {
+    if (this.selectedYAxis) {
+      this.yAxisValueWithoutAggregation = this.selectedYAxis.replace(
+        /^(?:AVG|COUNT|SUM)\(([^)]+)\)$/,
+        '$1'
+      );
+      const aggregationValue =
+        aggregation + '(' + this.yAxisValueWithoutAggregation + ')';
+      const index = this.yaxis.indexOf(this.selectedYAxis);
+      if (index !== -1) {
+        this.yaxis[index] = aggregationValue;
+      }
+    }
+  }
+
   loadDataView(id: string) {
     console.log(id);
     const headers = new HttpHeaders({
@@ -114,10 +157,17 @@ export class ChartComponent implements OnInit {
     });
   }
 
+  openMenu(index: number) {
+    this.selectedYAxis = this.yaxis[index];
+    this.identifier = this.yaxisData[this.selectedYAxis];
+  }
+
+  editSave(index: number) {}
+
   processData(data: any) {
-    console.log(data);
     data.columns.forEach((setData: any) => {
       this.database.push(setData);
+      this.yaxisData[setData] = setData;
     });
   }
 
@@ -146,11 +196,32 @@ export class ChartComponent implements OnInit {
     }
   }
 
-  backScreen() {
-    this.router.navigate(['/admin/dashboards']);
+  identifierData() {
+    const yAxisData = [];
+    for (let i = 0; i < this.yaxis.length; i++) {
+      const yAxisItem = this.yaxis[i];
+      let identifierItem = this.yaxisData[yAxisItem];
+
+      if (!identifierItem) {
+        identifierItem = yAxisItem;
+      } else {
+        const hasAggregation = /^(?:AVG|COUNT|SUM)\([^)]+\)$/.test(
+          identifierItem
+        );
+        if (hasAggregation) {
+          identifierItem =
+            yAxisItem +
+            identifierItem.replace(/^(?:AVG|COUNT|SUM)\(([^)]+)\)$/, '$1');
+        }
+      }
+
+      yAxisData.push({ name: yAxisItem, identifier: identifierItem });
+    }
+    console.log(yAxisData);
   }
 
   chartPreView() {
+    this.identifierData();
     console.log('Título:', this.titulo);
     console.log('eixo y ', this.yaxis);
     console.log('eixo x ', this.xaxis);
@@ -190,5 +261,8 @@ export class ChartComponent implements OnInit {
         },
       ],
     };
+  }
+  backScreen() {
+    this.router.navigate(['/admin/dashboards']);
   }
 }
