@@ -298,6 +298,6 @@ export class ChartScreenComponent implements OnInit {
   }
 
   backScreen() {
-    this.router.navigate(['/content/main/chartgroup']);
+    this.router.navigate(['/content/chartgroup']);
   }
 }

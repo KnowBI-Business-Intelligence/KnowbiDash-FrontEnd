@@ -1,16 +1,17 @@
 import { Routes } from '@angular/router';
+
 import { AuthGuard } from './core/guards/auth-guard.guard';
 import { ADMMainScreenComponent } from './DashSetup/screens/adm-main-screen/adm-main-screen.component';
 import { ADMContentScreenComponent } from './DashSetup/screens/admcontent-screen/admcontent-screen.component';
-import { CardsComponent } from './DashSetup/screens/dashboards/cards/cards.component';
-import { ChartComponent } from './DashSetup/screens/dashboards/chart/chart.component';
 import { DashboardsViewComponent } from './DashSetup/screens/dashboards/dashboards-view/dashboards-view.component';
 import { DashboardsComponent } from './DashSetup/screens/dashboards/dashboards.component';
-import { TableComponent } from './DashSetup/screens/dashboards/table/table.component';
+import { ViewCreateComponent } from './DashSetup/screens/dashboards/view-create/view-create.component';
+import { ViewEditComponent } from './DashSetup/screens/dashboards/view-edit/view-edit.component';
 import { DatabaseComponentComponent } from './DashSetup/screens/database-screen/database-component/database-component.component';
 import { DatabaseScreenComponent } from './DashSetup/screens/database-screen/database-screen.component';
 import { ChartsComponent } from './DashSetup/screens/folders-screen/charts/charts.component';
 import { CreateFoldersComponent } from './DashSetup/screens/folders-screen/create-folders/create-folders.component';
+import { FoldersScreenComponent } from './DashSetup/screens/folders-screen/folders-screen.component';
 import { FoldersComponent } from './DashSetup/screens/folders-screen/folders/folders.component';
 import { GroupComponent } from './DashSetup/screens/folders-screen/group/group.component';
 import { SQLRunnerUpdateComponent } from './DashSetup/screens/folders-screen/sqlrunner-update/sqlrunner-update.component';
@@ -27,7 +28,9 @@ import { ChartScreenComponent } from './DashView/screens/chart-screen/chart-scre
 import { ContentScreenComponent } from './DashView/screens/content-screen/content-screen.component';
 import { MainScreenComponent } from './DashView/screens/main-screen/main-screen.component';
 import { PageNotFoundComponent } from './DashView/screens/page-not-found/page-not-found.component';
+import { SettingsUserComponent } from './DashView/screens/settings-user/settings-user.component';
 import { LoginScreenComponent } from './shared/login-screen/login-screen.component';
+
 export const routes: Routes = [
   {
     path: '',
@@ -58,7 +61,6 @@ export const routes: Routes = [
           breadcrumb: '',
         },
       },
-
       {
         path: 'graphic_editing',
         component: GraphicEditingComponent,
@@ -67,20 +69,13 @@ export const routes: Routes = [
           breadcrumb: 'Koios - Editor Gráfico',
         },
       },
-      {
-        path: 'assistant',
-        title: 'Koios - Administrador',
-        component: AssistantScreenComponent,
-        data: {
-          breadcrumb: 'Koios Assistente',
-        },
-      },
+
       {
         path: 'cofig_db',
-        title: 'Koios - Administrador',
         component: DatabaseScreenComponent,
+        title: 'Koios - Administrador',
         data: {
-          breadcrumb: 'Koios Assistente',
+          breadcrumb: 'Configurar Database',
         },
         children: [
           {
@@ -88,7 +83,57 @@ export const routes: Routes = [
             component: DatabaseComponentComponent,
             title: 'Koios - Administrador',
             data: {
-              breadcrumb: 'Database',
+              breadcrumb: '',
+            },
+          },
+        ],
+      },
+      {
+        path: 'folders',
+        component: FoldersScreenComponent,
+        title: 'Koios - Administrador',
+        data: {
+          breadcrumb: 'Pastas',
+        },
+        children: [
+          {
+            path: '',
+            component: FoldersComponent,
+            title: 'Koios - Administrador',
+            data: {
+              breadcrumb: '',
+            },
+          },
+          {
+            path: 'create_group',
+            component: CreateFoldersComponent,
+            title: 'Koios - Administrador',
+            data: {
+              breadcrumb: 'Criar Grupo',
+            },
+          },
+          {
+            path: 'groups',
+            component: GroupComponent,
+            title: 'Koios - Administrador',
+            data: {
+              breadcrumb: 'Grupos',
+            },
+          },
+          {
+            path: 'sql_update',
+            component: SQLRunnerUpdateComponent,
+            title: 'Koios - Administrador',
+            data: {
+              breadcrumb: 'Injetar SQL',
+            },
+          },
+          {
+            path: 'charts',
+            component: ChartsComponent,
+            title: 'Koios - Administrador',
+            data: {
+              breadcrumb: 'Gráficos',
             },
           },
         ],
@@ -105,80 +150,23 @@ export const routes: Routes = [
             path: '',
             component: DashboardsViewComponent,
             title: 'Koios - Administrador',
-            data: {
-              breadcrumb: 'Dashboards',
-            },
           },
           {
-            path: 'chart_view',
-            component: ChartComponent,
+            path: '',
+            component: ViewCreateComponent,
             title: 'Koios - Administrador',
-            data: {
-              breadcrumb: 'Gráficos',
-            },
           },
           {
-            path: 'card_view',
-            component: CardsComponent,
-            title: 'Koios - Cards',
-            data: {
-              breadcrumb: 'Cards',
-            },
-          },
-          {
-            path: 'table_view',
-            component: TableComponent,
-            title: 'Koios - Tables',
-            data: {
-              breadcrumb: 'Tables',
-            },
+            path: '',
+            component: ViewEditComponent,
+            title: 'Koios - Administrador',
           },
         ],
       },
       {
-        path: '',
-        component: FoldersComponent,
-        title: 'Koios - Dashboards',
-        data: {
-          breadcrumb: '',
-        },
-      },
-      {
-        path: 'create_group',
-        component: CreateFoldersComponent,
-        title: 'Koios - Criar Grupo',
-        data: {
-          breadcrumb: 'Criar Grupo',
-        },
-      },
-      {
-        path: 'groups',
-        component: GroupComponent,
-        title: 'Koios - Grupos',
-        data: {
-          breadcrumb: 'Grupos',
-        },
-      },
-      {
-        path: 'sql_update',
-        component: SQLRunnerUpdateComponent,
-        title: 'Koios - Atualizar',
-        data: {
-          breadcrumb: 'Injetar SQL',
-        },
-      },
-      {
-        path: 'charts',
-        component: ChartsComponent,
-        title: 'Koios - Gráficos',
-        data: {
-          breadcrumb: 'Gráficos',
-        },
-      },
-      {
         path: 'users_panel',
         component: UsersScreenComponent,
-        title: 'Koios - Usuários',
+        title: 'Koios - Administrador',
         data: {
           breadcrumb: 'Usuários',
         },
@@ -186,7 +174,7 @@ export const routes: Routes = [
           {
             path: '',
             component: UsersComponent,
-            title: 'Koios - Usuários',
+            title: 'Koios - Administrador',
             data: {
               breadcrumb: '',
             },
@@ -194,7 +182,7 @@ export const routes: Routes = [
           {
             path: 'create_users',
             component: CreateUserComponent,
-            title: 'Koios - Cadastro',
+            title: 'Koios - Administrador',
             data: {
               breadcrumb: 'Adicionar Usuário',
             },
@@ -202,7 +190,7 @@ export const routes: Routes = [
           {
             path: 'edit_users',
             component: EditUserComponent,
-            title: 'Koios - Edição',
+            title: 'Koios - Administrador',
             data: {
               breadcrumb: 'Editar Usuário',
             },
@@ -212,15 +200,15 @@ export const routes: Routes = [
       {
         path: 'profiles_folders',
         component: StructureScreenComponent,
-        title: 'Koios - Estrutura',
+        title: 'Koios - Administrador',
         data: {
-          breadcrumb: 'Estrutura',
+          breadcrumb: 'Pastas e Perfis',
         },
         children: [
           {
             path: '',
             component: StructureComponent,
-            title: 'Koios - Estrutura',
+            title: 'Koios - Administrador',
             data: {
               breadcrumb: '',
             },
@@ -234,7 +222,7 @@ export const routes: Routes = [
   {
     path: 'content',
     component: ContentScreenComponent,
-    title: 'Koios - Inicio',
+    title: 'Koios - Padrão',
     canActivate: [AuthGuard],
     data: {
       breadcrumb: '',
@@ -242,48 +230,48 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        title: 'Koios - Painel',
+        title: 'Koios - Painel Usuário',
         component: MainScreenComponent,
         data: {
           breadcrumb: '',
         },
       },
-
       {
         path: 'main',
-        children: [
-          {
-            path: '',
-            title: 'Koios - Painel',
-            component: MainScreenComponent,
-          },
-          {
-            path: 'chartgroup',
-            title: 'Koios - grupos',
-            component: ChartGroupsComponent,
-          },
-          {
-            path: 'charts',
-            title: 'Koios - Gráficos',
-            component: ChartScreenComponent,
-          },
-        ],
+        title: 'Koios - Painel Usuário',
+        component: MainScreenComponent,
+      },
+      {
+        path: 'charts',
+        title: 'Koios - Painel Usuário',
+        component: ChartScreenComponent,
+      },
+      {
+        path: 'chartgroup',
+        component: ChartGroupsComponent,
+        title: 'Koios - Painel Usuário',
       },
       {
         path: 'assistant',
-        title: 'Koios - Assistente',
+        title: 'Koios - Painel Usuário',
         component: AssistantScreenComponent,
         data: {
           breadcrumb: 'Koios Assistente',
+        },
+      },
+      {
+        path: 'settings',
+        title: 'Koios - Painel Usuário',
+        component: SettingsUserComponent,
+        data: {
+          breadcrumb: 'Informações do Usuário',
         },
       },
     ],
   },
   {
     path: '**',
-    title: 'Page Not Found! 😥',
+    title: 'Opss! 😥',
     component: PageNotFoundComponent,
   },
-
-  //
 ];

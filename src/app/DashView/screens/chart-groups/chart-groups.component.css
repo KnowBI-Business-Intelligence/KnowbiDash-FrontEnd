@@ -15,13 +15,13 @@
 }
 
 .container-path-header {
-  width: 117px;
+  width: 7.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   position: fixed;
-  top: 17px;
-  left: 244px;
+  top: 1.2rem;
+  left: 15rem;
 }
 
 .container-path-header span {
@@ -66,6 +66,9 @@ strong {
 }
 
 .container-path-button {
+  display: flex;
+  align-items: center;
+  justify-content: start;
   cursor: pointer;
   border: none;
   border-radius: 3px;
@@ -74,9 +77,6 @@ strong {
   height: 55px;
   padding: 0 15px;
   background-color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   box-shadow: -1px 0px 5px 1px rgba(211, 211, 211, 0.51);
   -webkit-box-shadow: -1px 0px 5px 1px rgba(211, 211, 211, 0.51);
   -moz-box-shadow: -1px 0px 5px 1px rgba(211, 211, 211, 0.51);
@@ -88,14 +88,15 @@ strong {
 }
 
 .container-path-button img {
-  width: 16px;
+  width: 1rem;
+  margin-right: 2rem;
 }
 
 .container-path-button span {
-  font-size: 13px;
+  font-size: 0.8rem;
 }
 
 .chart-container {
-  width: 300px;
-  height: 300px;
+  width: 18.75rem;
+  height: 18.75rem;
 }

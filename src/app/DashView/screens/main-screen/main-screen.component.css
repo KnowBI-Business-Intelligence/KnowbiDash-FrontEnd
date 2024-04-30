@@ -47,21 +47,21 @@ strong {
 }
 
 .container-path-button {
-  cursor: pointer;
-  border: none;
-  border-radius: 3px;
-  margin: 8px 8px;
-  width: 228px;
-  height: 55px;
-  padding: 0 15px;
-  background-color: #ffffff;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: start;
+  cursor: pointer;
+  border: none;
+  background-color: #ffffff;
+  border-radius: 3px;
+  margin: 8px 8px;
+  width: 14.5rem;
+  height: 3.5rem;
+  padding: 0 15px;
+  transition: 0.5s;
   box-shadow: -1px 0px 5px 1px rgba(211, 211, 211, 0.51);
   -webkit-box-shadow: -1px 0px 5px 1px rgba(211, 211, 211, 0.51);
   -moz-box-shadow: -1px 0px 5px 1px rgba(211, 211, 211, 0.51);
-  transition: 0.5s;
 }
 
 .container-path-button:hover {
@@ -69,7 +69,8 @@ strong {
 }
 
 .container-path-button img {
-  width: 16px;
+  width: 1rem;
+  margin-right: 2rem;
 }
 
 .container-path-button span {

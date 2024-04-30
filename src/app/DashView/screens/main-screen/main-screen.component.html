@@ -6,7 +6,7 @@
     <div class="container-path-header-two">
       <span>Pastas</span>
     </div>
-    <div *ngFor="let perfil of perfis">
+    <div *ngFor="let perfil of profiles">
       <div class="container-path-body-profile-label">
         <span
           >Do perfil <strong>{{ perfil }}</strong></span
@@ -17,7 +17,7 @@
             *ngFor="let path of pathsByProfile[perfil]"
             (click)="openChartGroup(path)"
           >
-            <img src="../../../../assets/icons/folder.svg" alt="" />
+            <img src="assets/icons/folder.svg" alt="" />
             <span>{{
               path.name.length > 25
                 ? path.name.substring(0, 25) + "..."
@@ -28,26 +28,4 @@
       </div>
     </div>
   </div>
-  <!--<div class="info">
-    <h1>Bem-vindo à Koios</h1>
-    <p>Nossa ferramenta para dashboards em versão beta!</p>
-    <div class="text">
-      <p>
-        Estamos entusiasmados em tê-lo aqui e esperamos que você aproveite ao
-        máximo sua experiência. Como estamos em fase beta, gostaríamos de
-        destacar que algumas funcionalidades podem não estar totalmente
-        desenvolvidas ou podem apresentar instabilidades. Nossa equipe está
-        trabalhando para aprimorar a ferramenta e garantir que ela atenda às
-        suas necessidades de maneira eficaz. No entanto, durante esta fase
-        inicial, é possível que você encontre algumas áreas que ainda estão
-        sendo aprimoradas. Pedimos a sua compreensão e paciência enquanto
-        continuamos aprimorando.
-      </p>
-      <p>
-        Agradecemos por experimentar nossa ferramenta para dashboards em versão
-        beta e esperamos que você tenha uma experiência produtiva e
-        satisfatória!
-      </p>
-    </div>
-  </div>-->
 </div>

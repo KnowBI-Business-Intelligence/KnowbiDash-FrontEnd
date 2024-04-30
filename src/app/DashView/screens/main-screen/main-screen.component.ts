@@ -14,7 +14,7 @@ import { StorageService } from '../../../core/services/user/storage.service';
 })
 export class MainScreenComponent implements OnInit {
   user: any;
-  perfis: string[] = [];
+  profiles: string[] = [];
   pathsByProfile: { [key: string]: any[] } = {};
 
   constructor(
@@ -31,7 +31,6 @@ export class MainScreenComponent implements OnInit {
   initUserData() {
     this.user = this.token.getUser();
     this.getUserById(this.user.id, this.user.token);
-    console.log(this.user);
   }
 
   getUserById(id: number, token: any) {
@@ -56,13 +55,12 @@ export class MainScreenComponent implements OnInit {
         });
       }
       this.pathsByProfile[profile.name] = paths;
-      this.perfis.push(profile.name);
+      this.profiles.push(profile.name);
     });
   }
 
   openChartGroup(pathObj: any) {
-    console.log('pathOBJ ', pathObj);
     localStorage.setItem('selectedChartPath', JSON.stringify(pathObj.id));
-    this.router.navigate(['/content/main/chartgroup']);
+    this.router.navigate(['content/chartgroup']);
   }
 }

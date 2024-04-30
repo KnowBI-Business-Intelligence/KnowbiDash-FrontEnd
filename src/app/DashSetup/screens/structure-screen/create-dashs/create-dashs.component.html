@@ -37,8 +37,8 @@
           selectionMode="single"
           [value]="dataSource"
           (matSortChange)="announceSortChange($event)"
-          [contextMenu]="cm"
           [(contextMenuSelection)]="selectedDash"
+          [contextMenu]="cm"
           [rows]="10"
           [showCurrentPageReport]="true"
           [rowsPerPageOptions]="[10, 25, 50]"
@@ -66,7 +66,7 @@
                 <div class="flex align-items-center">Pastas</div>
               </th>
 
-              <th style="min-width: 15rem" pSortableColumn="sql">
+              <th style="min-width: 5rem" pSortableColumn="sql">
                 <div class="flex align-items-center">Código SQL</div>
               </th>
             </tr>
@@ -78,7 +78,6 @@
               pSelectableRow="dataSource"
               pContextMenuRow="dataSource"
               (click)="selectRow(dataSource)"
-              (click)="onRowSelect($event, dataSource)"
               (contextmenu)="onRowSelect($event, dataSource)"
               [pSelectableRow]="dataSource"
               style="

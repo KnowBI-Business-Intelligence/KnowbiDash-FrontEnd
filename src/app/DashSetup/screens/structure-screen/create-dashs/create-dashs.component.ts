@@ -133,6 +133,7 @@ export class CreateDashsComponent implements OnInit {
   onRowSelect(event: MouseEvent, element: any) {
     event.preventDefault();
     this.selectedDash = element;
+    console.log(this.selectedDash);
   }
 
   private getChartsGroup() {

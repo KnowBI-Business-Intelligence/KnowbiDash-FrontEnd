@@ -239,7 +239,7 @@ export class CreatePathsComponent implements OnInit {
             this.messageService.add({
               severity: 'sucess',
               summary: 'Sucesso',
-              detail: 'Perfil excluído!',
+              detail: 'Pasta excluída!',
             });
             this.cancelDelete();
           },
