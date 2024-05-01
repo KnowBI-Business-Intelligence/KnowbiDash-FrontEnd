@@ -15,17 +15,15 @@
         id="data-list"
         (cdkDropListDropped)="drop($event)"
       >
-        @for (item of database; track item) {
-        <div class="example-box" cdkDrag>
+        <div class="example-box" cdkDrag *ngFor="let item of database">
           <fa-icon
             class="icon"
             [icon]="icons.database"
             [size]="'xl'"
             title="Dashboards"
-          ></fa-icon
-          >{{ item }}
+          ></fa-icon>
+          {{ item?.name }}
         </div>
-        }
       </div>
     </div>
 
@@ -40,7 +38,7 @@
           <span class="serie-label"> Série base: </span>
           <div class="serie-content">
             <div *ngFor="let data of chartButtons">
-              <button>
+              <button (click)="selectChartButton(data.label)">
                 <fa-icon
                   class="iconChart"
                   [icon]="data.icon"
@@ -74,13 +72,13 @@
                   [icon]="icons.database"
                   [size]="'xl'"
                 ></fa-icon>
-                {{ selectedAggregation ? selectedAggregation : item }}
+                {{ selectedAggregation ? selectedAggregation : item?.name }}
               </div>
               <div class="series-buttons">
                 <button
                   [cdkMenuTriggerFor]="menuautosum"
                   class="example-standalone-item"
-                  (click)="openMenu(i)"
+                  (click)="openMenu(i, item)"
                 >
                   <img
                     class="autosum"
@@ -91,7 +89,7 @@
                 <button
                   [cdkMenuTriggerFor]="menuedit"
                   class="example-standalone-item"
-                  (click)="YAxisValue(item)"
+                  (click)="AxisValue(item)"
                 >
                   <fa-icon
                     class="commomicon"
@@ -133,13 +131,13 @@
                   [icon]="icons.database"
                   [size]="'xl'"
                 ></fa-icon>
-                {{ item }}
+                {{ item.name }}
               </div>
               <div class="series-buttons">
                 <button
                   [cdkMenuTriggerFor]="menuedit"
                   class="example-standalone-item"
-                  (click)="YAxisValue(item)"
+                  (click)="AxisValue(item)"
                 >
                   <fa-icon
                     class="commomicon"
@@ -179,13 +177,13 @@
                   [icon]="icons.database"
                   [size]="'xl'"
                 ></fa-icon>
-                {{ item }}
+                {{ item.name }}
               </div>
               <div class="series-buttons">
                 <button
                   [cdkMenuTriggerFor]="menuedit"
                   class="example-standalone-item"
-                  (click)="YAxisValue(item)"
+                  (click)="AxisValue(item)"
                 >
                   <fa-icon
                     class="commomicon"
@@ -225,13 +223,13 @@
                   [icon]="icons.database"
                   [size]="'xl'"
                 ></fa-icon>
-                {{ item }}
+                {{ item.name }}
               </div>
               <div class="series-buttons">
                 <button
                   [cdkMenuTriggerFor]="menuedit"
                   class="example-standalone-item"
-                  (click)="YAxisValue(item)"
+                  (click)="AxisValue(item)"
                 >
                   <fa-icon
                     class="commomicon"
@@ -271,13 +269,13 @@
                   [icon]="icons.database"
                   [size]="'xl'"
                 ></fa-icon>
-                {{ item }}
+                {{ item.name }}
               </div>
               <div class="series-buttons">
                 <button
                   [cdkMenuTriggerFor]="menuedit"
                   class="example-standalone-item"
-                  (click)="YAxisValue(item)"
+                  (click)="AxisValue(item)"
                 >
                   <fa-icon
                     class="commomicon"
@@ -317,13 +315,13 @@
                   [icon]="icons.database"
                   [size]="'xl'"
                 ></fa-icon>
-                {{ item }}
+                {{ item.name }}
               </div>
               <div class="series-buttons">
                 <button
                   [cdkMenuTriggerFor]="menuedit"
                   class="example-standalone-item"
-                  (click)="YAxisValue(item)"
+                  (click)="AxisValue(item)"
                 >
                   <fa-icon
                     class="commomicon"
@@ -365,7 +363,9 @@
       class="example-menu-item"
       cdkMenuItem
       (click)="extractValue('AVG')"
-      [class.selected]="selectedAggregation === 'AVG(' + selectedYAxis + ')'"
+      [class.selected]="
+        selectedAggregation === 'AVG(' + selectedYAxis.name + ')'
+      "
     >
       AVG()
     </button>
@@ -373,7 +373,9 @@
       class="example-menu-item"
       cdkMenuItem
       (click)="extractValue('COUNT')"
-      [class.selected]="selectedAggregation === 'COUNT(' + selectedYAxis + ')'"
+      [class.selected]="
+        selectedAggregation === 'COUNT(' + selectedYAxis.name + ')'
+      "
     >
       COUNT()
     </button>
@@ -381,19 +383,26 @@
       class="example-menu-item"
       cdkMenuItem
       (click)="extractValue('SUM')"
-      [class.selected]="selectedAggregation === 'SUM(' + selectedYAxis + ')'"
+      [class.selected]="
+        selectedAggregation === 'SUM(' + selectedYAxis.name + ')'
+      "
     >
       SUM()
     </button>
   </div>
 </ng-template>
 
-<ng-template #menuedit let-i="index">
+<ng-template #menuedit>
   <div class="edit-menu" cdkMenu>
     <div>
       <label for="identifier">Identificador</label>
-      <input name="identifier" type="text" [(ngModel)]="identifier" />
+      <input
+        name="identifier"
+        type="text"
+        [(ngModel)]="identifier"
+        [value]="selectedYAxis.identifier"
+      />
     </div>
-    <button class="edit-save" cdkMenuItem (click)="editSave(i)">Salvar</button>
+    <button class="edit-save" cdkMenuItem (click)="editSave()">Salvar</button>
   </div>
 </ng-template>

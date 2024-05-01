@@ -28,13 +28,10 @@ import { HighchartsChartModule } from 'highcharts-angular';
 import { FormsModule } from '@angular/forms';
 import { LocalstorageService } from '../../../../services/service/localstorage/localstorage.service';
 
-interface ChartData {
-  id: string;
-  title: string;
-  graphType: string;
-  xAxisColumns: any[];
-  yAxisColumns: any[];
-  filters: any[];
+interface Axis {
+  name: string;
+  type: string;
+  identifier: string;
 }
 
 interface ExtendedOptions extends Highcharts.Options {
@@ -63,20 +60,29 @@ interface ExtendedOptions extends Highcharts.Options {
   styleUrl: './chart.component.css',
 })
 export class ChartComponent implements OnInit {
-  selectedYAxis: string = '';
-  yAxisValueWithoutAggregation: string = '';
-  yaxisData: { [key: string]: string } = {};
-  identifier: string = '';
-  titulo: string = '';
-  selectedAggregation: string = '';
-  Highcharts: typeof Highcharts = Highcharts;
-  chartConfig!: ExtendedOptions;
-  group: any;
   icons = {
     database: faDatabase,
     close: faXmark,
     edit: faGear,
   };
+
+  titulo: string = '';
+  chartType: string = '';
+  sql: string = 'SELECT ';
+  tableName: string = '';
+
+  selectedYAxis: Axis = { name: '', type: '', identifier: '' };
+  buildData: { name: any; identifier: any }[] = [];
+  yAxisValueWithoutAggregation: string = '';
+  yaxisData: { [key: string]: string } = {};
+  yaxisIdentifiers: { [key: string]: string } = {};
+  identifier: string = '';
+  selectedAggregation: string = '';
+
+  Highcharts: typeof Highcharts = Highcharts;
+  chartConfig!: ExtendedOptions;
+  group: any;
+
   chartButtons = chartButtonsData;
   user = this.storageService.getUser();
   constructor(
@@ -86,13 +92,13 @@ export class ChartComponent implements OnInit {
     private chartsService: ChartsService
   ) {}
 
-  database: string[] = [];
-  yaxis: string[] = [];
-  xaxis: string[] = [];
-  series: string[] = [];
-  filters: string[] = [];
-  groupment: string[] = [];
-  order: string[] = [];
+  database: any[] = [];
+  yaxis: any[] = [];
+  xaxis: any[] = [];
+  series: any[] = [];
+  filters: any[] = [];
+  groupment: any[] = [];
+  order: any[] = [];
 
   drop(event: CdkDragDrop<string[]>) {
     if (event.previousContainer === event.container) {
@@ -117,25 +123,54 @@ export class ChartComponent implements OnInit {
     this.chartPreView();
   }
 
-  YAxisValue(item: string) {
-    if (!this.yaxisData[item]) {
-      this.yaxisData[item] = item;
-    }
+  selectChartButton(label: string) {
+    this.chartType = label;
+  }
 
-    this.identifier = this.yaxisData[item];
+  openMenu(index: number, item: any) {
+    this.selectedYAxis = item;
+    this.yaxis[index].identifier = this.identifier;
+  }
+
+  AxisValue(item: any) {
+    if (this.selectedYAxis) {
+      this.selectedYAxis = item;
+      if (!this.yaxisIdentifiers[item.name]) {
+        this.identifier = this.agregateReplace(item.name);
+      } else {
+        this.identifier = this.agregateReplace(
+          this.yaxisIdentifiers[item.name]
+        );
+      }
+    }
   }
 
   extractValue(aggregation: string) {
     if (this.selectedYAxis) {
-      this.yAxisValueWithoutAggregation = this.selectedYAxis.replace(
-        /^(?:AVG|COUNT|SUM)\(([^)]+)\)$/,
-        '$1'
+      const yAxisName = this.selectedYAxis.name;
+      const columnIndex = this.yaxis.findIndex(
+        (item) => item.name === yAxisName
       );
-      const aggregationValue =
-        aggregation + '(' + this.yAxisValueWithoutAggregation + ')';
-      const index = this.yaxis.indexOf(this.selectedYAxis);
-      if (index !== -1) {
-        this.yaxis[index] = aggregationValue;
+      if (columnIndex !== -1) {
+        const existingIdentifier = this.yaxis[columnIndex].identifier;
+        let newAggregationValue = '';
+        const columnNameRegex = /^(?:AVG|COUNT|SUM)\(([^)]+)\)$/;
+
+        if (columnNameRegex.test(existingIdentifier)) {
+          newAggregationValue = existingIdentifier.replace(
+            columnNameRegex,
+            aggregation + '($1)'
+          );
+        } else {
+          newAggregationValue = aggregation + '(' + existingIdentifier + ')';
+        }
+
+        const updatedAxis = {
+          name: newAggregationValue,
+          identifier: existingIdentifier, // Mantém o valor atual do identifier
+        };
+
+        this.yaxis[columnIndex] = updatedAxis;
       }
     }
   }
@@ -150,6 +185,7 @@ export class ChartComponent implements OnInit {
       next: (data) => {
         data.forEach((getId: any) => {
           if (id == getId.id) {
+            this.tableName = getId.pgTableName;
             this.processData(getId);
           }
         });
@@ -157,17 +193,17 @@ export class ChartComponent implements OnInit {
     });
   }
 
-  openMenu(index: number) {
-    this.selectedYAxis = this.yaxis[index];
-    this.identifier = this.yaxisData[this.selectedYAxis];
+  editSave() {
+    if (this.selectedYAxis) {
+      this.selectedYAxis.identifier = this.identifier;
+      this.yaxisIdentifiers[this.selectedYAxis.name] = this.identifier;
+    }
   }
-
-  editSave(index: number) {}
 
   processData(data: any) {
     data.columns.forEach((setData: any) => {
       this.database.push(setData);
-      this.yaxisData[setData] = setData;
+      this.yaxisData[setData.name] = setData;
     });
   }
 
@@ -197,38 +233,64 @@ export class ChartComponent implements OnInit {
   }
 
   identifierData() {
-    const yAxisData = [];
+    this.buildData = [];
     for (let i = 0; i < this.yaxis.length; i++) {
-      const yAxisItem = this.yaxis[i];
-      let identifierItem = this.yaxisData[yAxisItem];
-
-      if (!identifierItem) {
-        identifierItem = yAxisItem;
-      } else {
-        const hasAggregation = /^(?:AVG|COUNT|SUM)\([^)]+\)$/.test(
-          identifierItem
+      const yAxisItem = this.yaxis[i].name;
+      let identifierItem = yAxisItem;
+      const hasAggregation = /^(?:AVG|COUNT|SUM)\([^)]+\)$/.test(
+        identifierItem
+      );
+      if (hasAggregation) {
+        identifierItem = identifierItem.replace(
+          /^(?:AVG|COUNT|SUM)\(([^)]+)\)$/,
+          '$1'
         );
-        if (hasAggregation) {
-          identifierItem =
-            yAxisItem +
-            identifierItem.replace(/^(?:AVG|COUNT|SUM)\(([^)]+)\)$/, '$1');
-        }
       }
 
-      yAxisData.push({ name: yAxisItem, identifier: identifierItem });
+      this.buildData.push({ name: yAxisItem, identifier: identifierItem });
     }
-    console.log(yAxisData);
+
+    this.sql = 'SELECT ';
+
+    if (this.buildData.length > 0) {
+      const selectClauses = this.buildData.map((item) => {
+        return `${item.name} AS ${item.identifier}`;
+      });
+
+      this.sql += selectClauses.join(', ');
+    }
+
+    if (this.buildData.length > 0) {
+      this.sql += ` FROM ${this.tableName}`;
+    }
+
+    console.log(this.sql);
   }
 
-  chartPreView() {
-    this.identifierData();
+  seedData() {
     console.log('Título:', this.titulo);
-    console.log('eixo y ', this.yaxis);
+    console.log('Tipo:', this.chartType.toLowerCase());
+    console.log();
+
+    console.log('eixo y ');
+    this.yaxis.forEach((item) => {
+      console.log(
+        `name: ${this.agregateReplace(item.name)}, identifier: ${
+          item.identifier
+        }`
+      );
+    });
+
     console.log('eixo x ', this.xaxis);
     console.log('series ', this.series);
     console.log('filters ', this.filters);
     console.log('group ', this.groupment);
     console.log('order ', this.order);
+  }
+
+  chartPreView() {
+    this.identifierData();
+    this.seedData();
     this.chartConfig = {
       chart: {
         type: 'column',
@@ -264,5 +326,9 @@ export class ChartComponent implements OnInit {
   }
   backScreen() {
     this.router.navigate(['/admin/dashboards']);
+  }
+
+  agregateReplace(item: string) {
+    return item.replace(/^(?:AVG|COUNT|SUM)\(([^)]+)\)$/, '$1');
   }
 }
