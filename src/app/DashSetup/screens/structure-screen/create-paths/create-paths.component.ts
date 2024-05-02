@@ -38,7 +38,6 @@ import { StorageService } from '../../../../core/services/user/storage.service';
 export class CreatePathsComponent implements OnInit {
   createFolderForm = this.formBuilder.group({
     name: ['', Validators.required],
-    observation: ['', Validators.required],
     profile: ['', Validators.required],
   });
 
@@ -207,6 +206,7 @@ export class CreatePathsComponent implements OnInit {
   }
 
   addRegister() {
+    this.getProfiles();
     this.list = this.elementRef.nativeElement.querySelector('#list');
     this.add = this.elementRef.nativeElement.querySelector('#add');
 
@@ -270,33 +270,28 @@ export class CreatePathsComponent implements OnInit {
 
   createRegister() {
     const name = this.createFolderForm.get('name')?.value as string;
-    const documentation = this.createFolderForm.get('observation')
-      ?.value as string;
     const profile = this.createFolderForm.get('profile')?.value as any;
 
-    this.charts
-      .createChartsPath(this.headers, name, documentation, profile.id)
-      .subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'sucess',
-            summary: 'Sucesso',
-            detail: 'Pasta criada!',
-          });
-          this.cancelRegister();
-          this.createFolderForm.reset({
-            name: '',
-            observation: '',
-            profile: '',
-          });
-        },
-        error: () => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Erro',
-            detail: 'Erro na criação.',
-          });
-        },
-      });
+    this.charts.createChartsPath(this.headers, name, profile.id).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'sucess',
+          summary: 'Sucesso',
+          detail: 'Pasta criada!',
+        });
+        this.cancelRegister();
+        this.createFolderForm.reset({
+          name: '',
+          profile: '',
+        });
+      },
+      error: () => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Erro na criação.',
+        });
+      },
+    });
   }
 }

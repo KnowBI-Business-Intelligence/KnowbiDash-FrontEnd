@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container" *ngIf="!isSQL">
   <div class="container-body" id="list">
     <div class="container-content" id="body">
       <div class="container-content-header">
@@ -30,18 +30,17 @@
           </button>
         </div>
       </div>
+
       <section class="example-container mat-elevation-z8" tabindex="0">
         <p-table
-          matSort
           class="mat-elevation-z8 demo-table"
           selectionMode="single"
           [value]="dataSource"
-          (matSortChange)="announceSortChange($event)"
-          [(contextMenuSelection)]="selectedDash"
-          [contextMenu]="cm"
           [rows]="10"
           [showCurrentPageReport]="true"
           [rowsPerPageOptions]="[10, 25, 50]"
+          [scrollable]="true"
+          [tableStyle]="{ 'min-width': '50rem' }"
           [globalFilterFields]="[
             'id',
             'name',
@@ -55,9 +54,11 @@
               <th style="min-width: 5rem" pSortableColumn="id">
                 <div class="flex align-items-center">Código</div>
               </th>
+
               <th style="min-width: 15rem" pSortableColumn="name">
                 <div class="flex align-items-center">Nome</div>
               </th>
+
               <th style="min-width: 15rem" pSortableColumn="pgTableName">
                 <div class="flex align-items-center">Tabela</div>
               </th>
@@ -75,16 +76,9 @@
           <ng-template pTemplate="body" let-dataSource>
             <tr
               #tr
-              pSelectableRow="dataSource"
-              pContextMenuRow="dataSource"
-              (click)="selectRow(dataSource)"
-              (contextmenu)="onRowSelect($event, dataSource)"
               [pSelectableRow]="dataSource"
-              style="
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                overflow: hidden;
-              "
+              (click)="selectRow(dataSource)"
+              (dblclick)="onRowDoubleClick(dataSource)"
             >
               <td>
                 {{ dataSource.id }}
@@ -99,7 +93,9 @@
                 {{ dataSource.chartPath ? "Sim" : "Não" }}
               </td>
               <td>
-                {{ dataSource.sql?.length > 0 ? dataSource.sql : "Sem código" }}
+                {{
+                  dataSource?.sql?.length > 0 ? dataSource.sql : "Sem código"
+                }}
               </td>
             </tr>
           </ng-template>
@@ -112,8 +108,8 @@
         </p-table>
 
         <p-toast [life]="500"></p-toast>
-        <p-contextMenu #cm [model]="items"></p-contextMenu>
       </section>
+
       <mat-paginator
         [pageSize]="resultsLength"
         [length]="resultsLength"
@@ -121,13 +117,11 @@
     </div>
   </div>
 
-  <!-- todo -->
   <div class="container-add" id="add">
     <div class="container-content-add">
-      <h2 *ngIf="!isEditing">Cadastro de Dashboards</h2>
-      <h2 *ngIf="isEditing">Alterar Dashboards</h2>
+      <h2>Cadastro de Dashboards</h2>
     </div>
-    <div class="container-add-body" *ngIf="isSQL">
+    <div class="container-add-body">
       <form class="form-search" [formGroup]="createRegisterForm">
         <div class="form-group-input-side">
           <div class="form-group-input">
@@ -142,6 +136,7 @@
               maxlength="60"
             />
           </div>
+
           <div class="form-group-input">
             <label for="pgTableName">Nome da tabela</label>
             <input
@@ -170,36 +165,10 @@
         </div>
       </form>
     </div>
-    <div class="container-add-body" *ngIf="!isSQL">
-      <form class="form-search-sql" [formGroup]="createRegisterForm">
-        <div class="form-group-input">
-          <label for="sql">Código SQL</label>
-          <textarea
-            type="text"
-            class="form-control form-control-sql"
-            name="sql"
-            autocomplete="off"
-            formControlName="sql"
-            required
-          ></textarea>
-        </div>
-        <mat-progress-bar
-          mode="indeterminate"
-          *ngIf="progressBar"
-        ></mat-progress-bar>
-      </form>
-    </div>
-    <div class="container-add-footer" *ngIf="isSQL">
+
+    <div class="container-add-footer">
       <button id="cancel" (click)="cancelRegister()">Cancelar</button>
-      <button (click)="createRegister()">Próximo</button>
-    </div>
-    <div class="container-add-footer" *ngIf="!isSQL">
-      <button (click)="updateRegister()">Executar</button>
-      <button id="cancel" (click)="isSQL = !isSQL">Voltar</button>
-      <button (click)="finishProcess()">Finalizar</button>
-    </div>
-    <div class="result-SQL" *ngIf="ISSqlResult">
-      <span>{{ sqlResult }}</span>
+      <button (click)="createRegister()">Concluir</button>
     </div>
   </div>
 
@@ -250,4 +219,54 @@
       </div>
     </div>
   </div>
+
+  <p-toast [life]="1500"></p-toast>
+</div>
+
+<div class="container-sql" *ngIf="isSQL">
+  <div class="content-sql">
+    <div class="content-sql_header">
+      <h2>Editor de SQL</h2>
+      <div class="content-sql_buttons">
+        <div class="content-sql_buttons-action">
+          <button (click)="updateRegister()">
+            <span class="material-symbols-outlined"> play_circle </span>
+          </button>
+          <button (click)="refreshRegister()">
+            <span class="material-symbols-outlined"> refresh </span>
+          </button>
+          <button (click)="clearSQL()">
+            <span class="material-symbols-outlined"> delete </span>
+          </button>
+        </div>
+        <button (click)="goBack()">Voltar</button>
+      </div>
+    </div>
+
+    <div class="content-sql_body">
+      <div class="sql-body_code" [formGroup]="createRegisterForm">
+        <textarea
+          name="sql_code"
+          formControlName="sql"
+          minlength="10"
+          maxlength="400"
+          [placeholder]="
+            sqlPlaceholder?.length > 0 ? sqlPlaceholder : 'Insira o SQL'
+          "
+          spellcheck
+          required
+        >
+        </textarea>
+        <mat-progress-bar
+          *ngIf="progressBar"
+          mode="indeterminate"
+        ></mat-progress-bar>
+      </div>
+      <div class="sql-body_result">
+        <p>{{ sqlResult }}</p>
+      </div>
+    </div>
+  </div>
+
+  <p-toast [life]="1000"></p-toast>
 </div>

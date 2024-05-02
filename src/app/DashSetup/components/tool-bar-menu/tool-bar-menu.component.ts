@@ -19,11 +19,11 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
-import { CustomerService } from '../../../../assets/data/costumer-data';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { BreadrumbsService } from '../../../core/services/breadcrumb/breadrumbs.service';
 import { StorageService } from '../../../core/services/user/storage.service';
 import { BreadcrumbsComponent } from '../../../shared/breadcrumbs/breadcrumbs.component';
+import { CustomerService } from '../../screens/users-screen/users/data/costumer-data';
 
 interface SideNavTogle {
   screenWidth: number;

@@ -90,6 +90,8 @@ export class DashboardsViewComponent implements OnInit {
     this.loadDataInit();
     const groupIdFromLocalStorage =
       this.localStorageService.getDecryptedItem('chartGroupview');
+    console.log(groupIdFromLocalStorage);
+
     this.getCharts(groupIdFromLocalStorage.id);
     const simulatedEvent = {
       currentTarget:
@@ -190,7 +192,7 @@ export class DashboardsViewComponent implements OnInit {
           new Set(dataItem.xAxisColumns[0].data)
         );
 
-        const uniqueSubgroups = Array.from(new Set(dataItem.series[0].data));
+        const uniqueSubgroups = Array.from(new Set(dataItem?.series[0]?.data));
 
         const seriesData = uniqueSubgroups.map((subgrupo: any) => {
           const seriesValues: { name: string; y: any }[] = [];

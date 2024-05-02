@@ -21,7 +21,7 @@ import { MessageService } from 'primeng/api';
 import { DropdownModule } from 'primeng/dropdown';
 import { ToastModule } from 'primeng/toast';
 import { Observable } from 'rxjs';
-import { Roles } from '../../../../assets/data/roles';
+import { Roles } from '../../../core/modules/interfaces';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { StorageService } from '../../../core/services/user/storage.service';
 import { UserService } from '../../../core/services/user/user.service';

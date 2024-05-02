@@ -30,7 +30,6 @@
         [rowsPerPageOptions]="[10, 25, 50]"
         [loading]="loading"
         [paginator]="true"
-        [scrollable]="true"
         [tableStyle]="{ 'min-width': '50rem' }"
         [(contextMenuSelection)]="selectedCustomers"
         [contextMenu]="cm"
@@ -159,17 +158,16 @@
             </td>
           </tr>
         </ng-template>
+
         <ng-template pTemplate="emptymessage">
           <tr>
             <td colspan="7">Sem registros encontrados</td>
           </tr>
         </ng-template>
       </p-table>
-      <p-toast></p-toast>
+
+      <p-toast [life]="500"></p-toast>
       <p-contextMenu #cm [model]="items"></p-contextMenu>
-    </div>
-    <div class="message">
-      <p-toast [life]="1500"></p-toast>
     </div>
   </div>
 </div>

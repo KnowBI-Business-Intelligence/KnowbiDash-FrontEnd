@@ -81,19 +81,21 @@ export class ChartsService {
   createChartsPath(
     headers: HttpHeaders,
     name: string,
-    documentation: string,
     profile_id: string
   ): Observable<any> {
     const myHeaders = {
       headers: headers,
     };
 
+    const perfis = [
+      {
+        id: profile_id,
+      },
+    ];
+
     const body = {
       name,
-      documentation,
-      profile: {
-        profile_id,
-      },
+      perfis,
     };
 
     return this.http.post(`${this.ENV_CHARTPATH}/create`, body, myHeaders);
@@ -174,6 +176,7 @@ export class ChartsService {
     });
 
     const body = JSON.stringify({ sql });
+
     return this.http.patch(
       `${this.ENV_CHARTGROUP}/update/sql/${ID_chartPath}`,
       body,

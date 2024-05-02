@@ -38,6 +38,9 @@ import { StorageService } from '../../../../core/services/user/storage.service';
   styleUrl: './create-profiles.component.css',
 })
 export class CreateProfilesComponent implements OnInit {
+backScreen() {
+throw new Error('Method not implemented.');
+}
   createProfilesForm = this.formBuilder.group({
     name: ['', Validators.required],
     observation: ['', Validators.required],
@@ -132,7 +135,6 @@ export class CreateProfilesComponent implements OnInit {
   viewProfile() {
     this.isViewProfile = !this.isViewProfile;
     this.selectedRowChart = this.selectedRow?.chartPaths;
-    console.log(this.selectedRow);
 
     this.actionButton = true;
     const table =

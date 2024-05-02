@@ -63,7 +63,7 @@ export class ChartGroupsComponent implements OnInit {
 
   callCharts(groupName: any) {
     localStorage.setItem('chartGroup', JSON.stringify(groupName));
-    this.router.navigate(['/content/charts']);
+    this.router.navigate(['/content/main/charts']);
   }
 
   backScreen() {

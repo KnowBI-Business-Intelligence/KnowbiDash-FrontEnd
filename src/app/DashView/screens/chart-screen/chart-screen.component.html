@@ -27,8 +27,11 @@
   </div>
 
   <div class="container-charts">
-    <div class="left">
-      <div *ngFor="let chartConfig of chartGroupsData" class="chart-container">
+    <div class="container-charts_left">
+      <div
+        *ngFor="let chartConfig of chartGroupsData"
+        class="content-charts_left"
+      >
         <highcharts-chart
           style="width: 20rem; height: 20rem; margin: 5px"
           [Highcharts]="Highcharts"
@@ -43,16 +46,16 @@
     *ngIf="showModal"
     id="modal"
     [style.display]="showModal ? 'flex' : 'none'"
+    cdkDrag
   >
     <div class="modal-content">
       <div class="modal-header">
         <h2>Filtros</h2>
-        <span class="close" (click)="showModal = false"
-          ><span class="material-symbols-outlined close-icon">
-            close
-          </span></span
-        >
+        <span class="close" (click)="showModal = false">
+          <span class="material-symbols-outlined close-icon"> close </span>
+        </span>
       </div>
+
       <div class="modal-body">
         <div class="modal-fields" *ngFor="let filter of filters">
           <label for="filter.column">{{ filter.identifiers }}</label>

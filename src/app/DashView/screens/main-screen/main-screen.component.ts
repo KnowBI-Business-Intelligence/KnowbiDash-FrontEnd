@@ -61,6 +61,6 @@ export class MainScreenComponent implements OnInit {
 
   openChartGroup(pathObj: any) {
     localStorage.setItem('selectedChartPath', JSON.stringify(pathObj.id));
-    this.router.navigate(['content/chartgroup']);
+    this.router.navigate(['content/main/chartgroup']);
   }
 }

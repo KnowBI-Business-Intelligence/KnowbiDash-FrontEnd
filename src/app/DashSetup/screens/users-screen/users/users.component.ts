@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { MatListModule } from '@angular/material/list';
 import { Router, RouterModule } from '@angular/router';
@@ -16,12 +16,11 @@ import { SliderModule } from 'primeng/slider';
 import { Table, TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
 import { Observable } from 'rxjs';
-import { CustomerService } from '../../../../../assets/data/costumer-data';
-import { Roles } from '../../../../../assets/data/roles';
-import { UserData } from '../../../../../assets/data/users';
+import { Roles, UserData } from '../../../../core/modules/interfaces';
 import { AuthService } from '../../../../core/services/auth/auth.service';
 import { StorageService } from '../../../../core/services/user/storage.service';
 import { UserService } from '../../../../core/services/user/user.service';
+import { CustomerService } from './data/costumer-data';
 
 @Component({
   selector: 'app-users',
@@ -46,13 +45,8 @@ export class UsersComponent implements OnInit {
   @ViewChild('f') f!: NgForm;
   @ViewChild('customers') tabela!: Table;
 
-  modalVisible: boolean = false;
-  mouseEventPosition: { x: number; y: number } = { x: 0, y: 0 };
-
   user = this.storageService.getUser();
-  modal: HTMLElement | undefined;
   roles?: any;
-  statuses!: any[];
   searchValue?: string;
   users!: Observable<any>;
   rolesOptions: Roles[] | undefined;
@@ -78,8 +72,7 @@ export class UsersComponent implements OnInit {
     private messageService: MessageService,
     private authService: AuthService,
     private userService: UserService,
-    private router: Router,
-    private elementRef: ElementRef
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -194,9 +187,8 @@ export class UsersComponent implements OnInit {
 
   onRowSelect(event: MouseEvent, customer: any) {
     event.preventDefault();
+    this.userName = customer.userName;
     this.selectedCustomers = customer;
-    this.userName = this.selectedCustomers.userName;
-    console.log(this.selectedCustomers);
   }
 
   excludeUser() {

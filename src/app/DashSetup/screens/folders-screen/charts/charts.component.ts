@@ -54,42 +54,38 @@ export class ChartsComponent implements OnInit {
 
   ngOnInit(): void {
     this.item = this.router.getCurrentNavigation()?.extras.state?.['item'];
-
     this.listCharts = this.item.charts;
     this.filteredItems = this.item.charts;
   }
 
   private getHeaders() {
     const user = this.token.getUser();
-
     if (!user || !user.token) {
       console.error('Token não disponível');
       return;
     }
-
     this.headers = new HttpHeaders({
       Authorization: `Bearer ${user.token}`,
     });
   }
 
   private createCharts(title: string, sql: string, idChart: string) {
-    const that = this;
     this.getHeaders();
     this.charts.createCharts(this.headers, title, sql, idChart).subscribe({
-      next() {
-        that.messageService.add({
+      next: () => {
+        this.messageService.add({
           severity: 'success',
           summary: 'Sucesso',
           detail: 'Gráfico cadastrado.',
         });
 
-        that.chartFormGroup.setValue({
+        this.chartFormGroup.setValue({
           nameChart: '',
           SQL_Chart: '',
         });
       },
-      error() {
-        that.messageService.add({
+      error: () => {
+        this.messageService.add({
           severity: 'error',
           summary: 'Erro',
           detail: 'Verifique as informações.',

@@ -1,20 +1,11 @@
-import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { CommonModule } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import {
-  FormBuilder,
-  FormsModule,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { Component, ElementRef, OnInit } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MenuItem, MessageService } from 'primeng/api';
-import { ContextMenuModule } from 'primeng/contextmenu';
 import { DropdownModule } from 'primeng/dropdown';
-import { SliderModule } from 'primeng/slider';
 import { TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
 import { DashboardTable } from '../../../../core/modules/interfaces';
@@ -26,23 +17,17 @@ import { StorageService } from '../../../../core/services/user/storage.service';
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
     ReactiveFormsModule,
     TableModule,
     MatPaginator,
-    MatSortModule,
     ToastModule,
-    SliderModule,
     DropdownModule,
     MatProgressBarModule,
-    ContextMenuModule,
   ],
   templateUrl: './create-dashs.component.html',
   styleUrl: './create-dashs.component.css',
 })
 export class CreateDashsComponent implements OnInit {
-  @ViewChild(MatSort) sort!: MatSort;
-
   createRegisterForm = this.formBuilder.group({
     name: ['', Validators.required],
     pgTableName: ['', Validators.required],
@@ -58,7 +43,9 @@ export class CreateDashsComponent implements OnInit {
   seeButton: HTMLElement | null = null;
   add: HTMLElement | null = null;
   cancel: HTMLElement | null = null;
+
   items: MenuItem[] | undefined;
+
   selectedDash!: DashboardTable;
 
   displayedColumns: string[] = [
@@ -72,15 +59,11 @@ export class CreateDashsComponent implements OnInit {
   deleteProfile: boolean = false;
   isViewDashboard: boolean = false;
   actionButton: boolean = false;
-  isSQL: boolean = true;
-  progressBar: boolean = false;
-  ISSqlResult: boolean = false;
-  isEditing: boolean = false;
+  isSQL: boolean = false;
   showModal: boolean = false;
+  progressBar: boolean = false;
 
   dataSource: any;
-  private headers: any;
-  private chartGroupID: any;
 
   chartPaths: any;
   sqlResult: any;
@@ -89,8 +72,11 @@ export class CreateDashsComponent implements OnInit {
   selectedRow!: DashboardTable | null;
   selectedRowChartGroup: any;
 
+  private headers: any;
+  private chartGroupID: any;
+  sqlPlaceholder: any;
+
   constructor(
-    private _liveAnnouncer: LiveAnnouncer,
     private elementRef: ElementRef,
     private charts: ChartsService,
     private token: StorageService,
@@ -100,12 +86,6 @@ export class CreateDashsComponent implements OnInit {
 
   ngOnInit(): void {
     this.getChartsGroup();
-    this.items = [
-      {
-        label: 'Atualizar SQL',
-        command: () => this.updateSQL(),
-      },
-    ];
   }
 
   private getChartPath() {
@@ -132,8 +112,6 @@ export class CreateDashsComponent implements OnInit {
 
   onRowSelect(event: MouseEvent, element: any) {
     event.preventDefault();
-    this.selectedDash = element;
-    console.log(this.selectedDash);
   }
 
   private getChartsGroup() {
@@ -151,20 +129,13 @@ export class CreateDashsComponent implements OnInit {
     this.charts.getChartGroup(this.headers).subscribe({
       next: (value: any) => {
         this.dataSource = value;
+
         this.resultsLength = value?.length;
       },
       error(err: any) {
         console.error(err);
       },
     });
-  }
-
-  announceSortChange(sortState: any) {
-    if (sortState.direction) {
-      this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
-    } else {
-      this._liveAnnouncer.announce('Sorting cleared');
-    }
   }
 
   selectRow(row: DashboardTable) {
@@ -208,10 +179,6 @@ export class CreateDashsComponent implements OnInit {
       table.style.filter = 'none';
     }
     this.getChartsGroup();
-  }
-
-  onRowDoubleClick(row: DashboardTable) {
-    console.log('double click:', row);
   }
 
   deleteRegister() {
@@ -280,6 +247,13 @@ export class CreateDashsComponent implements OnInit {
     this.list = this.elementRef.nativeElement.querySelector('#list');
     this.add = this.elementRef.nativeElement.querySelector('#add');
 
+    this.createRegisterForm.reset({
+      name: '',
+      pgTableName: '',
+      sql: '',
+      chartPath: '',
+    });
+
     if (this.list) {
       this.list.style.display = 'flex';
     }
@@ -288,36 +262,64 @@ export class CreateDashsComponent implements OnInit {
     }
   }
 
-  finishProcess() {
-    this.cancelRegister();
-    this.isEditing = false;
-    this.isSQL = true;
-    console.log('eu finalizo');
-  }
-
-  updateSQL() {
-    this.addRegister();
-    this.isEditing = true;
-    this.isSQL = false;
-    console.log('eu atualizo');
-  }
-
   updateRegister() {
+    const sqlCode = this.createRegisterForm.get('sql')?.value as any;
+
+    if (sqlCode.trim() === '') {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Erro',
+        detail: 'Verifique o campo.',
+      });
+    } else {
+      this.progressBar = true;
+      this.messageService.add({
+        severity: '-',
+        summary: 'Aguarde',
+        detail: 'Criando metadado!',
+      });
+
+      this.charts
+        .updateChartGroupSQL(this.headers, this.chartGroupID, sqlCode)
+        .subscribe({
+          next: (value: any) => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Sucesso',
+              detail: 'SQL Atualizado!',
+            });
+            this.sqlResult = value;
+            this.progressBar = false;
+          },
+          error: () => {
+            console.log('ERRRRRO NEXCE SACARASDA');
+
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Erro',
+              detail: 'Erro no processo.',
+            });
+          },
+        });
+    }
+  }
+
+  refreshRegister() {
+    console.log('refresh', this.sqlPlaceholder);
+
     this.progressBar = true;
-    const sql = this.createRegisterForm.get('sql')?.value as string;
     this.charts
-      .updateChartGroupSQL(this.headers, this.chartGroupID, sql)
+      .updateChartGroupSQL(this.headers, this.chartGroupID, this.sqlPlaceholder)
       .subscribe({
         next: (value: any) => {
           this.messageService.add({
             severity: 'sucess',
             summary: 'Sucesso',
-            detail: 'Processo Finalizado!',
+            detail: 'SQL Atualizado!',
           });
+
           this.sqlResult = value;
-          this.ISSqlResult = true;
           this.progressBar = false;
-          this.finishProcess();
         },
         error: () => {
           this.messageService.add({
@@ -329,6 +331,12 @@ export class CreateDashsComponent implements OnInit {
       });
   }
 
+  onRowDoubleClick(row: DashboardTable) {
+    this.isSQL = true;
+    this.chartGroupID = row.id;
+    this.sqlPlaceholder = row.sql;
+  }
+
   createRegister() {
     const name = this.createRegisterForm.get('name')?.value as string;
     const pgTableName = this.createRegisterForm.get('pgTableName')
@@ -338,29 +346,31 @@ export class CreateDashsComponent implements OnInit {
     this.charts
       .createChartGroup(this.headers, name, pgTableName, chartPath.id)
       .subscribe({
-        next: (value: any) => {
+        next: () => {
           this.messageService.add({
             severity: 'sucess',
             summary: 'Sucesso',
-            detail: 'Dashboard criado!',
+            detail: 'Gráfico criado!',
           });
-          this.chartGroupID = value?.id;
-          this.isSQL = false;
-
-          this.createRegisterForm.reset({
-            name: '',
-            pgTableName: '',
-            sql: '',
-            chartPath: '',
-          });
+          this.cancelRegister();
         },
         error: () => {
           this.messageService.add({
             severity: 'error',
             summary: 'Erro',
-            detail: 'Erro na criação.',
+            detail: 'Erro no processo.',
           });
         },
       });
+  }
+
+  goBack() {
+    this.isSQL = false;
+  }
+
+  clearSQL() {
+    this.createRegisterForm.reset({
+      sql: '',
+    });
   }
 }

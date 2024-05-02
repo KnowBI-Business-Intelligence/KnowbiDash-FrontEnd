@@ -1,3 +1,4 @@
+import { CdkDrag } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
@@ -5,7 +6,6 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
-import { SkeletonModule } from 'primeng/skeleton';
 import { ChartsService } from '../../../core/services/charts/charts.service';
 import { StorageService } from '../../../core/services/user/storage.service';
 
@@ -25,7 +25,7 @@ interface ExtendedOptions extends Highcharts.Options {
 @Component({
   selector: 'app-chart-screen',
   standalone: true,
-  imports: [CommonModule, SkeletonModule, HighchartsChartModule, FormsModule],
+  imports: [CommonModule, HighchartsChartModule, CdkDrag, FormsModule],
   templateUrl: './chart-screen.component.html',
   styleUrl: './chart-screen.component.css',
 })
@@ -294,7 +294,7 @@ export class ChartScreenComponent implements OnInit {
       filter.values = filterValuesByColumn[filter.column];
     });
 
-    this.showModal = true;
+    this.showModal = !this.showModal;
   }
 
   backScreen() {
