@@ -133,50 +133,50 @@ export class ChartComponent implements OnInit {
   }
 
   AxisValue(item: any) {
-    if (this.selectedYAxis) {
-      this.selectedYAxis = item;
-      if (!this.yaxisIdentifiers[item.name]) {
-        this.identifier = this.agregateReplace(item.name);
-      } else {
-        this.identifier = this.agregateReplace(
-          this.yaxisIdentifiers[item.name]
-        );
-      }
+    this.selectedYAxis = item;
+    if (this.identifier == '' || this.identifier == undefined) {
+      this.identifier = this.selectedYAxis.name;
+    } else {
+      this.identifier = this.selectedYAxis.identifier;
     }
   }
 
   extractValue(aggregation: string) {
     if (this.selectedYAxis) {
       const yAxisName = this.selectedYAxis.name;
-      const columnIndex = this.yaxis.findIndex(
-        (item) => item.name === yAxisName
-      );
-      if (columnIndex !== -1) {
-        const existingIdentifier = this.yaxis[columnIndex].identifier;
-        let newAggregationValue = '';
-        const columnNameRegex = /^(?:AVG|COUNT|SUM)\(([^)]+)\)$/;
+      const columnNameRegex = /^(?:AVG|COUNT|SUM)\(([^)]+)\)$/;
 
-        if (columnNameRegex.test(existingIdentifier)) {
-          newAggregationValue = existingIdentifier.replace(
-            columnNameRegex,
-            aggregation + '($1)'
-          );
-        } else {
-          newAggregationValue = aggregation + '(' + existingIdentifier + ')';
-        }
-
+      if (columnNameRegex.test(yAxisName)) {
+        const columnName = yAxisName.replace(columnNameRegex, '$1');
+        const newAggregationValue = aggregation + '(' + columnName + ')';
+        console.log(this.selectedYAxis);
         const updatedAxis = {
           name: newAggregationValue,
-          identifier: existingIdentifier, // Mantém o valor atual do identifier
+          identifier: this.selectedYAxis.identifier
+            ? this.selectedYAxis.identifier
+            : this.selectedYAxis.name,
         };
 
-        this.yaxis[columnIndex] = updatedAxis;
+        const index = this.yaxis.findIndex((item) => item.name === yAxisName);
+        if (index !== -1) {
+          this.yaxis[index] = updatedAxis;
+        }
+      } else {
+        const aggregationValue = aggregation + '(' + yAxisName + ')';
+        const index = this.yaxis.findIndex((item) => item.name === yAxisName);
+        if (index !== -1) {
+          this.yaxis[index] = {
+            name: aggregationValue,
+            identifier: this.selectedYAxis.identifier
+              ? this.selectedYAxis.identifier
+              : this.selectedYAxis.name,
+          };
+        }
       }
     }
   }
 
   loadDataView(id: string) {
-    console.log(id);
     const headers = new HttpHeaders({
       Authorization: `Bearer ${this.user.token}`,
     });
@@ -195,8 +195,11 @@ export class ChartComponent implements OnInit {
 
   editSave() {
     if (this.selectedYAxis) {
-      this.selectedYAxis.identifier = this.identifier;
-      this.yaxisIdentifiers[this.selectedYAxis.name] = this.identifier;
+      this.selectedYAxis.identifier = this.identifier
+        ? this.identifier
+        : this.selectedYAxis.name;
+      this.yaxisIdentifiers[this.selectedYAxis.name] =
+        this.selectedYAxis.identifier;
     }
   }
 
@@ -204,6 +207,9 @@ export class ChartComponent implements OnInit {
     data.columns.forEach((setData: any) => {
       this.database.push(setData);
       this.yaxisData[setData.name] = setData;
+      if (!setData.identifier || setData.identifier.trim() === '') {
+        setData.identifier = setData.name;
+      }
     });
   }
 
@@ -237,6 +243,7 @@ export class ChartComponent implements OnInit {
     for (let i = 0; i < this.yaxis.length; i++) {
       const yAxisItem = this.yaxis[i].name;
       let identifierItem = yAxisItem;
+      console.log(identifierItem);
       const hasAggregation = /^(?:AVG|COUNT|SUM)\([^)]+\)$/.test(
         identifierItem
       );
@@ -270,22 +277,24 @@ export class ChartComponent implements OnInit {
   seedData() {
     console.log('Título:', this.titulo);
     console.log('Tipo:', this.chartType.toLowerCase());
-    console.log();
-
-    console.log('eixo y ');
-    this.yaxis.forEach((item) => {
-      console.log(
-        `name: ${this.agregateReplace(item.name)}, identifier: ${
-          item.identifier
-        }`
-      );
+    this.yaxis.forEach((axis) => {
+      console.log(`Eixo y ${axis.name}: ${axis.identifier}`);
     });
-
-    console.log('eixo x ', this.xaxis);
-    console.log('series ', this.series);
-    console.log('filters ', this.filters);
-    console.log('group ', this.groupment);
-    console.log('order ', this.order);
+    this.xaxis.forEach((axis) => {
+      console.log(`Eixo x ${axis.name}: ${axis.identifier}`);
+    });
+    this.series.forEach((series) => {
+      console.log(`Series ${series.name}: ${series.identifier}`);
+    });
+    this.filters.forEach((filter) => {
+      console.log(`filters ${filter.name}: ${filter.identifier}`);
+    });
+    this.groupment.forEach((group) => {
+      console.log(`group ${group.name}: ${group.identifier}`);
+    });
+    this.order.forEach((order) => {
+      console.log(`order ${order.name}: ${order.identifier}`);
+    });
   }
 
   chartPreView() {
