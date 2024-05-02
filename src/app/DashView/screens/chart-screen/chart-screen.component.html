@@ -27,17 +27,20 @@
   </div>
 
   <div class="container-charts">
-    <div class="container-charts_left">
-      <div
-        *ngFor="let chartConfig of chartGroupsData"
-        class="content-charts_left"
-      >
-        <highcharts-chart
-          style="width: 20rem; height: 20rem; margin: 5px"
-          [Highcharts]="Highcharts"
-          [options]="chartConfig"
-        ></highcharts-chart>
-      </div>
+    <div
+      class="content-charts_left"
+      cdkDropList
+      [cdkDropListData]="chartGroupsData"
+      (cdkDropListDropped)="drop($event)"
+    >
+      @for (chartConfig of chartGroupsData; track chartConfig) {
+      <highcharts-chart
+        cdkDrag
+        style="width: 20rem; height: 20rem; margin: 5px"
+        [Highcharts]="Highcharts"
+        [options]="chartConfig"
+      ></highcharts-chart>
+      }
     </div>
   </div>
 

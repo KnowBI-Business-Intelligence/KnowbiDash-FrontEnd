@@ -1,12 +1,21 @@
-import { CdkDrag } from '@angular/cdk/drag-drop';
+import {
+  CdkDrag,
+  CdkDragDrop,
+  CdkDragHandle,
+  CdkDropList,
+  CdkDropListGroup,
+  moveItemInArray,
+  transferArrayItem,
+} from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import Highcharts from 'highcharts';
+import Highcharts, { Options } from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { ChartsService } from '../../../core/services/charts/charts.service';
+import { LocalstorageService } from '../../../core/services/local-storage/local-storage.service';
 import { StorageService } from '../../../core/services/user/storage.service';
 
 interface ChartData {
@@ -25,7 +34,15 @@ interface ExtendedOptions extends Highcharts.Options {
 @Component({
   selector: 'app-chart-screen',
   standalone: true,
-  imports: [CommonModule, HighchartsChartModule, CdkDrag, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    CdkDrag,
+    CdkDropList,
+    CdkDragHandle,
+    CdkDropListGroup,
+    HighchartsChartModule,
+  ],
   templateUrl: './chart-screen.component.html',
   styleUrl: './chart-screen.component.css',
 })
@@ -49,13 +66,37 @@ export class ChartScreenComponent implements OnInit {
   constructor(
     private router: Router,
     private storageService: StorageService,
-    private chartService: ChartsService
+    private chartService: ChartsService,
+    private localStorage: LocalstorageService
   ) {
     this.loadingScreen = true;
   }
 
   ngOnInit(): void {
+    const storedItems = localStorage.getItem('items');
+
+    if (storedItems !== null) {
+      this.chartGroupsData = JSON.parse(storedItems) as Highcharts.Options[];
+    }
     this.getCharts();
+  }
+
+  drop(event: CdkDragDrop<Options[]>) {
+    if (event.previousContainer === event.container) {
+      moveItemInArray(
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex
+      );
+    } else {
+      transferArrayItem(
+        event.previousContainer.data,
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex
+      );
+    }
+    window.localStorage.setItem('items', JSON.stringify(this.chartGroupsData));
   }
 
   getCharts(): void {
@@ -73,7 +114,9 @@ export class ChartScreenComponent implements OnInit {
   }
 
   loadData(chartData: ChartData[]) {
-    this.chartObject = JSON.parse(localStorage.getItem('chartGroup') || 'null');
+    this.chartObject = JSON.parse(
+      this.localStorage.getDecryptedItem('chartGroup') || 'null'
+    );
     this.chartGroupsData = [];
     this.copydataJSON = [];
     this.filters = [];
@@ -154,8 +197,6 @@ export class ChartScreenComponent implements OnInit {
         this.chartGroupsData.push(chartConfig);
       }
     });
-
-    console.log(this.copydataJSON);
   }
 
   onCheckboxChange(column: string, value: string) {
@@ -188,7 +229,6 @@ export class ChartScreenComponent implements OnInit {
   }
 
   allValuesMatchAllFilters(values: any[], allFilters: any[]): boolean {
-    console.log(values, allFilters);
     return values.every((value) => allFilters.includes(value));
   }
 
@@ -255,21 +295,18 @@ export class ChartScreenComponent implements OnInit {
       filters: formattedFilters,
     };
 
-    console.log('Dados formatados:', requestData);
-
     const user = this.storageService.getUser();
     const headers = new HttpHeaders({
       Authorization: `Bearer ${user.token}`,
     });
     this.chartService.updateCharts(id, requestData, headers).subscribe({
-      next: (data: any) => {
-        console.log('Gráfico atualizado:', data);
+      next: () => {
         this.getCharts();
         this.chartGroupsData = [];
         this.copydataJSON = [];
       },
       error: (error: Error) => {
-        console.error('Erro ao atualizar o gráfico:', error);
+        throw new Error('Erro ao atualizar o gráfico:', error);
       },
     });
   }

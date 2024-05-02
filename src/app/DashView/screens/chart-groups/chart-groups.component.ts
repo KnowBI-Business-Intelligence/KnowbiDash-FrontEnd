@@ -3,6 +3,7 @@ import { HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ChartsService } from '../../../core/services/charts/charts.service';
+import { LocalstorageService } from '../../../core/services/local-storage/local-storage.service';
 import { StorageService } from '../../../core/services/user/storage.service';
 
 interface Group {
@@ -25,7 +26,8 @@ export class ChartGroupsComponent implements OnInit {
   constructor(
     private router: Router,
     private chartService: ChartsService,
-    private storageService: StorageService
+    private storageService: StorageService,
+    private localStorage: LocalstorageService
   ) {}
 
   ngOnInit(): void {
@@ -47,7 +49,7 @@ export class ChartGroupsComponent implements OnInit {
 
   initData(data: any) {
     this.selectedChartPath = JSON.parse(
-      localStorage.getItem('selectedChartPath') || 'null'
+      this.localStorage.getDecryptedItem('selectedChartPath') || 'null'
     );
 
     data.forEach((dataItem: any) => {
@@ -62,7 +64,7 @@ export class ChartGroupsComponent implements OnInit {
   }
 
   callCharts(groupName: any) {
-    localStorage.setItem('chartGroup', JSON.stringify(groupName));
+    this.localStorage.setEncryptedItem('chartGroup', JSON.stringify(groupName));
     this.router.navigate(['/content/main/charts']);
   }
 

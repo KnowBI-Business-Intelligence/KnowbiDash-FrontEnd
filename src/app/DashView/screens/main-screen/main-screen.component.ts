@@ -3,6 +3,7 @@ import { HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth/auth.service';
+import { LocalstorageService } from '../../../core/services/local-storage/local-storage.service';
 import { StorageService } from '../../../core/services/user/storage.service';
 
 @Component({
@@ -21,7 +22,8 @@ export class MainScreenComponent implements OnInit {
     private token: StorageService,
     private router: Router,
     private authService: AuthService,
-    private storageService: StorageService
+    private storageService: StorageService,
+    private localStorage: LocalstorageService
   ) {}
 
   ngOnInit(): void {
@@ -60,7 +62,10 @@ export class MainScreenComponent implements OnInit {
   }
 
   openChartGroup(pathObj: any) {
-    localStorage.setItem('selectedChartPath', JSON.stringify(pathObj.id));
+    this.localStorage.setEncryptedItem(
+      'selectedChartPath',
+      JSON.stringify(pathObj.id)
+    );
     this.router.navigate(['content/main/chartgroup']);
   }
 }

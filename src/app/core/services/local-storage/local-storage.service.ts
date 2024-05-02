@@ -9,6 +9,19 @@ export class LocalstorageService {
 
   constructor() {}
 
+  setEncryptedItem(key: string, value: any): void {
+    const encryptedValue = this.encryptData(value);
+    localStorage.setItem(key, encryptedValue);
+  }
+
+  getDecryptedItem(key: string): any {
+    const encryptedValue = localStorage.getItem(key);
+    if (encryptedValue) {
+      return this.decryptData(encryptedValue);
+    }
+    return null;
+  }
+
   encryptData(data: any): string {
     const encryptedData = CryptoJS.AES.encrypt(
       JSON.stringify(data),
@@ -23,18 +36,5 @@ export class LocalstorageService {
       this.secretKey
     ).toString(CryptoJS.enc.Utf8);
     return JSON.parse(decryptedData);
-  }
-
-  setEncryptedItem(key: string, value: any): void {
-    const encryptedValue = this.encryptData(value);
-    localStorage.setItem(key, encryptedValue);
-  }
-
-  getDecryptedItem(key: string): any {
-    const encryptedValue = localStorage.getItem(key);
-    if (encryptedValue) {
-      return this.decryptData(encryptedValue);
-    }
-    return null;
   }
 }
