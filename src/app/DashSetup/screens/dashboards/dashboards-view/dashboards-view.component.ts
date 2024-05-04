@@ -205,6 +205,7 @@ export class DashboardsViewComponent implements OnInit {
           return {
             type: dataItem.graphType,
             name: subgrupo,
+            height: '20%',
             data: seriesValues,
           };
         });
@@ -223,15 +224,31 @@ export class DashboardsViewComponent implements OnInit {
             title: {
               text: dataItem.xAxisColumns[0].name[0],
             },
+            labels: {
+              style: {
+                fontSize: '10px',
+              },
+            },
           },
           yAxis: {
             title: {
               text: dataItem.yAxisColumns[0].name[0],
             },
+            labels: {
+              style: {
+                fontSize: '10px',
+              },
+            },
           },
           series: seriesData,
           tooltip: {
             shared: true,
+          },
+          legend: {
+            maxHeight: 65,
+            itemStyle: {
+              fontSize: '12px',
+            },
           },
           plotOptions: {
             series: {
@@ -358,7 +375,7 @@ export class DashboardsViewComponent implements OnInit {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${user.token}`,
     });
-    this.chartsService.updateCharts(id, requestData, headers).subscribe({
+    this.chartsService.updateCharts(headers, requestData, id).subscribe({
       next: (data) => {
         console.log('Gráfico atualizado:', data);
         this.getCharts(id);

@@ -57,25 +57,12 @@ export class ChartsService {
 
   // CREATES
 
-  createCharts(
-    headers: HttpHeaders,
-    title: string,
-    sql: string,
-    ID_chartGroup: {} = {}
-  ): Observable<any> {
+  createCharts(headers: HttpHeaders, chartData: any): Observable<any> {
     const myHeaders = {
       headers: headers,
     };
 
-    const body = {
-      title,
-      sql,
-      chartGroup: {
-        id: ID_chartGroup,
-      },
-    };
-
-    return this.http.post(`${this.ENV_CHARTS}/create`, body, myHeaders);
+    return this.http.post(`${this.ENV_CHARTS}/create`, chartData, myHeaders);
   }
 
   createChartsPath(
@@ -134,16 +121,16 @@ export class ChartsService {
 
   // UPDATES
 
-  updateCharts(
-    id: string,
-    data: any, // Alterado para aceitar um objeto de dados
-    headers: HttpHeaders
-  ) {
+  updateCharts(headers: HttpHeaders, chartData: any, id: any) {
     const options = {
       headers: headers,
     };
 
-    return this.http.patch(`${this.ENV_CHARTS}/update/${id}`, data, options);
+    return this.http.patch(
+      `${this.ENV_CHARTS}/update/${id}`,
+      chartData,
+      options
+    );
   }
 
   updateChartGroupSQL(

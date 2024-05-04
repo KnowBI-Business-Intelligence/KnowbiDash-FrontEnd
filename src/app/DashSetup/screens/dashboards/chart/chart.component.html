@@ -38,7 +38,10 @@
           <span class="serie-label"> Série base: </span>
           <div class="serie-content">
             <div *ngFor="let data of chartButtons">
-              <button (click)="selectChartButton(data.label)">
+              <button
+                (click)="selectChartButton(data.label, data.value)"
+                [class.selected]="selectedChartButton === data.label"
+              >
                 <fa-icon
                   class="iconChart"
                   [icon]="data.icon"
@@ -157,7 +160,7 @@
           </div>
         </div>
         <div class="seriesdata">
-          <span>Series</span>
+          <span>Legenda</span>
           <div
             cdkDropList
             [cdkDropListData]="series"
@@ -248,52 +251,6 @@
             </div>
           </div>
         </div>
-        <div class="groupment">
-          <span>Agrupamento</span>
-          <div
-            cdkDropList
-            [cdkDropListData]="groupment"
-            class="serie-list a"
-            (cdkDropListDropped)="drop($event)"
-          >
-            <div
-              *ngFor="let item of groupment; let i = index"
-              class="series-box"
-              cdkDrag
-              cdkDragLockAxis="y"
-              cdkDragBoundary=".a"
-            >
-              <div>
-                <fa-icon
-                  class="icon"
-                  [icon]="icons.database"
-                  [size]="'xl'"
-                ></fa-icon>
-                {{ item.name }}
-              </div>
-              <div class="series-buttons">
-                <button
-                  [cdkMenuTriggerFor]="menuedit"
-                  class="example-standalone-item"
-                  (click)="AxisValue(item)"
-                >
-                  <fa-icon
-                    class="commomicon"
-                    [icon]="icons.edit"
-                    [size]="'xl'"
-                  ></fa-icon>
-                </button>
-                <button (click)="removeItem('groupment', i)">
-                  <fa-icon
-                    class="removedataicon"
-                    [icon]="icons.close"
-                    [size]="'xl'"
-                  ></fa-icon>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
         <div class="order">
           <span>Ordenação</span>
           <div
@@ -341,19 +298,23 @@
           </div>
         </div>
       </div>
-      <div class="visualize">
-        <button (click)="chartPreView()"><p>Visualizar</p></button>
-      </div>
     </div>
   </div>
   <div class="container-pre-view">
     <span>pré visualização</span>
-    <div class="chart-container">
+    <div *ngIf="showPreviewButton" class="visualize">
+      <button (click)="seedData()"><p>Pré-Visualizar</p></button>
+    </div>
+    <div *ngIf="!showPreviewButton" class="chart-container">
       <highcharts-chart
-        style="width: 30rem; height: 25rem; margin: 5px"
+        style="width: 100%; height: 25rem; margin: 5px"
         [Highcharts]="Highcharts"
         [options]="chartConfig"
       ></highcharts-chart>
+    </div>
+    <div class="chart-container-buttons">
+      <button (click)="openModal()"><p>Cancelar</p></button>
+      <button (click)="updateChart()"><p>Atualizar</p></button>
     </div>
   </div>
 </div>
@@ -406,3 +367,24 @@
     <button class="edit-save" cdkMenuItem (click)="editSave()">Salvar</button>
   </div>
 </ng-template>
+
+<div
+  class="modal"
+  *ngIf="showModal"
+  id="modal"
+  [style.display]="showModal ? 'flex' : 'none'"
+>
+  <div class="modal-content">
+    <span class="close" (click)="closeModal()">&times;</span>
+    <div>
+      <h2>Tem certeza que deseja cancelar esta ação?</h2>
+      <p>As alterações do gráfico não serão salvas</p>
+      <div class="modal-buttons">
+        <button class="cancel" (click)="closeModal()">cancelar</button>
+        <button class="exclude" (click)="openModalCancel()">
+          <span>Sair sem salvar</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -275,7 +275,7 @@ export class ChartScreenComponent implements OnInit {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${user.token}`,
     });
-    this.chartService.updateCharts(id, requestData, headers).subscribe({
+    this.chartService.updateCharts(headers, requestData, id).subscribe({
       next: (data) => {
         console.log('Gráfico atualizado:', data);
         this.getCharts();

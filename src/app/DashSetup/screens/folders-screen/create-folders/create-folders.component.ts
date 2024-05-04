@@ -153,7 +153,7 @@ export class CreateFoldersComponent {
       });
   }
 
-  private createCharts(name: string, sql: string) {
+  /*private createCharts(name: string, sql: string) {
     const that = this;
     this.getHeaders();
 
@@ -175,14 +175,14 @@ export class CreateFoldersComponent {
           console.error(err);
         },
       });
-  }
+  }*/
 
-  createChart() {
+  /*createChart() {
     this.chartName = this.thirdFormGroup.get('nameChart')?.value;
     this.SQL_chart = this.thirdFormGroup.get('SQL_Chart')?.value;
 
     this.createCharts(this.chartName, this.SQL_chart);
-  }
+  }*/
 
   getItemFolder() {
     this.chartGroupName = this.firstFormGroup.get('nameGroup')?.value;

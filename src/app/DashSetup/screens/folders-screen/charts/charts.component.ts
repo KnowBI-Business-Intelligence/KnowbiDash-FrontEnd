@@ -71,7 +71,7 @@ export class ChartsComponent implements OnInit {
       Authorization: `Bearer ${user.token}`,
     });
   }
-
+  /*
   private createCharts(title: string, sql: string, idChart: string) {
     const that = this;
     this.getHeaders();
@@ -96,14 +96,14 @@ export class ChartsComponent implements OnInit {
         });
       },
     });
-  }
+  }*/
 
-  createChart() {
+  /*createChart() {
     const name = this.chartFormGroup.get('nameChart')?.value as string;
     const sql = this.chartFormGroup.get('SQL_Chart')?.value as string;
 
     this.createCharts(name, sql, this.item.id);
-  }
+  }*/
 
   onInputChange(event: Event) {
     const searchTerm = (event.target as HTMLInputElement).value
