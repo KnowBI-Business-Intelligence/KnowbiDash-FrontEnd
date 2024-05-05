@@ -32,6 +32,7 @@ interface Axis {
   name: string;
   type: string;
   identifier: string;
+  value: '';
 }
 
 interface ExtendedOptions extends Highcharts.Options {
@@ -66,18 +67,25 @@ export class ChartComponent implements OnInit {
     edit: faGear,
   };
 
+  dashBoard: any;
+  chartId: any;
   titulo: string = '';
   chartType: string = '';
   sql: string = 'SELECT ';
   tableName: string = '';
+  identifier: string = '';
+  selectedAggregation: string = '';
 
-  selectedYAxis: Axis = { name: '', type: '', identifier: '' };
+  selectedChartButton: string = '';
+  showPreviewButton: boolean = true;
+  showModal: boolean = false;
+  modal: HTMLElement | undefined;
+
+  selectedYAxis: Axis = { name: '', type: '', identifier: '', value: '' };
   buildData: { name: any; identifier: any }[] = [];
   yAxisValueWithoutAggregation: string = '';
   yaxisData: { [key: string]: string } = {};
   yaxisIdentifiers: { [key: string]: string } = {};
-  identifier: string = '';
-  selectedAggregation: string = '';
 
   Highcharts: typeof Highcharts = Highcharts;
   chartConfig!: ExtendedOptions;
@@ -118,13 +126,9 @@ export class ChartComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const data = this.localStorageService.getDecryptedItem('chartGroupview');
-    this.loadDataView(data.id);
-    this.chartPreView();
-  }
-
-  selectChartButton(label: string) {
-    this.chartType = label;
+    this.dashBoard =
+      this.localStorageService.getDecryptedItem('chartGroupview');
+    this.loadDataView(this.dashBoard.id);
   }
 
   openMenu(index: number, item: any) {
@@ -141,48 +145,13 @@ export class ChartComponent implements OnInit {
     }
   }
 
-  extractValue(aggregation: string) {
-    if (this.selectedYAxis) {
-      const yAxisName = this.selectedYAxis.name;
-      const columnNameRegex = /^(?:AVG|COUNT|SUM)\(([^)]+)\)$/;
-
-      if (columnNameRegex.test(yAxisName)) {
-        const columnName = yAxisName.replace(columnNameRegex, '$1');
-        const newAggregationValue = aggregation + '(' + columnName + ')';
-        console.log(this.selectedYAxis);
-        const updatedAxis = {
-          name: newAggregationValue,
-          identifier: this.selectedYAxis.identifier
-            ? this.selectedYAxis.identifier
-            : this.selectedYAxis.name,
-        };
-
-        const index = this.yaxis.findIndex((item) => item.name === yAxisName);
-        if (index !== -1) {
-          this.yaxis[index] = updatedAxis;
-        }
-      } else {
-        const aggregationValue = aggregation + '(' + yAxisName + ')';
-        const index = this.yaxis.findIndex((item) => item.name === yAxisName);
-        if (index !== -1) {
-          this.yaxis[index] = {
-            name: aggregationValue,
-            identifier: this.selectedYAxis.identifier
-              ? this.selectedYAxis.identifier
-              : this.selectedYAxis.name,
-          };
-        }
-      }
-    }
-  }
-
   loadDataView(id: string) {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${this.user.token}`,
     });
 
     this.chartsService.getChartGroup(headers).subscribe({
-      next: (data: any) => {
+      next: (data) => {
         data.forEach((getId: any) => {
           if (id == getId.id) {
             this.tableName = getId.pgTableName;
@@ -193,22 +162,37 @@ export class ChartComponent implements OnInit {
     });
   }
 
-  editSave() {
-    if (this.selectedYAxis) {
-      this.selectedYAxis.identifier = this.identifier
-        ? this.identifier
-        : this.selectedYAxis.name;
-      this.yaxisIdentifiers[this.selectedYAxis.name] =
-        this.selectedYAxis.identifier;
-    }
-  }
-
   processData(data: any) {
-    data?.columns?.forEach((setData: any) => {
+    data.columns.forEach((setData: any) => {
       this.database.push(setData);
       this.yaxisData[setData.name] = setData;
       if (!setData.identifier || setData.identifier.trim() === '') {
         setData.identifier = setData.name;
+        setData.value = setData.name;
+      }
+
+      if (setData.type === 'timestamp') {
+        const parts = ['(dia)', '(mês)', '(ano)'];
+        parts.forEach((part) => {
+          let value = '';
+          if (part === '(dia)') {
+            value = `DATE_TRUNC('day', ${this.rmTimeStamp(setData.name)})`;
+          } else if (part === '(mês)') {
+            value = `DATE_TRUNC('month', ${this.rmTimeStamp(setData.name)})`;
+          } else if (part === '(ano)') {
+            value = `DATE_TRUNC('year', ${this.rmTimeStamp(setData.name)})`;
+          }
+
+          const name = `${setData.name}${part}`;
+          const identifier = `${setData.identifier}${part}`;
+          const timestampPart = {
+            name: name,
+            type: 'timestamp',
+            identifier: this.rmTimeStamp(identifier),
+            value: value,
+          };
+          this.database.push(timestampPart);
+        });
       }
     });
   }
@@ -238,71 +222,239 @@ export class ChartComponent implements OnInit {
     }
   }
 
+  extractValue(aggregation: string) {
+    if (this.selectedYAxis) {
+      const yAxisName = this.selectedYAxis.name;
+      const columnNameRegex = /^(?:AVG|COUNT|SUM)\(([^)]+)\)$/;
+
+      if (columnNameRegex.test(yAxisName)) {
+        const columnName = yAxisName.replace(columnNameRegex, '$1');
+        const newAggregationValue = aggregation + '(' + columnName + ')';
+
+        const updatedAxis = {
+          name: newAggregationValue,
+          identifier: this.selectedYAxis.identifier
+            ? this.selectedYAxis.identifier
+            : this.selectedYAxis.name,
+          value: columnName,
+        };
+
+        const index = this.yaxis.findIndex((item) => item.name === yAxisName);
+        if (index !== -1) {
+          this.yaxis[index] = updatedAxis;
+        }
+      } else {
+        const aggregationValue = aggregation + '(' + yAxisName + ')';
+        const index = this.yaxis.findIndex((item) => item.name === yAxisName);
+        if (index !== -1) {
+          this.yaxis[index] = {
+            name: aggregationValue,
+            identifier: this.selectedYAxis.identifier
+              ? this.selectedYAxis.identifier
+              : this.selectedYAxis.name,
+            value: yAxisName,
+          };
+        }
+      }
+    }
+  }
+
+  editSave() {
+    if (this.selectedYAxis) {
+      this.selectedYAxis.identifier = this.identifier
+        ? this.identifier
+        : this.selectedYAxis.name;
+      this.yaxisIdentifiers[this.selectedYAxis.name] =
+        this.selectedYAxis.identifier;
+    }
+  }
+
   identifierData() {
     this.buildData = [];
     for (let i = 0; i < this.yaxis.length; i++) {
       const yAxisItem = this.yaxis[i].name;
-      let identifierItem = yAxisItem;
-      console.log(identifierItem);
+      const yAxisidentifier = this.yaxis[i].value;
+      let identifierItem = yAxisidentifier;
       const hasAggregation = /^(?:AVG|COUNT|SUM)\([^)]+\)$/.test(
         identifierItem
       );
       if (hasAggregation) {
-        identifierItem = identifierItem.replace(
-          /^(?:AVG|COUNT|SUM)\(([^)]+)\)$/,
-          '$1'
-        );
+        identifierItem = this.rmAgregateReplace(identifierItem);
       }
 
       this.buildData.push({ name: yAxisItem, identifier: identifierItem });
     }
 
-    this.sql = 'SELECT ';
+    for (let i = 0; i < this.xaxis.length; i++) {
+      const xAxisItem = this.xaxis[i].value;
+      const xAxisidentifier = this.rmTimeStamp(this.xaxis[i].name);
+      this.buildData.push({ name: xAxisItem, identifier: xAxisidentifier });
+    }
 
+    for (let i = 0; i < this.series.length; i++) {
+      const seriesItem = this.series[i].value;
+      const seriesidentifier = this.rmTimeStamp(this.series[i].name);
+      this.buildData.push({ name: seriesItem, identifier: seriesidentifier });
+    }
+
+    this.sql = 'SELECT ';
     if (this.buildData.length > 0) {
       const selectClauses = this.buildData.map((item) => {
         return `${item.name} AS ${item.identifier}`;
       });
-
       this.sql += selectClauses.join(', ');
     }
 
     if (this.buildData.length > 0) {
       this.sql += ` FROM ${this.tableName}`;
     }
-
-    console.log(this.sql);
   }
 
   seedData() {
-    console.log('Título:', this.titulo);
-    console.log('Tipo:', this.chartType.toLowerCase());
-    this.yaxis.forEach((axis) => {
-      console.log(`Eixo y ${axis.name}: ${axis.identifier}`);
+    this.showPreviewButton = false;
+    this.identifierData();
+
+    const xAxisValues = this.xaxis.map((axis) => this.rmTimeStamp(axis.name));
+    const seriesValues = this.series.map((series) =>
+      this.rmTimeStamp(series.value)
+    );
+    const group = [...xAxisValues, ...seriesValues];
+
+    const chartData = {
+      title: this.titulo,
+      graphType: this.chartType.toLowerCase(),
+      sql: this.sql,
+      xAxisColumns: this.xaxis.map((axis) => {
+        return {
+          name: [this.rmTimeStamp(axis.name)],
+          identifiers: [axis.identifier],
+        };
+      }),
+      yAxisColumns: this.yaxis.map((axis) => {
+        return {
+          name: [this.rmTimeStamp(axis.value)],
+          identifiers: [axis.identifier],
+        };
+      }),
+      series: this.series.map((series) => {
+        return {
+          name: [this.rmTimeStamp(series.name)],
+          identifiers: [series.identifier],
+        };
+      }),
+      filters: this.filters.map((filter) => {
+        let operator;
+        if (filter.type === 'timestamp' || filter.type === 'number') {
+          operator = 'BETWEEN';
+        } else {
+          operator = 'IN';
+        }
+
+        return {
+          column: [this.rmTimeStamp(filter.name)],
+          operator: [operator],
+          value: [],
+          identifiers: [filter.identifier],
+        };
+      }),
+      group: group,
+      order: this.order.length
+        ? this.order.map((order) => this.rmTimeStamp(order.name))
+        : xAxisValues,
+      chartGroup: {
+        id: this.dashBoard.id,
+      },
+    };
+
+    this.createChart(chartData);
+  }
+
+  createChart(chartData: any) {
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.user.token}`,
     });
-    this.xaxis.forEach((axis) => {
-      console.log(`Eixo x ${axis.name}: ${axis.identifier}`);
-    });
-    this.series.forEach((series) => {
-      console.log(`Series ${series.name}: ${series.identifier}`);
-    });
-    this.filters.forEach((filter) => {
-      console.log(`filters ${filter.name}: ${filter.identifier}`);
-    });
-    this.groupment.forEach((group) => {
-      console.log(`group ${group.name}: ${group.identifier}`);
-    });
-    this.order.forEach((order) => {
-      console.log(`order ${order.name}: ${order.identifier}`);
+
+    this.chartsService.createCharts(headers, chartData).subscribe({
+      next: (data) => {
+        this.chartPreView(data);
+        this.chartId = data.id;
+        this.updateChart();
+      },
     });
   }
 
-  chartPreView() {
+  updateChart() {
     this.identifierData();
-    this.seedData();
+
+    const xAxisValues = this.xaxis.map((axis) => this.rmTimeStamp(axis.name));
+    const seriesValues = this.series.map((series) =>
+      this.rmTimeStamp(series.value)
+    );
+    const group = [...xAxisValues, ...seriesValues];
+    const chartData = {
+      title: this.titulo,
+      graphType: this.chartType.toLowerCase(),
+      sql: this.sql,
+      xAxisColumns: this.xaxis.map((axis) => {
+        return {
+          name: [this.rmTimeStamp(axis.name)],
+          identifiers: [axis.identifier],
+        };
+      }),
+      yAxisColumns: this.yaxis.map((axis) => {
+        return {
+          name: [this.rmTimeStamp(axis.value)],
+          identifiers: [axis.identifier],
+        };
+      }),
+      series: this.series.map((series) => {
+        return {
+          name: [this.rmTimeStamp(series.name)],
+          identifiers: [series.identifier],
+        };
+      }),
+      filters: this.filters.map((filter) => {
+        let operator;
+        if (filter.type === 'timestamp' || filter.type === 'number') {
+          operator = 'BETWEEN';
+        } else {
+          operator = 'IN';
+        }
+
+        return {
+          column: [this.rmTimeStamp(filter.name)],
+          operator: [operator],
+          value: [],
+          identifiers: [filter.identifier],
+        };
+      }),
+      group: group,
+      order: this.order.length
+        ? this.order.map((order) => this.rmTimeStamp(order.name))
+        : xAxisValues,
+      chartGroup: {
+        id: this.dashBoard.id,
+      },
+    };
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.user.token}`,
+    });
+
+    this.chartsService
+      .updateCharts(headers, chartData, this.chartId)
+      .subscribe({
+        next: (data) => {
+          this.chartPreView(data);
+        },
+      });
+  }
+
+  chartPreView(data: any) {
+    console.log(data);
     this.chartConfig = {
       chart: {
-        type: 'column',
+        type: data.graphType,
       },
       title: {
         text: this.titulo,
@@ -312,32 +464,68 @@ export class ChartComponent implements OnInit {
       },
       xAxis: {
         categories: ['UNIMED', 'CASF', 'Bradesco', 'CASSI'],
+        title: {
+          style: {
+            fontSize: '12px',
+          },
+        },
       },
       yAxis: {
         min: 0,
         title: {
           text: 'Atendimentos',
+          style: {
+            fontSize: '12px',
+          },
         },
+      },
+      legend: {
+        layout: 'vertical',
+        align: 'right',
+        verticalAlign: 'top',
+        x: -40,
+        y: 80,
+        floating: true,
+        borderWidth: 1,
+        backgroundColor: '#FFFFFF',
+        shadow: true,
       },
       series: [
         {
-          type: 'column',
-          name: 'consulta',
+          type: data.graphType,
+
           data: [631, 727, 3202, 721],
-        },
-        {
-          type: 'column',
-          name: 'Quimioterapia',
-          data: [814, 841, 3714, 726],
         },
       ],
     };
   }
+
+  selectChartButton(label: string, value: string) {
+    this.selectedChartButton = label;
+    this.chartType = value;
+  }
+
   backScreen() {
     this.router.navigate(['/admin/dashboards']);
   }
 
-  agregateReplace(item: string) {
-    return item.replace(/^(?:AVG|COUNT|SUM)\(([^)]+)\)$/, '$1');
+  openModalCancel() {
+    this.backScreen();
+  }
+
+  openModal(): void {
+    this.showModal = true;
+  }
+
+  closeModal(): void {
+    this.showModal = false;
+  }
+
+  rmAgregateReplace(item: string) {
+    return item.replace(/^(?:AVG|COUNT|SUM|mês)\(([^)]+)\)$/, '$1');
+  }
+
+  rmTimeStamp(item: string) {
+    return item.replace(/\((?:dia|mês|ano)\)/, '');
   }
 }

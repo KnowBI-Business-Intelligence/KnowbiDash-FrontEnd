@@ -155,24 +155,28 @@ export class CreateFoldersComponent {
     const that = this;
     this.getHeaders();
 
-    this.charts
-      .createCharts(this.headers, name, sql, this.chartGroupNameID)
-      .subscribe({
-        next(value: any) {
-          that.messageService.add({
-            severity: 'success',
-            summary: 'Sucesso',
-            detail: 'Gráfico cadastrado. ',
-          });
-          that.thirdFormGroup.setValue({
-            nameChart: '',
-            SQL_Chart: '',
-          });
-        },
-        error(err: Error) {
-          console.error(err);
-        },
-      });
+    const data = {
+      name,
+      sql,
+      id: this.chartGroupNameID,
+    };
+
+    this.charts.createCharts(this.headers, data).subscribe({
+      next(value: any) {
+        that.messageService.add({
+          severity: 'success',
+          summary: 'Sucesso',
+          detail: 'Gráfico cadastrado. ',
+        });
+        that.thirdFormGroup.setValue({
+          nameChart: '',
+          SQL_Chart: '',
+        });
+      },
+      error(err: Error) {
+        console.error(err);
+      },
+    });
   }
 
   createChart() {

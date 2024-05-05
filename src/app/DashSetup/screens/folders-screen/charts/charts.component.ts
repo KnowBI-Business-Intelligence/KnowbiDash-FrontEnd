@@ -70,8 +70,9 @@ export class ChartsComponent implements OnInit {
   }
 
   private createCharts(title: string, sql: string, idChart: string) {
+    const data = { title, sql, idChart };
     this.getHeaders();
-    this.charts.createCharts(this.headers, title, sql, idChart).subscribe({
+    this.charts.createCharts(this.headers, data).subscribe({
       next: () => {
         this.messageService.add({
           severity: 'success',

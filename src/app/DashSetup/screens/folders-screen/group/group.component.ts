@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-group',
@@ -14,12 +14,11 @@ export class GroupComponent implements OnInit {
   listcharts: any;
   filteredItems: any;
 
-  constructor(private router: Router, private route: ActivatedRoute) {}
+  constructor(private router: Router) {}
 
   ngOnInit(): void {
     this.item = this.router.getCurrentNavigation()?.extras.state?.['item'];
-    this.filteredItems = this.item.chartGroups;
-    this.listcharts = this.item.chartGroups;
+    console.log(this.item);
   }
   clear() {}
 

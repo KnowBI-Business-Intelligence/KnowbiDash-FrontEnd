@@ -36,16 +36,8 @@
       </div>
     </div>
     <div class="dashview">
-      <span class="groupname">Aberto recente: {{ groupName }}</span>
+      <span class="groupname">Dashboard: {{ groupName }}</span>
       <div class="filter">
-        <div class="filter-container">
-          <div class="filter-filters" *ngFor="let filter of filters">
-            <div class="filter-filters-data">
-              <h3>{{ filter.identifiers }}</h3>
-              <span [title]="filter.values">{{ filter.values }}</span>
-            </div>
-          </div>
-        </div>
         <div class="filter-button">
           <button (click)="openModal()">
             <p>Filtro</p>
@@ -53,6 +45,14 @@
               filter_alt
             </span>
           </button>
+        </div>
+        <div class="filter-container">
+          <div class="filter-filters" *ngFor="let filter of filters">
+            <div class="filter-filters-data">
+              <h3>{{ filter.identifiers }}</h3>
+              <span [title]="filter.values">{{ filter.values }}</span>
+            </div>
+          </div>
         </div>
       </div>
 

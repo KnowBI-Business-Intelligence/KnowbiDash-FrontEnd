@@ -73,12 +73,13 @@ export class ChartScreenComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const storedItems = localStorage.getItem('items');
+    const storedItems = this.localStorage.getDecryptedItem('items');
 
     if (storedItems !== null) {
       this.chartGroupsData = JSON.parse(storedItems) as Highcharts.Options[];
+    } else {
+      this.getCharts();
     }
-    this.getCharts();
   }
 
   drop(event: CdkDragDrop<Options[]>) {
@@ -96,7 +97,10 @@ export class ChartScreenComponent implements OnInit {
         event.currentIndex
       );
     }
-    window.localStorage.setItem('items', JSON.stringify(this.chartGroupsData));
+    this.localStorage.setEncryptedItem(
+      'items',
+      JSON.stringify(this.chartGroupsData)
+    );
   }
 
   getCharts(): void {
@@ -194,7 +198,9 @@ export class ChartScreenComponent implements OnInit {
           filters: dataItem.filters,
         };
 
-        this.chartGroupsData.push(chartConfig);
+        if (!this.localStorage.getDecryptedItem('items')) {
+          this.chartGroupsData.push(chartConfig);
+        }
       }
     });
   }
@@ -299,7 +305,7 @@ export class ChartScreenComponent implements OnInit {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${user.token}`,
     });
-    this.chartService.updateCharts(id, requestData, headers).subscribe({
+    this.chartService.updateCharts(headers, requestData, id).subscribe({
       next: () => {
         this.getCharts();
         this.chartGroupsData = [];

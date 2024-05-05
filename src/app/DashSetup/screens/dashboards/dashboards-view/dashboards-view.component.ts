@@ -90,8 +90,6 @@ export class DashboardsViewComponent implements OnInit {
     this.loadDataInit();
     const groupIdFromLocalStorage =
       this.localStorageService.getDecryptedItem('chartGroupview');
-    console.log(groupIdFromLocalStorage);
-
     this.getCharts(groupIdFromLocalStorage.id);
     const simulatedEvent = {
       currentTarget:
@@ -106,7 +104,7 @@ export class DashboardsViewComponent implements OnInit {
     });
 
     this.chartsService.getChartsPath(headers).subscribe({
-      next: (data: any) => {
+      next: (data) => {
         this.processData(data);
       },
     });
@@ -130,7 +128,7 @@ export class DashboardsViewComponent implements OnInit {
     });
 
     this.chartsService.getChartGroup(headers).subscribe({
-      next: (data: any) => {
+      next: (data) => {
         this.processDashboardsData(data, dataPath);
       },
     });
@@ -151,7 +149,7 @@ export class DashboardsViewComponent implements OnInit {
     });
 
     this.chartsService.getCharts(headers).subscribe({
-      next: (data: any) => {
+      next: (data) => {
         this.originalChartData = data;
         this.loadData(data, id);
       },
@@ -192,7 +190,7 @@ export class DashboardsViewComponent implements OnInit {
           new Set(dataItem.xAxisColumns[0].data)
         );
 
-        const uniqueSubgroups = Array.from(new Set(dataItem?.series[0]?.data));
+        const uniqueSubgroups = Array.from(new Set(dataItem.series[0].data));
 
         const seriesData = uniqueSubgroups.map((subgrupo: any) => {
           const seriesValues: { name: string; y: any }[] = [];
@@ -207,6 +205,7 @@ export class DashboardsViewComponent implements OnInit {
           return {
             type: dataItem.graphType,
             name: subgrupo,
+            height: '20%',
             data: seriesValues,
           };
         });
@@ -225,15 +224,31 @@ export class DashboardsViewComponent implements OnInit {
             title: {
               text: dataItem.xAxisColumns[0].name[0],
             },
+            labels: {
+              style: {
+                fontSize: '10px',
+              },
+            },
           },
           yAxis: {
             title: {
               text: dataItem.yAxisColumns[0].name[0],
             },
+            labels: {
+              style: {
+                fontSize: '10px',
+              },
+            },
           },
           series: seriesData,
           tooltip: {
             shared: true,
+          },
+          legend: {
+            maxHeight: 65,
+            itemStyle: {
+              fontSize: '12px',
+            },
           },
           plotOptions: {
             series: {
@@ -360,14 +375,15 @@ export class DashboardsViewComponent implements OnInit {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${user.token}`,
     });
-    this.chartsService.updateCharts(id, requestData, headers).subscribe({
-      next: () => {
+    this.chartsService.updateCharts(headers, requestData, id).subscribe({
+      next: (data) => {
+        console.log('Gráfico atualizado:', data);
         this.getCharts(id);
         this.chartGroupsData = [];
         this.copydataJSON = [];
       },
-      error: () => {
-        throw new Error('we had an error');
+      error: (error) => {
+        console.error('Erro ao atualizar o gráfico:', error);
       },
     });
   }
