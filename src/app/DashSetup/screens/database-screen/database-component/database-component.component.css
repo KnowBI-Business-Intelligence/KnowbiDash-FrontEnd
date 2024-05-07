@@ -1,10 +1,26 @@
+.container-nav-line {
+  width: 60%;
+  padding: 5px 10px;
+  position: relative;
+  top: -39px;
+  left: 19px;
+  align-self: baseline;
+  display: flex;
+}
+
+.container-nav-line span {
+  color: #00000074;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
 .container {
   display: flex;
   justify-content: start;
   flex-direction: column;
   align-items: center;
   width: 95vw;
-  height: 88vh;
+  height: 85vh;
   margin: 1rem;
 }
 

@@ -40,7 +40,6 @@ header {
   justify-content: space-between;
   align-items: center;
   width: 95%;
-  margin-top: -10px;
 }
 
 .content {
@@ -60,20 +59,7 @@ header {
   justify-content: center;
   line-height: 1;
   padding: 0 0.5rem;
-  font-size: 12px;
-}
-
-:host ::ng-deep .p-progressbar {
-  height: 0.5rem;
-  background-color: #d8dadc;
-}
-
-:host ::ng-deep .p-progressbar-value {
-  background-color: #607d8b;
-}
-
-:host ::ng-deep .p-table {
-  height: 20rem;
+  font-size: 0.75rem;
 }
 
 .card {
@@ -81,27 +67,40 @@ header {
   margin-top: 1rem;
 }
 
-.filter {
+.content-filter {
   display: flex;
-  justify-content: start;
+  align-items: center;
+  justify-content: space-between;
+  width: 18rem;
 }
 
-.filter button {
-  padding: 0.6rem;
+.content-filter button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  background-color: #fff;
+  box-shadow: 0px 0px 2px 0px #abbac0;
+}
+
+.content-filter input {
+  padding: 0.6rem;
+  border-radius: 0.2rem;
   margin-right: 1rem;
-  border-radius: 0.2rem;
-}
-
-.filter input {
-  padding: 0.6rem;
-  border-radius: 0.2rem;
   border: none;
+  outline: none;
+  border-radius: 0.25rem;
+  background-color: #fff;
+  box-shadow: 0px 0px 2px 0px #abbac0;
 }
 
 th {
   padding-bottom: 10px;
   padding-top: 10px;
+  font-size: 0.75rem;
 }
 
 .tr {
@@ -111,10 +110,21 @@ th {
 
 td {
   text-align: left;
-  border: 1px solid #e5e7eb;
   border-width: 0 0 1px 0;
   padding: 0.5rem 1rem;
-  font-size: 14px;
+  font-size: 0.75rem;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:host ::ng-deep .p-paginator {
+  font-size: 0.75rem;
+}
+
+:host ::ng-deep .p-paginator .p-dropdown .p-dropdown-label {
+  font-size: 0.75rem;
 }
 
 .modal {

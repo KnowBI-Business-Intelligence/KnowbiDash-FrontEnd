@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { ChartsService } from '../../../core/services/charts/charts.service';
 import { StorageService } from '../../../core/services/user/storage.service';
 
@@ -18,7 +18,11 @@ export class ADMMainScreenComponent {
   listpages: any;
   filteredItems: any;
 
-  constructor(private charts: ChartsService, private token: StorageService) {}
+  constructor(
+    private charts: ChartsService,
+    private token: StorageService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.getFolders();
@@ -39,8 +43,15 @@ export class ADMMainScreenComponent {
     );
   }
 
-  clear() {
-    throw new Error('Method not implemented.');
+  clear(event: MouseEvent) {
+    const searchTerm = (event.target as HTMLElement)
+      .closest('.content-filter')
+      ?.querySelector('input');
+    if (searchTerm) {
+      searchTerm.value = '';
+    }
+    this.filteredItems = this.listpages;
+    return;
   }
 
   private getFolders() {
@@ -66,5 +77,9 @@ export class ADMMainScreenComponent {
         console.error(err);
       },
     });
+  }
+
+  openNext(item: any) {
+    this.router.navigate(['admin/groups'], { state: item });
   }
 }

@@ -210,7 +210,9 @@
         <div class="container_profile-right">
           <span>Código SQL: </span>
           <br />
-          <span> {{ selectedRow?.sql }}</span>
+          <span>
+            {{ selectedRow?.sql ? selectedRow?.sql : "Sem conteúdo" }}</span
+          >
         </div>
       </div>
       <div class="footer_view-profile">
@@ -262,11 +264,18 @@
           mode="indeterminate"
         ></mat-progress-bar>
       </div>
-      <div class="sql-body_result">
-        <p>{{ sqlResult }}</p>
+      <div class="sql-result">
+        <div class="body-sql-result" *ngIf="sqlResult">
+          <p>Colunas selecionadas</p>
+          <div class="body-sql-result_columns">
+            <div *ngFor="let column of sqlResult?.columns">
+              <span>{{ column.name }} </span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <p-toast [life]="1000"></p-toast>
+  <p-toast styleClass="toast" [life]="1000"></p-toast>
 </div>

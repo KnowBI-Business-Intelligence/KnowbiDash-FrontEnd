@@ -1,3 +1,18 @@
 * {
   font-size: 0.75rem;
 }
+
+.container-nav-line {
+  display: flex;
+  width: 60%;
+  padding: 5px 10px;
+  position: relative;
+  top: -40px;
+  left: 19px;
+}
+
+.container-nav-line span {
+  color: #00000074;
+  font-size: 12px;
+  margin-bottom: 4px;
+}

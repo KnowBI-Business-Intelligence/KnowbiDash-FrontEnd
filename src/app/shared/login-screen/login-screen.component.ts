@@ -81,8 +81,8 @@ export class LoginScreenComponent implements OnInit {
   onSubmit(): void {
     const { username, password } = this.form;
     this.isLoginLoading = true;
-    this.authService.login(username, password).subscribe({
-      next: (data) => {
+    this.authService.loginUser(username, password).subscribe({
+      next: (data: any) => {
         this.storageService.saveToken(data.token);
         this.storageService.saveRefreshToken(data.refreshToken);
         this.storageService.saveUser(data);
@@ -99,7 +99,7 @@ export class LoginScreenComponent implements OnInit {
           }, 1000); // padrão: 2000
         }
       },
-      error: (err) => {
+      error: (err: Error) => {
         this.isLoginLoading = false;
         this.messageService.add({
           severity: 'error',

@@ -139,14 +139,6 @@ export class CreatePathsComponent implements OnInit {
     });
   }
 
-  announceSortChange(sortState: any) {
-    if (sortState.direction) {
-      this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
-    } else {
-      this._liveAnnouncer.announce('Sorting cleared');
-    }
-  }
-
   selectRow(row: ProfileTable) {
     this.selectedRow = row;
     this.deleteButton =

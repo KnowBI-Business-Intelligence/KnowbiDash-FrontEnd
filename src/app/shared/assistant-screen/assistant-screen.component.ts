@@ -3,8 +3,8 @@ import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatDivider } from '@angular/material/divider';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { ChatbotService } from '../../../core/services/chatbot/chatbot.service';
-import { StorageService } from '../../../core/services/user/storage.service';
+import { ChatbotService } from '../../core/services/chatbot/chatbot.service';
+import { StorageService } from '../../core/services/user/storage.service';
 
 @Component({
   selector: 'app-assistant-screen',

@@ -208,7 +208,7 @@ export class UsersComponent implements OnInit {
       Authorization: `Bearer ${this.user.token}`,
     });
 
-    this.authService.delete(userId, headers).subscribe({
+    this.authService.deleteUser(headers, userId).subscribe({
       next: () => {
         setTimeout(() => {
           this.messageService.add({

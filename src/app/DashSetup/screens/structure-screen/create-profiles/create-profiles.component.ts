@@ -38,9 +38,6 @@ import { StorageService } from '../../../../core/services/user/storage.service';
   styleUrl: './create-profiles.component.css',
 })
 export class CreateProfilesComponent implements OnInit {
-backScreen() {
-throw new Error('Method not implemented.');
-}
   createProfilesForm = this.formBuilder.group({
     name: ['', Validators.required],
     observation: ['', Validators.required],

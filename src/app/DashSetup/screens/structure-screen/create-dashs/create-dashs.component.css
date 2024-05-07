@@ -19,7 +19,7 @@ button {
 
 .container-body {
   display: flex;
-  height: 85vh;
+  height: 82vh;
 }
 
 .container-content {
@@ -113,11 +113,13 @@ th {
 }
 
 td {
-  text-align: left;
-  border: 1px solid #e5e7eb;
-  border-width: 0 0 1px 0;
-  padding: 0.5rem 1rem;
   font-size: 0.75rem;
+  padding-bottom: 0.625rem;
+  padding-top: 0.625rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 35rem;
 }
 
 .demo-table {
@@ -418,7 +420,6 @@ input {
 .container_profile-infos {
   display: flex;
   align-items: start;
-  justify-content: space-between;
   width: 100%;
 }
 
@@ -452,7 +453,7 @@ input {
 .footer_view-profile button {
   width: 30%;
   background-color: #5f65a5;
-  color: #e1e1e1;
+  color: #f2f2f2;
   padding: 0.3rem 1.5rem;
   border-radius: 0.3rem;
 }
@@ -546,4 +547,34 @@ input {
   border-radius: 0.3rem;
   outline: none;
   color: #7a7171;
+}
+
+.sql-result {
+  display: flex;
+  align-items: start;
+  justify-content: start;
+  width: 100%;
+}
+
+.sql-body_result {
+  width: 100%;
+  height: 10rem;
+  margin-top: 1rem;
+}
+
+.body-sql-result p {
+  font-size: 1rem;
+  font-weight: bold;
+  margin: 0.5rem 0;
+}
+
+.body-sql-result_columns {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  margin-left: 1rem;
+}
+
+.body-sql-result_columns span {
+  margin-right: 0.8rem;
 }

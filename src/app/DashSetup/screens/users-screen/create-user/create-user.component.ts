@@ -247,7 +247,7 @@ export class CreateUserComponent implements OnInit {
       roles: [access_level.id],
       perfis: profileIds,
     };
-    this.authService.register(userData, headers).subscribe({
+    this.authService.registerUser(headers, userData).subscribe({
       next: () => {
         this.messageService.add({
           severity: 'success',
@@ -260,13 +260,12 @@ export class CreateUserComponent implements OnInit {
           this.isLoginLoading = false;
         }, 2500);
       },
-      error: (err) => {
+      error: () => {
         this.messageService.add({
           severity: 'error',
           summary: 'Erro',
           detail: 'Ocorreu um erro durante o cadastro do usuário.',
         });
-        console.error(err);
       },
     });
   }

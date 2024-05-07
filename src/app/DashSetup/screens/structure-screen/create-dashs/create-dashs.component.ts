@@ -267,16 +267,16 @@ export class CreateDashsComponent implements OnInit {
 
     if (sqlCode.trim() === '') {
       this.messageService.add({
-        severity: 'error',
-        summary: 'Erro',
-        detail: 'Verifique o campo.',
+        severity: 'warn',
+        summary: 'Warn',
+        detail: 'Verifique os campos',
       });
     } else {
       this.progressBar = true;
       this.messageService.add({
-        severity: '-',
+        severity: 'success',
         summary: 'Aguarde',
-        detail: 'Criando metadado!',
+        detail: 'Criando metadado',
       });
 
       this.charts
@@ -285,15 +285,14 @@ export class CreateDashsComponent implements OnInit {
           next: (value: any) => {
             this.messageService.add({
               severity: 'success',
-              summary: 'Sucesso',
-              detail: 'SQL Atualizado!',
+              summary: 'Aguarde',
+              detail: 'Metadado atualizado',
             });
-            this.sqlResult = value;
+
+            this.sqlResult = JSON.parse(value);
             this.progressBar = false;
           },
           error: () => {
-            console.log('ERRRRRO NEXCE SACARASDA');
-
             this.messageService.add({
               severity: 'error',
               summary: 'Erro',
@@ -305,8 +304,6 @@ export class CreateDashsComponent implements OnInit {
   }
 
   refreshRegister() {
-    console.log('refresh', this.sqlPlaceholder);
-
     this.progressBar = true;
     this.charts
       .updateChartGroupSQL(this.headers, this.chartGroupID, this.sqlPlaceholder)
@@ -318,7 +315,7 @@ export class CreateDashsComponent implements OnInit {
             detail: 'SQL Atualizado!',
           });
 
-          this.sqlResult = value;
+          this.sqlResult = JSON.parse(value);
           this.progressBar = false;
         },
         error: () => {

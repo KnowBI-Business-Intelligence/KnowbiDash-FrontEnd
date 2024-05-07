@@ -18,11 +18,7 @@
             (click)="openChartGroup(path)"
           >
             <img src="assets/icons/folder.svg" alt="" />
-            <span>{{
-              path.name.length > 25
-                ? path.name.substring(0, 25) + "..."
-                : path.name
-            }}</span>
+            <span>{{ path.name }}</span>
           </button>
         </div>
       </div>

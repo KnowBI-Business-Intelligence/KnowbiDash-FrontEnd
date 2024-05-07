@@ -101,7 +101,7 @@ export class SideBarComponent implements OnInit {
   }
 
   logout() {
-    this.authService.logout().subscribe({
+    this.authService.logoutUser().subscribe({
       next: () => {
         this.tokenService.signOut();
         this.router.navigate(['/login']);

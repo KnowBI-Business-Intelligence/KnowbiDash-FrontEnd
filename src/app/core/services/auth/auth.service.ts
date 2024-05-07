@@ -13,7 +13,7 @@ export class AuthService {
   private USER_KEY = 'auth-user';
   constructor(private http: HttpClient) {}
 
-  login(username: string, password: string): Observable<any> {
+  loginUser(username: string, password: string): Observable<any> {
     const credentials = this.http
       .post(`${API_AUTH}/signin`, {
         userName: username,
@@ -29,39 +29,16 @@ export class AuthService {
   }
 
   getUsersInfo(headers: HttpHeaders): Observable<any> {
-    const myHeaders = {
-      headers: headers,
-    };
-
-    return this.http.get(`${API_USER}/get`, myHeaders);
+    return this.http.get(`${API_USER}/get`, { headers: headers });
   }
 
-  getById(id: any, headers: HttpHeaders): Observable<any> {
-    const myHeaders = {
-      headers: headers,
-    };
-
-    return this.http.get(`${API_USER}/get/${id}`, myHeaders);
+  getUserById(headers: HttpHeaders, id: any): Observable<any> {
+    return this.http.get(`${API_USER}/get/${id}`, { headers: headers });
   }
 
-  register(userData: any, headers: HttpHeaders): Observable<any> {
-    const headersRegister = {
-      headers: headers,
-    };
-
-    return this.http.post(`${API_USER}/create`, userData, headersRegister).pipe(
-      catchError((error) => {
-        throw error;
-      })
-    );
-  }
-
-  edit(id: number, userData: any, headers: any): Observable<any> {
-    const headersRgister = {
-      headers: headers,
-    };
+  registerUser(headers: HttpHeaders, userData: any): Observable<any> {
     return this.http
-      .patch(`${API_USER}/update/${id}`, userData, headersRgister)
+      .post(`${API_USER}/create`, userData, { headers: headers })
       .pipe(
         catchError((error) => {
           throw error;
@@ -69,13 +46,9 @@ export class AuthService {
       );
   }
 
-  delete(id_user: number, headers: any): Observable<any> {
-    const headersRgister = {
-      headers: headers,
-    };
-
+  editUser(headers: HttpHeaders, id: number, userData: any): Observable<any> {
     return this.http
-      .delete(`${API_USER}/delete/${id_user}`, headersRgister)
+      .patch(`${API_USER}/update/${id}`, userData, { headers: headers })
       .pipe(
         catchError((error) => {
           throw error;
@@ -83,11 +56,21 @@ export class AuthService {
       );
   }
 
-  logout(): Observable<any> {
+  deleteUser(headers: HttpHeaders, id: number): Observable<any> {
+    return this.http
+      .delete(`${API_USER}/delete/${id}`, { headers: headers })
+      .pipe(
+        catchError((error) => {
+          throw error;
+        })
+      );
+  }
+
+  logoutUser(): Observable<any> {
     return this.http.post(`${API_AUTH}/signout`, {});
   }
 
-  refreshToken(token: string) {
+  refreshTokenUser(token: string) {
     return this.http
       .post(`${API_AUTH}/refreshtoken`, { refreshToken: token })
       .pipe(
@@ -97,7 +80,7 @@ export class AuthService {
       );
   }
 
-  isAutenticaded(): boolean {
+  userIsAutenticaded(): boolean {
     try {
       if (typeof window === 'undefined' || !window.sessionStorage) {
         console.error('Acesso a window.sessionStorage indisponível.');

@@ -17,7 +17,7 @@ button {
 }
 
 .container-body {
-  height: 85vh;
+  height: 82vh;
   display: flex;
 }
 
@@ -137,12 +137,12 @@ td {
 
 .container-add-body {
   width: 100%;
-  height: 83%;
 }
 
 .container-add-footer {
   width: 100%;
   height: 30px;
+  margin-top: 2rem;
   display: flex;
   justify-content: flex-end;
 }

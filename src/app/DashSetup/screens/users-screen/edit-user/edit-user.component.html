@@ -22,7 +22,6 @@
             name="fullusernameer"
             [(ngModel)]="form.fullusername"
             #fullusername="ngModel"
-            [ngClass]="{ 'is-invalid': f.submitted && fullusername.errors }"
             placeholder="Ex: João da Silva"
           />
         </div>
@@ -35,7 +34,6 @@
             name="username"
             [(ngModel)]="form.username"
             #username="ngModel"
-            [ngClass]="{ 'is-invalid': f.submitted && username.errors }"
             placeholder="Ex: NomeUsuario"
           />
         </div>
@@ -51,7 +49,6 @@
             required
             minlength="6"
             #password="ngModel"
-            [ngClass]="{ 'is-invalid': f.submitted && password.errors }"
             placeholder="******"
           />
         </div>
@@ -66,7 +63,6 @@
             required
             minlength="6"
             #occupation="ngModel"
-            [ngClass]="{ 'is-invalid': f.submitted && occupation.errors }"
             placeholder="Ex: Analista Jr"
           />
         </div>
@@ -82,7 +78,6 @@
             required
             minlength="6"
             #email="ngModel"
-            [ngClass]="{ 'is-invalid': f.submitted && email.errors }"
             placeholder="Ex: email@email.com"
           />
         </div>
@@ -96,7 +91,6 @@
             placeholder="{{ placeholder }}"
             optionLabel="name"
             #access_level="ngModel"
-            [ngClass]="{ 'is-invalid': f.submitted && access_level.errors }"
           ></p-dropdown>
         </div>
 

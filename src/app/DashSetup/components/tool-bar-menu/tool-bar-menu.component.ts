@@ -96,13 +96,13 @@ export class ToolBarMenuComponent implements OnInit {
   }
 
   logout() {
-    this.auth.logout().subscribe({
+    this.auth.logoutUser().subscribe({
       next: () => {
         this.token.signOut();
         this.router.navigate(['/login']);
       },
-      error: (e) => {
-        console.error('erro logout', e);
+      error: () => {
+        throw new Error('Erro no logout');
       },
     });
   }

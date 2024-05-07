@@ -1,3 +1,28 @@
+*,
+::after,
+::before {
+  -webkit-box-sizing: inherit;
+  box-sizing: inherit;
+  list-style: none;
+  user-select: none;
+  font-size: 12px;
+}
+
+html,
+body,
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+}
+
+html > body {
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  -webkit-text-rendering: optimizeLegibility;
+}
+
 .container {
   display: flex;
   position: fixed;
@@ -97,31 +122,6 @@
   font-size: 12px;
 }
 
-*,
-::after,
-::before {
-  -webkit-box-sizing: inherit;
-  box-sizing: inherit;
-  list-style: none;
-  user-select: none;
-  font-size: 12px;
-}
-
-html,
-body,
-ul,
-ol {
-  margin: 0;
-  padding: 0;
-}
-
-html > body {
-  -webkit-font-smoothing: antialiased;
-  -webkit-text-size-adjust: 100%;
-  text-rendering: optimizeLegibility;
-  -webkit-text-rendering: optimizeLegibility;
-}
-
 h1 {
   font-weight: 400;
   color: #999;
@@ -136,6 +136,7 @@ details {
 
 details div.content {
   padding: 0px 0px 0px 24px;
+  width: 10rem;
 }
 
 details div.content button {
@@ -158,6 +159,13 @@ details div.content button:hover {
   margin: 0 0.5rem;
   color: #a3a7cb;
   font-size: 10px;
+}
+
+details .dashboardbtn p {
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 details[open] summary:after {
@@ -209,16 +217,11 @@ summary ul img {
   margin-right: 8px;
 }
 
-summary ul li {
-  flex: 1 100%;
-  flex-flow: row wrap;
-}
-
-summary ul li span {
-  display: block;
-  font-size: 12px;
-  margin-top: 6px;
-  opacity: 0.75;
+summary ul span {
+  width: 80%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 summary::after {
@@ -233,25 +236,6 @@ summary::after {
   top: calc(50% - 12px);
   bottom: 0;
   right: 0;
-}
-
-.titleValue {
-  color: #757575;
-}
-
-time {
-  color: #757575;
-  opacity: 0.75;
-}
-
-.list-unstyled {
-  margin-top: 15px;
-  padding-left: 0;
-  list-style: none;
-}
-
-.list-unstyled li {
-  margin-bottom: 6px;
 }
 
 .views {
@@ -314,7 +298,6 @@ time {
   align-items: center;
   height: 2.2rem;
   width: 99%;
-  background-color: #fff;
 }
 
 .filter-button button {

@@ -21,13 +21,13 @@ import { CreateUserComponent } from './DashSetup/screens/users-screen/create-use
 import { EditUserComponent } from './DashSetup/screens/users-screen/edit-user/edit-user.component';
 import { UsersScreenComponent } from './DashSetup/screens/users-screen/users-screen.component';
 import { UsersComponent } from './DashSetup/screens/users-screen/users/users.component';
-import { AssistantScreenComponent } from './DashView/screens/assistant-screen/assistant-screen.component';
 import { ChartGroupsComponent } from './DashView/screens/chart-groups/chart-groups.component';
 import { ChartScreenComponent } from './DashView/screens/chart-screen/chart-screen.component';
 import { ContentScreenComponent } from './DashView/screens/content-screen/content-screen.component';
 import { MainScreenComponent } from './DashView/screens/main-screen/main-screen.component';
 import { PageNotFoundComponent } from './DashView/screens/page-not-found/page-not-found.component';
 import { SettingsUserComponent } from './DashView/screens/settings-user/settings-user.component';
+import { AssistantScreenComponent } from './shared/assistant-screen/assistant-screen.component';
 import { LoginScreenComponent } from './shared/login-screen/login-screen.component';
 export const routes: Routes = [
   {

@@ -19,7 +19,6 @@ export class MainScreenComponent implements OnInit {
   pathsByProfile: { [key: string]: any[] } = {};
 
   constructor(
-    private token: StorageService,
     private router: Router,
     private authService: AuthService,
     private storageService: StorageService,
@@ -31,17 +30,16 @@ export class MainScreenComponent implements OnInit {
   }
 
   initUserData() {
-    this.user = this.token.getUser();
-    this.getUserById(this.user.id, this.user.token);
+    this.user = this.storageService.getUser();
+    this.getUserById(this.user);
   }
 
-  getUserById(id: number, token: any) {
-    const user = this.storageService.getUser();
+  getUserById(user: any) {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${user.token}`,
     });
 
-    this.authService.getById(id, headers).subscribe({
+    this.authService.getUserById(headers, user.id).subscribe({
       next: (data: any) => {
         this.processData(data);
       },

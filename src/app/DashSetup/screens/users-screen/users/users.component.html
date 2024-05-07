@@ -43,24 +43,21 @@
         ]"
       >
         <ng-template pTemplate="caption">
-          <div class="filter">
+          <div class="content-filter">
             <button
               pButton
               label="Limpar"
-              class="p-button-outlined"
+              class="filter-button-clear"
               (click)="clear(tableReference)"
             >
-              <fa-icon [icon]="icons.filter"></fa-icon>
+              <span class="material-symbols-outlined"> filter_alt_off </span>
             </button>
-            <span class="p-input-icon-left">
-              <input
-                pInputText
-                type="text"
-                [(ngModel)]="searchValue"
-                (input)="onInputChange($event, tableReference)"
-                placeholder="Pesquisar.."
-              />
-            </span>
+            <input
+              pInputText
+              type="text"
+              (input)="onInputChange($event, tableReference)"
+              placeholder="Pesquisar.."
+            />
           </div>
         </ng-template>
 
@@ -114,40 +111,20 @@
             pContextMenuRow="customer"
           >
             <td>
-              {{
-                customer.fullUserName.length > 15
-                  ? customer.fullUserName.slice(0, 15) + "..."
-                  : customer.fullUserName
-              }}
+              {{ customer.fullUserName }}
+            </td>
+            <td>
+              {{ customer.userName }}
+            </td>
+            <td>
+              {{ customer.cargo }}
+            </td>
+            <td>
+              {{ customer.email.toLowerCase() }}
             </td>
             <td>
               {{
-                customer.userName.length > 15
-                  ? customer.userName.slice(0, 15) + "..."
-                  : customer.userName
-              }}
-            </td>
-            <td>
-              {{
-                customer.cargo.length > 15
-                  ? customer.cargo.slice(0, 15) + "..."
-                  : customer.cargo
-              }}
-            </td>
-            <td>
-              {{
-                customer.email.toLowerCase().length > 15
-                  ? customer.email.toLowerCase().slice(0, 15) + "..."
-                  : customer.email.toLowerCase()
-              }}
-            </td>
-            <td>
-              {{
-                customer.perfis &&
-                customer.perfis.length > 0 &&
-                customer.perfis[0]?.name.length > 15
-                  ? customer.perfis[0]?.name.slice(0, 15) + "..."
-                  : customer.perfis && customer.perfis.length > 0
+                customer.perfis && customer.perfis.length > 0
                   ? customer.perfis[0]?.name
                   : "Sem perfil"
               }}

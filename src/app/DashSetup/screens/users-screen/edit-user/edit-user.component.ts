@@ -115,7 +115,6 @@ export class EditUserComponent implements OnInit {
   }
 
   selectedProfiles($event: MatAutocompleteSelectedEvent) {
-    console.log('teste');
     const selectedProfile = this.allProfiles.find(
       (profile) => profile.name === $event.option.viewValue
     );
@@ -124,8 +123,6 @@ export class EditUserComponent implements OnInit {
         this.profiles.push(selectedProfile.name);
         this.profileIds.push(selectedProfile.id);
       }
-      console.log(this.profiles);
-      console.log('id ', this.profileIds);
       const index = this.allProfiles.findIndex(
         (profile) => profile.name === selectedProfile.name
       );
@@ -159,12 +156,6 @@ export class EditUserComponent implements OnInit {
 
       this.allProfiles.push(removedProfileObject);
 
-      console.log(
-        `Perfil removido: ${removedProfile}, ID: ${removedProfileId}`
-      );
-
-      console.log('adicionado a todos os perfis', removedProfileObject);
-
       this.announcer.announce(`Removed ${profile}`);
 
       this.filteredProfiles = this.profilesCtrl.valueChanges.pipe(
@@ -179,7 +170,6 @@ export class EditUserComponent implements OnInit {
   }
 
   onSubmit() {
-    console.log(this.item.id);
     this.editUser(this.item.id);
   }
 
@@ -209,8 +199,7 @@ export class EditUserComponent implements OnInit {
     } = this.form;
 
     if (!this.user || !this.user.token) {
-      console.error('Token não disponível');
-      return;
+      throw new Error('Token não disponível');
     }
 
     const headers = new HttpHeaders({
@@ -218,7 +207,6 @@ export class EditUserComponent implements OnInit {
     });
 
     const profileIds = this.profileIds.map((profileIds) => profileIds);
-    console.log(profileIds);
 
     const userData = {
       fullUserName: fullusername,
@@ -230,9 +218,7 @@ export class EditUserComponent implements OnInit {
       perfis: profileIds,
     };
 
-    console.log(userData);
-
-    this.authService.edit(id, userData, headers).subscribe({
+    this.authService.editUser(headers, id, userData).subscribe({
       next: () => {
         this.messageService.add({
           severity: 'success',
@@ -245,13 +231,12 @@ export class EditUserComponent implements OnInit {
         }, 2500);
         this.f.reset();
       },
-      error: (err) => {
+      error: () => {
         this.messageService.add({
           severity: 'error',
           summary: 'Erro',
           detail: 'Ocorreu um erro durante a atualização.',
         });
-        console.error(err);
       },
     });
   }
@@ -266,7 +251,7 @@ export class EditUserComponent implements OnInit {
       Authorization: `Bearer ${this.user.token}`,
     });
 
-    this.authService.getById(id, headers).subscribe({
+    this.authService.getUserById(headers, id).subscribe({
       next: (userData: any) => {
         console.log(userData);
         this.form.fullusername = userData.fullUserName;
@@ -293,7 +278,7 @@ export class EditUserComponent implements OnInit {
         }
         console.log(this.form.access_level);
       },
-      error: (error) => {
+      error: (error: Error) => {
         console.error('Erro ao carregar dados do usuário:', error);
       },
     });

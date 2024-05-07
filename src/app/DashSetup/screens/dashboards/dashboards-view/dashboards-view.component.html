@@ -11,7 +11,7 @@
       <div class="panel">
         <details *ngFor="let pathId of getPathsArray()">
           <summary>
-            <ul>
+            <ul aria-hidden="true">
               <img src="../../../../assets/icons/folder.svg" alt="" />
               <span>{{ pathNames[pathId] }}</span>
             </ul>
@@ -21,12 +21,12 @@
               <button
                 (click)="getCharts(group.id); clickPress(group, $event)"
                 class="dashboardbtn"
+                aria-hidden="true"
               >
                 <fa-icon
                   class="icon"
                   [icon]="icons.dash"
                   [size]="'xl'"
-                  title="Dashboards"
                 ></fa-icon>
                 <p>{{ group.name }}</p>
               </button>
@@ -38,14 +38,6 @@
     <div class="dashview">
       <span class="groupname">Dashboard: {{ groupName }}</span>
       <div class="filter">
-        <div class="filter-button">
-          <button (click)="openModal()">
-            <p>Filtro</p>
-            <span class="material-symbols-outlined filter-icon">
-              filter_alt
-            </span>
-          </button>
-        </div>
         <div class="filter-container">
           <div class="filter-filters" *ngFor="let filter of filters">
             <div class="filter-filters-data">
@@ -53,6 +45,14 @@
               <span [title]="filter.values">{{ filter.values }}</span>
             </div>
           </div>
+        </div>
+        <div class="filter-button">
+          <button (click)="openModal()">
+            <p>Filtro</p>
+            <span class="material-symbols-outlined filter-icon">
+              filter_alt
+            </span>
+          </button>
         </div>
       </div>
 
@@ -135,7 +135,6 @@
           class="iconview"
           [icon]="icons.chartview"
           [size]="'xl'"
-          title="Home"
         ></fa-icon>
         Gráfico
       </button>
@@ -144,7 +143,6 @@
           class="iconview"
           [icon]="icons.cardview"
           [size]="'xl'"
-          title="Home"
         ></fa-icon>
         Card
       </button>
@@ -153,7 +151,6 @@
           class="iconview"
           [icon]="icons.tableview"
           [size]="'xl'"
-          title="Home"
         ></fa-icon>
         Tabela
       </button>
