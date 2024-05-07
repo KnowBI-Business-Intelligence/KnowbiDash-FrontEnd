@@ -1,6 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
-import { Component, ElementRef, OnInit } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
@@ -17,6 +23,8 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { ChartsService } from '../../../../core/services/charts/charts.service';
 import { LocalstorageService } from '../../../../core/services/local-storage/local-storage.service';
 import { StorageService } from '../../../../core/services/user/storage.service';
+import { Subject } from 'rxjs';
+import { AngularDraggableModule } from 'angular2-draggable';
 interface Group {
   id: string;
   name: string;
@@ -45,11 +53,34 @@ interface ExtendedOptions extends Highcharts.Options {
     SkeletonModule,
     HighchartsChartModule,
     FormsModule,
+    AngularDraggableModule,
   ],
   templateUrl: './dashboards-view.component.html',
   styleUrl: './dashboards-view.component.css',
 })
 export class DashboardsViewComponent implements OnInit {
+  name = 'Angular';
+  position!: string;
+  newPosition(event: any) {
+    const boundingRect = event.currentTarget.getBoundingClientRect();
+    const element = event.currentTarget;
+    const x = element.offsetLeft;
+    const y = element.offsetTop;
+
+    this.position = '(' + x + ', ' + y + ')';
+    console.log('yeah');
+  }
+
+  @ViewChild('chartContainer') chartContainer!: ElementRef;
+  chartConfig: any;
+  resizeChart() {
+    const chartWidth = this.chartContainer.nativeElement.offsetWidth;
+    const chartHeight = this.chartContainer.nativeElement.offsetHeight;
+    if (this.chartConfig && this.chartConfig.chart) {
+      this.chartConfig.chart.width = chartWidth;
+      this.chartConfig.chart.height = chartHeight;
+    }
+  }
   icons = {
     dash: faChartPie,
     chartview: faChartLine,
@@ -77,6 +108,7 @@ export class DashboardsViewComponent implements OnInit {
   showModal: boolean = false;
   isLoginLoading: boolean = false;
   user = this.storageService.getUser();
+  private destroy$: Subject<void> = new Subject<void>();
 
   constructor(
     private router: Router,
@@ -98,7 +130,15 @@ export class DashboardsViewComponent implements OnInit {
     this.clickPress(groupIdFromLocalStorage, simulatedEvent);
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   loadDataInit() {
+    this.chartGroupsData = [];
+    this.copydataJSON = [];
+    this.filters = [];
     const headers = new HttpHeaders({
       Authorization: `Bearer ${this.user.token}`,
     });
@@ -143,6 +183,9 @@ export class DashboardsViewComponent implements OnInit {
   }
 
   getCharts(id: string): void {
+    this.chartGroupsData = [];
+    this.copydataJSON = [];
+    this.filters = [];
     const user = this.storageService.getUser();
     const headers = new HttpHeaders({
       Authorization: `Bearer ${user.token}`,
@@ -216,7 +259,7 @@ export class DashboardsViewComponent implements OnInit {
           title: {
             text: dataItem.title,
             style: {
-              fontSize: '14px',
+              fontSize: '12px',
             },
           },
           xAxis: {
@@ -247,7 +290,7 @@ export class DashboardsViewComponent implements OnInit {
           legend: {
             maxHeight: 65,
             itemStyle: {
-              fontSize: '12px',
+              fontSize: '10px',
             },
           },
           plotOptions: {

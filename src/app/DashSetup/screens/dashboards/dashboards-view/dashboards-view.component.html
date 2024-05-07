@@ -56,15 +56,23 @@
         </div>
       </div>
 
-      <div class="container-view">
+      <div class="bound-box" #myBounds>
         <div class="container-charts">
           <div class="left">
             <div
               *ngFor="let chartConfig of chartGroupsData"
               class="chart-container"
+              ngResizable
+              ngDraggable
+              [inBounds]="true"
+              [bounds]="myBounds"
+              rzHandles="all"
+              [rzMinWidth]="350"
+              [rzMinHeight]="250"
+              (mouseup)="newPosition($event); resizeChart()"
             >
               <highcharts-chart
-                style="width: 25rem; height: 22rem; margin: 5px"
+                style="width: 100%; height: 100%"
                 [Highcharts]="Highcharts"
                 [options]="chartConfig"
               ></highcharts-chart>

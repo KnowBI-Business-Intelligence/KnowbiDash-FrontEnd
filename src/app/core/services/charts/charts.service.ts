@@ -220,14 +220,14 @@ export class ChartsService {
     const myHeaders = {
       headers: headers,
     };
-    return this.http.get(`${this.ENV_CHARTS}/delete/${id}`, myHeaders);
+    return this.http.delete(`${this.ENV_CHARTS}/delete/${id}`, myHeaders);
   }
 
   deleteChartGroup(headers: HttpHeaders, id: string) {
     const myHeaders = {
       headers: headers,
     };
-    return this.http.get(`${this.ENV_CHARTGROUP}/delete/${id}`, myHeaders);
+    return this.http.delete(`${this.ENV_CHARTGROUP}/delete/${id}`, myHeaders);
   }
 
   // ERROR

@@ -1,0 +1,500 @@
+.container-nav-line {
+  width: 60%;
+  padding: 5px 10px;
+  position: relative;
+  top: -39px;
+  left: 19px;
+  align-self: baseline;
+  display: flex;
+}
+
+.container-nav-line span {
+  color: #00000074;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.container-nav-line button {
+  border-radius: 50px;
+  border: solid 0.5px #00000074;
+  color: #00000074;
+  cursor: pointer;
+  margin-left: 5px;
+  height: 20px;
+  width: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  display: flex;
+  position: fixed;
+  top: 46px;
+  width: calc(97% - 5px);
+}
+
+.container span {
+  font-size: 12px;
+}
+
+.container-data-group {
+  width: 60%;
+  display: flex;
+}
+
+.container-data {
+  width: 35%;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 10px;
+  border-right: solid 0.2px #e6e6e6;
+}
+
+.container-create {
+  width: 65%;
+  display: flex;
+  flex-direction: column;
+  border-right: solid 0.2px #e6e6e6;
+}
+
+.graph-label {
+  padding: 10px;
+}
+
+.container-create-group,
+.title,
+.series,
+.yaxis,
+.xaxis,
+.seriesdata,
+.filters,
+.groupment,
+.order {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.container-create-group {
+  height: calc(86vh - 5px);
+  max-height: calc(86vh - 5px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.title {
+  width: 100%;
+}
+
+.title input {
+  outline: none;
+  font-size: 12px;
+  width: 60%;
+  border: solid 0.5px #dbdbdb;
+  border-radius: 2px;
+  padding: 3px 10px;
+}
+
+.serie-label {
+  margin-top: 15px;
+}
+
+.serie-content {
+  display: flex;
+  margin-top: 5px;
+}
+
+.serie-content div button {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  border: dashed 2px #00000020;
+  border-radius: 3px;
+  font-size: 10px;
+  padding: 5px;
+  background-color: #fff;
+  width: 55px;
+  margin: 2px;
+  transition: 0.5s;
+}
+
+.serie-content div button:hover {
+  border: solid 2px #a3a7cb;
+}
+
+.serie-content div button.selected {
+  border: solid 2px #a3a7cb;
+}
+
+.iconChart {
+  margin: 0 0.5rem;
+  color: #5f65a5;
+  font-size: 10px;
+}
+
+.yaxis,
+.xaxis,
+.seriesdata,
+.filters,
+.groupment,
+.order {
+  margin-top: 10px;
+  width: 100%;
+  border-bottom: 1px solid #e6e6e6;
+}
+.container-pre-view {
+  width: 40%;
+  height: calc(97vh - 5px);
+  display: flex;
+  flex-direction: column;
+  padding: 10px 10px;
+}
+
+.visualize {
+  height: calc(90vh - 5px);
+  width: calc(38vw - 5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  margin-top: 16px;
+  z-index: 99;
+  position: fixed;
+  background-color: #fafafa;
+}
+
+.visualize button,
+.chart-container-buttons button {
+  align-items: center;
+  background-color: #751a7e;
+  border-radius: 4px;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  display: inline-flex;
+  height: 2rem;
+  justify-content: center;
+  line-height: 1;
+  padding: 0 0.7rem;
+  font-size: 12px;
+  transition: 0.5s;
+}
+
+.chart-container {
+  width: 100%;
+  height: calc(83vh - 5px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.chart-container-buttons {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.chart-container-buttons button {
+  margin: 5px;
+}
+
+.chart-container-buttons button:nth-child(odd) {
+  background-color: #ffffff;
+  color: #000000da;
+  border: solid 1px #00000020;
+}
+
+.conclude {
+  border: solid 1px #751a7e !important;
+  color: #751a7e !important;
+}
+
+.serie-list {
+  width: 60%;
+}
+
+.data-list,
+.serie-list {
+  border: solid 1px #ccc;
+  min-height: 24.5px;
+  background: #ffffff54;
+  border-radius: 3px;
+  overflow: hidden;
+  display: block;
+  margin: 10px 2px;
+}
+
+.icon {
+  margin: 0 0.5rem;
+  color: #5f65a5;
+  font-size: 8px;
+}
+
+.example-box,
+.series-box {
+  padding: 2px 3px;
+  border-bottom: solid 1px #ccc;
+  color: rgba(0, 0, 0, 0.87);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  box-sizing: border-box;
+  cursor: grab;
+  background: white;
+  font-size: 12px;
+  max-height: 23px;
+}
+
+.series-box {
+  justify-content: space-between;
+}
+
+.series-buttons {
+  display: flex;
+  align-items: center;
+}
+
+.series-buttons button {
+  cursor: pointer;
+  border: none;
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  padding: 1px 4px;
+  height: 14px;
+  width: 18px;
+}
+
+.autosum {
+  width: 17px;
+}
+
+.commomicon {
+  color: #751a7e;
+  font-size: 8px;
+}
+
+.removedataicon {
+  color: rgb(255 98 98);
+  font-size: 8px;
+}
+
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 4px;
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+    0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+
+.cdk-drag-placeholder {
+  opacity: 0;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.example-box:last-child {
+  border: none;
+}
+
+.example-list.cdk-drop-list-dragging .example-box:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+*::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+*::-webkit-scrollbar-track {
+  border-radius: 5px;
+  background-color: #dfe9eb;
+}
+
+*::-webkit-scrollbar-track:hover {
+  background-color: #dfe9eb;
+}
+
+*::-webkit-scrollbar-track:active {
+  background-color: #dfe9eb;
+}
+
+*::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  background-color: #818979;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #363c33;
+}
+
+*::-webkit-scrollbar-thumb:active {
+  background-color: #01237e;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 20;
+}
+
+.example-menu,
+.edit-menu {
+  display: inline-flex;
+  flex-direction: column;
+  min-width: 180px;
+  max-width: 280px;
+  background-color: rgb(255, 255, 255);
+  padding: 6px 0;
+}
+
+.edit-menu {
+  padding: 10px;
+}
+
+.edit-menu div {
+  display: flex;
+  flex-direction: column;
+}
+
+.edit-menu div label {
+  margin: 5px 0;
+  font-size: 10px;
+}
+
+.edit-menu div input {
+  outline: none;
+  font-size: 12px;
+  border: solid 0.5px #dbdbdb;
+  border-radius: 2px;
+  padding: 3px 10px;
+}
+
+.edit-save {
+  margin: 10px 0;
+  width: 40%;
+  background-color: #751a7e;
+  border-radius: 4px;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  height: 2rem;
+  font-size: 12px;
+  align-self: flex-end;
+}
+
+.example-menu .example-menu-item {
+  width: 100%;
+}
+
+.example-menu-item {
+  font-size: 10px !important;
+  border-bottom: solid 1px #000;
+}
+
+.example-menu-item,
+.example-standalone-item {
+  background-color: transparent;
+  cursor: pointer;
+  border: none;
+  user-select: none;
+  min-width: 23px;
+  line-height: 36px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  flex: 1;
+  outline: none;
+}
+
+.example-menu-item:hover {
+  background-color: rgb(208, 208, 208);
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(5px);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  width: 480px;
+  height: fit-content;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  -webkit-box-shadow: 0px 1px 9px 3px rgba(66, 68, 90, 0.13);
+  -moz-box-shadow: 0px 1px 9px 3px rgba(66, 68, 90, 0.13);
+  box-shadow: 0px 1px 9px 3px rgba(66, 68, 90, 0.13);
+}
+
+.modal-content h2 {
+  font-size: 15px;
+}
+
+.modal-content p {
+  font-size: 13px;
+}
+
+.modal-buttons {
+  margin-top: 35px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.cancel,
+.exclude {
+  border: none;
+  padding: 8px 20px;
+  background-color: rgb(255, 70, 70);
+  margin: 7px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.cancel {
+  background-color: #ffffff;
+  border: solid 1px #00000020;
+  color: #4f4f4f;
+  width: 83px;
+  display: flex;
+  justify-content: center;
+}
+
+.exclude {
+  color: #ffffff;
+  width: 79px;
+  height: 36px;
+  display: flex;
+  justify-content: center;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  position: relative;
+  top: -23px;
+  left: 5px;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
