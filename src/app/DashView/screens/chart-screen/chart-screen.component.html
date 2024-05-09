@@ -42,7 +42,14 @@
         (endOffset)="onMoveEnd(i, $event)"
         [bounds]="containerCharts"
         [inBounds]="true"
-        zIndex="99"
+        [zIndexMoving]="zIndexMoving"
+        [zIndex]="zIndex"
+        [style.width.px]="
+          chartDimensions[i.toString()] ? chartDimensions[i.toString()].x : 350
+        "
+        [style.height.px]="
+          chartDimensions[i.toString()] ? chartDimensions[i.toString()].y : 250
+        "
       >
         <highcharts-chart
           style="width: 100%; height: 100%"

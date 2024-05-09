@@ -73,6 +73,9 @@ export class ChartScreenComponent implements OnInit {
 
   user = this.storageService.getUser();
 
+  zIndexMoving: string = '999';
+  zIndex: string = '0';
+
   constructor(
     private router: Router,
     private storageService: StorageService,
@@ -84,15 +87,25 @@ export class ChartScreenComponent implements OnInit {
 
   ngOnInit(): void {
     this.getCharts();
-    const drag = this.localStorage.getDecryptedItem('position');
-    const dimension: { [key: string]: { x: number; y: number } } =
-      JSON.parse(this.localStorage.getDecryptedItem('dimension')) || {};
 
-    if (drag) {
-      this.chartPositions = drag;
+    if (Object.keys(this.chartDimensions).length === 0) {
+      this.chartGroupsData.forEach((_, i) => {
+        this.chartDimensions[i.toString()] = { x: 0, y: 0 };
+      });
     }
-    if (dimension) {
-      this.chartDimensions = dimension;
+
+    const dimensionString = JSON.parse(
+      this.localStorage.getDecryptedItem('dimension')
+    );
+
+    const dragPosition = this.localStorage.getDecryptedItem('position');
+
+    if (dragPosition) {
+      this.chartPositions = dragPosition;
+    }
+
+    if (dimensionString) {
+      this.chartDimensions = dimensionString;
     }
   }
 
@@ -102,26 +115,12 @@ export class ChartScreenComponent implements OnInit {
       y: $event.size.height,
     };
 
-    const chartDimensionsStr = this.localStorage.getDecryptedItem('dimension');
-
-    const chartDimensions: { [key: string]: ChartDimensions } =
-      chartDimensionsStr ? JSON.parse(chartDimensionsStr) : {};
-
-    chartDimensions[index.toString()] = dimensions;
+    this.chartDimensions[index.toString()] = dimensions;
 
     this.localStorage.setEncryptedItem(
       'dimension',
-      JSON.stringify(chartDimensions)
+      JSON.stringify(this.chartDimensions)
     );
-
-    // resizeChart() {
-    //   const chartWidth = this.chartContainer.nativeElement.offsetWidth;
-    //   const chartHeight = this.chartContainer.nativeElement.offsetHeight;
-    //   if (this.chartConfig && this.chartConfig.chart) {
-    //     this.chartConfig.chart.width = chartWidth;
-    //     this.chartConfig.chart.height = chartHeight;
-    //   }
-    // }
   }
 
   onMoveEnd(index: number, $event: any) {

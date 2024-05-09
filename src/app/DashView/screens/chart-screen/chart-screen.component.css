@@ -135,25 +135,19 @@
   height: 100%;
   width: 95vw;
   margin: 0 1rem;
-  cursor: grab;
-}
-
-.container-charts_left {
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  height: 95%;
-  width: 100%;
 }
 
 .content-charts_left {
   display: flex;
+  width: 100%;
+  height: 100%;
 }
 
 .content-charts_left .drag {
   display: flex;
   cursor: pointer;
+  width: 20rem;
+  height: 15rem;
   box-shadow: 0px 0px 2px 0px #abbac0;
 }
 
