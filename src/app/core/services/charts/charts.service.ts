@@ -6,6 +6,7 @@ import {
 import { Injectable } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
 import {
+  API_CARDS,
   API_CHARTGROUP,
   API_CHARTPATH,
   API_CHARTS,
@@ -16,6 +17,7 @@ import {
 })
 export class ChartsService {
   private ENV_CHARTS = API_CHARTS;
+  private ENV_CARDS = API_CARDS;
   private ENV_CHARTPATH = API_CHARTPATH;
   private ENV_CHARTGROUP = API_CHARTGROUP;
 
@@ -63,6 +65,14 @@ export class ChartsService {
     };
 
     return this.http.post(`${this.ENV_CHARTS}/create`, chartData, myHeaders);
+  }
+
+  createCards(headers: HttpHeaders, chartData: any): Observable<any> {
+    const myHeaders = {
+      headers: headers,
+    };
+
+    return this.http.post(`${this.ENV_CARDS}/create`, chartData, myHeaders);
   }
 
   createChartsPath(
@@ -128,6 +138,18 @@ export class ChartsService {
 
     return this.http.patch(
       `${this.ENV_CHARTS}/update/${id}`,
+      chartData,
+      options
+    );
+  }
+
+  updateCards(headers: HttpHeaders, chartData: any, id: any) {
+    const options = {
+      headers: headers,
+    };
+
+    return this.http.patch(
+      `${this.ENV_CARDS}/update/${id}`,
       chartData,
       options
     );
@@ -221,6 +243,13 @@ export class ChartsService {
       headers: headers,
     };
     return this.http.delete(`${this.ENV_CHARTS}/delete/${id}`, myHeaders);
+  }
+
+  deleteCards(headers: HttpHeaders, id: string): Observable<any> {
+    const myHeaders = {
+      headers: headers,
+    };
+    return this.http.delete(`${this.ENV_CARDS}/delete/${id}`, myHeaders);
   }
 
   deleteChartGroup(headers: HttpHeaders, id: string) {

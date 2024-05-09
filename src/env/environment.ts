@@ -9,6 +9,8 @@ export const API_ECXECUTE_SQL = 'http://localhost:8080/script/execute-sql';
 
 // Variável para criação de gráficos e grupos de gráficos
 export const API_CHARTS = 'http://localhost:8080/api/charts';
+export const API_CARDS = 'http://localhost:8080/api/cards';
+export const API_TABLES = 'http://localhost:8080/api/tabledata';
 export const API_CHARTGROUP = 'http://localhost:8080/api/chartgroup';
 export const API_CHARTPATH = 'http://localhost:8080/api/chartpath';
 

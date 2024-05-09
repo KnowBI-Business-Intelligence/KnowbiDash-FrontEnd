@@ -1,9 +1,3 @@
-<div class="container-nav-line">
-  <span>Início > Dashboards > cards</span>
-  <button (click)="backScreen()">
-    <span> x </span>
-  </button>
-</div>
 <div class="container">
   <div cdkDropListGroup class="container-data-group">
     <div class="container-data">
@@ -28,164 +22,78 @@
     </div>
 
     <div class="container-create">
-      <span class="graph-label">Gráficos</span>
+      <span class="card-label">Card</span>
       <div class="container-create-group">
         <div class="title">
           <span>Título</span>
-          <input type="text" [(ngModel)]="titulo" />
+          <input type="text" [(ngModel)]="cardTitle" />
         </div>
-        <div class="series">
-          <span class="serie-label"> Série base: </span>
-        </div>
-        <div class="yaxis">
-          <span>Eixo y - Valores</span>
-          <div
-            id="yaxis"
-            cdkDropList
-            [cdkDropListData]="yaxis"
-            class="serie-list y"
-            [cdkDropListConnectedTo]="['data-list']"
-            (cdkDropListDropped)="drop($event)"
-          >
-            <div
-              *ngFor="let item of yaxis; let i = index"
-              class="series-box"
-              cdkDrag
-              cdkDragLockAxis="y"
-              cdkDragBoundary=".y"
-            >
-              <div>
+        <div class="cards">
+          <span>Valores</span>
+          <div class="values-container">
+            <div>
+              <button class="button-switch-code">
                 <fa-icon
                   class="icon"
-                  [icon]="icons.database"
+                  [icon]="icons.code"
                   [size]="'xl'"
                 ></fa-icon>
-                {{ selectedAggregation ? selectedAggregation : item?.name }}
-              </div>
-              <div class="series-buttons">
-                <button
-                  [cdkMenuTriggerFor]="menuautosum"
-                  class="example-standalone-item"
-                  (click)="openMenu(i, item)"
-                >
-                  <img
-                    class="autosum"
-                    src="../../../../../assets/icons/autosum.svg"
-                    alt=""
-                  />
-                </button>
-                <button
-                  [cdkMenuTriggerFor]="menuedit"
-                  class="example-standalone-item"
-                  (click)="AxisValue(item)"
-                >
-                  <fa-icon
-                    class="commomicon"
-                    [icon]="icons.edit"
-                    [size]="'xl'"
-                  ></fa-icon>
-                </button>
-                <button (click)="removeItem('yaxis', i)">
-                  <fa-icon
-                    class="removedataicon"
-                    [icon]="icons.close"
-                    [size]="'xl'"
-                  ></fa-icon>
-                </button>
-              </div>
+              </button>
             </div>
-          </div>
-        </div>
-        <div class="xaxis">
-          <span>Eixo x - Rótulos</span>
-          <div
-            id="xaxis"
-            cdkDropList
-            [cdkDropListData]="xaxis"
-            class="serie-list x"
-            [cdkDropListConnectedTo]="['data-list']"
-            (cdkDropListDropped)="drop($event)"
-          >
             <div
-              *ngFor="let item of xaxis; let i = index"
-              class="series-box"
-              cdkDrag
-              cdkDragLockAxis="y"
-              cdkDragBoundary=".x"
+              id="yaxis"
+              cdkDropList
+              [cdkDropListData]="yaxis"
+              class="serie-list y"
+              [cdkDropListConnectedTo]="['data-list']"
+              (cdkDropListDropped)="drop($event)"
             >
-              <div>
-                <fa-icon
-                  class="icon"
-                  [icon]="icons.database"
-                  [size]="'xl'"
-                ></fa-icon>
-                {{ item.name }}
-              </div>
-              <div class="series-buttons">
-                <button
-                  [cdkMenuTriggerFor]="menuedit"
-                  class="example-standalone-item"
-                  (click)="AxisValue(item)"
-                >
+              <div
+                *ngFor="let item of yaxis; let i = index"
+                class="series-box"
+                cdkDrag
+                cdkDragLockAxis="y"
+                cdkDragBoundary=".y"
+              >
+                <div>
                   <fa-icon
-                    class="commomicon"
-                    [icon]="icons.edit"
+                    class="icon"
+                    [icon]="icons.database"
                     [size]="'xl'"
                   ></fa-icon>
-                </button>
-                <button (click)="removeItem('xaxis', i)">
-                  <fa-icon
-                    class="removedataicon"
-                    [icon]="icons.close"
-                    [size]="'xl'"
-                  ></fa-icon>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="seriesdata">
-          <span>Legenda</span>
-          <div
-            cdkDropList
-            [cdkDropListData]="series"
-            class="serie-list s"
-            (cdkDropListDropped)="drop($event)"
-          >
-            <div
-              *ngFor="let item of series; let i = index"
-              class="series-box"
-              cdkDrag
-              cdkDragLockAxis="y"
-              cdkDragBoundary=".s"
-            >
-              <div>
-                <fa-icon
-                  class="icon"
-                  [icon]="icons.database"
-                  [size]="'xl'"
-                ></fa-icon>
-                {{ item.name }}
-              </div>
-              <div class="series-buttons">
-                <button
-                  [cdkMenuTriggerFor]="menuedit"
-                  class="example-standalone-item"
-                  (click)="AxisValue(item)"
-                >
-                  <fa-icon
-                    class="commomicon"
-                    [icon]="icons.edit"
-                    [size]="'xl'"
-                  ></fa-icon>
-                </button>
-                <button (click)="removeItem('series', i)">
-                  <fa-icon
-                    class="removedataicon"
-                    [icon]="icons.close"
-                    [size]="'xl'"
-                  ></fa-icon>
-                </button>
+                  {{ selectedAggregation ? selectedAggregation : item?.name }}
+                </div>
+                <div class="series-buttons">
+                  <button
+                    [cdkMenuTriggerFor]="menuautosum"
+                    class="example-standalone-item"
+                    (click)="openMenu(i, item)"
+                  >
+                    <img
+                      class="autosum"
+                      src="../../../../../assets/icons/autosum.svg"
+                      alt=""
+                    />
+                  </button>
+                  <button
+                    [cdkMenuTriggerFor]="menuedit"
+                    class="example-standalone-item"
+                    (click)="AxisValue(item)"
+                  >
+                    <fa-icon
+                      class="commomicon"
+                      [icon]="icons.edit"
+                      [size]="'xl'"
+                    ></fa-icon>
+                  </button>
+                  <button (click)="removeItem('yaxis', i)">
+                    <fa-icon
+                      class="removedataicon"
+                      [icon]="icons.close"
+                      [size]="'xl'"
+                    ></fa-icon>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -236,51 +144,13 @@
             </div>
           </div>
         </div>
-        <div class="order">
-          <span>Ordenação</span>
-          <div
-            cdkDropList
-            [cdkDropListData]="order"
-            class="serie-list o"
-            (cdkDropListDropped)="drop($event)"
-          >
-            <div
-              *ngFor="let item of order; let i = index"
-              class="series-box"
-              cdkDrag
-              cdkDragLockAxis="y"
-              cdkDragBoundary=".o"
-            >
-              <div>
-                <fa-icon
-                  class="icon"
-                  [icon]="icons.database"
-                  [size]="'xl'"
-                ></fa-icon>
-                {{ item.name }}
-              </div>
-              <div class="series-buttons">
-                <button
-                  [cdkMenuTriggerFor]="menuedit"
-                  class="example-standalone-item"
-                  (click)="AxisValue(item)"
-                >
-                  <fa-icon
-                    class="commomicon"
-                    [icon]="icons.edit"
-                    [size]="'xl'"
-                  ></fa-icon>
-                </button>
-                <button (click)="removeItem('order', i)">
-                  <fa-icon
-                    class="removedataicon"
-                    [icon]="icons.close"
-                    [size]="'xl'"
-                  ></fa-icon>
-                </button>
-              </div>
-            </div>
-          </div>
+        <div class="title">
+          <span>Prefixo</span>
+          <input type="text" [(ngModel)]="prefix" />
+        </div>
+        <div class="title">
+          <span>Sufixo</span>
+          <input type="text" [(ngModel)]="sufix" />
         </div>
       </div>
     </div>
@@ -288,16 +158,34 @@
   <div class="container-pre-view">
     <span>pré visualização</span>
     <div *ngIf="showPreviewButton" class="visualize">
-      <button (click)="seedData()"><p>Pré-Visualizar</p></button>
+      <div>
+        <button (click)="seedData()"><p>Pré-Visualizar</p></button>
+        <button (click)="returnToCreateView()" class="cancel-button">
+          <p>Cancelar</p>
+        </button>
+      </div>
     </div>
-    <div *ngIf="!showPreviewButton" class="chart-container"></div>
+    <div *ngIf="!showPreviewButton" class="chart-container">
+      <div class="card">
+        <div class="card-header">
+          {{ cardTitle }}
+        </div>
+        <div class="card-body">
+          <p>{{ cardData }}</p>
+        </div>
+      </div>
+    </div>
     <div class="chart-container-buttons">
       <div>
-        <button (click)="openModal()"><p>Cancelar</p></button>
+        <button (click)="openModal()">
+          <p>Cancelar</p>
+        </button>
         <button (click)="updateChart()"><p>Atualizar</p></button>
       </div>
       <div>
-        <button (click)="backScreen()" class="conclude"><p>Concluir</p></button>
+        <button (click)="returnToCreateView()" class="conclude">
+          <p>Concluir</p>
+        </button>
       </div>
     </div>
   </div>
@@ -362,7 +250,7 @@
     <span class="close" (click)="closeModal()">&times;</span>
     <div>
       <h2>Tem certeza que deseja cancelar esta ação?</h2>
-      <p>As alterações do gráfico não serão salvas</p>
+      <p>As alterações do cartão não serão salvas</p>
       <div class="modal-buttons">
         <button class="cancel" (click)="closeModal()">cancelar</button>
         <button class="exclude" (click)="openModalCancel()">

@@ -1,5 +1,11 @@
 import { HttpHeaders } from '@angular/common/http';
-import { Component } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { StorageService } from '../../../../core/services/user/storage.service';
 import { LocalstorageService } from '../../../../core/services/local-storage/local-storage.service';
@@ -22,7 +28,14 @@ import {
   CdkMenuItemCheckbox,
   CdkMenuTrigger,
 } from '@angular/cdk/menu';
-import { faDatabase, faGear, faXmark } from '@fortawesome/free-solid-svg-icons';
+import {
+  faDatabase,
+  faGear,
+  faXmark,
+  faCode,
+} from '@fortawesome/free-solid-svg-icons';
+import { ChartgroupService } from '../../../../core/services/chartgroup/chartgroup.service';
+import { Subscription } from 'rxjs';
 
 interface Axis {
   name: string;
@@ -50,16 +63,23 @@ interface Axis {
   templateUrl: './cards.component.html',
   styleUrl: './cards.component.css',
 })
-export class CardsComponent {
+export class CardsComponent implements OnInit, OnDestroy {
+  @Output() returnToCreate = new EventEmitter<void>();
+  private encryptedDataSubscription: Subscription | undefined;
   icons = {
     database: faDatabase,
     close: faXmark,
+    code: faCode,
     edit: faGear,
   };
 
+  cardTitle: string = '';
+  prefix: string = '';
+  sufix: string = '';
+  cardData: any = 1500;
+
   dashBoard: any;
   chartId: any;
-  titulo: string = '';
   chartType: string = '';
   sql: string = 'SELECT ';
   tableName: string = '';
@@ -82,16 +102,20 @@ export class CardsComponent {
     private router: Router,
     private storageService: StorageService,
     private localStorageService: LocalstorageService,
-    private chartsService: ChartsService
+    private chartsService: ChartsService,
+    private chartGroupService: ChartgroupService
   ) {}
 
   database: any[] = [];
   yaxis: any[] = [];
-  xaxis: any[] = [];
-  series: any[] = [];
   filters: any[] = [];
-  groupment: any[] = [];
-  order: any[] = [];
+
+  ngOnInit(): void {
+    this.dashBoard =
+      this.localStorageService.getDecryptedItem('chartGroupview');
+    this.loadDataView(this.dashBoard.id);
+    this.startDashboarData();
+  }
 
   drop(event: CdkDragDrop<string[]>) {
     if (event.previousContainer === event.container) {
@@ -109,11 +133,21 @@ export class CardsComponent {
       );
     }
   }
+  returnToCreateView(): void {
+    this.chartGroupService.setCurrentView('ViewCreateComponent');
+  }
 
-  ngOnInit(): void {
-    this.dashBoard =
-      this.localStorageService.getDecryptedItem('chartGroupview');
-    this.loadDataView(this.dashBoard.id);
+  startDashboarData() {
+    this.encryptedDataSubscription =
+      this.chartGroupService.encryptedData$.subscribe((encryptedData) => {
+        this.dashBoard = encryptedData;
+      });
+  }
+
+  ngOnDestroy() {
+    if (this.encryptedDataSubscription) {
+      this.encryptedDataSubscription.unsubscribe();
+    }
   }
 
   openMenu(index: number, item: any) {
@@ -191,20 +225,8 @@ export class CardsComponent {
       case 'yaxis':
         this.yaxis.splice(index, 1);
         break;
-      case 'xaxis':
-        this.xaxis.splice(index, 1);
-        break;
-      case 'series':
-        this.series.splice(index, 1);
-        break;
       case 'filters':
         this.filters.splice(index, 1);
-        break;
-      case 'groupment':
-        this.groupment.splice(index, 1);
-        break;
-      case 'order':
-        this.order.splice(index, 1);
         break;
       default:
         break;
@@ -274,18 +296,6 @@ export class CardsComponent {
       this.buildData.push({ name: yAxisItem, identifier: identifierItem });
     }
 
-    for (let i = 0; i < this.xaxis.length; i++) {
-      const xAxisItem = this.xaxis[i].value;
-      const xAxisidentifier = this.rmTimeStamp(this.xaxis[i].name);
-      this.buildData.push({ name: xAxisItem, identifier: xAxisidentifier });
-    }
-
-    for (let i = 0; i < this.series.length; i++) {
-      const seriesItem = this.series[i].value;
-      const seriesidentifier = this.rmTimeStamp(this.series[i].name);
-      this.buildData.push({ name: seriesItem, identifier: seriesidentifier });
-    }
-
     this.sql = 'SELECT ';
     if (this.buildData.length > 0) {
       const selectClauses = this.buildData.map((item) => {
@@ -300,44 +310,13 @@ export class CardsComponent {
   }
 
   seedData() {
-    this.showPreviewButton = false;
     this.identifierData();
-
-    const xAxisValues = this.xaxis.map((axis) => {
-      if (this.isTimestampField(axis.name)) {
-        return this.formatTimestampField(axis.name);
-      }
-      return this.rmTimeStamp(axis.name);
-    });
-
-    const seriesValues = this.series.map((series) =>
-      this.rmTimeStamp(series.value)
-    );
-
-    const group = [...xAxisValues, ...seriesValues];
-
-    const chartData = {
-      title: this.titulo,
-      graphType: this.chartType.toLowerCase(),
+    this.showPreviewButton = false;
+    const cardData = {
+      title: this.cardTitle,
+      prefix: this.prefix,
+      sufix: this.sufix,
       sql: this.sql,
-      xAxisColumns: this.xaxis.map((axis) => {
-        return {
-          name: [this.rmTimeStamp(axis.name)],
-          identifiers: [axis.identifier],
-        };
-      }),
-      yAxisColumns: this.yaxis.map((axis) => {
-        return {
-          name: [this.rmTimeStamp(axis.value)],
-          identifiers: [axis.identifier],
-        };
-      }),
-      series: this.series.map((series) => {
-        return {
-          name: [this.rmTimeStamp(series.name)],
-          identifiers: [series.identifier],
-        };
-      }),
       filters: this.filters.map((filter) => {
         let operator;
         if (filter.type === 'timestamp' || filter.type === 'number') {
@@ -353,64 +332,37 @@ export class CardsComponent {
           identifiers: [filter.identifier],
         };
       }),
-      group: group,
-      order: this.order.length
-        ? this.order.map((order) => this.rmTimeStamp(order.name))
-        : xAxisValues,
       chartGroup: {
         id: this.dashBoard.id,
       },
     };
 
-    this.createChart(chartData);
+    console.log(cardData);
+    this.createCard(cardData);
   }
 
-  createChart(chartData: any) {
+  createCard(chartData: any) {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${this.user.token}`,
     });
 
-    this.chartsService.createCharts(headers, chartData).subscribe({});
+    this.chartsService.createCards(headers, chartData).subscribe({
+      next: (data) => {
+        this.cardPreView(data);
+        this.chartId = data.id;
+        this.updateChart();
+      },
+    });
   }
 
   updateChart() {
     this.identifierData();
-
-    const xAxisValues = this.xaxis.map((axis) => {
-      if (this.isTimestampField(axis.name)) {
-        return this.formatTimestampField(axis.name);
-      }
-      return this.rmTimeStamp(axis.name);
-    });
-
-    const seriesValues = this.series.map((series) =>
-      this.rmTimeStamp(series.value)
-    );
-
-    const group = [...xAxisValues, ...seriesValues];
-
-    const chartData = {
-      title: this.titulo,
-      graphType: this.chartType.toLowerCase(),
+    this.showPreviewButton = false;
+    const cardData = {
+      title: this.cardTitle,
+      prefix: this.prefix,
+      sufix: this.sufix,
       sql: this.sql,
-      xAxisColumns: this.xaxis.map((axis) => {
-        return {
-          name: [this.rmTimeStamp(axis.name)],
-          identifiers: [axis.identifier],
-        };
-      }),
-      yAxisColumns: this.yaxis.map((axis) => {
-        return {
-          name: [this.rmTimeStamp(axis.value)],
-          identifiers: [axis.identifier],
-        };
-      }),
-      series: this.series.map((series) => {
-        return {
-          name: [this.rmTimeStamp(series.name)],
-          identifiers: [series.identifier],
-        };
-      }),
       filters: this.filters.map((filter) => {
         let operator;
         if (filter.type === 'timestamp' || filter.type === 'number') {
@@ -426,69 +378,58 @@ export class CardsComponent {
           identifiers: [filter.identifier],
         };
       }),
-      group: group,
-      order: this.order.length
-        ? this.order.map((order) => this.rmTimeStamp(order.name))
-        : xAxisValues,
       chartGroup: {
         id: this.dashBoard.id,
       },
     };
 
-    console.log(chartData);
-
     const headers = new HttpHeaders({
       Authorization: `Bearer ${this.user.token}`,
     });
 
-    this.chartsService
-      .updateCharts(headers, chartData, this.chartId)
-      .subscribe({});
+    this.chartsService.updateCards(headers, cardData, this.chartId).subscribe({
+      next: (data) => {
+        this.cardPreView(data);
+      },
+    });
+  }
+
+  cardPreView(data: any) {
+    let result = null;
+    if (typeof data.result === 'number') {
+      result = this.formatterResultWhenDecimal(data.result);
+    } else {
+      result = data.result;
+    }
+    console.log(result);
+    this.cardTitle = data.title;
+    this.cardData = data.prefix + '' + result + ' ' + data.sufix;
+  }
+
+  formatterResultWhenDecimal(result: number): string {
+    let formattedResult;
+    if (Number.isInteger(result)) {
+      formattedResult = result.toLocaleString('pt-BR');
+    } else {
+      formattedResult = result.toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+    }
+    return formattedResult;
   }
 
   openModalCancel() {
-    console.log(this.chartId);
     const headers = new HttpHeaders({
       Authorization: `Bearer ${this.user.token}`,
     });
-    this.chartsService.deleteCharts(headers, this.chartId).subscribe({});
-    this.backScreen();
-  }
-
-  chartPreView(data: any) {
-    console.log(data);
-    const uniqueCategories: any = Array.from(
-      new Set(data.xAxisColumns[0].data)
-    );
-
-    const uniqueSubgroups = Array.from(new Set(data.series[0].data));
-
-    const seriesData = uniqueSubgroups.map((subgrupo: any) => {
-      const seriesValues: { name: string; y: any }[] = [];
-      data.xAxisColumns[0].data.forEach((date: string, i: number) => {
-        if (data.series[0].data[i] === subgrupo) {
-          seriesValues.push({
-            name: date,
-            y: data.yAxisColumns[0].data[i],
-          });
-        }
-      });
-      return {
-        type: data.graphType,
-        name: subgrupo,
-        height: '20%',
-        data: seriesValues,
-      };
+    this.chartsService.deleteCards(headers, this.chartId).subscribe({
+      next: (data) => {
+        console.log(data);
+      },
     });
-  }
 
-  selectChartButton(label: string, value: string) {
-    this.selectedChartButton = label;
-    this.chartType = value;
-  }
-
-  backScreen() {
-    this.router.navigate(['/admin/dashboards']);
+    this.returnToCreateView();
   }
 
   openModal(): void {

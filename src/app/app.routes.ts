@@ -29,6 +29,7 @@ import { MainScreenComponent } from './DashView/screens/main-screen/main-screen.
 import { PageNotFoundComponent } from './DashView/screens/page-not-found/page-not-found.component';
 import { SettingsUserComponent } from './DashView/screens/settings-user/settings-user.component';
 import { LoginScreenComponent } from './shared/login-screen/login-screen.component';
+import { ViewCreateComponent } from './DashSetup/screens/dashboards/view-create/view-create.component';
 export const routes: Routes = [
   {
     path: '',
@@ -104,9 +105,17 @@ export const routes: Routes = [
           {
             path: '',
             component: DashboardsViewComponent,
-            title: 'Koios - Administrador',
+            title: 'Koios - Dashboards',
             data: {
               breadcrumb: 'Dashboards',
+            },
+          },
+          {
+            path: 'view',
+            component: ViewCreateComponent,
+            title: 'Koios - view',
+            data: {
+              breadcrumb: 'Gráficos',
             },
           },
           {

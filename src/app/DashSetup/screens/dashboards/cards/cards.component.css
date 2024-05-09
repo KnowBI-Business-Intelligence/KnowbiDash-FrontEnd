@@ -1,37 +1,9 @@
-.container-nav-line {
-  width: 60%;
-  padding: 5px 10px;
-  position: relative;
-  top: -39px;
-  left: 19px;
-  align-self: baseline;
-  display: flex;
-}
-
-.container-nav-line span {
-  color: #00000074;
-  font-size: 12px;
-  margin-bottom: 4px;
-}
-
-.container-nav-line button {
-  border-radius: 50px;
-  border: solid 0.5px #00000074;
-  color: #00000074;
-  cursor: pointer;
-  margin-left: 5px;
-  height: 20px;
-  width: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .container {
   display: flex;
   position: fixed;
-  top: 46px;
-  width: calc(97% - 5px);
+  top: 47px;
+  width: 81vw;
+  background-color: #fafafa;
 }
 
 .container span {
@@ -44,7 +16,7 @@
 }
 
 .container-data {
-  width: 35%;
+  min-width: 280px;
   display: flex;
   flex-direction: column;
   padding: 10px 10px;
@@ -58,112 +30,81 @@
   border-right: solid 0.2px #e6e6e6;
 }
 
-.graph-label {
+.card-label {
   padding: 10px;
 }
 
 .container-create-group,
 .title,
-.series,
-.yaxis,
-.xaxis,
-.seriesdata,
+.cards,
 .filters,
-.groupment,
-.order {
+.values-container {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.values-container {
+  width: 100%;
+  flex-direction: row;
+  justify-content: center;
+  margin-right: 35px;
+}
+
+.button-switch-code {
+  cursor: pointer;
+  border: none;
+  background-color: transparent;
+  display: flex;
+  width: 38px;
 }
 
 .container-create-group {
   height: calc(86vh - 5px);
   max-height: calc(86vh - 5px);
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-.title {
-  width: 100%;
 }
 
 .title input {
   outline: none;
   font-size: 12px;
-  width: 60%;
+  width: 75%;
   border: solid 0.5px #dbdbdb;
   border-radius: 2px;
   padding: 3px 10px;
+  margin-bottom: 10px;
 }
 
-.serie-label {
-  margin-top: 15px;
-}
-
-.serie-content {
-  display: flex;
-  margin-top: 5px;
-}
-
-.serie-content div button {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  border: dashed 2px #00000020;
-  border-radius: 3px;
-  font-size: 10px;
-  padding: 5px;
-  background-color: #fff;
-  width: 55px;
-  margin: 2px;
-  transition: 0.5s;
-}
-
-.serie-content div button:hover {
-  border: solid 2px #a3a7cb;
-}
-
-.serie-content div button.selected {
-  border: solid 2px #a3a7cb;
-}
-
-.iconChart {
-  margin: 0 0.5rem;
-  color: #5f65a5;
-  font-size: 10px;
-}
-
-.yaxis,
-.xaxis,
-.seriesdata,
-.filters,
-.groupment,
-.order {
+.title,
+.cards,
+.filters {
   margin-top: 10px;
   width: 100%;
   border-bottom: 1px solid #e6e6e6;
 }
+
 .container-pre-view {
-  width: 40%;
-  height: calc(97vh - 5px);
+  width: 35vw;
   display: flex;
   flex-direction: column;
   padding: 10px 10px;
 }
 
-.visualize {
+.visualize,
+.visualize div {
   height: calc(90vh - 5px);
-  width: calc(38vw - 5px);
+  width: calc(33vw - 5px);
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 10px;
   margin-top: 16px;
-  z-index: 99;
+  z-index: 10;
   position: fixed;
   background-color: #fafafa;
+}
+
+.visualize div {
+  flex-direction: column;
 }
 
 .visualize button,
@@ -183,12 +124,40 @@
   transition: 0.5s;
 }
 
+.visualize button:nth-child(even) {
+  background-color: #ffffff;
+  color: #000000da;
+  border: solid 1px #00000020;
+}
+
 .chart-container {
   width: 100%;
-  height: calc(83vh - 5px);
+  height: calc(81vh - 5px);
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
+}
+
+.card {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px 15px;
+  margin: 10px;
+  min-width: 200px;
+  min-height: 83px;
+  background-color: #fff;
+}
+
+.card-header {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.card-body {
+  font-size: 14px;
+  color: #00000099;
 }
 
 .chart-container-buttons {
@@ -207,13 +176,20 @@
   border: solid 1px #00000020;
 }
 
+.cancel-button {
+  z-index: 99 !important;
+  position: fixed;
+  bottom: 30px;
+  right: 10px;
+}
+
 .conclude {
   border: solid 1px #751a7e !important;
   color: #751a7e !important;
 }
 
 .serie-list {
-  width: 60%;
+  width: 75%;
 }
 
 .data-list,

@@ -18,10 +18,7 @@
           </summary>
           <div class="content">
             <div *ngFor="let group of paths[pathId]">
-              <button
-                (click)="getCharts(group.id); clickPress(group, $event)"
-                class="dashboardbtn"
-              >
+              <button (click)="clickPress(group, $event)" class="dashboardbtn">
                 <fa-icon
                   class="icon"
                   [icon]="icons.dash"
@@ -35,136 +32,46 @@
         </details>
       </div>
     </div>
-    <div class="dashview">
+    <div class="container-view-groupment">
       <span class="groupname">Dashboard: {{ groupName }}</span>
-      <div class="filter">
-        <div class="filter-button">
-          <button (click)="openModal()">
-            <p>Filtro</p>
-            <span class="material-symbols-outlined filter-icon">
-              filter_alt
-            </span>
+      <div class="dashview">
+        <div class="createview">
+          <span>Adicionar</span>
+          <button class="chartview" id="chart" (click)="switchView('chart')">
+            <fa-icon
+              class="iconview"
+              [icon]="icons.chartview"
+              [size]="'xl'"
+              title="Home"
+            ></fa-icon>
+            Gráfico
+          </button>
+          <button class="cardview" id="card" (click)="switchView('card')">
+            <fa-icon
+              class="iconview"
+              [icon]="icons.cardview"
+              [size]="'xl'"
+              title="Home"
+            ></fa-icon>
+            Card
+          </button>
+          <button class="tableview" id="table" (click)="switchView('table')">
+            <fa-icon
+              class="iconview"
+              [icon]="icons.tableview"
+              [size]="'xl'"
+              title="Home"
+            ></fa-icon>
+            Tabela
           </button>
         </div>
-        <div class="filter-container">
-          <div class="filter-filters" *ngFor="let filter of filters">
-            <div class="filter-filters-data">
-              <h3>{{ filter.identifiers }}</h3>
-              <span [title]="filter.values">{{ filter.values }}</span>
-            </div>
-          </div>
+        <div *ngIf="currentView === 'ViewCreateComponent'">
+          <app-view-create></app-view-create>
+        </div>
+        <div *ngIf="currentView === 'CardsComponent'">
+          <app-cards></app-cards>
         </div>
       </div>
-
-      <div class="bound-box" #myBounds>
-        <div class="container-charts">
-          <div class="left">
-            <div
-              *ngFor="let chartConfig of chartGroupsData"
-              class="chart-container"
-              ngResizable
-              ngDraggable
-              [inBounds]="true"
-              [bounds]="myBounds"
-              rzHandles="all"
-              [rzMinWidth]="350"
-              [rzMinHeight]="250"
-              (mouseup)="newPosition($event); resizeChart()"
-            >
-              <highcharts-chart
-                style="width: 100%; height: 100%"
-                [Highcharts]="Highcharts"
-                [options]="chartConfig"
-              ></highcharts-chart>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div
-        class="modal"
-        *ngIf="showModal"
-        id="modal"
-        [style.display]="showModal ? 'flex' : 'none'"
-      >
-        <div class="modal-content">
-          <div class="modal-header">
-            <h2>Filtros</h2>
-            <span class="close" (click)="closeModal()"
-              ><span class="material-symbols-outlined close-icon">
-                close
-              </span></span
-            >
-          </div>
-          <div class="modal-body">
-            <div class="modal-fields" *ngFor="let filter of filters">
-              <label for="filter.column">{{ filter.identifiers }}</label>
-              <div class="dropdown">
-                <button class="dropbtn">
-                  {{ selectedFilters[filter.column] || "Todos" }}
-                </button>
-                <div class="dropdown-content">
-                  <div
-                    class="dropdown-cl"
-                    *ngFor="let value of filter.allfilters"
-                  >
-                    <div>
-                      <input
-                        type="checkbox"
-                        [checked]="isChecked(filter.column, value)"
-                        (change)="onCheckboxChange(filter.column, value)"
-                      />
-                    </div>
-                    <div>
-                      <label>{{ value }}</label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div>
-            <div class="modal-buttons">
-              <button class="exclude">
-                <span *ngIf="!isLoginLoading">Filtrar</span>
-                <span *ngIf="isLoginLoading"
-                  ><div class="login-spinner"></div
-                ></span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="createview">
-      <span>Adicionar</span>
-      <button class="chartview" id="chart" (click)="addView('chart')">
-        <fa-icon
-          class="iconview"
-          [icon]="icons.chartview"
-          [size]="'xl'"
-          title="Home"
-        ></fa-icon>
-        Gráfico
-      </button>
-      <button class="cardview" id="card" (click)="addView('card')">
-        <fa-icon
-          class="iconview"
-          [icon]="icons.cardview"
-          [size]="'xl'"
-          title="Home"
-        ></fa-icon>
-        Card
-      </button>
-      <button class="tableview" id="table" (click)="addView('table')">
-        <fa-icon
-          class="iconview"
-          [icon]="icons.tableview"
-          [size]="'xl'"
-          title="Home"
-        ></fa-icon>
-        Tabela
-      </button>
     </div>
   </div>
 </div>
