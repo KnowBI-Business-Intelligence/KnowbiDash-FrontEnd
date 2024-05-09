@@ -86,7 +86,9 @@ export class LoginScreenComponent implements OnInit {
         this.storageService.saveToken(data.token);
         this.storageService.saveRefreshToken(data.refreshToken);
         this.storageService.saveUser(data);
+
         this.roles = this.storageService.getUser().roles;
+
         if (this.roles.includes('ROLE_ADMIN')) {
           setTimeout(() => {
             this.isLoginLoading = false;

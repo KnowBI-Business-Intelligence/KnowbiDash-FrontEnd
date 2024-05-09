@@ -26,21 +26,30 @@
     <div class="container-path-body"></div>
   </div>
 
-  <div class="container-charts">
-    <div
-      class="content-charts_left"
-      cdkDropList
-      [cdkDropListData]="chartGroupsData"
-      (cdkDropListDropped)="drop($event)"
-    >
-      @for (chartConfig of chartGroupsData; track chartConfig) {
-      <highcharts-chart
-        cdkDrag
-        style="width: 20rem; height: 20rem; margin: 5px"
-        [Highcharts]="Highcharts"
-        [options]="chartConfig"
-      ></highcharts-chart>
-      }
+  <div class="container-charts" #containerCharts>
+    <div class="content-charts_left">
+      <div
+        *ngFor="let chartConfig of chartGroupsData; let i = index"
+        class="drag"
+        ngDraggable
+        ngResizable
+        rzContain
+        rzHandles="all"
+        [rzMinWidth]="350"
+        [rzMinHeight]="250"
+        (rzStop)="resize(i, $event)"
+        [position]="chartPositions[i.toString()]"
+        (endOffset)="onMoveEnd(i, $event)"
+        [bounds]="containerCharts"
+        [inBounds]="true"
+        zIndex="99"
+      >
+        <highcharts-chart
+          style="width: 100%; height: 100%"
+          [Highcharts]="Highcharts"
+          [options]="chartConfig"
+        ></highcharts-chart>
+      </div>
     </div>
   </div>
 

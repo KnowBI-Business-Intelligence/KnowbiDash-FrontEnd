@@ -14,7 +14,7 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   loginUser(username: string, password: string): Observable<any> {
-    const credentials = this.http
+    return this.http
       .post(`${API_AUTH}/signin`, {
         userName: username,
         passWord: password,
@@ -24,8 +24,6 @@ export class AuthService {
           throw error;
         })
       );
-
-    return credentials;
   }
 
   getUsersInfo(headers: HttpHeaders): Observable<any> {
@@ -70,14 +68,12 @@ export class AuthService {
     return this.http.post(`${API_AUTH}/signout`, {});
   }
 
-  refreshTokenUser(token: string) {
-    return this.http
-      .post(`${API_AUTH}/refreshtoken`, { refreshToken: token })
-      .pipe(
-        catchError((error) => {
-          throw error;
-        })
-      );
+  refreshTokenUser(refreshToken: string) {
+    return this.http.post(`${API_AUTH}/refreshtoken`, refreshToken).pipe(
+      catchError((error) => {
+        throw error;
+      })
+    );
   }
 
   userIsAutenticaded(): boolean {

@@ -1,19 +1,32 @@
 import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { CommonModule } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
-import { Component, ElementRef, OnInit } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import {
   FormBuilder,
+  FormControl,
   FormsModule,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import {
+  MatAutocompleteModule,
+  MatAutocompleteSelectedEvent,
+} from '@angular/material/autocomplete';
+import { MatChipInputEvent, MatChipsModule } from '@angular/material/chips';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSortModule } from '@angular/material/sort';
 import { MessageService } from 'primeng/api';
-import { DropdownModule } from 'primeng/dropdown';
 import { TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
+import { map, Observable, startWith } from 'rxjs';
 import { ProfileTable } from '../../../../core/modules/interfaces';
 import { ChartsService } from '../../../../core/services/charts/charts.service';
 import { ProfilesService } from '../../../../core/services/profiles/profiles.service';
@@ -28,14 +41,19 @@ import { StorageService } from '../../../../core/services/user/storage.service';
     ReactiveFormsModule,
     TableModule,
     MatPaginator,
-    MatSortModule,
     ToastModule,
-    DropdownModule,
+    MatFormFieldModule,
+    MatChipsModule,
+    MatAutocompleteModule,
   ],
   templateUrl: './create-paths.component.html',
   styleUrl: './create-paths.component.css',
 })
 export class CreatePathsComponent implements OnInit {
+  separatorKeysCodes: number[] = [ENTER, COMMA];
+  announcer = inject(LiveAnnouncer);
+  @ViewChild('profileInput') profileInput!: ElementRef<HTMLInputElement>;
+
   createFolderForm = this.formBuilder.group({
     name: ['', Validators.required],
     profile: ['', Validators.required],
@@ -55,6 +73,7 @@ export class CreatePathsComponent implements OnInit {
   deleteProfile: boolean = false;
   isViewProfile: boolean = false;
   actionButton: boolean = false;
+  isUpdateFolder: boolean = false;
 
   dataSource: any;
   dataSourceGroup: any = [];
@@ -65,21 +84,42 @@ export class CreatePathsComponent implements OnInit {
   resultsLength: number = 0;
   selectedRow: ProfileTable | null = null;
   selectedRowChart: any;
-  listProfiles: any;
+
+  filteredProfiles!: Observable<string[]>;
+  profilesArray: string[] = [];
+  profileIds: string[] = [];
+  allProfiles: { name: string; id: string }[] = [];
+  profilesCtrl = new FormControl('');
 
   constructor(
-    private _liveAnnouncer: LiveAnnouncer,
     private elementRef: ElementRef,
     private charts: ChartsService,
     private token: StorageService,
     private formBuilder: FormBuilder,
     private messageService: MessageService,
     private profiles: ProfilesService
-  ) {}
+  ) {
+    this.filteredProfiles = this.profilesCtrl.valueChanges.pipe(
+      startWith(null),
+      map((profile: string | null) =>
+        profile
+          ? this._filter(profile)
+          : this.allProfiles.map((profile) => profile.name)
+      )
+    );
+  }
 
   ngOnInit(): void {
     this.getChartsPath();
     this.getProfiles();
+  }
+
+  private _filter(value: string): string[] {
+    const filterValue = value.toLowerCase();
+
+    return this.allProfiles
+      .map((profile) => profile.name)
+      .filter((name) => name.toLowerCase().includes(filterValue));
   }
 
   private getChartsPath() {
@@ -97,7 +137,6 @@ export class CreatePathsComponent implements OnInit {
     this.charts.getChartsPath(this.headers).subscribe({
       next: (value: any) => {
         this.dataSource = value;
-
         this.resultsLength = value?.length;
         this.getGroupChart();
       },
@@ -130,8 +169,20 @@ export class CreatePathsComponent implements OnInit {
 
   private getProfiles() {
     this.profiles.getProfiles(this.headers).subscribe({
-      next: (value) => {
-        this.listProfiles = value;
+      next: (data: any) => {
+        this.allProfiles = data.map((item: any) => ({
+          name: item.name,
+          id: item.id,
+        }));
+
+        this.filteredProfiles = this.profilesCtrl.valueChanges.pipe(
+          startWith(null),
+          map((profile: string | null) =>
+            profile
+              ? this._filter(profile)
+              : this.allProfiles.map((profile) => profile.name)
+          )
+        );
       },
       error() {
         throw new Error('we had asn error here');
@@ -175,7 +226,6 @@ export class CreatePathsComponent implements OnInit {
     this.actionButton = false;
     const table =
       this.elementRef.nativeElement.querySelector('.container-content');
-
     if (table) {
       table.style.filter = 'none';
     }
@@ -183,7 +233,8 @@ export class CreatePathsComponent implements OnInit {
   }
 
   onRowDoubleClick(row: ProfileTable) {
-    console.log('double click:', row);
+    this.selectedRow = row;
+    this.isUpdateFolder = true;
   }
 
   deleteRegister() {
@@ -246,6 +297,58 @@ export class CreatePathsComponent implements OnInit {
     }
   }
 
+  addProfiles($event: MatChipInputEvent) {
+    $event.chipInput!.clear();
+    this.profilesCtrl.setValue(null);
+  }
+
+  selectedProfiles($event: MatAutocompleteSelectedEvent) {
+    const selectedProfile = this.allProfiles.find(
+      (profile) => profile.name === $event.option.viewValue
+    );
+    if (selectedProfile) {
+      if (!this.profilesArray.includes(selectedProfile.name)) {
+        this.profilesArray.push(selectedProfile.name);
+        this.profileIds.push(selectedProfile.id);
+      }
+      const index = this.allProfiles.findIndex(
+        (profile) => profile.name === selectedProfile.name
+      );
+      if (index !== -1) {
+        this.allProfiles.splice(index, 1);
+      }
+    }
+    this.profileInput.nativeElement.value = '';
+    this.profilesCtrl.setValue(null);
+  }
+
+  removeProfile(profile: any) {
+    const index = this.profilesArray.indexOf(profile);
+
+    if (index >= 0) {
+      const removedProfile = this.profilesArray.splice(index, 1)[0];
+      const removedProfileId = this.profileIds.splice(index, 1)[0];
+
+      const removedProfileObject = {
+        name: removedProfile,
+        id: removedProfileId,
+      };
+
+      this.allProfiles.push(removedProfileObject);
+
+      this.announcer.announce(`Removed ${profile}`);
+
+      this.filteredProfiles = this.profilesCtrl.valueChanges.pipe(
+        startWith(null),
+        map((profile: string | null) =>
+          profile
+            ? this._filter(profile)
+            : this.allProfiles.map((profile) => profile.name)
+        )
+      );
+    }
+  }
+
   cancelRegister() {
     this.getChartsPath();
 
@@ -262,9 +365,9 @@ export class CreatePathsComponent implements OnInit {
 
   createRegister() {
     const name = this.createFolderForm.get('name')?.value as string;
-    const profile = this.createFolderForm.get('profile')?.value as any;
+    const profileIds = this.profileIds.map((id) => ({ id }));
 
-    this.charts.createChartsPath(this.headers, name, profile.id).subscribe({
+    this.charts.createChartsPath(this.headers, name, profileIds).subscribe({
       next: () => {
         this.messageService.add({
           severity: 'sucess',
@@ -285,5 +388,43 @@ export class CreatePathsComponent implements OnInit {
         });
       },
     });
+  }
+
+  updatePath() {
+    const profileIds = this.profileIds.map((id) => ({ id }));
+    const name: any = (this.createFolderForm.get('name')?.value as string)
+      ? (this.createFolderForm.get('name')?.value as string)
+      : this.selectedRow?.name;
+
+    this.charts
+      .updateChartsPath(
+        this.headers,
+        this.selectedRow?.id as string,
+        name,
+        profileIds
+      )
+      .subscribe({
+        next: () => {
+          this.messageService.add({
+            severity: 'sucess',
+            summary: 'Sucesso',
+            detail: 'Pasta criada!',
+          });
+          this.cancelRegister();
+          this.createFolderForm.reset({
+            name: '',
+            profile: '',
+          });
+        },
+        error: () => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erro',
+            detail: 'Erro na criação.',
+          });
+        },
+      });
+
+    this.isUpdateFolder = false;
   }
 }

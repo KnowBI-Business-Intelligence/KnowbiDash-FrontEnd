@@ -1,36 +1,19 @@
-.container {
+.container-nav-line {
   display: flex;
-  justify-content: center;
-  align-items: baseline;
-  height: calc(91%);
+  width: 60%;
+  padding: 5px 10px;
+  position: relative;
+  top: -2.75rem;
+  left: 9.5rem;
 }
 
-.container-path {
-  display: flex;
-  flex-direction: column;
-  width: 80%;
-  height: fit-content;
-  justify-content: space-between;
-  margin-top: 15px;
-}
-
-.container-path-header {
-  width: 7.5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: fixed;
-  top: 1.2rem;
-  left: 15rem;
-}
-
-.container-path-header span {
+.container-nav-line span {
   color: #00000074;
   font-size: 12px;
   margin-bottom: 4px;
 }
 
-.container-path-header button {
+.container-nav-line button {
   border-radius: 50px;
   border: solid 0.5px #00000074;
   color: #00000074;
@@ -43,9 +26,20 @@
   align-items: center;
 }
 
-.container-path-header span {
-  font-size: 13px;
-  color: #00000096;
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  height: calc(89vh - 7px);
+}
+
+.container-path {
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+  height: fit-content;
+  justify-content: space-between;
+  margin-top: 15px;
 }
 
 .container-path-body-profile-label {

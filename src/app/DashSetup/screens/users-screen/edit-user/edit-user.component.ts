@@ -10,10 +10,12 @@ import {
   ViewChild,
 } from '@angular/core';
 import {
+  FormBuilder,
   FormControl,
   FormsModule,
   NgForm,
   ReactiveFormsModule,
+  Validators,
 } from '@angular/forms';
 import {
   MatAutocompleteModule,
@@ -56,19 +58,20 @@ export class EditUserComponent implements OnInit {
   @ViewChild('profileInput') profileInput!: ElementRef<HTMLInputElement>;
   announcer = inject(LiveAnnouncer);
 
+  userEditForm = this.formBuilder.group({
+    fullusername: ['', Validators.required],
+    username: ['', Validators.required],
+    password: ['', Validators.required],
+    email: ['', Validators.required],
+    occupation: ['', Validators.required],
+    access_levels: ['', Validators.required],
+    profiles: ['', Validators.required],
+  });
+
   item: any;
   rolesOptions: Roles[] | undefined;
   role: Roles | undefined;
   isLoginLoading: boolean = false;
-  form: any = {
-    fullusername: null,
-    username: null,
-    password: null,
-    email: null,
-    occupation: null,
-    access_levels: null,
-    profiles: null,
-  };
 
   separatorKeysCodes: number[] = [ENTER, COMMA];
   filteredProfiles!: Observable<string[]>;
@@ -84,7 +87,8 @@ export class EditUserComponent implements OnInit {
     private storageService: StorageService,
     private messageService: MessageService,
     private profileService: ProfilesService,
-    private router: Router
+    private router: Router,
+    private formBuilder: FormBuilder
   ) {
     this.filteredProfiles = this.profilesCtrl.valueChanges.pipe(
       startWith(null),
@@ -97,13 +101,15 @@ export class EditUserComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.item = history.state.item;
-    this.loadUserData(this.item.id);
-    this.getProfiles();
     this.rolesOptions = [
       { id: 'user', name: 'Usuário Padrão' },
       { id: 'admin', name: 'Usuário Administrador' },
     ];
+
+    this.item = history.state.item;
+
+    this.loadUserData(this.item.id);
+    this.getProfiles();
   }
 
   private _filter(value: string): string[] {
@@ -175,28 +181,10 @@ export class EditUserComponent implements OnInit {
 
   private editUser(id: number) {
     this.isLoginLoading = true;
+
     setTimeout(() => {
       this.isLoginLoading = false;
     }, 2500);
-
-    if (this.areRequiredFieldsEmpty()) {
-      this.isLoginLoading = false;
-      this.messageService.add({
-        severity: 'error',
-        summary: '',
-        detail: 'Por favor, preencha todos os campos obrigatórios.',
-      });
-      return;
-    }
-
-    const {
-      fullusername,
-      username,
-      password,
-      email,
-      occupation,
-      access_level,
-    } = this.form;
 
     if (!this.user || !this.user.token) {
       throw new Error('Token não disponível');
@@ -207,14 +195,15 @@ export class EditUserComponent implements OnInit {
     });
 
     const profileIds = this.profileIds.map((profileIds) => profileIds);
+    const access_levels = this.userEditForm.get('access_levels')?.value as any;
 
     const userData = {
-      fullUserName: fullusername,
-      cargo: occupation,
-      email: email,
-      userName: username,
-      passWord: password,
-      roles: [access_level],
+      fullUserName: this.userEditForm.get('fullusername')?.value,
+      cargo: this.userEditForm.get('occupation')?.value,
+      email: this.userEditForm.get('email')?.value,
+      userName: this.userEditForm.get('username')?.value,
+      passWord: this.userEditForm.get('password')?.value,
+      roles: [access_levels.id],
       perfis: profileIds,
     };
 
@@ -253,20 +242,32 @@ export class EditUserComponent implements OnInit {
 
     this.authService.getUserById(headers, id).subscribe({
       next: (userData: any) => {
-        console.log(userData);
-        this.form.fullusername = userData.fullUserName;
-        this.form.username = userData.userName;
-        this.form.password = userData.password;
-        this.form.email = userData.email;
-        this.form.occupation = userData.cargo;
-        this.placeholder = userData.roles[0].name;
+        this.userEditForm.setValue({
+          fullusername: userData.fullUserName,
+          username: userData.userName,
+          occupation: userData.cargo,
+          email: userData.email,
+          access_levels: userData.roles[0].name,
+          password: userData.passWord,
+          profiles: userData.perfis,
+        });
 
-        if (this.placeholder == 'ROLE_USER') {
+        if (
+          (this.userEditForm.get('access_levels')?.value as string) ==
+          'ROLE_USER'
+        ) {
           this.placeholder = 'Usuário Padrão';
-          this.form.access_level = 'user';
-        } else if (this.placeholder == 'ROLE_ADMIN') {
+          this.userEditForm.patchValue({
+            access_levels: 'user',
+          });
+        } else if (
+          (this.userEditForm.get('access_levels')?.value as string) ==
+          'ROLE_ADMIN'
+        ) {
           this.placeholder = 'Usuário Administrador';
-          this.form.access_level = 'admin';
+          this.userEditForm.patchValue({
+            access_levels: 'admin',
+          });
         }
 
         if (userData.perfis && userData.perfis.length > 0) {
@@ -276,7 +277,6 @@ export class EditUserComponent implements OnInit {
           this.profiles = [];
           this.profileIds = [];
         }
-        console.log(this.form.access_level);
       },
       error: (error: Error) => {
         console.error('Erro ao carregar dados do usuário:', error);
@@ -307,25 +307,6 @@ export class EditUserComponent implements OnInit {
         );
       },
     });
-  }
-
-  areRequiredFieldsEmpty(): boolean {
-    const requiredFields = [
-      'fullusername',
-      'username',
-      'password',
-      'access_level',
-    ];
-    for (const key of requiredFields) {
-      if (
-        this.form[key] === null ||
-        this.form[key] === undefined ||
-        this.form[key] === ''
-      ) {
-        return true;
-      }
-    }
-    return false;
   }
 
   backScreen() {

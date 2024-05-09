@@ -1,18 +1,17 @@
 import {
   CdkDrag,
-  CdkDragDrop,
   CdkDragHandle,
   CdkDropList,
   CdkDropListGroup,
-  moveItemInArray,
-  transferArrayItem,
 } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import Highcharts, { Options } from 'highcharts';
+import { AngularDraggableModule } from 'angular2-draggable';
+import { IResizeEvent } from 'angular2-draggable/lib/models/resize-event';
+import Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { ChartsService } from '../../../core/services/charts/charts.service';
 import { LocalstorageService } from '../../../core/services/local-storage/local-storage.service';
@@ -31,6 +30,10 @@ interface ExtendedOptions extends Highcharts.Options {
   filters?: any;
 }
 
+interface ChartDimensions {
+  x: number;
+  y: number;
+}
 @Component({
   selector: 'app-chart-screen',
   standalone: true,
@@ -42,6 +45,7 @@ interface ExtendedOptions extends Highcharts.Options {
     CdkDragHandle,
     CdkDropListGroup,
     HighchartsChartModule,
+    AngularDraggableModule,
   ],
   templateUrl: './chart-screen.component.html',
   styleUrl: './chart-screen.component.css',
@@ -51,6 +55,7 @@ export class ChartScreenComponent implements OnInit {
   Highcharts: typeof Highcharts = Highcharts;
 
   chartGroupsData: Highcharts.Options[] = [];
+
   filters: any[] = [];
   selectedFilters: any = {};
   chartObject: any;
@@ -63,6 +68,11 @@ export class ChartScreenComponent implements OnInit {
   showModal: boolean = false;
   isLoginLoading: boolean = false;
 
+  chartPositions: { [key: string]: { x: number; y: number } } = {};
+  chartDimensions: { [key: string]: { x: number; y: number } } = {};
+
+  user = this.storageService.getUser();
+
   constructor(
     private router: Router,
     private storageService: StorageService,
@@ -73,40 +83,55 @@ export class ChartScreenComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const storedItems = this.localStorage.getDecryptedItem('items');
+    this.getCharts();
+    const drag = this.localStorage.getDecryptedItem('position');
+    const dimension: { [key: string]: { x: number; y: number } } =
+      JSON.parse(this.localStorage.getDecryptedItem('dimension')) || {};
 
-    if (storedItems !== null) {
-      this.chartGroupsData = JSON.parse(storedItems) as Highcharts.Options[];
-    } else {
-      this.getCharts();
+    if (drag) {
+      this.chartPositions = drag;
+    }
+    if (dimension) {
+      this.chartDimensions = dimension;
     }
   }
 
-  drop(event: CdkDragDrop<Options[]>) {
-    if (event.previousContainer === event.container) {
-      moveItemInArray(
-        event.container.data,
-        event.previousIndex,
-        event.currentIndex
-      );
-    } else {
-      transferArrayItem(
-        event.previousContainer.data,
-        event.container.data,
-        event.previousIndex,
-        event.currentIndex
-      );
-    }
+  resize(index: number, $event: IResizeEvent) {
+    const dimensions: ChartDimensions = {
+      x: $event.size.width,
+      y: $event.size.height,
+    };
+
+    const chartDimensionsStr = this.localStorage.getDecryptedItem('dimension');
+
+    const chartDimensions: { [key: string]: ChartDimensions } =
+      chartDimensionsStr ? JSON.parse(chartDimensionsStr) : {};
+
+    chartDimensions[index.toString()] = dimensions;
+
     this.localStorage.setEncryptedItem(
-      'items',
-      JSON.stringify(this.chartGroupsData)
+      'dimension',
+      JSON.stringify(chartDimensions)
     );
+
+    // resizeChart() {
+    //   const chartWidth = this.chartContainer.nativeElement.offsetWidth;
+    //   const chartHeight = this.chartContainer.nativeElement.offsetHeight;
+    //   if (this.chartConfig && this.chartConfig.chart) {
+    //     this.chartConfig.chart.width = chartWidth;
+    //     this.chartConfig.chart.height = chartHeight;
+    //   }
+    // }
+  }
+
+  onMoveEnd(index: number, $event: any) {
+    this.chartPositions[index.toString()] = $event;
+    this.localStorage.setEncryptedItem('position', this.chartPositions);
   }
 
   getCharts(): void {
-    const user = this.storageService.getUser();
     const headers = new HttpHeaders({
-      Authorization: `Bearer ${user.token}`,
+      Authorization: `Bearer ${this.user.token}`,
     });
 
     this.chartService.getCharts(headers).subscribe({
@@ -119,7 +144,7 @@ export class ChartScreenComponent implements OnInit {
 
   loadData(chartData: ChartData[]) {
     this.chartObject = JSON.parse(
-      this.localStorage.getDecryptedItem('chartGroup') || 'null'
+      this.localStorage.getDecryptedItem('chartGroup')
     );
     this.chartGroupsData = [];
     this.copydataJSON = [];
@@ -198,9 +223,7 @@ export class ChartScreenComponent implements OnInit {
           filters: dataItem.filters,
         };
 
-        if (!this.localStorage.getDecryptedItem('items')) {
-          this.chartGroupsData.push(chartConfig);
-        }
+        this.chartGroupsData.push(chartConfig);
       }
     });
   }
@@ -341,6 +364,6 @@ export class ChartScreenComponent implements OnInit {
   }
 
   backScreen() {
-    this.router.navigate(['/content/chartgroup']);
+    this.router.navigate(['content/main/chartgroup']);
   }
 }

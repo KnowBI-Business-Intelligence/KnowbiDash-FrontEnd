@@ -106,9 +106,10 @@
             [pSelectableRow]="customer"
             (click)="onRowClick(customer)"
             (contextmenu)="onRowSelect($event, customer)"
-            [routerLink]="['edit_users']"
-            [state]="{ item: customer }"
-            pContextMenuRow="customer"
+            routerLink="/users_panel"
+            routerLinkActive="active"
+            ariaCurrentWhenActive="page"
+            [routerLinkActiveOptions]="{ exact: true }"
           >
             <td>
               {{ customer.fullUserName }}

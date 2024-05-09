@@ -6,6 +6,7 @@ import {
 import { Injectable } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
 import {
+  API_CARDS,
   API_CHARTGROUP,
   API_CHARTPATH,
   API_CHARTS,
@@ -15,6 +16,7 @@ import {
   providedIn: 'root',
 })
 export class ChartsService {
+  private ENV_CARDS = API_CARDS;
   private ENV_CHARTS = API_CHARTS;
   private ENV_CHARTPATH = API_CHARTPATH;
   private ENV_CHARTGROUP = API_CHARTGROUP;
@@ -41,11 +43,17 @@ export class ChartsService {
     return this.http.get(`${this.ENV_CHARTGROUP}/get`, { headers: headers });
   }
 
-  getChartsGroupById(id: number, headers: any): Observable<any> {
+  getChartsGroupById(headers: HttpHeaders, id: number): Observable<any> {
     return this.http.get(`${API_CHARTGROUP}/get/${id}`, { headers: headers });
   }
 
   // CREATES
+
+  createCards(headers: HttpHeaders, chartData: any): Observable<any> {
+    return this.http.post(`${this.ENV_CARDS}/create`, chartData, {
+      headers: headers,
+    });
+  }
 
   createCharts(headers: HttpHeaders, chartData: any): Observable<any> {
     return this.http.post(`${this.ENV_CHARTS}/create`, chartData, {
@@ -56,12 +64,11 @@ export class ChartsService {
   createChartsPath(
     headers: HttpHeaders,
     name: string,
-    profile: string
+    profileID: {}
   ): Observable<any> {
-    console.log(profile);
-
     const body = {
       name,
+      perfis: profileID,
     };
 
     return this.http.post(`${this.ENV_CHARTPATH}/create`, body, {
@@ -108,6 +115,12 @@ export class ChartsService {
 
   // UPDATES
 
+  updateCards(headers: HttpHeaders, chartData: any, id: any) {
+    return this.http.patch(`${this.ENV_CARDS}/update/${id}`, chartData, {
+      headers: headers,
+    });
+  }
+
   updateCharts(headers: HttpHeaders, chartData: any, id: any) {
     return this.http.patch(`${this.ENV_CHARTS}/update/${id}`, chartData, {
       headers: headers,
@@ -151,10 +164,15 @@ export class ChartsService {
 
   updateChartsPath(
     headers: HttpHeaders,
-    id: string,
-    name: string
+    idPath: string,
+    name: string,
+    profileID: {}
   ): Observable<any> {
-    return this.http.patch(`${this.ENV_CHARTPATH}/update/${id}`, name, {
+    const body = {
+      name,
+      perfis: profileID,
+    };
+    return this.http.patch(`${this.ENV_CHARTPATH}/update/${idPath}`, body, {
       headers: headers,
     });
   }
@@ -183,8 +201,14 @@ export class ChartsService {
 
   // DELETE
 
+  deleteCards(headers: HttpHeaders, id: string): Observable<any> {
+    return this.http.delete(`${this.ENV_CARDS}/delete/${id}`, {
+      headers: headers,
+    });
+  }
+
   deleteChartsPath(headers: HttpHeaders, id: string): Observable<any> {
-    return this.http.delete(`${this.ENV_CHARTPATH}/delete${id}`, {
+    return this.http.delete(`${this.ENV_CHARTPATH}/delete/${id}`, {
       headers: headers,
     });
   }

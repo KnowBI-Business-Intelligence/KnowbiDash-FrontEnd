@@ -1,13 +1,27 @@
 import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { CommonModule } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
-import { Component, ElementRef, OnInit } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import {
   FormBuilder,
+  FormControl,
   FormsModule,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import {
+  MatAutocompleteModule,
+  MatAutocompleteSelectedEvent,
+} from '@angular/material/autocomplete';
+import { MatChipInputEvent, MatChipsModule } from '@angular/material/chips';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
@@ -15,7 +29,9 @@ import { MessageService } from 'primeng/api';
 import { ContextMenuModule } from 'primeng/contextmenu';
 import { TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
+import { map, Observable, startWith } from 'rxjs';
 import { ProfileTable } from '../../../../core/modules/interfaces';
+import { ChartsService } from '../../../../core/services/charts/charts.service';
 import { ProfilesService } from '../../../../core/services/profiles/profiles.service';
 import { StorageService } from '../../../../core/services/user/storage.service';
 
@@ -32,12 +48,17 @@ import { StorageService } from '../../../../core/services/user/storage.service';
     ContextMenuModule,
     ToastModule,
     TableModule,
+    MatFormFieldModule,
+    MatChipsModule,
+    MatAutocompleteModule,
   ],
   providers: [MessageService],
   templateUrl: './create-profiles.component.html',
   styleUrl: './create-profiles.component.css',
 })
 export class CreateProfilesComponent implements OnInit {
+  @ViewChild('folderInput') folderInput!: ElementRef<HTMLInputElement>;
+
   createProfilesForm = this.formBuilder.group({
     name: ['', Validators.required],
     observation: ['', Validators.required],
@@ -57,6 +78,7 @@ export class CreateProfilesComponent implements OnInit {
   deleteProfile: boolean = false;
   isViewProfile: boolean = false;
   actionButton: boolean = false;
+  isEditProfile: boolean = false;
 
   dataSource: any;
 
@@ -67,22 +89,74 @@ export class CreateProfilesComponent implements OnInit {
   selectedRow: ProfileTable | null = null;
   selectedProfile: ProfileTable | null = null;
   selectedRowChart: any;
+
+  announcer = inject(LiveAnnouncer);
+  folders: string[] = [];
+  filteredFolders!: Observable<string[]>;
+  separatorKeysCodes: number[] = [ENTER, COMMA];
+  folderControl = new FormControl('');
+  allFolders: { name: string; id: string }[] = [];
+  folderId: string[] = [];
+
   constructor(
-    private _liveAnnouncer: LiveAnnouncer,
     private elementRef: ElementRef,
     private profile: ProfilesService,
-    private token: StorageService,
+    private charts: ChartsService,
+    private storageService: StorageService,
     private formBuilder: FormBuilder,
     private messageService: MessageService
-  ) {}
+  ) {
+    this.filteredFolders = this.folderControl.valueChanges.pipe(
+      startWith(null),
+      map((folder: string | null) =>
+        folder
+          ? this._filter(folder)
+          : this.allFolders.map((folder) => folder.name)
+      )
+    );
+  }
 
   ngOnInit(): void {
     this.getProfiles();
+    this.getFolders();
+
+    this.filteredFolders = this.folderControl.valueChanges.pipe(
+      startWith(null),
+      map((folder: string | null) =>
+        folder
+          ? this._filter(folder)
+          : this.allFolders.map((folder) => folder.name)
+      )
+    );
+  }
+
+  private getFolders() {
+    const user = this.storageService.getUser();
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${user.token}`,
+    });
+
+    this.charts.getChartsPath(headers).subscribe({
+      next: (value: any) => {
+        this.allFolders = value.map((item: any) => ({
+          name: item.name,
+          id: item.id,
+        }));
+
+        this.filteredFolders = this.folderControl.valueChanges.pipe(
+          startWith(null),
+          map((folder: string | null) =>
+            folder
+              ? this._filter(folder)
+              : this.allFolders.map((folder) => folder.name)
+          )
+        );
+      },
+    });
   }
 
   private getProfiles() {
-    const user = this.token.getUser();
-
+    const user = this.storageService.getUser();
     if (!user || !user.token) {
       console.error('Token não disponível');
       return;
@@ -101,14 +175,6 @@ export class CreateProfilesComponent implements OnInit {
         console.error(err);
       },
     });
-  }
-
-  announceSortChange(sortState: any) {
-    if (sortState.direction) {
-      this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
-    } else {
-      this._liveAnnouncer.announce('Sorting cleared');
-    }
   }
 
   selectRow(row: ProfileTable) {
@@ -130,6 +196,7 @@ export class CreateProfilesComponent implements OnInit {
   }
 
   viewProfile() {
+    this.getProfiles();
     this.isViewProfile = !this.isViewProfile;
     this.selectedRowChart = this.selectedRow?.chartPaths;
 
@@ -155,7 +222,8 @@ export class CreateProfilesComponent implements OnInit {
   }
 
   onRowDoubleClick(row: ProfileTable) {
-    console.log('double click:', row);
+    this.selectedProfile = row;
+    this.isEditProfile = true;
   }
 
   deleteProfiles() {
@@ -251,5 +319,105 @@ export class CreateProfilesComponent implements OnInit {
         });
       },
     });
+  }
+
+  updateProfile() {
+    const profileIds = this.folderId.map((id) => ({ id }));
+    const dataUpdate = {
+      name: (this.createProfilesForm.get('name')?.value as string)
+        ? (this.createProfilesForm.get('name')?.value as string)
+        : this.selectedRow?.name,
+      observation: (this.createProfilesForm.get('observation')?.value as string)
+        ? (this.createProfilesForm.get('observation')?.value as string)
+        : this.selectedRow?.observation,
+      chartPaths: profileIds,
+    };
+
+    this.profile
+      .updateProfiles(
+        this.headers,
+        this.selectedProfile?.id as string,
+        dataUpdate
+      )
+      .subscribe({
+        next: () => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Sucesso',
+            detail: 'Perfil criado!',
+          });
+          this.cancelRegister();
+          this.createProfilesForm.reset({ name: '', observation: '' });
+        },
+        error: () => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erro',
+            detail: 'Erro na autenticação.',
+          });
+        },
+      });
+
+    this.isEditProfile = false;
+  }
+
+  removeFolder(folder: any) {
+    const index = this.folders.indexOf(folder);
+
+    if (index >= 0) {
+      const removedFolder = this.folders.splice(index, 1)[0];
+      const removedFolderId = this.folderId.splice(index, 1)[0];
+
+      const removedFolderObject = {
+        name: removedFolder,
+        id: removedFolderId,
+      };
+
+      this.allFolders.push(removedFolderObject);
+
+      this.announcer.announce(`Removed ${folder}`);
+
+      this.filteredFolders = this.folderControl.valueChanges.pipe(
+        startWith(null),
+        map((folder: string | null) =>
+          folder
+            ? this._filter(folder)
+            : this.allFolders.map((folder) => folder.name)
+        )
+      );
+    }
+  }
+
+  private _filter(value: string): string[] {
+    const filterValue = value.toLowerCase();
+
+    return this.allFolders
+      .map((folder) => folder.name)
+      .filter((name) => name.toLowerCase().includes(filterValue));
+  }
+
+  selectedFolders($event: MatAutocompleteSelectedEvent) {
+    const selectedFolder = this.allFolders.find(
+      (folder) => folder.name === $event.option.viewValue
+    );
+    if (selectedFolder) {
+      if (!this.folders.includes(selectedFolder.name)) {
+        this.folders.push(selectedFolder.name);
+        this.folderId.push(selectedFolder.id);
+      }
+      const index = this.allFolders.findIndex(
+        (folder) => folder.name === selectedFolder.name
+      );
+      if (index !== -1) {
+        this.allFolders.splice(index, 1);
+      }
+    }
+    this.folderInput.nativeElement.value = '';
+    this.folderControl.setValue(null);
+  }
+
+  addFolder($event: MatChipInputEvent) {
+    $event.chipInput!.clear();
+    this.folderControl.setValue(null);
   }
 }

@@ -178,9 +178,13 @@ export class ChartComponent implements OnInit {
           if (part === '(dia)') {
             value = `DATE_TRUNC('day', ${this.rmTimeStamp(setData.name)})`;
           } else if (part === '(mês)') {
-            value = `DATE_TRUNC('month', ${this.rmTimeStamp(setData.name)})`;
+            value = `mes_por_extenso(DATE_TRUNC('month', ${this.rmTimeStamp(
+              setData.name
+            )}))`;
           } else if (part === '(ano)') {
-            value = `DATE_TRUNC('year', ${this.rmTimeStamp(setData.name)})`;
+            value = `ano_por_extenso(DATE_TRUNC('year', ${this.rmTimeStamp(
+              setData.name
+            )}))`;
           }
 
           const name = `${setData.name}${part}`;
@@ -314,10 +318,17 @@ export class ChartComponent implements OnInit {
     this.showPreviewButton = false;
     this.identifierData();
 
-    const xAxisValues = this.xaxis.map((axis) => this.rmTimeStamp(axis.name));
+    const xAxisValues = this.xaxis.map((axis) => {
+      if (this.isTimestampField(axis.name)) {
+        return this.formatTimestampField(axis.name);
+      }
+      return this.rmTimeStamp(axis.name);
+    });
+
     const seriesValues = this.series.map((series) =>
       this.rmTimeStamp(series.value)
     );
+
     const group = [...xAxisValues, ...seriesValues];
 
     const chartData = {
@@ -386,11 +397,19 @@ export class ChartComponent implements OnInit {
   updateChart() {
     this.identifierData();
 
-    const xAxisValues = this.xaxis.map((axis) => this.rmTimeStamp(axis.name));
+    const xAxisValues = this.xaxis.map((axis) => {
+      if (this.isTimestampField(axis.name)) {
+        return this.formatTimestampField(axis.name);
+      }
+      return this.rmTimeStamp(axis.name);
+    });
+
     const seriesValues = this.series.map((series) =>
       this.rmTimeStamp(series.value)
     );
+
     const group = [...xAxisValues, ...seriesValues];
+
     const chartData = {
       title: this.titulo,
       graphType: this.chartType.toLowerCase(),
@@ -437,6 +456,8 @@ export class ChartComponent implements OnInit {
       },
     };
 
+    console.log(chartData);
+
     const headers = new HttpHeaders({
       Authorization: `Bearer ${this.user.token}`,
     });
@@ -450,53 +471,85 @@ export class ChartComponent implements OnInit {
       });
   }
 
+  openModalCancel() {
+    console.log(this.chartId);
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${this.user.token}`,
+    });
+    this.chartsService.deleteCharts(headers, this.chartId).subscribe({
+      next: (data) => {
+        console.log(data);
+      },
+    });
+    this.backScreen();
+  }
+
   chartPreView(data: any) {
     console.log(data);
+    const uniqueCategories: any = Array.from(
+      new Set(data.xAxisColumns[0].data)
+    );
+
+    const uniqueSubgroups = Array.from(new Set(data.series[0].data));
+
+    const seriesData = uniqueSubgroups.map((subgrupo: any) => {
+      const seriesValues: { name: string; y: any }[] = [];
+      data.xAxisColumns[0].data.forEach((date: string, i: number) => {
+        if (data.series[0].data[i] === subgrupo) {
+          seriesValues.push({
+            name: date,
+            y: data.yAxisColumns[0].data[i],
+          });
+        }
+      });
+      return {
+        type: data.graphType,
+        name: subgrupo,
+        height: '20%',
+        data: seriesValues,
+      };
+    });
     this.chartConfig = {
       chart: {
         type: data.graphType,
       },
       title: {
-        text: this.titulo,
+        text: data.title,
         style: {
           fontSize: '14px',
         },
       },
       xAxis: {
-        categories: ['UNIMED', 'CASF', 'Bradesco', 'CASSI'],
+        categories: uniqueCategories,
         title: {
+          text: data.xAxisColumns[0].name[0],
+        },
+        labels: {
           style: {
-            fontSize: '12px',
+            fontSize: '10px',
           },
         },
       },
       yAxis: {
-        min: 0,
         title: {
-          text: 'Atendimentos',
+          text: data.yAxisColumns[0].name[0],
+        },
+        labels: {
           style: {
-            fontSize: '12px',
+            fontSize: '10px',
           },
         },
       },
       legend: {
-        layout: 'vertical',
-        align: 'right',
-        verticalAlign: 'top',
-        x: -40,
-        y: 80,
-        floating: true,
-        borderWidth: 1,
-        backgroundColor: '#FFFFFF',
-        shadow: true,
-      },
-      series: [
-        {
-          type: data.graphType,
-
-          data: [631, 727, 3202, 721],
+        maxHeight: 65,
+        itemStyle: {
+          fontSize: '12px',
         },
-      ],
+      },
+      series: seriesData,
+      tooltip: {
+        shared: true,
+      },
     };
   }
 
@@ -507,10 +560,6 @@ export class ChartComponent implements OnInit {
 
   backScreen() {
     this.router.navigate(['/admin/dashboards']);
-  }
-
-  openModalCancel() {
-    this.backScreen();
   }
 
   openModal(): void {
@@ -527,5 +576,30 @@ export class ChartComponent implements OnInit {
 
   rmTimeStamp(item: string) {
     return item.replace(/\((?:dia|mês|ano)\)/, '');
+  }
+
+  getDateFormat(fieldName: string): string {
+    return `DATE_TRUNC('month', ${this.rmTimeStamp(fieldName)})`;
+  }
+
+  isTimestampField(fieldName: string): boolean {
+    return (
+      fieldName.includes('(dia)') ||
+      fieldName.includes('(mês)') ||
+      fieldName.includes('(ano)')
+    );
+  }
+
+  formatTimestampField(axisName: string): string {
+    if (axisName.includes('(dia)')) {
+      return `DATE_TRUNC('day', ${this.rmTimeStamp(axisName)})`;
+    } else if (axisName.includes('(mês)')) {
+      return `DATE_TRUNC('month', ${this.rmTimeStamp(axisName)})`;
+    } else if (axisName.includes('(ano)')) {
+      return `ano_por_extenso(DATE_TRUNC('year', ${this.rmTimeStamp(
+        axisName
+      )}))`;
+    }
+    return this.rmTimeStamp(axisName);
   }
 }

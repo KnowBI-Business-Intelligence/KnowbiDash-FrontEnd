@@ -36,7 +36,6 @@
           class="mat-elevation-z8 demo-table"
           selectionMode="single"
           [value]="dataSource"
-          (matSortChange)="announceSortChange($event)"
           [(contextMenuSelection)]="selectedProfile"
           [rows]="10"
           [showCurrentPageReport]="true"
@@ -67,6 +66,7 @@
               pSelectableRow="dataSource"
               pContextMenuRow="dataSource"
               (click)="selectRow(dataSource)"
+              (dblclick)="onRowDoubleClick(dataSource)"
               [pSelectableRow]="dataSource"
             >
               <td>
@@ -191,6 +191,80 @@
         <p></p>
         <button (click)="notViewProfile()">Voltar</button>
       </div>
+    </div>
+  </div>
+
+  <div class="modal-edit-profile" *ngIf="isEditProfile">
+    <div class="container-content-add">
+      <h2>Editar de Perfil</h2>
+    </div>
+    <div class="container-add-body">
+      <form class="form-search" [formGroup]="createProfilesForm">
+        <div class="form-group-input">
+          <label for="username">Nome do perfil</label>
+          <input
+            type="text"
+            class="form-control"
+            name="username"
+            autocomplete="off"
+            formControlName="name"
+            [placeholder]="selectedProfile?.name"
+            required
+            maxlength="60"
+          />
+        </div>
+
+        <div class="form-group-input">
+          <label for="username">Documentação do perfil</label>
+          <input
+            type="text"
+            class="form-control"
+            name="username"
+            autocomplete="off"
+            formControlName="observation"
+            [placeholder]="selectedProfile?.observation"
+            required
+            maxlength="250"
+          />
+        </div>
+
+        <mat-form-field class="form-create-user-profiles">
+          <mat-label>Adicione pastas</mat-label>
+          <mat-chip-grid #chipGrid aria-label="Folder selection">
+            <mat-chip-row
+              *ngFor="let folder of folders"
+              (removed)="removeFolder(folder)"
+            >
+              {{ folder }}
+              <button matChipRemove [attr.aria-label]="'Remover ' + folder">
+                <span class="material-symbols-outlined"> cancel </span>
+              </button>
+            </mat-chip-row>
+          </mat-chip-grid>
+          <input
+            placeholder="Nova pasta..."
+            #folderInput
+            [formControl]="folderControl"
+            [matChipInputFor]="chipGrid"
+            [matAutocomplete]="auto"
+            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+            (matChipInputTokenEnd)="addFolder($event)"
+          />
+          <mat-autocomplete
+            #auto="matAutocomplete"
+            (optionSelected)="selectedFolders($event)"
+          >
+            @for (folder of filteredFolders | async; track folder) {
+            <mat-option [value]="folder">{{ folder }}</mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
+      </form>
+    </div>
+
+    <div class="container-add-footer">
+      <button id="cancel" (click)="isEditProfile = false">Cancelar</button>
+      <button (click)="updateProfile()">Editar</button>
     </div>
   </div>
 </div>

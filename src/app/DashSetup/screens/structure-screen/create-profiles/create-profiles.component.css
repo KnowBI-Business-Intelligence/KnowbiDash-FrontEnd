@@ -48,6 +48,13 @@ button {
   width: 10rem;
 }
 
+.mat-mdc-form-field {
+  width: 34rem;
+  align-self: center;
+  justify-self: center;
+  margin-top: 1rem;
+}
+
 .action-button {
   color: #4f80e1;
   padding: 0 10px;
@@ -424,4 +431,24 @@ input {
   color: #e1e1e1;
   padding: 0.3rem 1.5rem;
   border-radius: 0.3rem;
+}
+
+.modal-edit-profile {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+  background-color: #ffffff;
+  padding: 2rem;
+  width: 40rem;
+  height: 25rem;
+  z-index: 99;
+  border-radius: 0.5rem;
+  box-shadow: 0px 0px 2px 0px #abbac0;
 }

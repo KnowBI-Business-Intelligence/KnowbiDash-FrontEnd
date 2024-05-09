@@ -13,84 +13,79 @@
         class="form-register"
         name="form-create-user"
         #f="ngForm"
+        [formGroup]="userEditForm"
       >
         <div class="form-create-user">
-          <label for="fullnameuser">Nome Completo: </label>
+          <label for="update_fullusernameer">Nome Completo: </label>
           <input
             autocomplete="off"
             type="text"
-            name="fullusernameer"
-            [(ngModel)]="form.fullusername"
-            #fullusername="ngModel"
+            name="update_fullusernameer"
             placeholder="Ex: João da Silva"
+            formControlName="fullusername"
           />
         </div>
 
         <div class="form-create-user">
-          <label for="username">Nome de usuário: </label>
+          <label for="update_username">Nome de usuário: </label>
           <input
             autocomplete="off"
             type="text"
-            name="username"
-            [(ngModel)]="form.username"
-            #username="ngModel"
+            name="update_username"
             placeholder="Ex: NomeUsuario"
+            formControlName="username"
           />
         </div>
 
         <div class="form-create-user">
-          <label for="password">Senha: </label>
+          <label for="update_password">Senha: </label>
           <input
             autocomplete="off"
             type="password"
-            name="password"
-            [(ngModel)]="form.password"
+            name="update_password"
             autocomplete="off"
             required
             minlength="6"
-            #password="ngModel"
             placeholder="******"
+            formControlName="password"
           />
         </div>
 
         <div class="form-create-user">
-          <label for="occupation">Ocupação: </label>
+          <label for="update_occupation">Ocupação: </label>
           <input
             autocomplete="off"
             type="text"
-            name="occupation"
-            [(ngModel)]="form.occupation"
+            name="update_occupation"
             required
             minlength="6"
-            #occupation="ngModel"
             placeholder="Ex: Analista Jr"
+            formControlName="occupation"
           />
         </div>
 
         <div class="form-create-user">
-          <label for="email">E-mail: </label>
+          <label for="update_email">E-mail: </label>
           <input
             autocomplete="off"
             type="email"
-            name="email"
+            name="update_email"
             autocomplete="off"
-            [(ngModel)]="form.email"
             required
             minlength="6"
-            #email="ngModel"
             placeholder="Ex: email@email.com"
+            formControlName="email"
           />
         </div>
 
         <div class="form-create-user">
           <label for="access_level">Nível de acesso: </label>
           <p-dropdown
-            name="access_level"
-            [options]="rolesOptions"
-            [(ngModel)]="form.access_level"
+            name="update_access_level"
             placeholder="{{ placeholder }}"
             optionLabel="name"
-            #access_level="ngModel"
+            [options]="rolesOptions"
+            formControlName="access_levels"
           ></p-dropdown>
         </div>
 
@@ -109,7 +104,7 @@
           <input
             placeholder="Novo perfil..."
             #profileInput
-            [(ngModel)]="form.profiles"
+            formControlName="access_levels"
             [formControl]="profilesCtrl"
             [matChipInputFor]="chipGrid"
             [matAutocomplete]="auto"

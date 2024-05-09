@@ -9,13 +9,6 @@ import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideRouter(routes),
-    provideClientHydration(),
-    provideAnimationsAsync(),
-    provideHttpClient(withFetch()),
-    ConfirmationService,
-    MessageService,
-
     {
       provide: IMAGE_CONFIG,
       useValue: {
@@ -23,5 +16,12 @@ export const appConfig: ApplicationConfig = {
         disableImageLazyLoadWarning: true,
       },
     },
+
+    provideRouter(routes),
+    provideClientHydration(),
+    provideAnimationsAsync(),
+    provideHttpClient(withFetch()),
+    ConfirmationService,
+    MessageService,
   ],
 };

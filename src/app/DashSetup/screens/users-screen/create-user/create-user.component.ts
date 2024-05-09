@@ -60,6 +60,7 @@ export class CreateUserComponent implements OnInit {
   rolesOptions: Roles[] | undefined;
   role: Roles | undefined;
   isLoginLoading: boolean = false;
+
   form: any = {
     fullusername: null,
     username: null,
@@ -112,8 +113,6 @@ export class CreateUserComponent implements OnInit {
         this.profiles.push(selectedProfile.name);
         this.profileIds.push(selectedProfile.id);
       }
-      console.log(this.profiles);
-      console.log('id ', this.profileIds);
       const index = this.allProfiles.findIndex(
         (profile) => profile.name === selectedProfile.name
       );
@@ -126,10 +125,7 @@ export class CreateUserComponent implements OnInit {
   }
 
   addProfiles($event: MatChipInputEvent) {
-    const value = ($event?.value || '').trim();
-
     $event.chipInput!.clear();
-
     this.profilesCtrl.setValue(null);
   }
 
@@ -186,7 +182,6 @@ export class CreateUserComponent implements OnInit {
           name: item.name,
           id: item.id,
         }));
-        console.log(this.allProfiles);
 
         this.filteredProfiles = this.profilesCtrl.valueChanges.pipe(
           startWith(null),

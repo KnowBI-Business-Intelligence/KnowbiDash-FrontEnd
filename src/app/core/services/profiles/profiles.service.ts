@@ -9,16 +9,10 @@ import { API_PROFILES } from '../../../../env/environment';
 export class ProfilesService {
   private ENV_PROFILES = API_PROFILES;
 
-  headers: any;
-
   constructor(private http: HttpClient) {}
 
   getProfiles(headers: HttpHeaders): Observable<any> {
-    const headersRgister = {
-      headers: headers,
-    };
-
-    return this.http.get(`${this.ENV_PROFILES}/get`, headersRgister);
+    return this.http.get(`${this.ENV_PROFILES}/get`, { headers: headers });
   }
 
   createProfiles(
@@ -27,33 +21,26 @@ export class ProfilesService {
     observation: string,
     chartPath: {} = {}
   ): Observable<any> {
-    const myHeaders = {
-      headers: headers,
-    };
-
     const body = {
       name,
       observation,
       chartPath,
     };
 
-    return this.http.post(`${this.ENV_PROFILES}/create`, body, myHeaders);
+    return this.http.post(`${this.ENV_PROFILES}/create`, body, {
+      headers: headers,
+    });
   }
 
-  updateProfiles(headers: HttpHeaders): Observable<any> {
-    const headersRgister = {
+  updateProfiles(headers: HttpHeaders, id: string, data: {}): Observable<any> {
+    return this.http.patch(`${this.ENV_PROFILES}/update/${id}`, data, {
       headers: headers,
-    };
-    return this.http.get(`${this.ENV_PROFILES}/get`, headersRgister);
+    });
   }
 
-  deleteProfiles(headers: HttpHeaders, profileID: string): Observable<any> {
-    const headersRgister = {
+  deleteProfiles(headers: HttpHeaders, id: string): Observable<any> {
+    return this.http.delete(`${this.ENV_PROFILES}/delete/${id}`, {
       headers: headers,
-    };
-    return this.http.delete(
-      `${this.ENV_PROFILES}/delete/${profileID}`,
-      headersRgister
-    );
+    });
   }
 }

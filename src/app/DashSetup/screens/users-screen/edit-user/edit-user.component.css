@@ -106,7 +106,17 @@
   font-size: 1rem;
   width: 20rem;
   border-radius: 0.25rem;
-  background-color: #eaeaea;
+  background-color: #ffff;
+  outline: none;
+  transition: 0.3s;
+}
+
+.form-create-user > input:hover {
+  border: 1px solid #3b82f6;
+}
+
+.form-create-user > input:focus {
+  box-shadow: 0px 0px 3px 3px #a7c6ed;
 }
 
 .button-form-cancel {

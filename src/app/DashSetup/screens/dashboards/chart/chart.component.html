@@ -1,5 +1,5 @@
 <div class="container-nav-line">
-  <span>Início > Dashboards > Gráfico</span>
+  <span>Início > Dashboards > gráfico</span>
   <button (click)="backScreen()">
     <span> x </span>
   </button>
@@ -313,8 +313,13 @@
       ></highcharts-chart>
     </div>
     <div class="chart-container-buttons">
-      <button (click)="openModal()"><p>Cancelar</p></button>
-      <button (click)="updateChart()"><p>Atualizar</p></button>
+      <div>
+        <button (click)="openModal()"><p>Cancelar</p></button>
+        <button (click)="updateChart()"><p>Atualizar</p></button>
+      </div>
+      <div>
+        <button (click)="backScreen()" class="conclude"><p>Concluir</p></button>
+      </div>
     </div>
   </div>
 </div>

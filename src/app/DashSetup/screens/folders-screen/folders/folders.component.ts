@@ -55,12 +55,10 @@ export class FoldersComponent implements OnInit {
       Authorization: `Bearer ${this.user.token}`,
     });
 
-    const that = this;
-
     this.charts.getChartsPath(headers).subscribe({
-      next(value: any) {
-        that.listpages = value;
-        that.filteredItems = value;
+      next: (value: any) => {
+        this.listpages = value;
+        this.filteredItems = value;
       },
       error(err: Error) {
         console.error(err);

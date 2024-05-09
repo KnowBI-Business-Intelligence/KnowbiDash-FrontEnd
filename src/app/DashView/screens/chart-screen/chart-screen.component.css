@@ -96,17 +96,12 @@
 
 .container-path-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  position: fixed;
-  top: 17px;
-  left: 244px;
-}
+  justify-content: space-between;
 
-.container-path-header span {
-  color: #00000074;
-  font-size: 12px;
-  margin-bottom: 4px;
+  position: fixed;
+  top: 18px;
+  left: 225px;
 }
 
 .container-path-header button {
@@ -123,7 +118,7 @@
 }
 
 .container-path-header span {
-  font-size: 13px;
+  font-size: 12px;
   color: #00000096;
 }
 
@@ -138,8 +133,9 @@
   align-items: center;
   justify-content: space-between;
   height: 100%;
-  width: 100%;
+  width: 95vw;
   margin: 0 1rem;
+  cursor: grab;
 }
 
 .container-charts_left {
@@ -153,6 +149,12 @@
 
 .content-charts_left {
   display: flex;
+}
+
+.content-charts_left .drag {
+  display: flex;
+  cursor: pointer;
+  box-shadow: 0px 0px 2px 0px #abbac0;
 }
 
 .modal {

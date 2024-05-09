@@ -98,14 +98,15 @@
         <mat-form-field class="form-create-user-profiles">
           <mat-label>Adicione perfis</mat-label>
           <mat-chip-grid #chipGrid aria-label="Profile selection">
-            @for (profile of profiles; track profile) {
-            <mat-chip-row (removed)="removeProfile(profile)">
+            <mat-chip-row
+              *ngFor="let profile of profiles"
+              (removed)="removeProfile(profile)"
+            >
               {{ profile }}
               <button matChipRemove [attr.aria-label]="'remover ' + profile">
                 <mat-icon>cancel</mat-icon>
               </button>
             </mat-chip-row>
-            }
           </mat-chip-grid>
           <input
             placeholder="Novo perfil..."

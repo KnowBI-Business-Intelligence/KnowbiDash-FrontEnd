@@ -54,6 +54,7 @@
               pContextMenuRow="dataSourceGroup"
               (click)="selectRow(dataSourceGroup)"
               [pSelectableRow]="dataSourceGroup"
+              (dblclick)="onRowDoubleClick(dataSourceGroup)"
             >
               <td>
                 {{ dataSourceGroup.id }}
@@ -99,16 +100,39 @@
             maxlength="60"
           />
         </div>
-        <div class="form-group-input">
-          <label for="profile">Perfil</label>
-          <p-dropdown
-            name="profile"
-            placeholder="Vincule o perfil"
-            [options]="listProfiles"
-            optionLabel="name"
+
+        <mat-form-field class="form-create-user-profiles">
+          <mat-label>Adicione perfis</mat-label>
+          <mat-chip-grid #chipGrid aria-label="Profile selection">
+            <mat-chip-row
+              *ngFor="let profile of profilesArray"
+              (removed)="removeProfile(profile)"
+            >
+              {{ profile }}
+              <button matChipRemove [attr.aria-label]="'remover ' + profile">
+                <span class="material-symbols-outlined"> cancel </span>
+              </button>
+            </mat-chip-row>
+          </mat-chip-grid>
+          <input
+            placeholder="Novo perfil..."
+            #profileInput
             formControlName="profile"
-          ></p-dropdown>
-        </div>
+            [formControl]="profilesCtrl"
+            [matChipInputFor]="chipGrid"
+            [matAutocomplete]="auto"
+            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+            (matChipInputTokenEnd)="addProfiles($event)"
+          />
+          <mat-autocomplete
+            #auto="matAutocomplete"
+            (optionSelected)="selectedProfiles($event)"
+          >
+            @for (profile of filteredProfiles | async; track profile) {
+            <mat-option [value]="profile">{{ profile }}</mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
       </form>
     </div>
     <div class="container-add-footer">
@@ -168,6 +192,67 @@
         <p></p>
         <button (click)="notViewProfile()">Voltar</button>
       </div>
+    </div>
+  </div>
+
+  <div class="modal-up-profile" *ngIf="isUpdateFolder">
+    <div class="container-content-add">
+      <h2>Editar de Pasta</h2>
+    </div>
+    <div class="container-up-body">
+      <form class="form-up" [formGroup]="createFolderForm">
+        <div class="form-group-input-up">
+          <label for="username">Nome do pasta</label>
+          <input
+            type="text"
+            class="form-control"
+            name="username"
+            autocomplete="off"
+            formControlName="name"
+            required
+            maxlength="60"
+            [placeholder]="selectedRow?.name"
+          />
+        </div>
+
+        <mat-form-field class="form-create-user-profiles">
+          <mat-label>Atualize perfis</mat-label>
+          <mat-chip-grid #chipGrid aria-label="Profile selection">
+            <mat-chip-row
+              *ngFor="let profile of profilesArray"
+              (removed)="removeProfile(profile)"
+            >
+              {{ profile }}
+              <button matChipRemove [attr.aria-label]="'remover ' + profile">
+                <span class="material-symbols-outlined"> cancel </span>
+              </button>
+            </mat-chip-row>
+          </mat-chip-grid>
+          <input
+            placeholder="Atualizar perfis.."
+            #profileInput
+            formControlName="profile"
+            [formControl]="profilesCtrl"
+            [matChipInputFor]="chipGrid"
+            [matAutocomplete]="auto"
+            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+            (matChipInputTokenEnd)="addProfiles($event)"
+          />
+          <mat-autocomplete
+            #auto="matAutocomplete"
+            (optionSelected)="selectedProfiles($event)"
+          >
+            @for (profile of filteredProfiles | async; track profile) {
+            <mat-option [value]="profile">{{ profile }}</mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
+      </form>
+    </div>
+
+    <div class="container-add-footer">
+      <button id="cancel" (click)="isUpdateFolder = false">Cancelar</button>
+      <button (click)="updatePath()">Editar</button>
     </div>
   </div>
 </div>

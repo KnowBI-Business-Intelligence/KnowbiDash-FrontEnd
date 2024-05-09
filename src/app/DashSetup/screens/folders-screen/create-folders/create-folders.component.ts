@@ -87,11 +87,10 @@ export class CreateFoldersComponent {
 
   private getPath() {
     this.getHeaders();
-    const that = this;
 
     this.charts.getChartsPath(this.headers).subscribe({
-      next(value: any) {
-        that.folderControl = value;
+      next: (value: any) => {
+        this.folderControl = value;
       },
       error(err: Error) {
         console.error(err);
