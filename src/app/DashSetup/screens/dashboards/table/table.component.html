@@ -1,1 +1,272 @@
-<p>table works!</p>
+<div class="container">
+  <div cdkDropListGroup class="container-data-group">
+    <div class="container-data">
+      <span>Dados</span>
+      <div
+        cdkDropList
+        [cdkDropListData]="database"
+        class="data-list"
+        id="data-list"
+        (cdkDropListDropped)="drop($event)"
+      >
+        <div class="example-box" cdkDrag *ngFor="let item of database">
+          <fa-icon
+            class="icon"
+            [icon]="icons.database"
+            [size]="'xl'"
+            title="Dashboards"
+          ></fa-icon>
+          {{ item?.name }}
+        </div>
+      </div>
+    </div>
+
+    <div class="container-create">
+      <span class="table-label">Tabela</span>
+      <div class="container-create-group">
+        <div class="title">
+          <span>Título</span>
+          <input type="text" [(ngModel)]="tableTitle" />
+        </div>
+        <div class="tables">
+          <span>Colunas</span>
+          <div
+            id="tabledata"
+            cdkDropList
+            [cdkDropListData]="tabledata"
+            class="serie-list y"
+            [cdkDropListConnectedTo]="['data-list']"
+            (cdkDropListDropped)="drop($event)"
+          >
+            <div
+              *ngFor="let item of tabledata; let i = index"
+              class="series-box"
+              cdkDrag
+              cdkDragLockAxis="y"
+              cdkDragBoundary=".y"
+            >
+              <div>
+                <fa-icon
+                  class="icon"
+                  [icon]="icons.database"
+                  [size]="'xl'"
+                ></fa-icon>
+                {{ selectedAggregation ? selectedAggregation : item?.name }}
+              </div>
+              <div class="series-buttons">
+                <button
+                  *ngIf="item.type == 'numeric'"
+                  [cdkMenuTriggerFor]="menuautosum"
+                  class="example-standalone-item"
+                  (click)="openMenu(i, item)"
+                >
+                  <img
+                    class="autosum"
+                    src="../../../../../assets/icons/autosum.svg"
+                    alt=""
+                  />
+                </button>
+                <button
+                  [cdkMenuTriggerFor]="menuedit"
+                  class="example-standalone-item"
+                  (click)="AxisValue(item)"
+                >
+                  <fa-icon
+                    class="commomicon"
+                    [icon]="icons.edit"
+                    [size]="'xl'"
+                  ></fa-icon>
+                </button>
+                <button (click)="removeItem('tabledata', i)">
+                  <fa-icon
+                    class="removedataicon"
+                    [icon]="icons.close"
+                    [size]="'xl'"
+                  ></fa-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="filters">
+          <span>Filtros</span>
+          <div
+            cdkDropList
+            [cdkDropListData]="filters"
+            class="serie-list f"
+            (cdkDropListDropped)="drop($event)"
+          >
+            <div
+              *ngFor="let item of filters; let i = index"
+              class="series-box"
+              cdkDrag
+              cdkDragLockAxis="y"
+              cdkDragBoundary=".f"
+            >
+              <div>
+                <fa-icon
+                  class="icon"
+                  [icon]="icons.database"
+                  [size]="'xl'"
+                ></fa-icon>
+                {{ item.name }}
+              </div>
+              <div class="series-buttons">
+                <button
+                  [cdkMenuTriggerFor]="menuedit"
+                  class="example-standalone-item"
+                  (click)="AxisValue(item)"
+                >
+                  <fa-icon
+                    class="commomicon"
+                    [icon]="icons.edit"
+                    [size]="'xl'"
+                  ></fa-icon>
+                </button>
+                <button (click)="removeItem('filters', i)">
+                  <fa-icon
+                    class="removedataicon"
+                    [icon]="icons.close"
+                    [size]="'xl'"
+                  ></fa-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container-pre-view">
+    <span>pré visualização</span>
+    <div *ngIf="showPreviewButton" class="visualize">
+      <div>
+        <button (click)="seedData()"><p>Pré-Visualizar</p></button>
+        <button (click)="returnToCreateView()" class="cancel-button">
+          <p>Cancelar</p>
+        </button>
+      </div>
+    </div>
+    <div *ngIf="!showPreviewButton" class="chart-container">
+      <section class="table-container mat-elevation-z8" tabindex="0">
+        <h2>{{ tableTitle }}</h2>
+        <section class="table-container-overflow">
+          <table
+            mat-table
+            [dataSource]="displayedRows"
+            matSort
+            (matSortChange)="announceSortChange($event)"
+          >
+            <ng-container
+              *ngFor="let column of displayedColumns"
+              [matColumnDef]="column"
+            >
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                mat-sort-header
+                [sortActionDescription]="sortDescriptions[column]"
+              >
+                {{ column }}
+              </th>
+              <td mat-cell *matCellDef="let row">{{ row[column] }}</td>
+            </ng-container>
+            <tr
+              mat-header-row
+              *matHeaderRowDef="displayedColumns; sticky: true"
+            ></tr>
+            <tr
+              mat-header-row
+              *matRowDef="let row; columns: displayedColumns"
+            ></tr>
+          </table>
+        </section>
+      </section>
+    </div>
+
+    <div class="chart-container-buttons">
+      <div>
+        <button (click)="clearTableData()">Limpar Dados</button>
+        <button (click)="openModal()">
+          <p>Cancelar</p>
+        </button>
+        <button (click)="updateData()"><p>Atualizar</p></button>
+      </div>
+      <div>
+        <button (click)="returnToCreateView()" class="conclude">
+          <p>Concluir</p>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<ng-template #menuautosum>
+  <div class="example-menu" cdkMenu>
+    <button
+      class="example-menu-item"
+      cdkMenuItem
+      (click)="extractValue('AVG')"
+      [class.selected]="
+        selectedAggregation === 'AVG(' + selectedtabledata.name + ')'
+      "
+    >
+      AVG()
+    </button>
+    <button
+      class="example-menu-item"
+      cdkMenuItem
+      (click)="extractValue('COUNT')"
+      [class.selected]="
+        selectedAggregation === 'COUNT(' + selectedtabledata.name + ')'
+      "
+    >
+      COUNT()
+    </button>
+    <button
+      class="example-menu-item"
+      cdkMenuItem
+      (click)="extractValue('SUM')"
+      [class.selected]="
+        selectedAggregation === 'SUM(' + selectedtabledata.name + ')'
+      "
+    >
+      SUM()
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #menuedit>
+  <div class="edit-menu" cdkMenu>
+    <div>
+      <label for="identifier">Identificador</label>
+      <input
+        name="identifier"
+        type="text"
+        [(ngModel)]="identifier"
+        [value]="selectedtabledata.identifier"
+      />
+    </div>
+    <button class="edit-save" cdkMenuItem (click)="editSave()">Salvar</button>
+  </div>
+</ng-template>
+
+<div
+  class="modal"
+  *ngIf="showModal"
+  id="modal"
+  [style.display]="showModal ? 'flex' : 'none'"
+>
+  <div class="modal-content">
+    <span class="close" (click)="closeModal()">&times;</span>
+    <div>
+      <h2>Tem certeza que deseja cancelar esta ação?</h2>
+      <p>As alterações do cartão não serão salvas</p>
+      <div class="modal-buttons">
+        <button class="cancel" (click)="closeModal()">cancelar</button>
+        <button class="exclude" (click)="openModalCancel()">
+          <span>Sair sem salvar</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

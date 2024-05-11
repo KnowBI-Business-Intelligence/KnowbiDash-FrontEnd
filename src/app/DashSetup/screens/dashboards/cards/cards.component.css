@@ -147,6 +147,7 @@
   min-width: 200px;
   min-height: 83px;
   background-color: #fff;
+  box-shadow: 0px 1px 6px 3px rgb(211 211 211 / 13%);
 }
 
 .card-header {

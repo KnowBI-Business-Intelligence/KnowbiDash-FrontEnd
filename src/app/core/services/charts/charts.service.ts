@@ -10,6 +10,7 @@ import {
   API_CHARTGROUP,
   API_CHARTPATH,
   API_CHARTS,
+  API_TABLES,
 } from '../../../../env/environment';
 
 @Injectable({
@@ -18,6 +19,7 @@ import {
 export class ChartsService {
   private ENV_CHARTS = API_CHARTS;
   private ENV_CARDS = API_CARDS;
+  private ENV_TABLES = API_TABLES;
   private ENV_CHARTPATH = API_CHARTPATH;
   private ENV_CHARTGROUP = API_CHARTGROUP;
 
@@ -31,6 +33,22 @@ export class ChartsService {
     };
 
     return this.http.get(`${this.ENV_CHARTS}/get`, myHeaders);
+  }
+
+  getCards(headers: HttpHeaders): Observable<any> {
+    const myHeaders = {
+      headers: headers,
+    };
+
+    return this.http.get(`${this.ENV_CARDS}/get`, myHeaders);
+  }
+
+  getTables(headers: HttpHeaders): Observable<any> {
+    const myHeaders = {
+      headers: headers,
+    };
+
+    return this.http.get(`${this.ENV_CARDS}/get`, myHeaders);
   }
 
   getChartsPath(headers: HttpHeaders): Observable<any> {
@@ -73,6 +91,14 @@ export class ChartsService {
     };
 
     return this.http.post(`${this.ENV_CARDS}/create`, chartData, myHeaders);
+  }
+
+  createTables(headers: HttpHeaders, chartData: any): Observable<any> {
+    const myHeaders = {
+      headers: headers,
+    };
+
+    return this.http.post(`${this.ENV_TABLES}/create`, chartData, myHeaders);
   }
 
   createChartsPath(
@@ -150,6 +176,18 @@ export class ChartsService {
 
     return this.http.patch(
       `${this.ENV_CARDS}/update/${id}`,
+      chartData,
+      options
+    );
+  }
+
+  updateTables(headers: HttpHeaders, chartData: any, id: any) {
+    const options = {
+      headers: headers,
+    };
+
+    return this.http.patch(
+      `${this.ENV_TABLES}/update/${id}`,
       chartData,
       options
     );
@@ -250,6 +288,13 @@ export class ChartsService {
       headers: headers,
     };
     return this.http.delete(`${this.ENV_CARDS}/delete/${id}`, myHeaders);
+  }
+
+  deleteTables(headers: HttpHeaders, id: string): Observable<any> {
+    const myHeaders = {
+      headers: headers,
+    };
+    return this.http.delete(`${this.ENV_TABLES}/delete/${id}`, myHeaders);
   }
 
   deleteChartGroup(headers: HttpHeaders, id: string) {

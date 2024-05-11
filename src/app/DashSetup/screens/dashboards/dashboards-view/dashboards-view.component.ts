@@ -23,6 +23,8 @@ import { StorageService } from '../../../../core/services/user/storage.service';
 import { CardsComponent } from '../cards/cards.component';
 import { ViewCreateComponent } from '../view-create/view-create.component';
 import { ChartgroupService } from '../../../../core/services/chartgroup/chartgroup.service';
+import { ChartComponent } from '../chart/chart.component';
+import { TableComponent } from '../table/table.component';
 interface Group {
   id: string;
   name: string;
@@ -40,6 +42,8 @@ interface Group {
     FormsModule,
     ViewCreateComponent,
     CardsComponent,
+    ChartComponent,
+    TableComponent,
   ],
 })
 export class DashboardsViewComponent implements OnInit {
@@ -107,8 +111,12 @@ export class DashboardsViewComponent implements OnInit {
   }
 
   switchView(view: string) {
-    if (view == 'card') {
+    if (view == 'chart') {
+      this.currentView = 'ChartComponent';
+    } else if (view == 'card') {
       this.currentView = 'CardsComponent';
+    } else if (view == 'table') {
+      this.currentView = 'TableComponent';
     } else {
       this.currentView = 'ViewCreateComponent';
     }

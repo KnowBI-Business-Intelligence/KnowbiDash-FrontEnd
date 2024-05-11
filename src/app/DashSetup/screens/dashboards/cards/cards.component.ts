@@ -76,7 +76,7 @@ export class CardsComponent implements OnInit, OnDestroy {
   cardTitle: string = '';
   prefix: string = '';
   sufix: string = '';
-  cardData: any = 1500;
+  cardData: any;
 
   dashBoard: any;
   chartId: any;
