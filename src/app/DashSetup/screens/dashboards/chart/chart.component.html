@@ -1,9 +1,3 @@
-<div class="container-nav-line">
-  <span>Início > Dashboards > gráfico</span>
-  <button (click)="backScreen()">
-    <span> x </span>
-  </button>
-</div>
 <div class="container">
   <div cdkDropListGroup class="container-data-group">
     <div class="container-data">
@@ -79,6 +73,7 @@
               </div>
               <div class="series-buttons">
                 <button
+                  *ngIf="item.type == 'numeric'"
                   [cdkMenuTriggerFor]="menuautosum"
                   class="example-standalone-item"
                   (click)="openMenu(i, item)"
@@ -304,6 +299,9 @@
     <span>pré visualização</span>
     <div *ngIf="showPreviewButton" class="visualize">
       <button (click)="seedData()"><p>Pré-Visualizar</p></button>
+      <button (click)="returnToCreateView()" class="cancel-button">
+        <p>Cancelar</p>
+      </button>
     </div>
     <div *ngIf="!showPreviewButton" class="chart-container">
       <highcharts-chart
@@ -318,7 +316,9 @@
         <button (click)="updateChart()"><p>Atualizar</p></button>
       </div>
       <div>
-        <button (click)="backScreen()" class="conclude"><p>Concluir</p></button>
+        <button (click)="returnToCreateView()" class="conclude">
+          <p>Concluir</p>
+        </button>
       </div>
     </div>
   </div>

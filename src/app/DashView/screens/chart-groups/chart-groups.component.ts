@@ -7,7 +7,7 @@ import { LocalstorageService } from '../../../core/services/local-storage/local-
 import { StorageService } from '../../../core/services/user/storage.service';
 
 interface Group {
-  id: string; // Adjust the type of id if necessary (could be number or string based on your actual data)
+  id: string;
   name: string;
 }
 

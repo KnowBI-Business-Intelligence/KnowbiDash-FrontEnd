@@ -13,48 +13,68 @@
   font-size: 12px;
   margin-bottom: 4px;
 }
+
+.container-nav-line button {
+  border-radius: 50px;
+  border: solid 0.5px #00000074;
+  color: #00000074;
+  cursor: pointer;
+  margin-left: 5px;
+  height: 20px;
+  width: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .container {
   display: flex;
   flex-direction: column;
   margin: 0.2rem 0 0 1.8rem;
-  margin-top: -22px;
+  margin-top: -37px;
   height: calc(93vh - 5px);
   max-width: calc(97% - 5px);
 }
 
-header {
+.filter {
+  justify-content: start;
+  background-color: #fff;
   display: flex;
-  justify-content: space-between;
+  justify-items: center;
   align-items: center;
+  border-radius: 30px;
+  width: 250px;
+  height: 40px;
 }
 
-.content-filter {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  column-gap: 2rem;
+.filter .iconSearch {
+  font-size: 10px;
+  padding: 8px 2px 8px 15px;
 }
 
-.content-main-container {
+.filter button {
+  padding: 0.6rem;
+  border: none;
+  margin-right: 1rem;
+  border-radius: 0.2rem;
+}
+
+.filter input {
+  padding: 0.6rem;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  font-size: 12px;
+  width: 205px;
+}
+
+.container-path {
   display: flex;
   flex-direction: column;
-  margin-top: 12px;
-  padding: 15px 0;
-  overflow-y: auto;
-  max-width: 100%;
-  max-height: calc(78vh - 5px);
-  border-top: 1px solid #e5e7eb;
-}
-
-.container-path-body-profile-label {
-  font-size: 12px;
-  color: #00000096;
-  padding: 10px;
-  margin-top: 5px;
-}
-
-strong {
-  font-weight: 550;
+  width: 100%;
+  height: fit-content;
+  justify-content: space-between;
+  margin-top: 15px;
 }
 
 .container-path-header {
@@ -73,7 +93,12 @@ strong {
 .container-path-body {
   display: flex;
   flex-wrap: wrap;
-  margin-top: 8px;
+  margin-top: 12px;
+  padding: 15px 0;
+  overflow-y: auto;
+  max-width: 100%;
+  max-height: calc(78vh - 5px);
+  border-top: 1px solid #e5e7eb;
 }
 
 .container-path-button {
@@ -98,50 +123,18 @@ strong {
   background-color: #f8f8fa;
 }
 
-.container-path-button img {
-  width: 1rem;
+.icon {
+  margin: 0 0.5rem;
+  color: #a3a7cb;
+  font-size: 10px;
   margin-right: 10px;
 }
 
 .container-path-button span {
-  font-size: 13px;
+  font-size: 0.8rem;
 }
 
-.filter {
-  justify-content: start;
-  background-color: #fff;
-  display: flex;
-  justify-items: center;
-  align-items: center;
-  border-radius: 30px;
-  width: 250px;
-  height: 40px;
-}
-
-.filter .icon {
-  font-size: 10px;
-  padding: 8px 2px 8px 15px;
-}
-
-.filter button {
-  padding: 0.6rem;
-  border: none;
-  margin-right: 1rem;
-  border-radius: 0.2rem;
-}
-
-.filter input {
-  padding: 0.6rem;
-  border: none;
-  outline: none;
-  background-color: transparent;
-  font-size: 12px;
-  width: 205px;
-}
-
-.content-nochart {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 5rem;
+.chart-container {
+  width: 18.75rem;
+  height: 18.75rem;
 }

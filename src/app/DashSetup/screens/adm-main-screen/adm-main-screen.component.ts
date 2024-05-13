@@ -2,69 +2,88 @@ import { CommonModule } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { ChartsService } from '../../../core/services/charts/charts.service';
 import { StorageService } from '../../../core/services/user/storage.service';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import { AuthService } from '../../../core/services/auth/auth.service';
+import { LocalstorageService } from '../../../core/services/local-storage/local-storage.service';
+import { Console } from 'console';
 
 @Component({
   selector: 'app-adm-main-screen',
   standalone: true,
-  imports: [RouterModule, CommonModule, FormsModule],
+  imports: [RouterModule, CommonModule, FormsModule, FontAwesomeModule],
   templateUrl: './adm-main-screen.component.html',
   styleUrl: './adm-main-screen.component.css',
 })
 export class ADMMainScreenComponent {
-  private user: any;
-  listpages: any;
-  filteredItems: any;
+  icons = {
+    search: faMagnifyingGlass,
+  };
 
-  constructor(private charts: ChartsService, private token: StorageService) {}
+  searchTerm: string = '';
+  profiles: any[] = [];
+  pathsByProfile: { [key: string]: any[] } = {};
+  private user = this.storageService.getUser();
+  headers = new HttpHeaders({
+    Authorization: `Bearer ${this.user.token}`,
+  });
+
+  constructor(
+    private charts: ChartsService,
+    private authService: AuthService,
+    private storageService: StorageService,
+    private localStorage: LocalstorageService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-    this.getFolders();
+    this.getUserById(this.user.id, this.user.token);
   }
 
-  onInputChange(event: Event) {
-    const searchTerm = (event.target as HTMLInputElement).value
-      .trim()
-      .toLowerCase();
+  getUserById(id: number, token: any) {
+    this.authService.getById(id, this.headers).subscribe({
+      next: (data: any) => {
+        this.processData(data);
+      },
+    });
+    console.log(this.user);
+  }
 
-    if (!searchTerm) {
-      this.filteredItems = this.listpages;
-      return;
-    }
+  processData(data: any) {
+    data.perfis.forEach((profile: any) => {
+      const paths: string[] = [];
+      if (profile && profile.chartPaths) {
+        profile.chartPaths.forEach((chartPath: any) => {
+          paths.push(chartPath);
+        });
+      }
+      this.pathsByProfile[profile.name] = paths;
+      this.profiles.push({ name: profile.name, paths: paths });
+      console.log(this.pathsByProfile);
+    });
+  }
 
-    this.filteredItems = this.listpages.filter((item: any) =>
-      item.name.toLowerCase().includes(searchTerm)
+  openChartGroup(pathObj: any) {
+    this.localStorage.setEncryptedItem(
+      'selectedChartPath',
+      JSON.stringify(pathObj.id)
     );
+    console.log(pathObj);
+    this.router.navigate(['admin/adm_main_dashboard']);
   }
 
-  clear() {
-    throw new Error('Method not implemented.');
-  }
-
-  private getFolders() {
-    this.user = this.token.getUser();
-
-    if (!this.user || !this.user.token) {
-      console.error('Token não disponível');
-      return;
-    }
-
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${this.user.token}`,
-    });
-
-    const that = this;
-
-    this.charts.getChartsPath(headers).subscribe({
-      next(value: any) {
-        that.listpages = value;
-        that.filteredItems = value;
-      },
-      error(err: Error) {
-        console.error(err);
-      },
-    });
+  applyFilter(term: string) {
+    return (profile: any) => {
+      const lowercaseTerm = term.toLowerCase();
+      return (
+        profile.name.toLowerCase().includes(lowercaseTerm) ||
+        profile.paths.some((path: any) =>
+          path.name.toLowerCase().includes(lowercaseTerm)
+        )
+      );
+    };
   }
 }

@@ -30,6 +30,8 @@ import { PageNotFoundComponent } from './DashView/screens/page-not-found/page-no
 import { SettingsUserComponent } from './DashView/screens/settings-user/settings-user.component';
 import { LoginScreenComponent } from './shared/login-screen/login-screen.component';
 import { ViewCreateComponent } from './DashSetup/screens/dashboards/view-create/view-create.component';
+import { AdmMainDashboardsComponent } from './DashSetup/screens/adm-main-dashboards/adm-main-dashboards/adm-main-dashboards.component';
+import { AdmMainChartsComponent } from './DashSetup/screens/adm-main-charts/adm-main-charts/adm-main-charts.component';
 export const routes: Routes = [
   {
     path: '',
@@ -55,6 +57,22 @@ export const routes: Routes = [
       {
         path: '',
         component: ADMMainScreenComponent,
+        title: 'Koios - Administrador',
+        data: {
+          breadcrumb: '',
+        },
+      },
+      {
+        path: 'adm_main_dashboard',
+        component: AdmMainDashboardsComponent,
+        title: 'Koios - Administrador',
+        data: {
+          breadcrumb: '',
+        },
+      },
+      {
+        path: 'adm_main_charts',
+        component: AdmMainChartsComponent,
         title: 'Koios - Administrador',
         data: {
           breadcrumb: '',

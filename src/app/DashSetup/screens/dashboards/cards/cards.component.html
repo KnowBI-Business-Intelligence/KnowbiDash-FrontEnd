@@ -65,6 +65,7 @@
                 </div>
                 <div class="series-buttons">
                   <button
+                    *ngIf="item.type == 'numeric'"
                     [cdkMenuTriggerFor]="menuautosum"
                     class="example-standalone-item"
                     (click)="openMenu(i, item)"

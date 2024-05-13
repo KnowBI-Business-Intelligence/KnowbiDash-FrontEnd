@@ -65,32 +65,31 @@ interface Axis {
 })
 export class CardsComponent implements OnInit, OnDestroy {
   @Output() returnToCreate = new EventEmitter<void>();
-  private encryptedDataSubscription: Subscription | undefined;
   icons = {
     database: faDatabase,
     close: faXmark,
     code: faCode,
     edit: faGear,
   };
-
+  private encryptedDataSubscription: Subscription | undefined;
+  database: any[] = [];
+  yaxis: any[] = [];
+  filters: any[] = [];
+  cardData: any;
+  dashBoard: any;
+  chartId: any;
   cardTitle: string = '';
   prefix: string = '';
   sufix: string = '';
-  cardData: any;
-
-  dashBoard: any;
-  chartId: any;
   chartType: string = '';
   sql: string = 'SELECT ';
   tableName: string = '';
   identifier: string = '';
   selectedAggregation: string = '';
-
   selectedChartButton: string = '';
   showPreviewButton: boolean = true;
   showModal: boolean = false;
   modal: HTMLElement | undefined;
-
   selectedYAxis: Axis = { name: '', type: '', identifier: '', value: '' };
   buildData: { name: any; identifier: any }[] = [];
   yAxisValueWithoutAggregation: string = '';
@@ -106,14 +105,7 @@ export class CardsComponent implements OnInit, OnDestroy {
     private chartGroupService: ChartgroupService
   ) {}
 
-  database: any[] = [];
-  yaxis: any[] = [];
-  filters: any[] = [];
-
   ngOnInit(): void {
-    this.dashBoard =
-      this.localStorageService.getDecryptedItem('chartGroupview');
-    this.loadDataView(this.dashBoard.id);
     this.startDashboarData();
   }
 
@@ -141,6 +133,7 @@ export class CardsComponent implements OnInit, OnDestroy {
     this.encryptedDataSubscription =
       this.chartGroupService.encryptedData$.subscribe((encryptedData) => {
         this.dashBoard = encryptedData;
+        this.loadDataView(this.dashBoard.id);
       });
   }
 
@@ -181,7 +174,18 @@ export class CardsComponent implements OnInit, OnDestroy {
     });
   }
 
+  clearData(): void {
+    this.yaxis = [];
+  }
+
+  clearFilterData(): void {
+    this.filters = [];
+  }
+
   processData(data: any) {
+    this.database = [];
+    this.clearFilterData();
+    this.clearData();
     data.columns.forEach((setData: any) => {
       this.database.push(setData);
       this.yaxisData[setData.name] = setData;
@@ -247,6 +251,7 @@ export class CardsComponent implements OnInit, OnDestroy {
           identifier: this.selectedYAxis.identifier
             ? this.selectedYAxis.identifier
             : this.selectedYAxis.name,
+          type: this.selectedYAxis.type,
           value: columnName,
         };
 
@@ -263,6 +268,7 @@ export class CardsComponent implements OnInit, OnDestroy {
             identifier: this.selectedYAxis.identifier
               ? this.selectedYAxis.identifier
               : this.selectedYAxis.name,
+            type: this.selectedYAxis.type,
             value: yAxisName,
           };
         }
@@ -337,7 +343,6 @@ export class CardsComponent implements OnInit, OnDestroy {
       },
     };
 
-    console.log(cardData);
     this.createCard(cardData);
   }
 
@@ -401,7 +406,6 @@ export class CardsComponent implements OnInit, OnDestroy {
     } else {
       result = data.result;
     }
-    console.log(result);
     this.cardTitle = data.title;
     this.cardData = data.prefix + '' + result + ' ' + data.sufix;
   }

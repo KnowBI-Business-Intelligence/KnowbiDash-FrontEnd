@@ -16,7 +16,7 @@ import {
 } from '@angular/cdk/menu';
 import { CommonModule } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -27,6 +27,8 @@ import { ChartsService } from '../../../../core/services/charts/charts.service';
 import { LocalstorageService } from '../../../../core/services/local-storage/local-storage.service';
 import { StorageService } from '../../../../core/services/user/storage.service';
 import { chartButtonsData } from './chartbuttons';
+import { Subscription } from 'rxjs';
+import { ChartgroupService } from '../../../../core/services/chartgroup/chartgroup.service';
 
 interface Axis {
   name: string;
@@ -61,12 +63,27 @@ interface ExtendedOptions extends Highcharts.Options {
   styleUrl: './chart.component.css',
 })
 export class ChartComponent implements OnInit {
+  @Output() returnToCreate = new EventEmitter<void>();
   icons = {
     database: faDatabase,
     close: faXmark,
     edit: faGear,
   };
-
+  private encryptedDataSubscription: Subscription | undefined;
+  private xAxisColumns: any[] = [];
+  private yAxisColumns: any[] = [];
+  private seriesData: any[] = [];
+  private filtersData: any[] = [];
+  private xAxisValues: any[] = [];
+  private seriesValues: any[] = [];
+  private groupData: any[] = [];
+  database: any[] = [];
+  yaxis: any[] = [];
+  xaxis: any[] = [];
+  series: any[] = [];
+  filters: any[] = [];
+  groupment: any[] = [];
+  order: any[] = [];
   dashBoard: any;
   chartId: any;
   titulo: string = '';
@@ -75,18 +92,15 @@ export class ChartComponent implements OnInit {
   tableName: string = '';
   identifier: string = '';
   selectedAggregation: string = '';
-
   selectedChartButton: string = '';
   showPreviewButton: boolean = true;
   showModal: boolean = false;
   modal: HTMLElement | undefined;
-
   selectedYAxis: Axis = { name: '', type: '', identifier: '', value: '' };
   buildData: { name: any; identifier: any }[] = [];
   yAxisValueWithoutAggregation: string = '';
   yaxisData: { [key: string]: string } = {};
   yaxisIdentifiers: { [key: string]: string } = {};
-
   Highcharts: typeof Highcharts = Highcharts;
   chartConfig!: ExtendedOptions;
   group: any;
@@ -97,16 +111,9 @@ export class ChartComponent implements OnInit {
     private router: Router,
     private storageService: StorageService,
     private localStorageService: LocalstorageService,
-    private chartsService: ChartsService
+    private chartsService: ChartsService,
+    private chartGroupService: ChartgroupService
   ) {}
-
-  database: any[] = [];
-  yaxis: any[] = [];
-  xaxis: any[] = [];
-  series: any[] = [];
-  filters: any[] = [];
-  groupment: any[] = [];
-  order: any[] = [];
 
   drop(event: CdkDragDrop<string[]>) {
     if (event.previousContainer === event.container) {
@@ -126,9 +133,7 @@ export class ChartComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.dashBoard =
-      this.localStorageService.getDecryptedItem('chartGroupview');
-    this.loadDataView(this.dashBoard.id);
+    this.startDashboarData();
   }
 
   openMenu(index: number, item: any) {
@@ -143,6 +148,15 @@ export class ChartComponent implements OnInit {
     } else {
       this.identifier = this.selectedYAxis.identifier;
     }
+  }
+
+  startDashboarData() {
+    this.encryptedDataSubscription =
+      this.chartGroupService.encryptedData$.subscribe((encryptedData) => {
+        this.dashBoard = encryptedData;
+        this.loadDataView(this.dashBoard.id);
+        console.log(this.dashBoard);
+      });
   }
 
   loadDataView(id: string) {
@@ -162,7 +176,22 @@ export class ChartComponent implements OnInit {
     });
   }
 
+  returnToCreateView(): void {
+    this.chartGroupService.setCurrentView('ViewCreateComponent');
+  }
+
+  clearAxisData() {
+    this.database = [];
+    this.yaxis = [];
+    this.xaxis = [];
+    this.series = [];
+    this.filters = [];
+    this.group = [];
+    this.order = [];
+  }
+
   processData(data: any) {
+    this.clearAxisData();
     data.columns.forEach((setData: any) => {
       this.database.push(setData);
       this.yaxisData[setData.name] = setData;
@@ -240,6 +269,7 @@ export class ChartComponent implements OnInit {
           identifier: this.selectedYAxis.identifier
             ? this.selectedYAxis.identifier
             : this.selectedYAxis.name,
+          type: this.selectedYAxis.type,
           value: columnName,
         };
 
@@ -256,6 +286,7 @@ export class ChartComponent implements OnInit {
             identifier: this.selectedYAxis.identifier
               ? this.selectedYAxis.identifier
               : this.selectedYAxis.name,
+            type: this.selectedYAxis.type,
             value: yAxisName,
           };
         }
@@ -314,68 +345,79 @@ export class ChartComponent implements OnInit {
     }
   }
 
-  seedData() {
-    this.showPreviewButton = false;
-    this.identifierData();
-
-    const xAxisValues = this.xaxis.map((axis) => {
+  dataRepo() {
+    this.xAxisValues = this.xaxis.map((axis) => {
       if (this.isTimestampField(axis.name)) {
         return this.formatTimestampField(axis.name);
       }
       return this.rmTimeStamp(axis.name);
     });
 
-    const seriesValues = this.series.map((series) =>
+    this.seriesValues = this.series.map((series) =>
       this.rmTimeStamp(series.value)
     );
 
-    const group = [...xAxisValues, ...seriesValues];
+    this.groupData = [...this.xAxisValues, ...this.seriesValues];
 
+    this.yAxisColumns = this.yaxis.map((axis) => {
+      return {
+        name: [this.rmTimeStamp(axis.value)],
+        identifiers: [axis.identifier],
+      };
+    });
+
+    this.xAxisColumns = this.xaxis.map((axis) => {
+      return {
+        name: [this.rmTimeStamp(axis.name)],
+        identifiers: [axis.identifier],
+      };
+    });
+
+    this.seriesData = this.series.map((series) => {
+      return {
+        name: [this.rmTimeStamp(series.name)],
+        identifiers: [series.identifier],
+      };
+    });
+
+    this.filtersData = this.filters.map((filter) => {
+      let operator;
+      if (filter.type === 'timestamp' || filter.type === 'number') {
+        operator = 'BETWEEN';
+      } else {
+        operator = 'IN';
+      }
+
+      return {
+        column: [this.rmTimeStamp(filter.name)],
+        operator: [operator],
+        value: [],
+        identifiers: [filter.identifier],
+      };
+    });
+  }
+
+  seedData() {
+    this.identifierData();
+    this.dataRepo();
     const chartData = {
       title: this.titulo,
       graphType: this.chartType.toLowerCase(),
       sql: this.sql,
-      xAxisColumns: this.xaxis.map((axis) => {
-        return {
-          name: [this.rmTimeStamp(axis.name)],
-          identifiers: [axis.identifier],
-        };
-      }),
-      yAxisColumns: this.yaxis.map((axis) => {
-        return {
-          name: [this.rmTimeStamp(axis.value)],
-          identifiers: [axis.identifier],
-        };
-      }),
-      series: this.series.map((series) => {
-        return {
-          name: [this.rmTimeStamp(series.name)],
-          identifiers: [series.identifier],
-        };
-      }),
-      filters: this.filters.map((filter) => {
-        let operator;
-        if (filter.type === 'timestamp' || filter.type === 'number') {
-          operator = 'BETWEEN';
-        } else {
-          operator = 'IN';
-        }
-
-        return {
-          column: [this.rmTimeStamp(filter.name)],
-          operator: [operator],
-          value: [],
-          identifiers: [filter.identifier],
-        };
-      }),
-      group: group,
+      yAxisColumns: this.yAxisColumns,
+      xAxisColumns: this.xAxisColumns,
+      series: this.seriesData,
+      filters: this.filtersData,
+      group: this.groupData,
       order: this.order.length
         ? this.order.map((order) => this.rmTimeStamp(order.name))
-        : xAxisValues,
+        : this.xAxisValues,
       chartGroup: {
         id: this.dashBoard.id,
       },
     };
+
+    console.log(chartData);
 
     this.createChart(chartData);
   }
@@ -387,70 +429,28 @@ export class ChartComponent implements OnInit {
 
     this.chartsService.createCharts(headers, chartData).subscribe({
       next: (data) => {
+        this.showPreviewButton = false;
         this.chartPreView(data);
         this.chartId = data.id;
-        this.updateChart();
       },
     });
   }
 
   updateChart() {
     this.identifierData();
-
-    const xAxisValues = this.xaxis.map((axis) => {
-      if (this.isTimestampField(axis.name)) {
-        return this.formatTimestampField(axis.name);
-      }
-      return this.rmTimeStamp(axis.name);
-    });
-
-    const seriesValues = this.series.map((series) =>
-      this.rmTimeStamp(series.value)
-    );
-
-    const group = [...xAxisValues, ...seriesValues];
-
+    this.dataRepo();
     const chartData = {
       title: this.titulo,
       graphType: this.chartType.toLowerCase(),
       sql: this.sql,
-      xAxisColumns: this.xaxis.map((axis) => {
-        return {
-          name: [this.rmTimeStamp(axis.name)],
-          identifiers: [axis.identifier],
-        };
-      }),
-      yAxisColumns: this.yaxis.map((axis) => {
-        return {
-          name: [this.rmTimeStamp(axis.value)],
-          identifiers: [axis.identifier],
-        };
-      }),
-      series: this.series.map((series) => {
-        return {
-          name: [this.rmTimeStamp(series.name)],
-          identifiers: [series.identifier],
-        };
-      }),
-      filters: this.filters.map((filter) => {
-        let operator;
-        if (filter.type === 'timestamp' || filter.type === 'number') {
-          operator = 'BETWEEN';
-        } else {
-          operator = 'IN';
-        }
-
-        return {
-          column: [this.rmTimeStamp(filter.name)],
-          operator: [operator],
-          value: [],
-          identifiers: [filter.identifier],
-        };
-      }),
-      group: group,
+      yAxisColumns: this.yAxisColumns,
+      xAxisColumns: this.xAxisColumns,
+      series: this.seriesData,
+      filters: this.filtersData,
+      group: this.groupData,
       order: this.order.length
         ? this.order.map((order) => this.rmTimeStamp(order.name))
-        : xAxisValues,
+        : this.xAxisValues,
       chartGroup: {
         id: this.dashBoard.id,
       },
@@ -481,7 +481,7 @@ export class ChartComponent implements OnInit {
         console.log(data);
       },
     });
-    this.backScreen();
+    this.returnToCreateView();
   }
 
   chartPreView(data: any) {

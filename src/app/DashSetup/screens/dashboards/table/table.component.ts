@@ -79,9 +79,8 @@ export interface PeriodicElement {
   templateUrl: './table.component.html',
   styleUrl: './table.component.css',
 })
-export class TableComponent implements OnInit, AfterViewInit {
+export class TableComponent implements OnInit {
   @Output() returnToCreate = new EventEmitter<void>();
-  @ViewChild(MatSort) sort!: MatSort;
   icons = {
     database: faDatabase,
     close: faXmark,
@@ -128,14 +127,7 @@ export class TableComponent implements OnInit, AfterViewInit {
     private chartGroupService: ChartgroupService
   ) {}
 
-  ngAfterViewInit() {
-    this.dataSource.sort = this.sort;
-    console.log(this.sort);
-  }
-
   ngOnInit(): void {
-    this.dashBoard =
-      this.localStorageService.getDecryptedItem('chartGroupview');
     this.startDashboarData();
   }
 
@@ -213,6 +205,7 @@ export class TableComponent implements OnInit, AfterViewInit {
   clearFilterData(): void {
     this.filters = [];
   }
+
   processData(data: any) {
     this.database = [];
     this.clearFilterData();
@@ -505,12 +498,6 @@ export class TableComponent implements OnInit, AfterViewInit {
       this.displayedColumns.forEach((column) => {
         this.sortDescriptions[column] = `Sort by ${column}`;
       });
-
-      this.dataSource.data = this.displayedRows;
-
-      console.log(this.sortDescriptions);
-      console.log(this.dataSource);
-      console.log(this.sort);
     }
   }
 

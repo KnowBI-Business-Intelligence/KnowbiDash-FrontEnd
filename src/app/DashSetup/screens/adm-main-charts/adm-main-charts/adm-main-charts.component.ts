@@ -1,26 +1,18 @@
-import { CommonModule } from '@angular/common';
-import { HttpHeaders } from '@angular/common/http';
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  OnDestroy,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { AngularDraggableModule } from 'angular2-draggable';
-import { HighchartsChartModule } from 'highcharts-angular';
-import { SkeletonModule } from 'primeng/skeleton';
-import { Subject, Subscription } from 'rxjs';
-import Highcharts from 'highcharts';
-import { ChartsService } from '../../../../core/services/charts/charts.service';
 import { StorageService } from '../../../../core/services/user/storage.service';
-import { ChartgroupService } from '../../../../core/services/chartgroup/chartgroup.service';
+import { ChartsService } from '../../../../core/services/charts/charts.service';
+import { LocalstorageService } from '../../../../core/services/local-storage/local-storage.service';
+import { MatIconModule } from '@angular/material/icon';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { CommonModule } from '@angular/common';
+import { SkeletonModule } from 'primeng/skeleton';
+import { HighchartsChartModule } from 'highcharts-angular';
+import { FormsModule } from '@angular/forms';
+import { AngularDraggableModule } from 'angular2-draggable';
 import { MatTableModule } from '@angular/material/table';
+import Highcharts from 'highcharts';
+import { HttpHeaders } from '@angular/common/http';
 
 interface Group {
   id: string;
@@ -45,7 +37,7 @@ interface ExtendedOptions extends Highcharts.Options {
 }
 
 @Component({
-  selector: 'app-view-create',
+  selector: 'app-adm-main-charts',
   standalone: true,
   imports: [
     MatIconModule,
@@ -57,13 +49,11 @@ interface ExtendedOptions extends Highcharts.Options {
     AngularDraggableModule,
     MatTableModule,
   ],
-  templateUrl: './view-create.component.html',
-  styleUrl: './view-create.component.css',
+  templateUrl: './adm-main-charts.component.html',
+  styleUrl: './adm-main-charts.component.css',
 })
-export class ViewCreateComponent implements OnInit, OnDestroy {
+export class AdmMainChartsComponent implements OnInit {
   @ViewChild('chartContainer') chartContainer!: ElementRef;
-  private encryptedDataSubscription: Subscription | undefined;
-
   name = 'Angular';
   position!: string;
   groupName: string = '';
@@ -97,32 +87,19 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
 
   constructor(
     private router: Router,
-    private chartsService: ChartsService,
     private storageService: StorageService,
-    private chartGroupService: ChartgroupService
-  ) {
-    this.currentView = null;
-  }
-
+    private chartsService: ChartsService,
+    private localStorage: LocalstorageService
+  ) {}
   ngOnInit(): void {
-    this.startDashboarData();
-  }
-
-  ngOnDestroy() {
-    if (this.encryptedDataSubscription) {
-      this.encryptedDataSubscription.unsubscribe();
-    }
-  }
-
-  startDashboarData() {
-    this.encryptedDataSubscription =
-      this.chartGroupService.encryptedData$.subscribe((encryptedData) => {
-        this.groupName = encryptedData.name;
-        this.getCharts(encryptedData.id);
-        this.getCards(encryptedData.id);
-        this.getTables(encryptedData.id);
-        console.log(encryptedData);
-      });
+    const storedChartGroupString =
+      this.localStorage.getDecryptedItem('chartGroup');
+    const storedChartGroup = JSON.parse(storedChartGroupString);
+    this.getCharts(storedChartGroup.id);
+    this.getCards(storedChartGroup.id);
+    this.getTables(storedChartGroup.id);
+    this.groupName = storedChartGroup.name;
+    console.log(storedChartGroup);
   }
 
   getCharts(id: string): void {
@@ -484,7 +461,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   }
 
   backScreen() {
-    this.router.navigate(['/admin']);
+    this.router.navigate(['/admin/adm_main_dashboard']);
   }
 
   newPosition(event: any) {

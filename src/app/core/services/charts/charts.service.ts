@@ -48,7 +48,7 @@ export class ChartsService {
       headers: headers,
     };
 
-    return this.http.get(`${this.ENV_CARDS}/get`, myHeaders);
+    return this.http.get(`${this.ENV_TABLES}/get`, myHeaders);
   }
 
   getChartsPath(headers: HttpHeaders): Observable<any> {

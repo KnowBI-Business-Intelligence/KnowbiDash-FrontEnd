@@ -1,0 +1,48 @@
+<div class="container-nav-line">
+  <span>Início > Dashboards</span>
+  <button (click)="backScreen()">
+    <span> x </span>
+  </button>
+</div>
+<div class="container">
+  <div class="container-path">
+    <div class="container-path-header">
+      <span>Dashboards</span>
+      <header>
+        <div class="content-filter">
+          <div class="filter">
+            <fa-icon
+              class="iconSearch"
+              [icon]="icons.search"
+              [size]="'xl'"
+              title="Dashboards"
+            ></fa-icon>
+            <span class="p-input-icon-left">
+              <input
+                pInputText
+                type="text"
+                [(ngModel)]="searchTerm"
+                placeholder="Pesquisar Dashboard"
+                (input)="onInputChange($event)"
+              />
+            </span>
+          </div>
+        </div>
+      </header>
+    </div>
+
+    <div class="container-path-body">
+      <ng-container *ngFor="let group of filteredItems">
+        <button class="container-path-button" (click)="callCharts(group)">
+          <fa-icon
+            class="icon"
+            [icon]="icons.dash"
+            [size]="'xl'"
+            title="Dashboards"
+          ></fa-icon>
+          <span>{{ group.name }}</span>
+        </button>
+      </ng-container>
+    </div>
+  </div>
+</div>
