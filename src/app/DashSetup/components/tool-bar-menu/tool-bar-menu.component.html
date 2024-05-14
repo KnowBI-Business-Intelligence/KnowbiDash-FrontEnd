@@ -21,11 +21,12 @@
 
       <mat-list-item
         pRipple
-        [routerLink]="['/admin']"
+        routerLink="/admin"
         routerLinkActive="active"
         ariaCurrentWhenActive="page"
-        [routerLinkActiveOptions]="{ exact: true }"
-        (click)="toggleClose()"
+        [routerLinkActiveOptions]="{ exact: false }"
+        [class.active]="menuAtivo === 'home'"
+        (click)="toggleMenuAtivo('home')"
       >
         <div class="container-icon">
           <fa-icon
@@ -43,8 +44,9 @@
         routerLink="users_panel"
         routerLinkActive="active"
         ariaCurrentWhenActive="page"
-        [routerLinkActiveOptions]="{ exact: true }"
-        (click)="toggleClose()"
+        [routerLinkActiveOptions]="{ exact: false }"
+        [class.active]="menuAtivo === 'users_panel'"
+        (click)="toggleMenuAtivo('users_panel')"
       >
         <div class="container-icon">
           <fa-icon
@@ -63,7 +65,8 @@
         routerLinkActive="active"
         ariaCurrentWhenActive="page"
         [routerLinkActiveOptions]="{ exact: true }"
-        (click)="toggleClose()"
+        [class.active]="menuAtivo === 'estructure'"
+        (click)="toggleMenuAtivo('estructure')"
       >
         <div class="container-icon">
           <fa-icon
@@ -71,6 +74,7 @@
             [icon]="icons.profiles"
             [size]="'xl'"
             title="Estrutura"
+            #menuIcon
           ></fa-icon>
           <span class="menu-item">Estrutura</span>
         </div>
@@ -82,7 +86,8 @@
         routerLinkActive="active"
         ariaCurrentWhenActive="page"
         [routerLinkActiveOptions]="{ exact: true }"
-        (click)="toggleClose()"
+        [class.active]="menuAtivo === 'dashboards'"
+        (click)="toggleMenuAtivo('dashboards')"
       >
         <div class="container-icon">
           <fa-icon
@@ -100,7 +105,8 @@
         routerLinkActive="active"
         ariaCurrentWhenActive="page"
         [routerLinkActiveOptions]="{ exact: true }"
-        (click)="toggleClose()"
+        [class.active]="menuAtivo === 'assistant'"
+        (click)="toggleMenuAtivo('assistant')"
       >
         <div class="container-icon">
           <fa-icon
@@ -120,6 +126,8 @@
         ariaCurrentWhenActive="page"
         [routerLinkActiveOptions]="{ exact: true }"
         (click)="toggleClose()"
+        [class.active]="menuAtivo === 'database'"
+        (click)="toggleMenuAtivo('database')"
       >
         <div class="container-icon">
           <fa-icon
@@ -136,6 +144,12 @@
 
   <mat-sidenav-content>
     <mat-toolbar>
+      <span class="dashboard-label">
+        <img
+          src="../../../../assets/images/logo_principal_reduzida.png"
+          alt=""
+        />
+      </span>
       <!--<div class="breadcrumbs-menu">
         <app-breadcrumbs></app-breadcrumbs>
       </div>-->

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { ChartsService } from '../../../core/services/charts/charts.service';
@@ -9,7 +9,6 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { LocalstorageService } from '../../../core/services/local-storage/local-storage.service';
-import { Console } from 'console';
 
 @Component({
   selector: 'app-adm-main-screen',
@@ -18,7 +17,7 @@ import { Console } from 'console';
   templateUrl: './adm-main-screen.component.html',
   styleUrl: './adm-main-screen.component.css',
 })
-export class ADMMainScreenComponent {
+export class ADMMainScreenComponent implements OnInit {
   icons = {
     search: faMagnifyingGlass,
   };

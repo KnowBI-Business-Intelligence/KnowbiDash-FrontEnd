@@ -10,7 +10,7 @@
   padding: 5px 10px;
   position: relative;
   top: -39px;
-  left: 19px;
+  left: 145px;
   align-self: baseline;
   display: flex;
 }
@@ -19,19 +19,6 @@
   color: #00000074;
   font-size: 12px;
   margin-bottom: 4px;
-}
-
-.container-nav-line button {
-  border-radius: 50px;
-  border: solid 0.5px #00000074;
-  color: #00000074;
-  cursor: pointer;
-  margin-left: 5px;
-  height: 20px;
-  width: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 .list-dashboards {

@@ -5,47 +5,48 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { LocalstorageService } from '../../../core/services/local-storage/local-storage.service';
 import { StorageService } from '../../../core/services/user/storage.service';
+import { FormsModule } from '@angular/forms';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import { ChartsService } from '../../../core/services/charts/charts.service';
 
 @Component({
   selector: 'app-main-screen',
   templateUrl: './main-screen.component.html',
   styleUrl: './main-screen.component.css',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule, FontAwesomeModule],
 })
 export class MainScreenComponent implements OnInit {
-  user: any;
-  profiles: string[] = [];
+  icons = {
+    search: faMagnifyingGlass,
+  };
+  searchTerm: string = '';
+  profiles: any[] = [];
   pathsByProfile: { [key: string]: any[] } = {};
+  private user = this.storageService.getUser();
+  headers = new HttpHeaders({
+    Authorization: `Bearer ${this.user.token}`,
+  });
 
   constructor(
-    private token: StorageService,
-    private router: Router,
     private authService: AuthService,
     private storageService: StorageService,
-    private localStorage: LocalstorageService
+    private localStorage: LocalstorageService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.initUserData();
-  }
-
-  initUserData() {
-    this.user = this.token.getUser();
     this.getUserById(this.user.id, this.user.token);
   }
 
   getUserById(id: number, token: any) {
-    const user = this.storageService.getUser();
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${user.token}`,
-    });
-
-    this.authService.getById(id, headers).subscribe({
+    this.authService.getById(id, this.headers).subscribe({
       next: (data: any) => {
         this.processData(data);
       },
     });
+    console.log(this.user);
   }
 
   processData(data: any) {
@@ -57,13 +58,26 @@ export class MainScreenComponent implements OnInit {
         });
       }
       this.pathsByProfile[profile.name] = paths;
-      this.profiles.push(profile.name);
+      this.profiles.push({ name: profile.name, paths: paths });
+      console.log(this.pathsByProfile);
     });
+  }
+
+  applyFilter(term: string) {
+    return (profile: any) => {
+      const lowercaseTerm = term.toLowerCase();
+      return (
+        profile.name.toLowerCase().includes(lowercaseTerm) ||
+        profile.paths.some((path: any) =>
+          path.name.toLowerCase().includes(lowercaseTerm)
+        )
+      );
+    };
   }
 
   openChartGroup(pathObj: any) {
     this.localStorage.setEncryptedItem(
-      'selectedChartPath',
+      'selectedChartPathUser',
       JSON.stringify(pathObj.id)
     );
     this.router.navigate(['content/main/chartgroup']);

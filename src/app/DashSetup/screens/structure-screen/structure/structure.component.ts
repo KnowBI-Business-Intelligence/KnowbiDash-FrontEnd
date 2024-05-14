@@ -4,6 +4,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { CreateDashsComponent } from '../create-dashs/create-dashs.component';
 import { CreatePathsComponent } from '../create-paths/create-paths.component';
 import { CreateProfilesComponent } from '../create-profiles/create-profiles.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-profiles-folders',
@@ -18,4 +19,9 @@ import { CreateProfilesComponent } from '../create-profiles/create-profiles.comp
   templateUrl: './structure.component.html',
   styleUrl: './structure.component.css',
 })
-export class StructureComponent {}
+export class StructureComponent {
+  constructor(private router: Router) {}
+  backScreen() {
+    this.router.navigate(['/admin']);
+  }
+}

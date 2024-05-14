@@ -1,16 +1,9 @@
-.conteiner {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: calc(100% - 7rem);
-}
-
 .container-nav-line {
   width: 60%;
   padding: 5px 10px;
   position: relative;
-  top: -48px;
-  left: 19px;
+  top: -39px;
+  left: 145px;
   align-self: baseline;
   display: flex;
 }
@@ -34,6 +27,13 @@
   align-items: center;
 }
 
+.conteiner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100% - 7rem);
+}
+
 .register-user {
   display: flex;
   flex-direction: column;
@@ -41,21 +41,19 @@
   justify-content: flex-start;
   width: 100vw;
   height: 100%;
-  padding: 0 30px;
-  margin-top: -40px;
+  padding: 0 35px;
+  margin-top: -23px;
 }
 
-.register-user > h2 {
-  font-size: 1.8rem;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 3rem;
+.register-user-label {
+  font-size: 14px;
   margin: 0 0 1.4rem 0;
 }
 
 .forms {
+  border-top: 1px solid #e5e7eb;
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
 }
 
@@ -65,6 +63,8 @@
   justify-content: space-between;
   align-items: center;
   row-gap: 1rem;
+  width: 80%;
+  margin-top: 25px;
 }
 
 .form-create-user {
@@ -88,9 +88,8 @@
 
 .form-create-user > label {
   color: #2a2d2e;
-  font-size: 1rem;
+  font-size: 12px;
   font-style: normal;
-  font-weight: 500;
   line-height: 1.55rem;
   margin-bottom: 0.2rem;
 }
@@ -98,13 +97,13 @@
 .form-create-user > input {
   display: flex;
   align-items: center;
-  padding: 0.6rem;
   border: 1px solid gainsboro;
-  border-radius: 0.4rem;
-  font-size: 1rem;
+  border-radius: 3px;
+  font-size: 12px;
   width: 20rem;
   border-radius: 0.25rem;
-  background-color: #eaeaea;
+  outline: none;
+  padding: 5px 10px;
 }
 
 .button-form-cancel {
@@ -125,14 +124,14 @@
 }
 
 .button-form {
-  border-radius: 50px;
+  border-radius: 3px;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 0.4rem 0.6rem;
-  border: 0.25rem solid #090238;
-  background-color: #090238;
-  color: #d9dee0;
+  border: none;
+  background-color: #751a7e;
+  color: #fff;
   font-size: 14px;
   font-style: normal;
   font-weight: 300;
@@ -140,13 +139,7 @@
   margin-top: 3rem;
   cursor: pointer;
   transition: 0.5s;
-  width: 86px;
-}
-
-.button-form:hover {
-  background-color: #090238;
-  border: 0.25rem solid #090238;
-  opacity: 0.85;
+  width: 75px;
 }
 
 .buttons {
@@ -156,6 +149,8 @@
   height: 40%;
   align-self: flex-end;
   align-items: end;
+  position: fixed;
+  bottom: 20px;
 }
 
 .login-spinner {
@@ -167,6 +162,65 @@
   height: 19px;
   -webkit-animation: spin 1s linear infinite;
   animation: spin 1s linear infinite;
+}
+
+:host ::ng-deep .p-dropdown {
+  display: inline-flex;
+  cursor: pointer;
+  position: relative;
+  -webkit-user-select: none;
+  user-select: none;
+  font-size: 12px;
+  width: 100%;
+  height: 33px;
+  border-radius: 5px !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+:host ::ng-deep .p-dropdown .p-dropdown-label.p-placeholder {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+:host ::ng-deep .p-dropdown .p-dropdown-label {
+  font-size: 12px;
+}
+
+:host ::ng-deep span {
+  font-size: 12px;
+}
+
+:host
+  ::ng-deep
+  .p-dropdown-panel
+  .p-dropdown-items
+  .p-dropdown-item.p-highlight.p-focus
+  .p-dropdown-panel
+  .p-dropdown-items
+  .p-dropdown-item {
+  padding: 10px;
+}
+
+:host ::ng-deep .mdc-text-field--filled:not(.mdc-text-field--disabled) {
+  background-color: #fff;
+  font-size: 12px;
+}
+
+:host ::ng-deep .mat-mdc-standard-chip:not(.mdc-evolution-chip--disabled) {
+  background-color: #7b5fa5;
+}
+
+:host
+  ::ng-deep
+  .mat-mdc-chip.mdc-evolution-chip--with-trailing-action
+  .mat-mdc-chip-action-label {
+  color: #fff;
+}
+
+.mat-mdc-chip-remove .mat-icon {
+  color: #fff;
 }
 
 @-webkit-keyframes spin {

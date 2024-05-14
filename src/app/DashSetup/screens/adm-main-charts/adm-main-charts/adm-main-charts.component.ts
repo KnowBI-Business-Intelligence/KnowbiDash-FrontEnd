@@ -13,6 +13,7 @@ import { AngularDraggableModule } from 'angular2-draggable';
 import { MatTableModule } from '@angular/material/table';
 import Highcharts from 'highcharts';
 import { HttpHeaders } from '@angular/common/http';
+import { faFilter, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 
 interface Group {
   id: string;
@@ -53,6 +54,10 @@ interface ExtendedOptions extends Highcharts.Options {
   styleUrl: './adm-main-charts.component.css',
 })
 export class AdmMainChartsComponent implements OnInit {
+  icons = {
+    filter: faFilter,
+    arrowLeft: faChevronDown,
+  };
   @ViewChild('chartContainer') chartContainer!: ElementRef;
   name = 'Angular';
   position!: string;

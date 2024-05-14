@@ -3,7 +3,7 @@
   padding: 5px 10px;
   position: relative;
   top: -39px;
-  left: 19px;
+  left: 145px;
   align-self: baseline;
   display: flex;
 }
@@ -31,7 +31,8 @@
   margin: 0.2rem 0 0 1rem;
   margin-top: -20px;
   height: calc(93vh - 5px);
-  max-width: calc(97% - 5px);
+  max-width: calc(98% - 5px);
+  display: flex;
 }
 
 .groupname {
@@ -39,14 +40,32 @@
 }
 
 .filter {
+  position: fixed;
+  top: 46px;
+  right: 5px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  height: 2.2rem;
-  width: 100%;
+  align-items: baseline;
+  width: 39px;
   background-color: #fff;
-  padding: 5px;
-  border-bottom: solid 1px #e6e6e6;
+  border-left: solid 1px #e6e6e6;
+  height: 100vh;
+  transition: 0.3s;
+  padding: 10px 0;
+  z-index: 99;
+}
+
+.filter-button span {
+  font-size: 14px;
+  margin: 8px;
+  color: #0000008a;
+}
+
+.filter-group-buttons {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  height: 75px;
 }
 
 .filter-button button {
@@ -60,11 +79,19 @@
   border-radius: 3px;
   border: none;
   font-size: 12px;
+  transform: rotate(90deg);
+  margin: -2px;
 }
 
-.filter-icon {
-  color: #22035185;
-  font-size: 1rem;
+.filter .iconOpenFilter {
+  font-size: 11px;
+  color: #000000b4;
+  padding: 0px 2px 0px 15px;
+}
+
+.filter .iconSearch {
+  font-size: 12px;
+  padding: 0px 2px 0px 15px;
 }
 
 .filter-container {
@@ -117,11 +144,12 @@
 }
 
 .main-content {
-  height: calc(85vh - 5px);
-  max-height: calc(85vh - 5px);
+  height: calc(90vh - 5px);
+  max-height: calc(90vh - 5px);
+  max-width: calc(98vw - 5px);
   overflow-y: auto;
   overflow-x: hidden;
-  position: fixed;
+  /*position: fixed;*/
 }
 
 .container-charts {
@@ -142,22 +170,19 @@
 
 .chart-container {
   display: flex;
-  border: solid 1px #00000024;
-  margin: 5px;
+  margin: 4px 5px;
   width: 400px;
   height: 250px;
 }
 
 .card {
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  border-radius: 3px;
   padding: 10px 15px;
-  margin: 10px;
+  margin: 4px 5px;
   min-width: 200px;
   min-height: 83px;
   height: 83px;
   background-color: #fff;
-  box-shadow: 0px 1px 6px 3px rgb(211 211 211 / 13%);
   display: flex;
   align-items: baseline;
   flex-direction: column;
@@ -181,10 +206,10 @@
 }
 
 .table-container {
-  height: 95%;
+  margin: 4px 5px;
+  height: 50%;
   outline: none;
   background-color: #fff;
-  border: solid 1px #00000020;
   padding: 5px;
 }
 
@@ -239,9 +264,9 @@ table td {
   position: fixed;
   z-index: 999;
   right: 0;
-  top: 95px;
-  height: calc(87vh - 5px);
-  max-width: 80%;
+  top: 46px;
+  height: calc(80% - 5px);
+  max-width: 100%;
   overflow: hidden;
   display: flex;
   justify-content: center;

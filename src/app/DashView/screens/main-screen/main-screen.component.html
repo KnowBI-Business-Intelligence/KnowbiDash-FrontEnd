@@ -1,20 +1,41 @@
+<div class="container-nav-line">
+  <span>Início</span>
+</div>
 <div class="container">
-  <div class="container-path">
-    <div class="container-path-header">
-      <span>Pastas</span>
-    </div>
-    <div class="container-path-header-two">
-      <span>Pastas</span>
-    </div>
+  <div class="container-path-header">
+    <span>Pastas</span>
+    <header>
+      <div class="content-filter">
+        <div class="filter">
+          <fa-icon
+            class="icon"
+            [icon]="icons.search"
+            [size]="'xl'"
+            title="Dashboards"
+          ></fa-icon>
+          <span class="p-input-icon-left">
+            <input
+              pInputText
+              type="text"
+              [(ngModel)]="searchTerm"
+              placeholder="Pesquisar pasta"
+            />
+          </span>
+        </div>
+      </div>
+    </header>
+  </div>
+
+  <div class="content-main-container">
     <div *ngFor="let perfil of profiles">
       <div class="container-path-body-profile-label">
         <span
-          >Do perfil <strong>{{ perfil }}</strong></span
+          >Do perfil <strong>{{ perfil.name }}</strong></span
         >
         <div class="container-path-body">
           <button
             class="container-path-button"
-            *ngFor="let path of pathsByProfile[perfil]"
+            *ngFor="let path of perfil.paths"
             (click)="openChartGroup(path)"
           >
             <img src="assets/icons/folder.svg" alt="" />

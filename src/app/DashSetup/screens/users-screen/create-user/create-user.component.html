@@ -1,16 +1,16 @@
 <div class="container-nav-line">
-  <span>Início > Usuários > Cadastrar</span>
+  <span>Usuários > Cadastrar</span>
   <button (click)="backScreen()">
     <span> x </span>
   </button>
 </div>
 <div class="conteiner">
   <div class="register-user">
-    <h2>Cadastrar Usuário</h2>
+    <span class="register-user-label">Cadastrar Usuário</span>
     <div class="forms">
       <form class="form-register" name="form-create-user" #f="ngForm">
         <div class="form-create-user">
-          <label for="fullnameuser">Nome Completo: </label>
+          <label for="fullnameuser">Nome Completo </label>
           <input
             autocomplete="off"
             type="text"
@@ -18,12 +18,11 @@
             [(ngModel)]="form.fullusername"
             #fullusername="ngModel"
             [ngClass]="{ 'is-invalid': f.submitted && fullusername.errors }"
-            placeholder="Ex: João da Silva"
           />
         </div>
 
         <div class="form-create-user">
-          <label for="username">Nome de usuário: </label>
+          <label for="username">Usuário </label>
           <input
             autocomplete="off"
             type="text"
@@ -31,12 +30,11 @@
             [(ngModel)]="form.username"
             #username="ngModel"
             [ngClass]="{ 'is-invalid': f.submitted && username.errors }"
-            placeholder="Ex: NomeUsuario"
           />
         </div>
 
         <div class="form-create-user">
-          <label for="password">Senha: </label>
+          <label for="password">Senha </label>
           <input
             autocomplete="off"
             type="password"
@@ -47,12 +45,11 @@
             minlength="6"
             #password="ngModel"
             [ngClass]="{ 'is-invalid': f.submitted && password.errors }"
-            placeholder="******"
           />
         </div>
 
         <div class="form-create-user">
-          <label for="occupation">Ocupação: </label>
+          <label for="occupation">Ocupação </label>
           <input
             autocomplete="off"
             type="text"
@@ -62,12 +59,11 @@
             minlength="6"
             #occupation="ngModel"
             [ngClass]="{ 'is-invalid': f.submitted && occupation.errors }"
-            placeholder="Ex: Analista Jr"
           />
         </div>
 
         <div class="form-create-user">
-          <label for="email">E-mail: </label>
+          <label for="email">E-mail </label>
           <input
             autocomplete="off"
             type="email"
@@ -78,12 +74,11 @@
             minlength="6"
             #email="ngModel"
             [ngClass]="{ 'is-invalid': f.submitted && email.errors }"
-            placeholder="Ex: email@email.com"
           />
         </div>
 
         <div class="form-create-user">
-          <label for="access_level">Nível de acesso: </label>
+          <label for="access_level">Nível de acesso </label>
           <p-dropdown
             name="access_level"
             [options]="rolesOptions"
@@ -146,7 +141,7 @@
         class="button-form"
         (click)="onSubmit()"
       >
-        <span *ngIf="!isLoginLoading">Cadastrar</span>
+        <span *ngIf="!isLoginLoading">Salvar</span>
         <span *ngIf="isLoginLoading"><div class="login-spinner"></div></span>
       </button>
     </div>

@@ -8,6 +8,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
   faClose,
   faFilterCircleXmark,
+  faMagnifyingGlass,
 } from '@fortawesome/free-solid-svg-icons';
 import { FilterMetadata, MenuItem, MessageService } from 'primeng/api';
 import { ContextMenuModule } from 'primeng/contextmenu';
@@ -62,6 +63,7 @@ export class UsersComponent implements OnInit {
   icons = {
     filter: faFilterCircleXmark,
     closed: faClose,
+    search: faMagnifyingGlass,
   };
 
   allProfiles: string[] = [];

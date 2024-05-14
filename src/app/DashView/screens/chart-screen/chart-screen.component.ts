@@ -1,15 +1,13 @@
 import {
   CdkDrag,
-  CdkDragDrop,
   CdkDragHandle,
   CdkDropList,
   CdkDropListGroup,
-  moveItemInArray,
-  transferArrayItem,
 } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
+import { faFilter, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { HttpHeaders } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import Highcharts, { Options } from 'highcharts';
@@ -17,6 +15,18 @@ import { HighchartsChartModule } from 'highcharts-angular';
 import { ChartsService } from '../../../core/services/charts/charts.service';
 import { LocalstorageService } from '../../../core/services/local-storage/local-storage.service';
 import { StorageService } from '../../../core/services/user/storage.service';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { AngularDraggableModule } from 'angular2-draggable';
+import { MatTableModule } from '@angular/material/table';
+
+interface Group {
+  id: string;
+  name: string;
+}
+
+interface TableRow {
+  [key: string]: any;
+}
 
 interface ChartData {
   id: string;
@@ -42,91 +52,164 @@ interface ExtendedOptions extends Highcharts.Options {
     CdkDragHandle,
     CdkDropListGroup,
     HighchartsChartModule,
+    FontAwesomeModule,
+    AngularDraggableModule,
+    MatTableModule,
   ],
   templateUrl: './chart-screen.component.html',
   styleUrl: './chart-screen.component.css',
 })
 export class ChartScreenComponent implements OnInit {
-  loadingScreen!: boolean;
+  icons = {
+    filter: faFilter,
+    arrowLeft: faChevronDown,
+  };
+  @ViewChild('chartContainer') chartContainer!: ElementRef;
+  name = 'Angular';
+  position!: string;
+  groupName: string = '';
+  tableTitle: string = '';
+  chartConfig: any;
+  currentView: any;
+  changeBg: HTMLElement | null = null;
+  paths: { [key: string]: Group[] } = {};
+  pathNames: { [key: string]: string } = {};
   Highcharts: typeof Highcharts = Highcharts;
-
+  displayedColumns: string[] = [];
+  displayedRows: TableRow[] = [];
   chartGroupsData: Highcharts.Options[] = [];
+  cardGroupsData: any[] = [];
+  tableGroupsData: any[] = [];
   filters: any[] = [];
   selectedFilters: any = {};
-  chartObject: any;
   checkedValues: any = {};
-
+  copydataJSON: any[] = [];
+  selectedGroupId: any = null;
   originalChartData: ChartData[] = [];
   chartData: ChartData[] = [];
-  copydataJSON: any[] = [];
-
+  cardsData: any[] = [];
+  tableData: any[] = [];
   showModal: boolean = false;
   isLoginLoading: boolean = false;
+  user = this.storageService.getUser();
+  headers = new HttpHeaders({
+    Authorization: `Bearer ${this.user.token}`,
+  });
 
   constructor(
     private router: Router,
     private storageService: StorageService,
-    private chartService: ChartsService,
+    private chartsService: ChartsService,
     private localStorage: LocalstorageService
-  ) {
-    this.loadingScreen = true;
-  }
+  ) {}
 
   ngOnInit(): void {
-    const storedItems = this.localStorage.getDecryptedItem('items');
-
-    if (storedItems !== null) {
-      this.chartGroupsData = JSON.parse(storedItems) as Highcharts.Options[];
-    } else {
-      this.getCharts();
-    }
+    const storedChartGroupString =
+      this.localStorage.getDecryptedItem('chartGroupUser');
+    const storedChartGroup = JSON.parse(storedChartGroupString);
+    this.getCharts(storedChartGroup.id);
+    this.getCards(storedChartGroup.id);
+    this.getTables(storedChartGroup.id);
+    this.groupName = storedChartGroup.name;
+    console.log(storedChartGroup);
   }
 
-  drop(event: CdkDragDrop<Options[]>) {
-    if (event.previousContainer === event.container) {
-      moveItemInArray(
-        event.container.data,
-        event.previousIndex,
-        event.currentIndex
-      );
-    } else {
-      transferArrayItem(
-        event.previousContainer.data,
-        event.container.data,
-        event.previousIndex,
-        event.currentIndex
-      );
-    }
-    this.localStorage.setEncryptedItem(
-      'items',
-      JSON.stringify(this.chartGroupsData)
-    );
-  }
-
-  getCharts(): void {
-    const user = this.storageService.getUser();
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${user.token}`,
-    });
-
-    this.chartService.getCharts(headers).subscribe({
-      next: (data: any) => {
+  getCharts(id: string): void {
+    this.chartsService.getCharts(this.headers).subscribe({
+      next: (data) => {
         this.originalChartData = data;
-        this.loadData(data);
+        this.loadData(data, id);
       },
     });
   }
 
-  loadData(chartData: ChartData[]) {
-    this.chartObject = JSON.parse(
-      this.localStorage.getDecryptedItem('chartGroup') || 'null'
-    );
+  getCards(id: string): void {
+    this.chartsService.getCards(this.headers).subscribe({
+      next: (data) => {
+        this.loadCards(data, id);
+      },
+    });
+  }
+
+  getTables(id: string): void {
+    this.chartsService.getTables(this.headers).subscribe({
+      next: (data) => {
+        this.loadTables(data, id);
+      },
+    });
+  }
+
+  loadCards(cardData: any, groupId: any) {
+    this.cardGroupsData = [];
+    cardData.forEach((card: any) => {
+      if (card.chartGroup.id == groupId) {
+        console.log(card);
+
+        let result = null;
+        if (typeof card.result === 'number') {
+          result = this.formatterResultWhenDecimal(card.result);
+        } else {
+          result = card.result;
+        }
+        let cardTitle = card.title;
+        let cardResult = card.prefix + '' + result + ' ' + card.sufix;
+
+        let finalData = {
+          title: cardTitle,
+          content: cardResult,
+        };
+
+        this.cardGroupsData.push(finalData);
+      }
+    });
+  }
+
+  loadTables(tableData: any, groupId: any) {
+    this.tableGroupsData = [];
+    tableData.forEach((table: any) => {
+      if (
+        table.chartGroup.id == groupId &&
+        table.tableData &&
+        table.tableData.length > 0
+      ) {
+        console.log(tableData);
+        const tableGroup: any = {
+          title: table.title,
+          columns: [],
+          rows: [],
+        };
+
+        table.tableData.forEach((rowData: any) => {
+          rowData.th.forEach((th: string) => {
+            if (!tableGroup.columns.includes(th)) {
+              tableGroup.columns.push(th);
+            }
+          });
+        });
+
+        const numRows = table.tableData[0].td.length;
+        for (let i = 0; i < numRows; i++) {
+          const row: any = {};
+          table.tableData.forEach((rowData: any) => {
+            rowData.th.forEach((th: string, index: number) => {
+              row[th] = rowData.td[i];
+            });
+          });
+          tableGroup.rows.push(row);
+        }
+
+        this.tableGroupsData.push(tableGroup);
+      }
+    });
+  }
+
+  loadData(chartData: ChartData[], groupId: any) {
     this.chartGroupsData = [];
     this.copydataJSON = [];
     this.filters = [];
 
     chartData.forEach((chart: any) => {
-      if (chart.chartGroup && chart.chartGroup.id == this.chartObject) {
+      if (chart.chartGroup && chart.chartGroup.id == groupId) {
         chart.filters.forEach((filter: any) => {
           const existingFilter = this.filters.find(
             (f) => f.column === filter.column[0]
@@ -148,28 +231,31 @@ export class ChartScreenComponent implements OnInit {
     });
 
     chartData.forEach((dataItem: any) => {
-      if (dataItem.chartGroup.id == this.chartObject) {
-        const seriesData: any[] = [];
+      if (dataItem.chartGroup.id == groupId) {
         this.copydataJSON.push(dataItem);
-        dataItem.xAxisColumns.forEach((xAxisColumn: any, index: number) => {
-          const yAxisColumn = dataItem.yAxisColumns[index];
-          const seriesName = yAxisColumn ? yAxisColumn.name[0] : '';
+        const uniqueCategories: any = Array.from(
+          new Set(dataItem.xAxisColumns[0].data)
+        );
 
-          const seriesValues = xAxisColumn.data.map((value: any, i: number) => {
-            const yValue = yAxisColumn ? parseFloat(yAxisColumn.data[i]) : null;
+        const uniqueSubgroups = Array.from(new Set(dataItem.series[0].data));
 
-            return {
-              name: value,
-              y: yValue,
-            };
+        const seriesData = uniqueSubgroups.map((subgrupo: any) => {
+          const seriesValues: { name: string; y: any }[] = [];
+          dataItem.xAxisColumns[0].data.forEach((date: string, i: number) => {
+            if (dataItem.series[0].data[i] === subgrupo) {
+              seriesValues.push({
+                name: date,
+                y: dataItem.yAxisColumns[0].data[i],
+              });
+            }
           });
-
-          seriesData.push({
-            name: seriesName,
+          return {
+            type: dataItem.graphType,
+            name: subgrupo,
+            height: '20%',
             data: seriesValues,
-          });
+          };
         });
-
         const chartConfig: ExtendedOptions = {
           chart: {
             type: dataItem.graphType,
@@ -177,30 +263,56 @@ export class ChartScreenComponent implements OnInit {
           title: {
             text: dataItem.title,
             style: {
-              fontSize: '14px',
+              fontSize: '12px',
             },
           },
           xAxis: {
-            categories: dataItem.xAxisColumns[0].data,
+            categories: uniqueCategories,
             title: {
               text: dataItem.xAxisColumns[0].name[0],
+            },
+            labels: {
+              style: {
+                fontSize: '10px',
+              },
             },
           },
           yAxis: {
             title: {
               text: dataItem.yAxisColumns[0].name[0],
             },
+            labels: {
+              style: {
+                fontSize: '10px',
+              },
+            },
           },
           series: seriesData,
           tooltip: {
             shared: true,
           },
+          legend: {
+            maxHeight: 65,
+            itemStyle: {
+              fontSize: '10px',
+            },
+          },
+          plotOptions: {
+            series: {
+              cursor: 'pointer',
+              point: {
+                events: {
+                  click: function () {
+                    console.log('Coluna clicada:', this.category, this.y);
+                  },
+                },
+              },
+            },
+          },
           filters: dataItem.filters,
         };
 
-        if (!this.localStorage.getDecryptedItem('items')) {
-          this.chartGroupsData.push(chartConfig);
-        }
+        this.chartGroupsData.push(chartConfig);
       }
     });
   }
@@ -235,6 +347,7 @@ export class ChartScreenComponent implements OnInit {
   }
 
   allValuesMatchAllFilters(values: any[], allFilters: any[]): boolean {
+    console.log(values, allFilters);
     return values.every((value) => allFilters.includes(value));
   }
 
@@ -301,20 +414,36 @@ export class ChartScreenComponent implements OnInit {
       filters: formattedFilters,
     };
 
+    console.log('Dados formatados:', requestData);
+
     const user = this.storageService.getUser();
     const headers = new HttpHeaders({
       Authorization: `Bearer ${user.token}`,
     });
-    this.chartService.updateCharts(headers, requestData, id).subscribe({
-      next: () => {
-        this.getCharts();
+    this.chartsService.updateCharts(headers, requestData, id).subscribe({
+      next: (data: any) => {
+        console.log('Gráfico atualizado:', data);
+        this.getCharts(id);
         this.chartGroupsData = [];
         this.copydataJSON = [];
       },
-      error: (error: Error) => {
-        throw new Error('Erro ao atualizar o gráfico:', error);
+      error: (error: any) => {
+        console.error('Erro ao atualizar o gráfico:', error);
       },
     });
+  }
+
+  formatterResultWhenDecimal(result: number): string {
+    let formattedResult;
+    if (Number.isInteger(result)) {
+      formattedResult = result.toLocaleString('pt-BR');
+    } else {
+      formattedResult = result.toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+    }
+    return formattedResult;
   }
 
   openModal(): void {
@@ -337,10 +466,33 @@ export class ChartScreenComponent implements OnInit {
       filter.values = filterValuesByColumn[filter.column];
     });
 
-    this.showModal = !this.showModal;
+    this.showModal = true;
+  }
+
+  closeModal(): void {
+    this.showModal = false;
+  }
+
+  newPosition(event: any) {
+    const boundingRect = event.currentTarget.getBoundingClientRect();
+    const element = event.currentTarget;
+    const x = element.offsetLeft;
+    const y = element.offsetTop;
+
+    this.position = '(' + x + ', ' + y + ')';
+    console.log('yeah');
+  }
+
+  resizeChart() {
+    const chartWidth = this.chartContainer.nativeElement.offsetWidth;
+    const chartHeight = this.chartContainer.nativeElement.offsetHeight;
+    if (this.chartConfig && this.chartConfig.chart) {
+      this.chartConfig.chart.width = chartWidth;
+      this.chartConfig.chart.height = chartHeight;
+    }
   }
 
   backScreen() {
-    this.router.navigate(['/content/chartgroup']);
+    this.router.navigate(['/content/main/chartgroup']);
   }
 }

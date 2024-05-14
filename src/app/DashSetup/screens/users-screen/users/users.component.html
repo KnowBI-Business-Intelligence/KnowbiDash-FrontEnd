@@ -1,12 +1,9 @@
 <div class="container-nav-line">
-  <span>Início > Usuários</span>
-  <button (click)="backScreen()">
-    <span> x </span>
-  </button>
+  <span>Usuários</span>
 </div>
 <div class="container">
   <header>
-    <h2>Usuários</h2>
+    <span>Usuários</span>
     <button
       role="button"
       class="button-header"
@@ -34,6 +31,7 @@
         [(contextMenuSelection)]="selectedCustomers"
         [contextMenu]="cm"
         [globalFilterFields]="[
+          'id',
           'fullUserName',
           'userName',
           'email',
@@ -44,21 +42,19 @@
       >
         <ng-template pTemplate="caption">
           <div class="filter">
-            <button
-              pButton
-              label="Limpar"
-              class="p-button-outlined"
-              (click)="clear(tableReference)"
-            >
-              <fa-icon [icon]="icons.filter"></fa-icon>
-            </button>
+            <fa-icon
+              class="icon"
+              [icon]="icons.search"
+              [size]="'xl'"
+              title="Dashboards"
+            ></fa-icon>
             <span class="p-input-icon-left">
               <input
                 pInputText
                 type="text"
                 [(ngModel)]="searchValue"
                 (input)="onInputChange($event, tableReference)"
-                placeholder="Pesquisar.."
+                placeholder="Pesquisar"
               />
             </span>
           </div>
@@ -66,6 +62,9 @@
 
         <ng-template pTemplate="header">
           <tr>
+            <th style="min-width: 5rem" pSortableColumn="id">
+              <div class="flex align-items-center">Código</div>
+            </th>
             <th style="min-width: 15rem" pSortableColumn="fullUserName">
               <div class="flex align-items-center">Nome</div>
             </th>
@@ -113,6 +112,9 @@
             [state]="{ item: customer }"
             pContextMenuRow="customer"
           >
+            <td>
+              {{ customer.id }}
+            </td>
             <td>
               {{
                 customer.fullUserName.length > 15

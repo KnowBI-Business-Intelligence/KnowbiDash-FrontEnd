@@ -140,6 +140,17 @@ mat-list-item {
   border-bottom: solid 0.2px #e6e6e6;
 }
 
+.dashboard-label {
+  font-size: 14px;
+  color: #00000095;
+  border-right: solid 0.5px #e7e7e7;
+  padding-right: 20px;
+}
+
+.dashboard-label img {
+  width: 100px;
+}
+
 .profile-menu {
   display: flex;
   justify-content: center;
@@ -154,8 +165,8 @@ mat-list-item {
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 1px solid #ced4d7;
-  background-color: #abbac015;
+  border: none;
+  background-color: #751a7e;
   width: 35px;
   height: 35px;
   border-radius: 50px;
@@ -164,24 +175,14 @@ mat-list-item {
   padding: 0px;
 }
 
-.button-profile-menu:active {
-  border: 1px solid #ced4d784;
-  background-color: #abbac053;
-}
-
-.button-profile-menu:hover {
-  border: 1px solid #ced4d784;
-  background-color: #abbac053;
-}
-
 .initials {
   display: flex;
   justify-content: center;
   align-items: center;
-  color: #08051c;
+  color: #fff;
   width: 100%;
+  font-weight: 300;
   font-size: 20px;
-  font-weight: 400;
   line-height: 1.2rem;
   margin: 10px;
 }

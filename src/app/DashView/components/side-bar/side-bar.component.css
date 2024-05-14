@@ -84,13 +84,17 @@
   cursor: pointer;
 }
 
+.mat-drawer-content {
+  overflow: hidden !important;
+}
+
 .mat-toolbar {
   padding: 0 25px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   background-color: transparent;
-  height: 3.5rem;
+  height: 46px;
   background-color: #ffffff;
   box-shadow: -1px 0px 5px 1px rgba(211, 211, 211, 0.51);
   -webkit-box-shadow: -1px 0px 5px 1px rgba(211, 211, 211, 0.51);

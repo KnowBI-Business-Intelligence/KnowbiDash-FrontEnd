@@ -3,7 +3,7 @@
   padding: 5px 10px;
   position: relative;
   top: -39px;
-  left: 19px;
+  left: 145px;
   align-self: baseline;
   display: flex;
 }
@@ -21,19 +21,7 @@
   align-items: center;
   width: 100%;
   z-index: 1;
-}
-
-.container-nav-line button {
-  border-radius: 50px;
-  border: solid 0.5px #00000074;
-  color: #00000074;
-  cursor: pointer;
-  margin-left: 5px;
-  height: 20px;
-  width: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  margin-top: -5px;
 }
 
 header {
@@ -44,9 +32,30 @@ header {
   margin-top: -10px;
 }
 
+header span {
+  font-size: 15px;
+}
+
+.container-content-header-button-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  width: 10rem;
+}
+
+.action-button {
+  color: #4f80e1;
+  padding: 0 10px;
+}
+
+#deleteButton,
+#seeButton {
+  color: #aeaeae;
+}
+
 .content {
   width: 95%;
-  margin-top: 1rem;
+  max-height: calc(86vh - 5px);
 }
 
 .button-header {
@@ -61,6 +70,15 @@ header {
   justify-content: center;
   line-height: 1;
   padding: 0 0.5rem;
+  font-size: 12px;
+}
+
+:host ::ng-deep a {
+  font-size: 12px !important;
+}
+
+:host ::ng-deep .p-paginator-current,
+.p-paginator-rpp-options {
   font-size: 12px;
 }
 
@@ -82,9 +100,24 @@ header {
   margin-top: 1rem;
 }
 
+:host ::ng-deep .p-datatable .p-datatable-header {
+  padding: 1rem 0rem !important;
+}
+
 .filter {
-  display: flex;
   justify-content: start;
+  background-color: #fff;
+  display: flex;
+  justify-items: center;
+  align-items: center;
+  border-radius: 30px;
+  width: 250px;
+  height: 40px;
+}
+
+.filter .icon {
+  font-size: 10px;
+  padding: 8px 2px 8px 15px;
 }
 
 .filter button {
@@ -96,13 +129,17 @@ header {
 
 .filter input {
   padding: 0.6rem;
-  border-radius: 0.2rem;
   border: none;
+  outline: none;
+  background-color: transparent;
+  font-size: 12px;
+  width: 205px;
 }
 
 th {
   padding-bottom: 10px;
   padding-top: 10px;
+  font-size: 13px;
 }
 
 .tr {
@@ -115,7 +152,8 @@ td {
   border: 1px solid #e5e7eb;
   border-width: 0 0 1px 0;
   padding: 0.5rem 1rem;
-  font-size: 14px;
+  font-size: 12px;
+  max-width: 120px;
 }
 
 .modal {
@@ -127,10 +165,10 @@ td {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-color: rgb(0 0 0 / 22%);
   display: flex;
   justify-content: center;
   align-items: center;
+  backdrop-filter: blur(5px);
 }
 
 .modal-content {
@@ -139,9 +177,11 @@ td {
   padding: 20px;
   width: 480px;
   height: fit-content;
-  border-left: 10px solid rgb(255, 70, 70);
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
+  -webkit-box-shadow: 0px 1px 9px 3px rgba(66, 68, 90, 0.13);
+  -moz-box-shadow: 0px 1px 9px 3px rgba(66, 68, 90, 0.13);
+  box-shadow: 0px 1px 9px 3px rgba(66, 68, 90, 0.13);
 }
 
 .modal-content h2 {
@@ -207,6 +247,63 @@ td {
   height: 19px;
   -webkit-animation: spin 1s linear infinite;
   animation: spin 1s linear infinite;
+}
+
+.example-list.cdk-drop-list-dragging .example-box:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 4px;
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+    0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
+
+.cdk-drag-placeholder {
+  opacity: 0;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.example-box:last-child {
+  border: none;
+}
+
+*::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+*::-webkit-scrollbar-track {
+  border-radius: 5px;
+  background-color: #dfe9eb;
+}
+
+*::-webkit-scrollbar-track:hover {
+  background-color: #dfe9eb;
+}
+
+*::-webkit-scrollbar-track:active {
+  background-color: #dfe9eb;
+}
+
+*::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  background-color: #818979;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #363c33;
+}
+
+*::-webkit-scrollbar-thumb:active {
+  background-color: #01237e;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 20;
 }
 
 @-webkit-keyframes spin {

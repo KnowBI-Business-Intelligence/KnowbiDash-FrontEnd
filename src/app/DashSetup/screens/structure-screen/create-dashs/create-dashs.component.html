@@ -92,7 +92,11 @@
               <td>
                 {{ dataSource.chartPath ? "Sim" : "Não" }}
               </td>
-              <td>
+              <td
+                [title]="
+                  dataSource?.sql?.length > 0 ? dataSource.sql : 'Sem código'
+                "
+              >
                 {{
                   dataSource?.sql?.length > 0 ? dataSource.sql : "Sem código"
                 }}

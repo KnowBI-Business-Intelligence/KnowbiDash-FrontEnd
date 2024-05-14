@@ -1,46 +1,113 @@
+<div class="container-nav-line">
+  <span>Início > Dashboards > {{ groupName }}</span>
+  <button (click)="backScreen()">
+    <span> x </span>
+  </button>
+</div>
 <div class="container">
   <div class="filter">
-    <div class="filter-container">
-      <div class="filter-filters" *ngFor="let filter of filters">
-        <div class="filter-filters-data">
-          <h3>{{ filter.identifiers }}:</h3>
-          <span [title]="filter.values">{{ filter.values }} </span>
-        </div>
+    <div class="filter-button">
+      <div class="filter-group-buttons">
+        <button (click)="openModal()">
+          <fa-icon
+            class="iconSearch"
+            [icon]="icons.arrowLeft"
+            [size]="'xl'"
+          ></fa-icon>
+        </button>
+        <button (click)="openModal()">
+          <fa-icon
+            class="iconOpenFilter"
+            [icon]="icons.filter"
+            [size]="'xl'"
+          ></fa-icon>
+          <span>Filtros</span>
+        </button>
       </div>
     </div>
-    <div class="filter-button">
-      <button (click)="openModal()">
-        <p>Filtro</p>
-        <span class="material-symbols-outlined filter-icon"> filter_alt </span>
-      </button>
-    </div>
+    <!--<div class="filter-container">
+      <div class="filter-filters" *ngFor="let filter of filters">
+        <div class="filter-filters-data">
+          <h3>{{ filter.identifiers }}</h3>
+          <span [title]="filter.values">{{ filter.values }}</span>
+        </div>
+      </div>
+    </div>-->
   </div>
 
-  <div class="container-path">
-    <div class="container-path-header">
-      <span>Pastas > Grupos > Gráficos</span>
-      <button (click)="backScreen()">
-        <span> x </span>
-      </button>
-    </div>
-    <div class="container-path-body"></div>
-  </div>
-
-  <div class="container-charts">
-    <div
-      class="content-charts_left"
-      cdkDropList
-      [cdkDropListData]="chartGroupsData"
-      (cdkDropListDropped)="drop($event)"
-    >
-      @for (chartConfig of chartGroupsData; track chartConfig) {
-      <highcharts-chart
-        cdkDrag
-        style="width: 20rem; height: 20rem; margin: 5px"
-        [Highcharts]="Highcharts"
-        [options]="chartConfig"
-      ></highcharts-chart>
-      }
+  <div class="main-content">
+    <div class="bound-box" #myBounds>
+      <div class="container-charts">
+        <div class="left">
+          <div
+            *ngFor="let chartConfig of chartGroupsData"
+            class="chart-container"
+            ngResizable
+            ngDraggable
+            rzHandles="all"
+            [rzMinWidth]="350"
+            [rzMinHeight]="250"
+            (mouseup)="newPosition($event); resizeChart()"
+          >
+            <highcharts-chart
+              style="width: 100%; height: 100%"
+              [Highcharts]="Highcharts"
+              [options]="chartConfig"
+            ></highcharts-chart>
+          </div>
+          <div
+            *ngFor="let cardData of cardGroupsData"
+            class="card"
+            ngResizable
+            ngDraggable
+            rzHandles="all"
+            [rzMinWidth]="200"
+            [rzMinHeight]="83"
+            (mouseup)="newPosition($event); resizeChart()"
+          >
+            <div class="card-header">
+              {{ cardData.title }}
+            </div>
+            <div class="card-body">
+              <p>{{ cardData.content }}</p>
+            </div>
+          </div>
+          <section
+            *ngFor="let tableGroup of tableGroupsData"
+            class="table-container mat-elevation-z8"
+            tabindex="0"
+            ngResizable
+            ngDraggable
+            rzHandles="all"
+            [rzMinWidth]="350"
+            [rzMinHeight]="250"
+            (mouseup)="newPosition($event); resizeChart()"
+          >
+            <h2>{{ tableGroup.title }}</h2>
+            <section class="table-container-overflow">
+              <table mat-table [dataSource]="tableGroup.rows" matSort>
+                <ng-container
+                  *ngFor="let column of tableGroup.columns"
+                  [matColumnDef]="column"
+                >
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                    {{ column }}
+                  </th>
+                  <td mat-cell *matCellDef="let row">{{ row[column] }}</td>
+                </ng-container>
+                <tr
+                  mat-header-row
+                  *matHeaderRowDef="tableGroup.columns; sticky: true"
+                ></tr>
+                <tr
+                  mat-header-row
+                  *matRowDef="let row; columns: tableGroup.columns"
+                ></tr>
+              </table>
+            </section>
+          </section>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -49,16 +116,18 @@
     *ngIf="showModal"
     id="modal"
     [style.display]="showModal ? 'flex' : 'none'"
-    cdkDrag
+    ngDraggable
+    rzHandles="all"
   >
     <div class="modal-content">
       <div class="modal-header">
         <h2>Filtros</h2>
-        <span class="close" (click)="showModal = false">
-          <span class="material-symbols-outlined close-icon"> close </span>
-        </span>
+        <span class="close" (click)="closeModal()"
+          ><span class="material-symbols-outlined close-icon">
+            close
+          </span></span
+        >
       </div>
-
       <div class="modal-body">
         <div class="modal-fields" *ngFor="let filter of filters">
           <label for="filter.column">{{ filter.identifiers }}</label>
@@ -85,7 +154,7 @@
       </div>
       <div>
         <div class="modal-buttons">
-          <button class="exclude" (click)="executeFilter()">
+          <button class="exclude">
             <span *ngIf="!isLoginLoading">Filtrar</span>
             <span *ngIf="isLoginLoading"
               ><div class="login-spinner"></div

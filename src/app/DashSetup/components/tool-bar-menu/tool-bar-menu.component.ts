@@ -1,5 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  OnInit,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
@@ -52,6 +59,8 @@ interface SideNavTogle {
 })
 export class ToolBarMenuComponent implements OnInit {
   @Output() onToggleSideNav: EventEmitter<SideNavTogle> = new EventEmitter();
+  icon: HTMLElement | null = null;
+  item: HTMLElement | null = null;
   collapsed = false;
   screenWidth = 0;
   private roles: string[] = [];
@@ -63,6 +72,8 @@ export class ToolBarMenuComponent implements OnInit {
   aliasName?: string;
   user: any;
   userFirstName: any;
+
+  menuAtivo: any;
 
   icons = {
     home: faHome,
@@ -77,12 +88,25 @@ export class ToolBarMenuComponent implements OnInit {
   constructor(
     private auth: AuthService,
     private token: StorageService,
-    private router: Router
+    private router: Router,
+    private elementRef: ElementRef
   ) {}
 
   ngOnInit(): void {
     this.isLoggedIn = !!this.token.getToken();
 
+    this.initials();
+    if (this.menuAtivo == '') {
+      this.menuAtivo = 'home';
+    } else {
+      this.icon = this.elementRef.nativeElement.querySelector('.icon');
+      this.item = this.elementRef.nativeElement.querySelector('.menu-item');
+      this.icon!.style.color = '#5F65A5';
+      this.item!.style.color = '#5F65A5';
+    }
+  }
+
+  initials() {
     if (this.isLoggedIn) {
       this.user = this.token.getUser();
       this.roles = this.user.roles;
@@ -93,6 +117,12 @@ export class ToolBarMenuComponent implements OnInit {
       const name = this.user.fullUserName.split(' ');
       this.userFirstName = name[0].charAt(0).toUpperCase();
     }
+  }
+
+  toggleMenuAtivo(item: string) {
+    this.menuAtivo = item;
+    console.log(this.menuAtivo);
+    this.toggleClose();
   }
 
   logout() {
