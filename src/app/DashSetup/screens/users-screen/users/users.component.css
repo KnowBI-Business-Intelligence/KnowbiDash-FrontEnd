@@ -186,6 +186,7 @@ td {
 
 .modal-content h2 {
   font-size: 15px;
+  font-weight: 500;
 }
 
 .modal-content p {
@@ -270,6 +271,11 @@ td {
 
 .example-box:last-child {
   border: none;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-header {
+  border-left: none;
+  border-right: none;
 }
 
 *::-webkit-scrollbar {

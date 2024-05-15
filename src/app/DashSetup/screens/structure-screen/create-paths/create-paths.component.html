@@ -20,6 +20,14 @@
           >
             Excluir
           </button>
+          <button
+            [disabled]="actionButton"
+            class="action-button"
+            id="seeButton"
+            (click)="viewProfile()"
+          >
+            Ver
+          </button>
         </div>
       </div>
       <section class="example-container mat-elevation-z8" tabindex="0">
@@ -30,19 +38,31 @@
           [value]="dataSourceGroup"
           (matSortChange)="announceSortChange($event)"
           [rows]="10"
+          [paginator]="true"
+          [resizableColumns]="true"
+          styleClass="p-datatable-gridlines"
+          currentPageReportTemplate="Exibindo de {first} a {last} de {totalRecords} registros"
           [showCurrentPageReport]="true"
           [rowsPerPageOptions]="[10, 25, 50]"
           [globalFilterFields]="['id', 'name', 'path']"
         >
           <ng-template pTemplate="header">
             <tr>
-              <th style="min-width: 5rem" pSortableColumn="id">
+              <th pResizableColumn style="min-width: 5rem" pSortableColumn="id">
                 <div class="flex align-items-center">Código</div>
               </th>
-              <th style="min-width: 15rem" pSortableColumn="name">
+              <th
+                pResizableColumn
+                style="min-width: 15rem"
+                pSortableColumn="name"
+              >
                 <div class="flex align-items-center">Nome</div>
               </th>
-              <th style="min-width: 15rem" pSortableColumn="path">
+              <th
+                pResizableColumn
+                style="min-width: 15rem"
+                pSortableColumn="path"
+              >
                 <div class="flex align-items-center">Dashboards</div>
               </th>
             </tr>

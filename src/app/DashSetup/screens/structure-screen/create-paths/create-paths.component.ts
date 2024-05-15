@@ -272,7 +272,7 @@ export class CreatePathsComponent implements OnInit {
     const name = this.createFolderForm.get('name')?.value as string;
     const profile = this.createFolderForm.get('profile')?.value as any;
 
-    this.charts.createChartsPath(this.headers, name, profile.id).subscribe({
+    this.charts.createChartsPath(name, profile.id, this.headers).subscribe({
       next: () => {
         this.messageService.add({
           severity: 'sucess',

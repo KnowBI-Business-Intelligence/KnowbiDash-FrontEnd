@@ -10,14 +10,15 @@ import {
 } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
-import { MatTableModule } from '@angular/material/table';
 import { MessageService } from 'primeng/api';
 import { ContextMenuModule } from 'primeng/contextmenu';
 import { TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
-import { ProfileTable } from '../../../../core/modules/interfaces';
+import { Path, ProfileTable } from '../../../../core/modules/interfaces';
 import { ProfilesService } from '../../../../core/services/profiles/profiles.service';
 import { StorageService } from '../../../../core/services/user/storage.service';
+import { ChartsService } from '../../../../core/services/charts/charts.service';
+import { InputTextModule } from 'primeng/inputtext';
 
 @Component({
   selector: 'app-create-profiles',
@@ -26,21 +27,21 @@ import { StorageService } from '../../../../core/services/user/storage.service';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    MatTableModule,
     MatPaginator,
     MatSortModule,
     ContextMenuModule,
     ToastModule,
     TableModule,
+    InputTextModule,
   ],
   providers: [MessageService],
   templateUrl: './create-profiles.component.html',
   styleUrl: './create-profiles.component.css',
 })
 export class CreateProfilesComponent implements OnInit {
-backScreen() {
-throw new Error('Method not implemented.');
-}
+  backScreen() {
+    throw new Error('Method not implemented.');
+  }
   createProfilesForm = this.formBuilder.group({
     name: ['', Validators.required],
     observation: ['', Validators.required],
@@ -56,27 +57,38 @@ throw new Error('Method not implemented.');
   cancel: HTMLElement | null = null;
 
   displayedColumns: string[] = ['id', 'name', 'observation', 'chartPaths'];
+  listPaths: Path[] = [];
+  editPath: Path[] = [];
+  requestChartPaths: any[] = [];
 
   deleteProfile: boolean = false;
   isViewProfile: boolean = false;
   actionButton: boolean = false;
+  isEditProfile: boolean = false;
 
   dataSource: any;
-
-  private headers: any;
 
   selectedTab: string = '---';
   resultsLength: number = 0;
   selectedRow: ProfileTable | null = null;
   selectedProfile: ProfileTable | null = null;
   selectedRowChart: any;
+  profileId: any;
+
+  private user = this.token.getUser();
+
+  private headers = new HttpHeaders({
+    Authorization: `Bearer ${this.user.token}`,
+  });
+
   constructor(
     private _liveAnnouncer: LiveAnnouncer,
     private elementRef: ElementRef,
     private profile: ProfilesService,
     private token: StorageService,
     private formBuilder: FormBuilder,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private chartServices: ChartsService
   ) {}
 
   ngOnInit(): void {
@@ -84,26 +96,60 @@ throw new Error('Method not implemented.');
   }
 
   private getProfiles() {
-    const user = this.token.getUser();
-
-    if (!user || !user.token) {
-      console.error('Token não disponível');
-      return;
-    }
-
-    this.headers = new HttpHeaders({
-      Authorization: `Bearer ${user.token}`,
-    });
-
     this.profile.getProfiles(this.headers).subscribe({
       next: (value: any) => {
         this.dataSource = value;
         this.resultsLength = value?.length;
+        this.getPaths();
       },
       error: (err: Error) => {
         console.error(err);
       },
     });
+  }
+
+  getPaths() {
+    this.chartServices.getChartsPath(this.headers).subscribe({
+      next: (value: any) => {
+        this.loadPaths(value);
+      },
+    });
+  }
+
+  loadPaths(data: any) {
+    this.listPaths = [];
+    data.forEach((content: any) => {
+      this.listPaths.push(content);
+    });
+  }
+
+  printDetails(event: any, path: any) {
+    if (event.target.checked) {
+      if (!this.requestChartPaths.some((item) => item.id === path)) {
+        this.requestChartPaths.push({ id: path });
+        console.log(this.requestChartPaths);
+      }
+    } else {
+      const index = this.requestChartPaths.findIndex(
+        (item) => item.id === path
+      );
+      if (index !== -1) {
+        this.requestChartPaths.splice(index, 1);
+        console.log(this.requestChartPaths);
+      }
+    }
+  }
+
+  isSelected(path: any): boolean {
+    if (
+      this.selectedRow?.chartPaths &&
+      Array.isArray(this.selectedRow.chartPaths)
+    ) {
+      return this.selectedRow.chartPaths.some(
+        (chartPath) => chartPath.id === path.id && chartPath.name === path.name
+      );
+    }
+    return false;
   }
 
   announceSortChange(sortState: any) {
@@ -119,7 +165,7 @@ throw new Error('Method not implemented.');
     this.deleteButton =
       this.elementRef.nativeElement.querySelector('#deleteButton');
     this.seeButton = this.elementRef.nativeElement.querySelector('#seeButton');
-
+    this.profileId = row.id;
     if (this.deleteButton) {
       this.deleteButton.style.color = '#4f80e1';
     }
@@ -128,21 +174,22 @@ throw new Error('Method not implemented.');
     }
   }
 
-  isSelected(row: ProfileTable): boolean {
-    return this.selectedRow === row;
-  }
-
   viewProfile() {
+    this.requestChartPaths = [];
     this.isViewProfile = !this.isViewProfile;
     this.selectedRowChart = this.selectedRow?.chartPaths;
-
     this.actionButton = true;
-    const table =
-      this.elementRef.nativeElement.querySelector('.container-content');
+    this.getPaths();
 
-    if (table) {
-      table.style.filter = 'blur(3px)';
-    }
+    this.selectedRowChart.forEach((data: any) => {
+      if (
+        this.listPaths.some(
+          (path: any) => path.id === data.id && path.name === data.name
+        )
+      ) {
+        this.requestChartPaths.push({ id: data.id });
+      }
+    });
   }
 
   notViewProfile() {
@@ -158,7 +205,7 @@ throw new Error('Method not implemented.');
   }
 
   onRowDoubleClick(row: ProfileTable) {
-    console.log('double click:', row);
+    //console.log('double click:', row);
   }
 
   deleteProfiles() {
@@ -173,6 +220,7 @@ throw new Error('Method not implemented.');
   }
 
   addRegister() {
+    this.getPaths();
     this.list = this.elementRef.nativeElement.querySelector('#list');
     this.add = this.elementRef.nativeElement.querySelector('#add');
 
@@ -202,7 +250,6 @@ throw new Error('Method not implemented.');
         next: () => {
           this.messageService.add({
             severity: 'sucess',
-            summary: 'Sucesso',
             detail: 'Perfil excluído!',
           });
           this.cancelDelete();
@@ -210,7 +257,6 @@ throw new Error('Method not implemented.');
         error: () => {
           this.messageService.add({
             severity: 'error',
-            summary: 'Erro',
             detail: 'Erro ao excluir.',
           });
         },
@@ -236,12 +282,23 @@ throw new Error('Method not implemented.');
     const observation = this.createProfilesForm.get('observation')
       ?.value as string;
 
-    this.profile.createProfiles(this.headers, name, observation).subscribe({
+    const chartPaths = this.requestChartPaths.map((path: any) => {
+      return { id: path.id.toString() };
+    });
+
+    const requestBody = {
+      name,
+      observation,
+      chartPaths,
+    };
+
+    console.log(requestBody);
+    this.profile.createProfiles(requestBody, this.headers).subscribe({
       next: () => {
         this.messageService.add({
-          severity: 'sucess',
+          severity: 'success',
           summary: 'Sucesso',
-          detail: 'Perfil criado!',
+          detail: 'Perfil criado',
         });
         this.cancelRegister();
         this.createProfilesForm.reset({ name: '', observation: '' });
@@ -254,5 +311,45 @@ throw new Error('Method not implemented.');
         });
       },
     });
+  }
+
+  updateProfile() {
+    console.log(this.profileId);
+    this.notViewProfile();
+    const name = this.createProfilesForm.get('name')?.value as string;
+    const observation = this.createProfilesForm.get('observation')
+      ?.value as string;
+
+    const chartPaths = this.requestChartPaths.map((path: any) => {
+      return { id: path.id.toString() };
+    });
+
+    const requestBody = {
+      name,
+      observation,
+      chartPaths,
+    };
+
+    console.log(requestBody);
+    this.profile
+      .updateProfiles(this.profileId, requestBody, this.headers)
+      .subscribe({
+        next: () => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Sucesso',
+            detail: 'Perfil atualizado',
+          });
+          this.cancelRegister();
+          this.createProfilesForm.reset({ name: '', observation: '' });
+        },
+        error: () => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erro',
+            detail: 'Erro ao executar ação.',
+          });
+        },
+      });
   }
 }

@@ -21,30 +21,31 @@ export class ProfilesService {
     return this.http.get(`${this.ENV_PROFILES}/get`, headersRgister);
   }
 
-  createProfiles(
-    headers: HttpHeaders,
-    name: string,
-    observation: string,
-    chartPath: {} = {}
-  ): Observable<any> {
+  createProfiles(requestBody: any, headers: HttpHeaders): Observable<any> {
     const myHeaders = {
       headers: headers,
     };
 
-    const body = {
-      name,
-      observation,
-      chartPath,
-    };
-
-    return this.http.post(`${this.ENV_PROFILES}/create`, body, myHeaders);
+    return this.http.post(
+      `${this.ENV_PROFILES}/create`,
+      requestBody,
+      myHeaders
+    );
   }
 
-  updateProfiles(headers: HttpHeaders): Observable<any> {
+  updateProfiles(
+    id: any,
+    requestBody: any,
+    headers: HttpHeaders
+  ): Observable<any> {
     const headersRgister = {
       headers: headers,
     };
-    return this.http.get(`${this.ENV_PROFILES}/get`, headersRgister);
+    return this.http.patch(
+      `${this.ENV_PROFILES}/update/${id}`,
+      requestBody,
+      headersRgister
+    );
   }
 
   deleteProfiles(headers: HttpHeaders, profileID: string): Observable<any> {

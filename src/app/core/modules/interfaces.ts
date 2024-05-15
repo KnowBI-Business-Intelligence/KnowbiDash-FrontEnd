@@ -37,3 +37,9 @@ export interface Roles {
   id: string;
   name: string;
 }
+
+export interface Path {
+  id: string;
+  name: string;
+  checked: boolean;
+}

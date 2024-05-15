@@ -39,23 +39,39 @@
           (matSortChange)="announceSortChange($event)"
           [(contextMenuSelection)]="selectedProfile"
           [rows]="10"
+          [paginator]="true"
+          [resizableColumns]="true"
+          styleClass="p-datatable-gridlines"
+          currentPageReportTemplate="Exibindo de {first} a {last} de {totalRecords} registros"
           [showCurrentPageReport]="true"
           [rowsPerPageOptions]="[10, 25, 50]"
           [globalFilterFields]="['id', 'name', 'observation', 'chartPaths']"
         >
           <ng-template pTemplate="header">
             <tr>
-              <th style="min-width: 5rem" pSortableColumn="id">
+              <th pResizableColumn style="min-width: 5rem" pSortableColumn="id">
                 <div class="flex align-items-center">Código</div>
               </th>
-              <th style="min-width: 15rem" pSortableColumn="name">
+              <th
+                pResizableColumn
+                style="min-width: 12rem"
+                pSortableColumn="name"
+              >
                 <div class="flex align-items-center">Nome</div>
               </th>
-              <th style="min-width: 15rem" pSortableColumn="observation">
+              <th
+                pResizableColumn
+                style="min-width: 12rem"
+                pSortableColumn="observation"
+              >
                 <div class="flex align-items-center">Documentação</div>
               </th>
 
-              <th style="min-width: 6rem" pSortableColumn="chartPaths">
+              <th
+                pResizableColumn
+                style="min-width: 6rem"
+                pSortableColumn="chartPaths"
+              >
                 <div class="flex align-items-center">Pastas</div>
               </th>
             </tr>
@@ -67,15 +83,16 @@
               pSelectableRow="dataSource"
               pContextMenuRow="dataSource"
               (click)="selectRow(dataSource)"
+              (dblclick)="onRowDoubleClick(dataSource)"
               [pSelectableRow]="dataSource"
             >
-              <td>
+              <td [title]="dataSource.id">
                 {{ dataSource.id }}
               </td>
-              <td>
+              <td [title]="dataSource.name">
                 {{ dataSource.name }}
               </td>
-              <td>
+              <td [title]="dataSource.observation">
                 {{ dataSource.observation }}
               </td>
               <td>
@@ -91,44 +108,75 @@
           </ng-template>
         </p-table>
       </section>
-      <mat-paginator
-        [pageSize]="resultsLength"
-        [length]="resultsLength"
-      ></mat-paginator>
     </div>
   </div>
 
-  <!-- Adicionar perfil -->
-
   <div class="container-add" id="add">
     <div class="container-content-add">
-      <h2>Cadastro de Perfil</h2>
+      <h2>Adicionar</h2>
     </div>
     <div class="container-add-body">
       <form class="form-search" [formGroup]="createProfilesForm">
-        <div class="form-group-input">
-          <label for="username">Nome do perfil</label>
-          <input
-            type="text"
-            class="form-control"
-            name="username"
-            autocomplete="off"
-            formControlName="name"
-            required
-            maxlength="60"
-          />
+        <div>
+          <div class="form-group-input">
+            <label for="username">Nome do perfil</label>
+            <input
+              type="text"
+              class="form-control"
+              name="username"
+              autocomplete="off"
+              formControlName="name"
+              required
+              maxlength="60"
+            />
+          </div>
+          <div class="form-group-input">
+            <label for="username">Documentação do perfil</label>
+            <textarea
+              type="text"
+              class="form-control-doc"
+              name="username"
+              autocomplete="off"
+              formControlName="observation"
+              required
+              maxlength="250"
+              rows="6"
+              cols="50"
+            ></textarea>
+          </div>
         </div>
-        <div class="form-group-input">
-          <label for="username">Documentação do perfil</label>
-          <input
-            type="text"
-            class="form-control"
-            name="username"
-            autocomplete="off"
-            formControlName="observation"
-            required
-            maxlength="250"
-          />
+        <div class="paths">
+          <span>Vincular pasta</span>
+          <div
+            style="
+              max-height: 80%;
+              overflow-y: auto;
+              overflow-x: hidden;
+              margin-top: 8px;
+            "
+          >
+            <table>
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Código</th>
+                  <th>Nome</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let path of listPaths">
+                  <td>
+                    <input
+                      type="checkbox"
+                      (change)="printDetails($event, path.id)"
+                    />
+                  </td>
+                  <td>{{ path.id }}</td>
+                  <td>{{ path.name }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </form>
     </div>
@@ -139,57 +187,104 @@
   </div>
 
   <div class="message">
-    <p-toast [life]="1500"></p-toast>
-  </div>
-
-  <div class="modal-delete-profile" *ngIf="deleteProfile">
-    <div class="container_delete-profile">
-      <span>Tem certeza de que deseja excluir este registro?</span>
-      <div class="buttons_delete-profile">
-        <button
-          class="action-buttons_delete-profile yes"
-          (click)="confirmDelete()"
-        >
-          Sim
-        </button>
-        <button
-          class="action-buttons_delete-profile no"
-          (click)="cancelDelete()"
-        >
-          Não
-        </button>
-      </div>
-    </div>
+    <p-toast [life]="2500"></p-toast>
   </div>
 
   <div class="modal-view-profile" *ngIf="isViewProfile">
-    <div class="container_view-profile">
-      <span>Informações do perfil:</span>
-      <div class="container_profile-infos">
-        <div class="container_profile-left">
-          <span>Nome: </span>
-          <span> {{ selectedRow?.name }}</span>
-          <br />
-          <span>Documentação: </span>
-          <span>{{ selectedRow?.observation }}</span>
-        </div>
-
-        <div class="container_profile-rigth">
-          Pastas:
-          <div class="overflow-content_profile-rigth">
-            <div
-              class="content_profile-rigth"
-              *ngFor="let item of selectedRowChart"
-            >
-              <span>{{ item.id }}</span>
-              <span>{{ item.name }}</span>
-            </div>
+    <div class="container-edit-content">
+      <h2>Editar</h2>
+    </div>
+    <div class="container-edit-body">
+      <form class="form-search" [formGroup]="createProfilesForm">
+        <div>
+          <div class="form-group-input">
+            <label for="username">Nome do perfil</label>
+            <input
+              type="text"
+              class="form-control"
+              name="username"
+              autocomplete="off"
+              formControlName="name"
+              required
+              maxlength="60"
+              [(ngModel)]="selectedRow!.name"
+            />
+          </div>
+          <div class="form-group-input">
+            <label for="username">Documentação do perfil</label>
+            <textarea
+              type="text"
+              class="form-control-doc"
+              name="username"
+              autocomplete="off"
+              formControlName="observation"
+              required
+              maxlength="250"
+              rows="6"
+              cols="50"
+              [(ngModel)]="selectedRow!.observation"
+            ></textarea>
           </div>
         </div>
-      </div>
-      <div class="footer_view-profile">
-        <p></p>
-        <button (click)="notViewProfile()">Voltar</button>
+        <div class="paths">
+          <span>Vincular pasta</span>
+          <div
+            style="
+              max-height: 90%;
+              overflow-y: auto;
+              overflow-x: hidden;
+              margin-top: 8px;
+            "
+          >
+            <table>
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Código</th>
+                  <th>Nome</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let path of listPaths">
+                  <td>
+                    <input
+                      type="checkbox"
+                      (change)="printDetails($event, path.id)"
+                      [checked]="isSelected(path)"
+                    />
+                  </td>
+                  <td>{{ path.id }}</td>
+                  <td>{{ path.name }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="container-add-footer">
+      <button id="cancel" (click)="notViewProfile()">Voltar</button>
+      <button (click)="updateProfile()">Salvar</button>
+    </div>
+  </div>
+
+  <div
+    class="modal"
+    *ngIf="deleteProfile"
+    id="modal"
+    [style.display]="deleteProfile ? 'flex' : 'none'"
+  >
+    <div class="modal-content">
+      <span class="close" (click)="cancelDelete()">&times;</span>
+      <div>
+        <h2>Tem certeza de que deseja excluir este perfil?</h2>
+        <p>Esta ação não pode ser desfeita</p>
+        <div class="modal-buttons">
+          <button class="cancel" (click)="cancelDelete()">cancelar</button>
+          <button class="exclude" (click)="confirmDelete()">
+            <span>Excluir</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
