@@ -245,19 +245,20 @@ export class CreateProfilesComponent implements OnInit {
   }
 
   confirmDelete() {
+    this.cancelDelete();
     if (this.selectedRow) {
       this.profile.deleteProfiles(this.headers, this.selectedRow.id).subscribe({
         next: () => {
           this.messageService.add({
-            severity: 'sucess',
-            detail: 'Perfil excluído!',
+            severity: 'success',
+            detail: 'Perfil excluído',
           });
           this.cancelDelete();
         },
         error: () => {
           this.messageService.add({
             severity: 'error',
-            detail: 'Erro ao excluir.',
+            detail: 'Erro ao excluir, verifique os vinculos do perfil',
           });
         },
       });

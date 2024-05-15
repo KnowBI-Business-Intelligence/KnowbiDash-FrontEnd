@@ -275,7 +275,7 @@ export class CreatePathsComponent implements OnInit {
     this.charts.createChartsPath(name, profile.id, this.headers).subscribe({
       next: () => {
         this.messageService.add({
-          severity: 'sucess',
+          severity: 'success',
           summary: 'Sucesso',
           detail: 'Pasta criada!',
         });
