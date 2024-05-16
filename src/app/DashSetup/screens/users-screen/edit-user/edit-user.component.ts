@@ -187,17 +187,7 @@ export class EditUserComponent implements OnInit {
     this.isLoginLoading = true;
     setTimeout(() => {
       this.isLoginLoading = false;
-    }, 2500);
-
-    if (this.areRequiredFieldsEmpty()) {
-      this.isLoginLoading = false;
-      this.messageService.add({
-        severity: 'error',
-        summary: '',
-        detail: 'Por favor, preencha todos os campos obrigatórios.',
-      });
-      return;
-    }
+    }, 2000);
 
     const {
       fullusername,
@@ -237,19 +227,20 @@ export class EditUserComponent implements OnInit {
         this.messageService.add({
           severity: 'success',
           summary: 'Sucesso',
-          detail: 'Usuário Atualizado!',
+          detail: 'Usuário Atualizado',
         });
         setTimeout(() => {
           this.router.navigate(['/admin/users_panel']);
           this.isLoginLoading = false;
-        }, 2500);
+        }, 2000);
         this.f.reset();
       },
       error: (err) => {
         this.messageService.add({
           severity: 'error',
           summary: 'Erro',
-          detail: 'Ocorreu um erro durante a atualização.',
+          detail:
+            'Ocorreu um erro durante a atualização, verifique os campos preenchidos',
         });
         console.error(err);
       },
@@ -268,7 +259,6 @@ export class EditUserComponent implements OnInit {
 
     this.authService.getById(id, headers).subscribe({
       next: (userData: any) => {
-        console.log(userData);
         this.form.fullusername = userData.fullUserName;
         this.form.username = userData.userName;
         this.form.password = userData.password;

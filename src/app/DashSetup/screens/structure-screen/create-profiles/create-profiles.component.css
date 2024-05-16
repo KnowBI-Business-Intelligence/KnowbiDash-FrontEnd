@@ -87,13 +87,46 @@ button {
 }
 
 .example-container {
-  max-height: 87%;
+  max-height: 88%;
   overflow: auto;
   outline: none;
 }
 
+.filter {
+  justify-content: start;
+  background-color: #fff;
+  display: flex;
+  justify-items: center;
+  align-items: center;
+  border-radius: 30px;
+  width: 250px;
+  height: 30px;
+}
+
+.filter .icon {
+  font-size: 10px;
+  padding: 8px 2px 8px 15px;
+}
+
+.filter button {
+  padding: 0.6rem;
+  border: none;
+  margin-right: 1rem;
+  border-radius: 0.2rem;
+}
+
+.filter input {
+  padding: 0.6rem;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  font-size: 12px;
+  width: 205px;
+}
+
 th {
-  font-size: 0.75rem;
+  font-size: 12px;
+  font-weight: 450;
   padding-bottom: 0.625rem;
   padding-top: 0.625rem;
 }
@@ -142,6 +175,12 @@ td {
 .container-add-body {
   width: 100%;
   height: 83%;
+}
+
+.checkbox {
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
 }
 
 .container-add-footer {
@@ -222,12 +261,12 @@ td {
 }
 
 .form-search {
-  height: 93%;
+  height: 100%;
   border-radius: 5px;
   display: flex;
-  justify-content: space-between;
-  width: 55%;
-  margin-top: 25px;
+  justify-content: flex-start;
+  width: 100%;
+  margin-top: 10px;
 }
 
 .form-group-input {
@@ -265,6 +304,7 @@ textarea {
 
 .paths {
   padding: 7px;
+  width: 650px;
 }
 
 .paths table {
@@ -450,5 +490,18 @@ textarea {
 
 :host ::ng-deep .p-paginator-current,
 .p-paginator-rpp-options {
+  font-size: 12px;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-header {
+  border-left: none;
+  border-right: none;
+}
+
+:host ::ng-deep .p-datatable .p-paginator-bottom {
+  padding: 2px;
+}
+
+:host ::ng-deep .p-paginator .p-paginator-pages .p-paginator-page {
   font-size: 12px;
 }

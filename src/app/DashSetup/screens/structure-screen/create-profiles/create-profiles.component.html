@@ -32,6 +32,7 @@
       </div>
       <section class="example-container mat-elevation-z8" tabindex="0">
         <p-table
+          #tableReference
           matSort
           class="mat-elevation-z8 demo-table"
           selectionMode="single"
@@ -41,15 +42,33 @@
           [rows]="10"
           [paginator]="true"
           [resizableColumns]="true"
+          scrollHeight="350px"
           styleClass="p-datatable-gridlines"
           currentPageReportTemplate="Exibindo de {first} a {last} de {totalRecords} registros"
           [showCurrentPageReport]="true"
           [rowsPerPageOptions]="[10, 25, 50]"
           [globalFilterFields]="['id', 'name', 'observation', 'chartPaths']"
         >
+          <ng-template pTemplate="caption">
+            <div class="filter">
+              <fa-icon
+                class="icon"
+                [icon]="icons.search"
+                [size]="'xl'"
+              ></fa-icon>
+              <span class="p-input-icon-left">
+                <input
+                  pInputText
+                  type="text"
+                  (input)="onInputChange($event, tableReference)"
+                  placeholder="Pesquisar"
+                />
+              </span>
+            </div>
+          </ng-template>
           <ng-template pTemplate="header">
             <tr>
-              <th pResizableColumn style="min-width: 5rem" pSortableColumn="id">
+              <th pResizableColumn style="width: 2rem" pSortableColumn="id">
                 <div class="flex align-items-center">Código</div>
               </th>
               <th
@@ -147,35 +166,85 @@
         </div>
         <div class="paths">
           <span>Vincular pasta</span>
-          <div
-            style="
-              max-height: 80%;
-              overflow-y: auto;
-              overflow-x: hidden;
-              margin-top: 8px;
-            "
-          >
-            <table>
-              <thead>
+          <div style="overflow-y: auto; overflow-x: hidden; margin-top: 8px">
+            <p-table
+              #tableCreate
+              matSort
+              class="mat-elevation-z8 demo-table"
+              selectionMode="single"
+              [value]="listPaths"
+              (matSortChange)="announceSortChange($event)"
+              [rows]="10"
+              [paginator]="true"
+              [resizableColumns]="true"
+              scrollHeight="250px"
+              styleClass="p-datatable-gridlines"
+              [globalFilterFields]="['id', 'name']"
+            >
+              <ng-template pTemplate="caption">
+                <div class="filter">
+                  <fa-icon
+                    class="icon"
+                    [icon]="icons.search"
+                    [size]="'xl'"
+                  ></fa-icon>
+                  <span class="p-input-icon-left">
+                    <input
+                      pInputText
+                      type="text"
+                      (input)="onInputChange($event, tableCreate)"
+                      placeholder="Pesquisar"
+                    />
+                  </span>
+                </div>
+              </ng-template>
+              <ng-template pTemplate="header">
                 <tr>
-                  <th></th>
-                  <th>Código</th>
-                  <th>Nome</th>
+                  <th style="width: 1rem">
+                    <div class="flex align-items-center"></div>
+                  </th>
+                  <th
+                    pResizableColumn
+                    style="min-width: 5rem"
+                    pSortableColumn="id"
+                  >
+                    <div class="flex align-items-center">Código</div>
+                  </th>
+                  <th
+                    pResizableColumn
+                    style="min-width: 12rem"
+                    pSortableColumn="name"
+                  >
+                    <div class="flex align-items-center">Pasta</div>
+                  </th>
                 </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let path of listPaths">
+              </ng-template>
+
+              <ng-template pTemplate="body" let-listPaths>
+                <tr
+                  #tr
+                  pSelectableRow="listPaths"
+                  pContextMenuRow="listPaths"
+                  [pSelectableRow]="listPaths"
+                >
                   <td>
                     <input
                       type="checkbox"
-                      (change)="printDetails($event, path.id)"
+                      class="checkbox"
+                      (change)="printDetails($event, listPaths.id)"
                     />
                   </td>
-                  <td>{{ path.id }}</td>
-                  <td>{{ path.name }}</td>
+                  <td>{{ listPaths.id }}</td>
+                  <td>{{ listPaths.name }}</td>
                 </tr>
-              </tbody>
-            </table>
+              </ng-template>
+
+              <ng-template pTemplate="emptymessage">
+                <tr>
+                  <td colspan="7">Sem registros encontrados</td>
+                </tr>
+              </ng-template>
+            </p-table>
           </div>
         </div>
       </form>
@@ -195,7 +264,7 @@
       <h2>Editar</h2>
     </div>
     <div class="container-edit-body">
-      <form class="form-search" [formGroup]="createProfilesForm">
+      <form class="form-search" [formGroup]="editProfilesForm">
         <div>
           <div class="form-group-input">
             <label for="username">Nome do perfil</label>
@@ -236,28 +305,85 @@
               margin-top: 8px;
             "
           >
-            <table>
-              <thead>
+            <p-table
+              #tableEdit
+              matSort
+              class="mat-elevation-z8 demo-table"
+              selectionMode="single"
+              [value]="listPaths"
+              (matSortChange)="announceSortChange($event)"
+              [rows]="10"
+              [paginator]="true"
+              [resizableColumns]="true"
+              scrollHeight="250px"
+              styleClass="p-datatable-gridlines"
+              [globalFilterFields]="['id', 'name']"
+            >
+              <ng-template pTemplate="caption">
+                <div class="filter">
+                  <fa-icon
+                    class="icon"
+                    [icon]="icons.search"
+                    [size]="'xl'"
+                  ></fa-icon>
+                  <span class="p-input-icon-left">
+                    <input
+                      pInputText
+                      type="text"
+                      (input)="onInputChange($event, tableEdit)"
+                      placeholder="Pesquisar"
+                    />
+                  </span>
+                </div>
+              </ng-template>
+              <ng-template pTemplate="header">
                 <tr>
-                  <th></th>
-                  <th>Código</th>
-                  <th>Nome</th>
+                  <th style="width: 1rem">
+                    <div class="flex align-items-center"></div>
+                  </th>
+                  <th
+                    pResizableColumn
+                    style="min-width: 5rem"
+                    pSortableColumn="id"
+                  >
+                    <div class="flex align-items-center">Código</div>
+                  </th>
+                  <th
+                    pResizableColumn
+                    style="min-width: 12rem"
+                    pSortableColumn="name"
+                  >
+                    <div class="flex align-items-center">Pasta</div>
+                  </th>
                 </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let path of listPaths">
+              </ng-template>
+
+              <ng-template pTemplate="body" let-listPaths>
+                <tr
+                  #tr
+                  pSelectableRow="listPaths"
+                  pContextMenuRow="listPaths"
+                  [pSelectableRow]="listPaths"
+                >
                   <td>
                     <input
                       type="checkbox"
-                      (change)="printDetails($event, path.id)"
-                      [checked]="isSelected(path)"
+                      class="checkbox"
+                      (change)="printDetails($event, listPaths.id)"
+                      [checked]="isSelected(listPaths)"
                     />
                   </td>
-                  <td>{{ path.id }}</td>
-                  <td>{{ path.name }}</td>
+                  <td>{{ listPaths.id }}</td>
+                  <td>{{ listPaths.name }}</td>
                 </tr>
-              </tbody>
-            </table>
+              </ng-template>
+
+              <ng-template pTemplate="emptymessage">
+                <tr>
+                  <td colspan="7">Sem registros encontrados</td>
+                </tr>
+              </ng-template>
+            </p-table>
           </div>
         </div>
       </form>
@@ -277,7 +403,7 @@
     <div class="modal-content">
       <span class="close" (click)="cancelDelete()">&times;</span>
       <div>
-        <h2>Tem certeza de que deseja excluir este perfil?</h2>
+        <h2>Tem certeza de que deseja excluir este registro?</h2>
         <p>Esta ação não pode ser desfeita</p>
         <div class="modal-buttons">
           <button class="cancel" (click)="cancelDelete()">cancelar</button>

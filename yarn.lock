@@ -5929,10 +5929,10 @@ primeicons@^6.0.1:
   resolved "https://registry.npmjs.org/primeicons/-/primeicons-6.0.1.tgz"
   integrity sha512-KDeO94CbWI4pKsPnYpA1FPjo79EsY9I+M8ywoPBSf9XMXoe/0crjbUK7jcQEDHuc0ZMRIZsxH3TYLv4TUtHmAA==
 
-primeng@^17.2.0:
-  version "17.6.0"
-  resolved "https://registry.npmjs.org/primeng/-/primeng-17.6.0.tgz"
-  integrity sha512-Q9wEbTE1D+Tt0dtCg1lTt7JcV5klQhRByciU67SySYNaDQDutKUKtvMs2AUF5iZAbh8mp1GHzElJWzrXa+TuGw==
+primeng@^17.16.1:
+  version "17.16.1"
+  resolved "https://registry.npmjs.org/primeng/-/primeng-17.16.1.tgz"
+  integrity sha512-bNCUxdXgT4ikOG/aKA2PW9FCFnD/EtB+fLoGLuQXAGB1PJU72x5c0yQoGFDQcAgx78o3d/4LjZOdOPYwovN9Lg==
   dependencies:
     tslib "^2.3.0"
 

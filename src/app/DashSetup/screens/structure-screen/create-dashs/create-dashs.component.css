@@ -28,8 +28,10 @@ button {
 }
 
 .container-content h2,
-.container-content-add h2 {
+.container-content-add h2,
+.container-edit-content h2 {
   font-size: 15px;
+  font-weight: 400;
 }
 
 .container-content-header {
@@ -44,7 +46,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-evenly;
-  width: 10rem;
+  width: 11rem;
 }
 
 .action-button {
@@ -104,8 +106,41 @@ button {
   outline: none;
 }
 
+.filter {
+  justify-content: start;
+  background-color: #fff;
+  display: flex;
+  justify-items: center;
+  align-items: center;
+  border-radius: 30px;
+  width: 250px;
+  height: 30px;
+}
+
+.filter .icon {
+  font-size: 10px;
+  padding: 8px 2px 8px 15px;
+}
+
+.filter button {
+  padding: 0.6rem;
+  border: none;
+  margin-right: 1rem;
+  border-radius: 0.2rem;
+}
+
+.filter input {
+  padding: 0.6rem;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  font-size: 12px;
+  width: 205px;
+}
+
 th {
-  font-size: 0.75rem;
+  font-size: 12px;
+  font-weight: 450;
   padding-bottom: 0.625rem;
   padding-top: 0.625rem;
 }
@@ -548,4 +583,22 @@ input {
   border-radius: 0.3rem;
   outline: none;
   color: #7a7171;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-header {
+  border-left: none;
+  border-right: none;
+}
+
+:host ::ng-deep .p-paginator .p-paginator-pages .p-paginator-page {
+  font-size: 12px;
+}
+
+:host ::ng-deep .p-paginator-current,
+.p-paginator-rpp-options {
+  font-size: 12px;
+}
+
+:host ::ng-deep a {
+  font-size: 12px !important;
 }

@@ -33,14 +33,19 @@
 
       <section class="example-container mat-elevation-z8" tabindex="0">
         <p-table
+          #tableReference
           class="mat-elevation-z8 demo-table"
           selectionMode="single"
           [value]="dataSource"
           [rows]="10"
+          [paginator]="true"
+          [resizableColumns]="true"
+          scrollHeight="350px"
+          styleClass="p-datatable-gridlines"
+          currentPageReportTemplate="Exibindo de {first} a {last} de {totalRecords} registros"
           [showCurrentPageReport]="true"
           [rowsPerPageOptions]="[10, 25, 50]"
           [scrollable]="true"
-          [tableStyle]="{ 'min-width': '50rem' }"
           [globalFilterFields]="[
             'id',
             'name',
@@ -49,25 +54,59 @@
             'sql'
           ]"
         >
+          <ng-template pTemplate="caption">
+            <div class="filter">
+              <fa-icon
+                class="icon"
+                [icon]="icons.search"
+                [size]="'xl'"
+              ></fa-icon>
+              <span class="p-input-icon-left">
+                <input
+                  pInputText
+                  type="text"
+                  [(ngModel)]="searchValue"
+                  (input)="onInputChange($event, tableReference)"
+                  placeholder="Pesquisar"
+                />
+              </span>
+            </div>
+          </ng-template>
           <ng-template pTemplate="header">
             <tr>
-              <th style="min-width: 5rem" pSortableColumn="id">
+              <th pResizableColumn style="width: 1rem" pSortableColumn="id">
                 <div class="flex align-items-center">Código</div>
               </th>
 
-              <th style="min-width: 15rem" pSortableColumn="name">
+              <th
+                pResizableColumn
+                style="min-width: 15rem"
+                pSortableColumn="name"
+              >
                 <div class="flex align-items-center">Nome</div>
               </th>
 
-              <th style="min-width: 15rem" pSortableColumn="pgTableName">
+              <th
+                pResizableColumn
+                style="min-width: 15rem"
+                pSortableColumn="pgTableName"
+              >
                 <div class="flex align-items-center">Tabela</div>
               </th>
 
-              <th style="min-width: 6rem" pSortableColumn="chartPath">
+              <th
+                pResizableColumn
+                style="min-width: 6rem"
+                pSortableColumn="chartPath"
+              >
                 <div class="flex align-items-center">Pastas</div>
               </th>
 
-              <th style="min-width: 5rem" pSortableColumn="sql">
+              <th
+                pResizableColumn
+                style="min-width: 5rem"
+                pSortableColumn="sql"
+              >
                 <div class="flex align-items-center">Código SQL</div>
               </th>
             </tr>
@@ -110,14 +149,7 @@
             </tr>
           </ng-template>
         </p-table>
-
-        <p-toast [life]="500"></p-toast>
       </section>
-
-      <mat-paginator
-        [pageSize]="resultsLength"
-        [length]="resultsLength"
-      ></mat-paginator>
     </div>
   </div>
 
@@ -261,10 +293,6 @@
           required
         >
         </textarea>
-        <mat-progress-bar
-          *ngIf="progressBar"
-          mode="indeterminate"
-        ></mat-progress-bar>
       </div>
       <div class="sql-body_result">
         <p>{{ sqlResult }}</p>

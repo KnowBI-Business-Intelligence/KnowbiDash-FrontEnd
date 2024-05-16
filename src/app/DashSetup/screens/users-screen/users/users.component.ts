@@ -212,22 +212,21 @@ export class UsersComponent implements OnInit {
 
     this.authService.delete(userId, headers).subscribe({
       next: () => {
-        setTimeout(() => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Sucesso',
-            detail: `Usuário ${this.userName} Excluído`,
-            life: 2500,
-          });
-          this.closeModal();
-          this.isLoginLoading = false;
-        }, 2500);
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Sucesso',
+          detail: `Usuário ${this.userName} excluído`,
+          life: 2500,
+        });
+        this.closeModal();
+        this.getInformations();
+        this.isLoginLoading = false;
       },
       error: (err) => {
         this.messageService.add({
           severity: 'error',
           summary: 'Erro',
-          detail: 'Ocorreu um erro durante a atualização.',
+          detail: 'Ocorreu um erro durante a exclusão.',
           life: 2500,
         });
         console.error(err);

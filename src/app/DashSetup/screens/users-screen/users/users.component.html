@@ -140,40 +140,40 @@
             <td>
               {{ customer.id }}
             </td>
-            <td>
+            <td [title]="customer.fullUserName">
               {{
-                customer.fullUserName.length > 15
-                  ? customer.fullUserName.slice(0, 15) + "..."
+                customer.fullUserName.length > 35
+                  ? customer.fullUserName.slice(0, 35) + "..."
                   : customer.fullUserName
               }}
             </td>
-            <td>
+            <td [title]="customer.userName">
               {{
-                customer.userName.length > 15
-                  ? customer.userName.slice(0, 15) + "..."
+                customer.userName.length > 35
+                  ? customer.userName.slice(0, 35) + "..."
                   : customer.userName
               }}
             </td>
-            <td>
+            <td [title]="customer.cargo">
               {{
-                customer.cargo.length > 15
-                  ? customer.cargo.slice(0, 15) + "..."
+                customer.cargo.length > 35
+                  ? customer.cargo.slice(0, 35) + "..."
                   : customer.cargo
               }}
             </td>
-            <td>
+            <td [title]="customer.email">
               {{
-                customer.email.toLowerCase().length > 15
-                  ? customer.email.toLowerCase().slice(0, 15) + "..."
+                customer.email.toLowerCase().length > 35
+                  ? customer.email.toLowerCase().slice(0, 35) + "..."
                   : customer.email.toLowerCase()
               }}
             </td>
-            <td>
+            <td [title]="customer.perfis">
               {{
                 customer.perfis &&
                 customer.perfis.length > 0 &&
-                customer.perfis[0]?.name.length > 15
-                  ? customer.perfis[0]?.name.slice(0, 15) + "..."
+                customer.perfis[0]?.name.length > 35
+                  ? customer.perfis[0]?.name.slice(0, 35) + "..."
                   : customer.perfis && customer.perfis.length > 0
                   ? customer.perfis[0]?.name
                   : "Sem perfil"

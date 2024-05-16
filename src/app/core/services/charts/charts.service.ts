@@ -101,21 +101,12 @@ export class ChartsService {
     return this.http.post(`${this.ENV_TABLES}/create`, chartData, myHeaders);
   }
 
-  createChartsPath(
-    name: string,
-    profile_id: {} = {},
-    headers: HttpHeaders
-  ): Observable<any> {
+  createChartsPath(pathData: any, headers: HttpHeaders): Observable<any> {
     const myHeaders = {
       headers: headers,
     };
 
-    const body = {
-      name,
-      profile_id,
-    };
-
-    return this.http.post(`${this.ENV_CHARTPATH}/create`, body, myHeaders);
+    return this.http.post(`${this.ENV_CHARTPATH}/create`, pathData, myHeaders);
   }
 
   createChartGroup(
@@ -229,8 +220,8 @@ export class ChartsService {
 
   updateChartsPath(
     headers: HttpHeaders,
-    id: string,
-    name: string
+    requestBody: any,
+    id: string
   ): Observable<any> {
     const myHeaders = {
       headers: headers,
@@ -238,7 +229,7 @@ export class ChartsService {
 
     return this.http.patch(
       `${this.ENV_CHARTPATH}/update/${id}`,
-      name,
+      requestBody,
       myHeaders
     );
   }
@@ -273,7 +264,7 @@ export class ChartsService {
     const myHeaders = {
       headers: headers,
     };
-    return this.http.delete(`${this.ENV_CHARTPATH}/delete${id}`, myHeaders);
+    return this.http.delete(`${this.ENV_CHARTPATH}/delete/${id}`, myHeaders);
   }
 
   deleteCharts(headers: HttpHeaders, id: string): Observable<any> {

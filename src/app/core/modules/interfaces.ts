@@ -5,6 +5,13 @@ export interface ProfileTable {
   chartPaths: boolean;
 }
 
+export interface PathTable {
+  id: string;
+  name: string;
+  observation: string;
+  chartPaths: any;
+}
+
 export interface DashboardTable {
   id: string;
   name: string;

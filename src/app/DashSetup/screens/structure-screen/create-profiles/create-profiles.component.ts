@@ -8,17 +8,22 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import {
+  faClose,
+  faFilterCircleXmark,
+  faMagnifyingGlass,
+} from '@fortawesome/free-solid-svg-icons';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
-import { MessageService } from 'primeng/api';
+import { FilterMetadata, MessageService } from 'primeng/api';
 import { ContextMenuModule } from 'primeng/contextmenu';
-import { TableModule } from 'primeng/table';
+import { Table, TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
 import { Path, ProfileTable } from '../../../../core/modules/interfaces';
 import { ProfilesService } from '../../../../core/services/profiles/profiles.service';
 import { StorageService } from '../../../../core/services/user/storage.service';
 import { ChartsService } from '../../../../core/services/charts/charts.service';
-import { InputTextModule } from 'primeng/inputtext';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
   selector: 'app-create-profiles',
@@ -32,17 +37,25 @@ import { InputTextModule } from 'primeng/inputtext';
     ContextMenuModule,
     ToastModule,
     TableModule,
-    InputTextModule,
+    FontAwesomeModule,
   ],
   providers: [MessageService],
   templateUrl: './create-profiles.component.html',
   styleUrl: './create-profiles.component.css',
 })
 export class CreateProfilesComponent implements OnInit {
-  backScreen() {
-    throw new Error('Method not implemented.');
-  }
+  icons = {
+    filter: faFilterCircleXmark,
+    closed: faClose,
+    search: faMagnifyingGlass,
+  };
+
   createProfilesForm = this.formBuilder.group({
+    name: ['', Validators.required],
+    observation: ['', Validators.required],
+  });
+
+  editProfilesForm = this.formBuilder.group({
     name: ['', Validators.required],
     observation: ['', Validators.required],
   });
@@ -57,6 +70,7 @@ export class CreateProfilesComponent implements OnInit {
   cancel: HTMLElement | null = null;
 
   displayedColumns: string[] = ['id', 'name', 'observation', 'chartPaths'];
+  searchValue?: string;
   listPaths: Path[] = [];
   editPath: Path[] = [];
   requestChartPaths: any[] = [];
@@ -80,6 +94,10 @@ export class CreateProfilesComponent implements OnInit {
   private headers = new HttpHeaders({
     Authorization: `Bearer ${this.user.token}`,
   });
+
+  customers!: ProfileTable[];
+
+  selectedCustomers!: ProfileTable;
 
   constructor(
     private _liveAnnouncer: LiveAnnouncer,
@@ -127,7 +145,6 @@ export class CreateProfilesComponent implements OnInit {
     if (event.target.checked) {
       if (!this.requestChartPaths.some((item) => item.id === path)) {
         this.requestChartPaths.push({ id: path });
-        console.log(this.requestChartPaths);
       }
     } else {
       const index = this.requestChartPaths.findIndex(
@@ -150,6 +167,34 @@ export class CreateProfilesComponent implements OnInit {
       );
     }
     return false;
+  }
+
+  clear(table: Table): void {
+    table.clear();
+    this.searchValue = '';
+  }
+
+  onInputChange(event: any, table: Table): void {
+    if (event.target instanceof HTMLInputElement) {
+      const inputValue: string = event.target.value;
+
+      if (inputValue.trim() !== '') {
+        const customFilter: FilterMetadata = {
+          value: inputValue,
+          matchMode: 'contains',
+        };
+
+        const filters: { [s: string]: FilterMetadata } = {};
+
+        for (const field of table.globalFilterFields!) {
+          filters[field] = customFilter;
+        }
+
+        table.filterGlobal(inputValue, 'contains');
+      } else {
+        this.clear(table);
+      }
+    }
   }
 
   announceSortChange(sortState: any) {
@@ -178,9 +223,7 @@ export class CreateProfilesComponent implements OnInit {
     this.requestChartPaths = [];
     this.isViewProfile = !this.isViewProfile;
     this.selectedRowChart = this.selectedRow?.chartPaths;
-    this.actionButton = true;
     this.getPaths();
-
     this.selectedRowChart.forEach((data: any) => {
       if (
         this.listPaths.some(
@@ -251,6 +294,7 @@ export class CreateProfilesComponent implements OnInit {
         next: () => {
           this.messageService.add({
             severity: 'success',
+            summary: 'Sucesso',
             detail: 'Perfil excluído',
           });
           this.cancelDelete();
@@ -258,7 +302,8 @@ export class CreateProfilesComponent implements OnInit {
         error: () => {
           this.messageService.add({
             severity: 'error',
-            detail: 'Erro ao excluir, verifique os vinculos do perfil',
+            summary: 'Erro',
+            detail: 'verifique os vinculos do perfil',
           });
         },
       });
@@ -308,7 +353,7 @@ export class CreateProfilesComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Erro',
-          detail: 'Erro na autenticação.',
+          detail: 'Verifique os campos preenchidos',
         });
       },
     });
@@ -317,8 +362,8 @@ export class CreateProfilesComponent implements OnInit {
   updateProfile() {
     console.log(this.profileId);
     this.notViewProfile();
-    const name = this.createProfilesForm.get('name')?.value as string;
-    const observation = this.createProfilesForm.get('observation')
+    const name = this.editProfilesForm.get('name')?.value as string;
+    const observation = this.editProfilesForm.get('observation')
       ?.value as string;
 
     const chartPaths = this.requestChartPaths.map((path: any) => {
@@ -342,13 +387,13 @@ export class CreateProfilesComponent implements OnInit {
             detail: 'Perfil atualizado',
           });
           this.cancelRegister();
-          this.createProfilesForm.reset({ name: '', observation: '' });
+          this.editProfilesForm.reset({ name: '', observation: '' });
         },
         error: () => {
           this.messageService.add({
             severity: 'error',
             summary: 'Erro',
-            detail: 'Erro ao executar ação.',
+            detail: 'Verifique os campos preenchidos',
           });
         },
       });

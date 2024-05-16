@@ -1,33 +1,52 @@
 import { CommonModule } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
 import { Component, ElementRef, OnInit } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MenuItem, MessageService } from 'primeng/api';
+import { FilterMetadata, MenuItem, MessageService } from 'primeng/api';
 import { DropdownModule } from 'primeng/dropdown';
-import { TableModule } from 'primeng/table';
+import { Table, TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
 import { DashboardTable } from '../../../../core/modules/interfaces';
 import { ChartsService } from '../../../../core/services/charts/charts.service';
 import { StorageService } from '../../../../core/services/user/storage.service';
+import { MatSortModule } from '@angular/material/sort';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import {
+  faClose,
+  faFilterCircleXmark,
+  faMagnifyingGlass,
+} from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-create-dashs',
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     ReactiveFormsModule,
     TableModule,
     MatPaginator,
+    MatSortModule,
     ToastModule,
     DropdownModule,
-    MatProgressBarModule,
+    FontAwesomeModule,
   ],
   templateUrl: './create-dashs.component.html',
   styleUrl: './create-dashs.component.css',
 })
 export class CreateDashsComponent implements OnInit {
+  icons = {
+    filter: faFilterCircleXmark,
+    closed: faClose,
+    search: faMagnifyingGlass,
+  };
   createRegisterForm = this.formBuilder.group({
     name: ['', Validators.required],
     pgTableName: ['', Validators.required],
@@ -64,10 +83,13 @@ export class CreateDashsComponent implements OnInit {
   progressBar: boolean = false;
 
   dataSource: any;
-
   chartPaths: any;
   sqlResult: any;
+
+  requestChartPaths: any[] = [];
+
   selectedTab: string = '---';
+  searchValue?: string;
   resultsLength: number = 0;
   selectedRow!: DashboardTable | null;
   selectedRowChartGroup: any;
@@ -152,8 +174,61 @@ export class CreateDashsComponent implements OnInit {
     }
   }
 
-  isSelected(row: DashboardTable): boolean {
-    return this.selectedRow === row;
+  printDetails(event: any, path: any) {
+    if (event.target.checked) {
+      if (!this.requestChartPaths.some((item) => item.id === path)) {
+        this.requestChartPaths.push({ id: path });
+        console.log(this.requestChartPaths);
+      }
+    } else {
+      const index = this.requestChartPaths.findIndex(
+        (item) => item.id === path
+      );
+      if (index !== -1) {
+        this.requestChartPaths.splice(index, 1);
+        console.log(this.requestChartPaths);
+      }
+    }
+  }
+
+  isSelected(path: any): boolean {
+    if (
+      this.selectedRow?.chartPath &&
+      Array.isArray(this.selectedRow.chartPath)
+    ) {
+      return this.selectedRow.chartPath.some(
+        (chartPath) => chartPath.id === path.id && chartPath.name === path.name
+      );
+    }
+    return false;
+  }
+
+  clear(table: Table): void {
+    table.clear();
+    this.searchValue = '';
+  }
+
+  onInputChange(event: any, table: Table): void {
+    if (event.target instanceof HTMLInputElement) {
+      const inputValue: string = event.target.value;
+
+      if (inputValue.trim() !== '') {
+        const customFilter: FilterMetadata = {
+          value: inputValue,
+          matchMode: 'contains',
+        };
+
+        const filters: { [s: string]: FilterMetadata } = {};
+
+        for (const field of table.globalFilterFields!) {
+          filters[field] = customFilter;
+        }
+
+        table.filterGlobal(inputValue, 'contains');
+      } else {
+        this.clear(table);
+      }
+    }
   }
 
   viewDashInfo() {
