@@ -109,43 +109,17 @@ export class ChartsService {
     return this.http.post(`${this.ENV_CHARTPATH}/create`, pathData, myHeaders);
   }
 
-  createChartGroup(
-    headers: any,
-    name: string,
-    pgTableName: string,
-    ID_chartPath: string
-  ) {
-    let headerObj: { [header: string]: string } = {};
-
-    if (headers instanceof HttpHeaders) {
-      headers.keys().forEach((key) => {
-        const value = headers.get(key);
-        if (value !== null) {
-          headerObj[key] = value;
-        }
-      });
-    } else {
-      headerObj = headers;
-    }
-
-    const myHeaders = new HttpHeaders({
-      'Content-Type': 'application/json',
-      ...headerObj,
-    });
-
-    const chartPath = {
-      id: ID_chartPath,
+  createChartGroup(groupData: any, headers: HttpHeaders): Observable<any> {
+    const myHeaders = {
+      headers: headers,
     };
 
-    const body = { name, pgTableName, chartPath };
-
-    return this.http
-      .post(`${this.ENV_CHARTGROUP}/create`, body, {
-        headers: myHeaders,
-      })
-      .pipe(catchError(this.handleError));
+    return this.http.post(
+      `${this.ENV_CHARTGROUP}/create`,
+      groupData,
+      myHeaders
+    );
   }
-
   // UPDATES
 
   updateCharts(headers: HttpHeaders, chartData: any, id: any) {
@@ -180,6 +154,18 @@ export class ChartsService {
     return this.http.patch(
       `${this.ENV_TABLES}/update/${id}`,
       chartData,
+      options
+    );
+  }
+
+  updateChartGroup(headers: HttpHeaders, chartGroupData: any, id: any) {
+    const options = {
+      headers: headers,
+    };
+
+    return this.http.patch(
+      `${this.ENV_CHARTGROUP}/update/${id}`,
+      chartGroupData,
       options
     );
   }
@@ -230,30 +216,6 @@ export class ChartsService {
     return this.http.patch(
       `${this.ENV_CHARTPATH}/update/${id}`,
       requestBody,
-      myHeaders
-    );
-  }
-
-  updateChartGroup(
-    id: string,
-    name: string,
-    pgTableName: string,
-    ID_chartPath: string,
-    headers: HttpHeaders
-  ) {
-    const myHeaders = {
-      headers: headers,
-    };
-
-    const chartPath = {
-      id: ID_chartPath,
-    };
-
-    const body = { name, pgTableName, chartPath };
-
-    return this.http.patch(
-      `${this.ENV_CHARTGROUP}/update/${id}`,
-      body,
       myHeaders
     );
   }

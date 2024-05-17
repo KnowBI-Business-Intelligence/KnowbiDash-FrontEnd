@@ -10,6 +10,7 @@ export interface PathTable {
   name: string;
   observation: string;
   chartPaths: any;
+  chartGroups: any;
 }
 
 export interface DashboardTable {

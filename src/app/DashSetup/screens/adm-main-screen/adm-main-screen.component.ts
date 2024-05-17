@@ -48,7 +48,6 @@ export class ADMMainScreenComponent implements OnInit {
         this.processData(data);
       },
     });
-    console.log(this.user);
   }
 
   processData(data: any) {
@@ -61,16 +60,14 @@ export class ADMMainScreenComponent implements OnInit {
       }
       this.pathsByProfile[profile.name] = paths;
       this.profiles.push({ name: profile.name, paths: paths });
-      console.log(this.pathsByProfile);
     });
   }
 
   openChartGroup(pathObj: any) {
     this.localStorage.setEncryptedItem(
       'selectedChartPath',
-      JSON.stringify(pathObj.id)
+      JSON.stringify(pathObj)
     );
-    console.log(pathObj);
     this.router.navigate(['admin/adm_main_dashboard']);
   }
 

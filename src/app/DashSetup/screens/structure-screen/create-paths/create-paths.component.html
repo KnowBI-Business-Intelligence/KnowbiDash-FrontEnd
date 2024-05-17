@@ -124,7 +124,7 @@
       <form class="form-search" [formGroup]="createFolderForm">
         <div>
           <div class="form-group-input">
-            <label for="username">Nome do perfil</label>
+            <label for="username">Nome da pasta</label>
             <input
               type="text"
               class="form-control"
@@ -137,87 +137,182 @@
           </div>
         </div>
         <div class="paths">
-          <span>Vincular Perfil</span>
-          <div style="overflow-y: auto; overflow-x: hidden; margin-top: 8px">
-            <p-table
-              #tableCreate
-              matSort
-              class="mat-elevation-z8 demo-table"
-              selectionMode="single"
-              [value]="listProfiles"
-              (matSortChange)="announceSortChange($event)"
-              [rows]="10"
-              [paginator]="true"
-              [resizableColumns]="true"
-              scrollHeight="220px"
-              styleClass="p-datatable-gridlines"
-              [globalFilterFields]="['id', 'name']"
-            >
-              <ng-template pTemplate="caption">
-                <div class="filter">
-                  <fa-icon
-                    class="icon"
-                    [icon]="icons.search"
-                    [size]="'xl'"
-                  ></fa-icon>
-                  <span class="p-input-icon-left">
-                    <input
-                      pInputText
-                      type="text"
-                      (input)="onInputChange($event, tableCreate)"
-                      placeholder="Pesquisar"
-                    />
-                  </span>
-                </div>
-              </ng-template>
-              <ng-template pTemplate="header">
-                <tr>
-                  <th style="width: 1rem">
-                    <div class="flex align-items-center"></div>
-                  </th>
-                  <th
-                    pResizableColumn
-                    style="min-width: 5rem"
-                    pSortableColumn="id"
-                  >
-                    <div class="flex align-items-center">Código</div>
-                  </th>
-                  <th
-                    pResizableColumn
-                    style="min-width: 12rem"
-                    pSortableColumn="name"
-                  >
-                    <div class="flex align-items-center">Perfil</div>
-                  </th>
-                </tr>
-              </ng-template>
-
-              <ng-template pTemplate="body" let-listProfiles>
-                <tr
-                  #tr
-                  pSelectableRow="listProfiles"
-                  pContextMenuRow="listProfiles"
-                  [pSelectableRow]="listProfiles"
+          <mat-tab-group
+            class="container-tab-group"
+            mat-stretch-tabs="false"
+            mat-align-tabs="start"
+          >
+            <mat-tab label="Vincular Perfil">
+              <div
+                style="overflow-y: auto; overflow-x: hidden; margin-top: 8px"
+              >
+                <p-table
+                  #tableCreate
+                  matSort
+                  class="mat-elevation-z8 demo-table"
+                  selectionMode="single"
+                  [value]="listProfiles"
+                  (matSortChange)="announceSortChange($event)"
+                  [rows]="10"
+                  [paginator]="true"
+                  [resizableColumns]="true"
+                  scrollHeight="220px"
+                  styleClass="p-datatable-gridlines"
+                  [globalFilterFields]="['id', 'name']"
                 >
-                  <td>
-                    <input
-                      class="checkbox"
-                      type="checkbox"
-                      (change)="printDetails($event, listProfiles.id)"
-                    />
-                  </td>
-                  <td>{{ listProfiles.id }}</td>
-                  <td>{{ listProfiles.name }}</td>
-                </tr>
-              </ng-template>
+                  <ng-template pTemplate="caption">
+                    <div class="filter">
+                      <fa-icon
+                        class="icon"
+                        [icon]="icons.search"
+                        [size]="'xl'"
+                      ></fa-icon>
+                      <span class="p-input-icon-left">
+                        <input
+                          pInputText
+                          type="text"
+                          (input)="onInputChange($event, tableCreate)"
+                          placeholder="Pesquisar"
+                        />
+                      </span>
+                    </div>
+                  </ng-template>
+                  <ng-template pTemplate="header">
+                    <tr>
+                      <th style="width: 1rem">
+                        <div class="flex align-items-center"></div>
+                      </th>
+                      <th
+                        pResizableColumn
+                        style="min-width: 5rem"
+                        pSortableColumn="id"
+                      >
+                        <div class="flex align-items-center">Código</div>
+                      </th>
+                      <th
+                        pResizableColumn
+                        style="min-width: 12rem"
+                        pSortableColumn="name"
+                      >
+                        <div class="flex align-items-center">Perfil</div>
+                      </th>
+                    </tr>
+                  </ng-template>
 
-              <ng-template pTemplate="emptymessage">
-                <tr>
-                  <td colspan="7">Sem registros encontrados</td>
-                </tr>
-              </ng-template>
-            </p-table>
-          </div>
+                  <ng-template pTemplate="body" let-listProfiles>
+                    <tr
+                      #tr
+                      pSelectableRow="listProfiles"
+                      pContextMenuRow="listProfiles"
+                      [pSelectableRow]="listProfiles"
+                    >
+                      <td>
+                        <input
+                          class="checkbox"
+                          type="checkbox"
+                          (change)="printDetails($event, listProfiles.id)"
+                        />
+                      </td>
+                      <td>{{ listProfiles.id }}</td>
+                      <td>{{ listProfiles.name }}</td>
+                    </tr>
+                  </ng-template>
+
+                  <ng-template pTemplate="emptymessage">
+                    <tr>
+                      <td colspan="7">Sem registros encontrados</td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </div>
+            </mat-tab>
+            <mat-tab label="Vincular Dashboard">
+              <div
+                style="overflow-y: auto; overflow-x: hidden; margin-top: 8px"
+              >
+                <p-table
+                  #tableEdit
+                  matSort
+                  class="mat-elevation-z8 demo-table"
+                  selectionMode="single"
+                  [value]="listDashboards"
+                  (matSortChange)="announceSortChange($event)"
+                  [rows]="10"
+                  [paginator]="true"
+                  [resizableColumns]="true"
+                  scrollHeight="220px"
+                  styleClass="p-datatable-gridlines"
+                  [globalFilterFields]="['id', 'name']"
+                >
+                  <ng-template pTemplate="caption">
+                    <div class="filter">
+                      <fa-icon
+                        class="icon"
+                        [icon]="icons.search"
+                        [size]="'xl'"
+                      ></fa-icon>
+                      <span class="p-input-icon-left">
+                        <input
+                          pInputText
+                          type="text"
+                          (input)="onInputChange($event, tableEdit)"
+                          placeholder="Pesquisar"
+                        />
+                      </span>
+                    </div>
+                  </ng-template>
+                  <ng-template pTemplate="header">
+                    <tr>
+                      <th style="width: 1rem">
+                        <div class="flex align-items-center"></div>
+                      </th>
+                      <th
+                        pResizableColumn
+                        style="min-width: 5rem"
+                        pSortableColumn="id"
+                      >
+                        <div class="flex align-items-center">Código</div>
+                      </th>
+                      <th
+                        pResizableColumn
+                        style="min-width: 12rem"
+                        pSortableColumn="name"
+                      >
+                        <div class="flex align-items-center">Perfil</div>
+                      </th>
+                    </tr>
+                  </ng-template>
+
+                  <ng-template pTemplate="body" let-listDashboards>
+                    <tr
+                      #tr
+                      pSelectableRow="listDashboards"
+                      pContextMenuRow="listDashboards"
+                      [pSelectableRow]="listDashboards"
+                    >
+                      <td>
+                        <input
+                          class="checkbox"
+                          type="checkbox"
+                          (change)="
+                            printDetailsDashboards($event, listDashboards.id)
+                          "
+                        />
+                      </td>
+                      <td>{{ listDashboards.id }}</td>
+                      <td>{{ listDashboards.name }}</td>
+                    </tr>
+                  </ng-template>
+
+                  <ng-template pTemplate="emptymessage">
+                    <tr>
+                      <td colspan="7">Sem registros encontrados</td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </div>
+            </mat-tab>
+          </mat-tab-group>
         </div>
       </form>
     </div>
@@ -253,88 +348,180 @@
           </div>
         </div>
         <div class="paths">
-          <span>Vincular perfil</span>
-          <div style="margin-top: 8px">
-            <p-table
-              #tableEdit
-              matSort
-              class="mat-elevation-z8 demo-table"
-              selectionMode="single"
-              [value]="listProfiles"
-              (matSortChange)="announceSortChange($event)"
-              [rows]="10"
-              [paginator]="true"
-              [resizableColumns]="true"
-              scrollHeight="220px"
-              styleClass="p-datatable-gridlines"
-              [globalFilterFields]="['id', 'name']"
-            >
-              <ng-template pTemplate="caption">
-                <div class="filter">
-                  <fa-icon
-                    class="icon"
-                    [icon]="icons.search"
-                    [size]="'xl'"
-                  ></fa-icon>
-                  <span class="p-input-icon-left">
-                    <input
-                      pInputText
-                      type="text"
-                      (input)="onInputChange($event, tableEdit)"
-                      placeholder="Pesquisar"
-                    />
-                  </span>
-                </div>
-              </ng-template>
-              <ng-template pTemplate="header">
-                <tr>
-                  <th style="width: 1rem">
-                    <div class="flex align-items-center"></div>
-                  </th>
-                  <th
-                    pResizableColumn
-                    style="min-width: 5rem"
-                    pSortableColumn="id"
-                  >
-                    <div class="flex align-items-center">Código</div>
-                  </th>
-                  <th
-                    pResizableColumn
-                    style="min-width: 12rem"
-                    pSortableColumn="name"
-                  >
-                    <div class="flex align-items-center">Perfil</div>
-                  </th>
-                </tr>
-              </ng-template>
-
-              <ng-template pTemplate="body" let-listProfiles>
-                <tr
-                  #tr
-                  pSelectableRow="listPaths"
-                  pContextMenuRow="listPaths"
-                  [pSelectableRow]="listProfiles"
+          <mat-tab-group
+            class="container-tab-group"
+            mat-stretch-tabs="false"
+            mat-align-tabs="start"
+          >
+            <mat-tab label="Vincular Perfil"
+              ><div style="margin-top: 8px">
+                <p-table
+                  #tableEdit
+                  matSort
+                  class="mat-elevation-z8 demo-table"
+                  selectionMode="single"
+                  [value]="listProfiles"
+                  (matSortChange)="announceSortChange($event)"
+                  [rows]="10"
+                  [paginator]="true"
+                  [resizableColumns]="true"
+                  scrollHeight="220px"
+                  styleClass="p-datatable-gridlines"
+                  [globalFilterFields]="['id', 'name']"
                 >
-                  <td>
-                    <input
-                      class="checkbox"
-                      type="checkbox"
-                      (change)="printDetails($event, listProfiles.id)"
-                      [checked]="isSelected(listProfiles)"
-                    />
-                  </td>
-                  <td>{{ listProfiles.id }}</td>
-                  <td>{{ listProfiles.name }}</td>
-                </tr>
-              </ng-template>
+                  <ng-template pTemplate="caption">
+                    <div class="filter">
+                      <fa-icon
+                        class="icon"
+                        [icon]="icons.search"
+                        [size]="'xl'"
+                      ></fa-icon>
+                      <span class="p-input-icon-left">
+                        <input
+                          pInputText
+                          type="text"
+                          (input)="onInputChange($event, tableEdit)"
+                          placeholder="Pesquisar"
+                        />
+                      </span>
+                    </div>
+                  </ng-template>
+                  <ng-template pTemplate="header">
+                    <tr>
+                      <th style="width: 1rem">
+                        <div class="flex align-items-center"></div>
+                      </th>
+                      <th
+                        pResizableColumn
+                        style="min-width: 5rem"
+                        pSortableColumn="id"
+                      >
+                        <div class="flex align-items-center">Código</div>
+                      </th>
+                      <th
+                        pResizableColumn
+                        style="min-width: 12rem"
+                        pSortableColumn="name"
+                      >
+                        <div class="flex align-items-center">Perfil</div>
+                      </th>
+                    </tr>
+                  </ng-template>
 
-              <ng-template pTemplate="emptymessage">
-                <tr>
-                  <td colspan="7">Sem registros encontrados</td>
-                </tr>
-              </ng-template>
-            </p-table>
-          </div>
+                  <ng-template pTemplate="body" let-listProfiles>
+                    <tr
+                      #tr
+                      pSelectableRow="listPaths"
+                      pContextMenuRow="listPaths"
+                      [pSelectableRow]="listProfiles"
+                    >
+                      <td>
+                        <input
+                          class="checkbox"
+                          type="checkbox"
+                          (change)="printDetails($event, listProfiles.id)"
+                          [checked]="isSelected(listProfiles)"
+                        />
+                      </td>
+                      <td>{{ listProfiles.id }}</td>
+                      <td>{{ listProfiles.name }}</td>
+                    </tr>
+                  </ng-template>
+
+                  <ng-template pTemplate="emptymessage">
+                    <tr>
+                      <td colspan="7">Sem registros encontrados</td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </div></mat-tab
+            >
+            <mat-tab label="Vincular Dashboard"
+              ><div style="margin-top: 8px">
+                <p-table
+                  #tableEdit
+                  matSort
+                  class="mat-elevation-z8 demo-table"
+                  selectionMode="single"
+                  [value]="listDashboards"
+                  (matSortChange)="announceSortChange($event)"
+                  [rows]="10"
+                  [paginator]="true"
+                  [resizableColumns]="true"
+                  scrollHeight="220px"
+                  styleClass="p-datatable-gridlines"
+                  [globalFilterFields]="['id', 'name']"
+                >
+                  <ng-template pTemplate="caption">
+                    <div class="filter">
+                      <fa-icon
+                        class="icon"
+                        [icon]="icons.search"
+                        [size]="'xl'"
+                      ></fa-icon>
+                      <span class="p-input-icon-left">
+                        <input
+                          pInputText
+                          type="text"
+                          (input)="onInputChange($event, tableEdit)"
+                          placeholder="Pesquisar"
+                        />
+                      </span>
+                    </div>
+                  </ng-template>
+                  <ng-template pTemplate="header">
+                    <tr>
+                      <th style="width: 1rem">
+                        <div class="flex align-items-center"></div>
+                      </th>
+                      <th
+                        pResizableColumn
+                        style="min-width: 5rem"
+                        pSortableColumn="id"
+                      >
+                        <div class="flex align-items-center">Código</div>
+                      </th>
+                      <th
+                        pResizableColumn
+                        style="min-width: 12rem"
+                        pSortableColumn="name"
+                      >
+                        <div class="flex align-items-center">Perfil</div>
+                      </th>
+                    </tr>
+                  </ng-template>
+
+                  <ng-template pTemplate="body" let-listDashboards>
+                    <tr
+                      #tr
+                      pSelectableRow="listDashboards"
+                      pContextMenuRow="listDashboards"
+                      [pSelectableRow]="listDashboards"
+                    >
+                      <td>
+                        <input
+                          class="checkbox"
+                          type="checkbox"
+                          (change)="
+                            printDetailsDashboards($event, listDashboards.id)
+                          "
+                          [checked]="isSelectedDash(listDashboards)"
+                        />
+                      </td>
+                      <td>{{ listDashboards.id }}</td>
+                      <td>{{ listDashboards.name }}</td>
+                    </tr>
+                  </ng-template>
+
+                  <ng-template pTemplate="emptymessage">
+                    <tr>
+                      <td colspan="7">Sem registros encontrados</td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </div></mat-tab
+            >
+          </mat-tab-group>
         </div>
       </form>
     </div>

@@ -23,6 +23,7 @@ import {
   faFilterCircleXmark,
   faMagnifyingGlass,
 } from '@fortawesome/free-solid-svg-icons';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
 
 @Component({
   selector: 'app-create-dashs',
@@ -47,7 +48,15 @@ export class CreateDashsComponent implements OnInit {
     closed: faClose,
     search: faMagnifyingGlass,
   };
+
   createRegisterForm = this.formBuilder.group({
+    name: ['', Validators.required],
+    pgTableName: ['', Validators.required],
+    sql: ['', Validators.required],
+    chartPath: ['', Validators.required],
+  });
+
+  editDashForm = this.formBuilder.group({
     name: ['', Validators.required],
     pgTableName: ['', Validators.required],
     sql: ['', Validators.required],
@@ -85,6 +94,7 @@ export class CreateDashsComponent implements OnInit {
   dataSource: any;
   chartPaths: any;
   sqlResult: any;
+  dashId: any;
 
   requestChartPaths: any[] = [];
 
@@ -93,12 +103,17 @@ export class CreateDashsComponent implements OnInit {
   resultsLength: number = 0;
   selectedRow!: DashboardTable | null;
   selectedRowChartGroup: any;
-
-  private headers: any;
   private chartGroupID: any;
   sqlPlaceholder: any;
 
+  private user = this.token.getUser();
+
+  private headers = new HttpHeaders({
+    Authorization: `Bearer ${this.user.token}`,
+  });
+
   constructor(
+    private _liveAnnouncer: LiveAnnouncer,
     private elementRef: ElementRef,
     private charts: ChartsService,
     private token: StorageService,
@@ -108,20 +123,10 @@ export class CreateDashsComponent implements OnInit {
 
   ngOnInit(): void {
     this.getChartsGroup();
+    this.getChartPath();
   }
 
   private getChartPath() {
-    const user = this.token.getUser();
-
-    if (!user || !user.token) {
-      console.error('Token não disponível');
-      return;
-    }
-
-    this.headers = new HttpHeaders({
-      Authorization: `Bearer ${user.token}`,
-    });
-
     this.charts.getChartsPath(this.headers).subscribe({
       next: (value: any) => {
         this.chartPaths = value;
@@ -137,17 +142,6 @@ export class CreateDashsComponent implements OnInit {
   }
 
   private getChartsGroup() {
-    const user = this.token.getUser();
-
-    if (!user || !user.token) {
-      console.error('Token não disponível');
-      return;
-    }
-
-    this.headers = new HttpHeaders({
-      Authorization: `Bearer ${user.token}`,
-    });
-
     this.charts.getChartGroup(this.headers).subscribe({
       next: (value: any) => {
         this.dataSource = value;
@@ -160,8 +154,18 @@ export class CreateDashsComponent implements OnInit {
     });
   }
 
+  announceSortChange(sortState: any) {
+    if (sortState.direction) {
+      this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
+    } else {
+      this._liveAnnouncer.announce('Sorting cleared');
+    }
+  }
+
   selectRow(row: DashboardTable) {
     this.selectedRow = row;
+    console.log(this.selectedRow);
+    this.dashId = row.id;
     this.deleteButton =
       this.elementRef.nativeElement.querySelector('#deleteButton');
     this.seeButton = this.elementRef.nativeElement.querySelector('#seeButton');
@@ -196,9 +200,10 @@ export class CreateDashsComponent implements OnInit {
       this.selectedRow?.chartPath &&
       Array.isArray(this.selectedRow.chartPath)
     ) {
-      return this.selectedRow.chartPath.some(
-        (chartPath) => chartPath.id === path.id && chartPath.name === path.name
-      );
+      const isPathSelected = this.selectedRow.chartPath.some((data: any) => {
+        return data.id == path.id;
+      });
+      return isPathSelected;
     }
     return false;
   }
@@ -234,14 +239,8 @@ export class CreateDashsComponent implements OnInit {
   viewDashInfo() {
     this.isViewDashboard = true;
     this.selectedRowChartGroup = this.selectedRow?.chartPath;
-
+    this.getChartPath();
     this.actionButton = true;
-    const table =
-      this.elementRef.nativeElement.querySelector('.container-content');
-
-    if (table) {
-      table.style.filter = 'blur(3px)';
-    }
   }
 
   notViewDashInfo() {
@@ -265,6 +264,41 @@ export class CreateDashsComponent implements OnInit {
     if (table) {
       table.style.filter = 'blur(3px)';
     }
+  }
+
+  createRegister() {
+    const name = this.createRegisterForm.get('name')?.value as string;
+    const pgTableName = this.createRegisterForm.get('pgTableName')
+      ?.value as string;
+    const chartPath = this.requestChartPaths.map((path: any) => {
+      return { id: path.id.toString() };
+    });
+
+    const object = {
+      name: name,
+      pgTableName: pgTableName,
+      chartPath: chartPath,
+    };
+
+    console.log(object);
+    this.charts.createChartGroup(object, this.headers).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Sucesso',
+          detail: 'Dashboard criado',
+        });
+        this.cancelRegister();
+      },
+      error: (err) => {
+        console.log(err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: err.error.error,
+        });
+      },
+    });
   }
 
   addRegister() {
@@ -300,9 +334,9 @@ export class CreateDashsComponent implements OnInit {
         .subscribe({
           next: () => {
             this.messageService.add({
-              severity: 'sucess',
+              severity: 'success',
               summary: 'Sucesso',
-              detail: 'Dashboard excluído!',
+              detail: 'Dashboard excluído',
             });
             this.cancelDelete();
           },
@@ -310,7 +344,7 @@ export class CreateDashsComponent implements OnInit {
             this.messageService.add({
               severity: 'error',
               summary: 'Erro',
-              detail: 'Erro ao excluir.',
+              detail: 'Erro ao excluir',
             });
           },
         });
@@ -338,6 +372,40 @@ export class CreateDashsComponent implements OnInit {
   }
 
   updateRegister() {
+    const name = this.editDashForm.get('name')?.value as string;
+    const pgTableName = this.editDashForm.get('pgTableName')?.value as string;
+    const chartPath = this.requestChartPaths.map((path: any) => {
+      return { id: path.id.toString() };
+    });
+
+    const object = {
+      name: name,
+      pgTableName: pgTableName,
+      chartPath: chartPath,
+    };
+
+    console.log(object);
+    this.charts.updateChartGroup(this.headers, object, this.dashId).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Sucesso',
+          detail: 'Dashboard atualizado',
+        });
+        this.notViewDashInfo();
+      },
+      error: (err) => {
+        console.log(err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: err.error.error,
+        });
+      },
+    });
+  }
+
+  updateRegisterSql() {
     const sqlCode = this.createRegisterForm.get('sql')?.value as any;
 
     if (sqlCode.trim() === '') {
@@ -361,14 +429,12 @@ export class CreateDashsComponent implements OnInit {
             this.messageService.add({
               severity: 'success',
               summary: 'Sucesso',
-              detail: 'SQL Atualizado!',
+              detail: 'SQL Atualizado',
             });
             this.sqlResult = value;
             this.progressBar = false;
           },
           error: () => {
-            console.log('ERRRRRO NEXCE SACARASDA');
-
             this.messageService.add({
               severity: 'error',
               summary: 'Erro',
@@ -412,39 +478,16 @@ export class CreateDashsComponent implements OnInit {
     this.sqlPlaceholder = row.sql;
   }
 
-  createRegister() {
-    const name = this.createRegisterForm.get('name')?.value as string;
-    const pgTableName = this.createRegisterForm.get('pgTableName')
-      ?.value as string;
-    const chartPath = this.createRegisterForm.get('chartPath')?.value as any;
-
-    this.charts
-      .createChartGroup(this.headers, name, pgTableName, chartPath.id)
-      .subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'sucess',
-            summary: 'Sucesso',
-            detail: 'Gráfico criado!',
-          });
-          this.cancelRegister();
-        },
-        error: () => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Erro',
-            detail: 'Erro no processo.',
-          });
-        },
-      });
-  }
-
   goBack() {
     this.isSQL = false;
   }
 
   clearSQL() {
     this.createRegisterForm.reset({
+      sql: '',
+    });
+
+    this.editDashForm.reset({
       sql: '',
     });
   }

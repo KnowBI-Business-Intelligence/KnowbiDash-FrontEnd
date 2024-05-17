@@ -10,8 +10,7 @@ import { TableComponent } from './DashSetup/screens/dashboards/table/table.compo
 import { DatabaseComponentComponent } from './DashSetup/screens/database-screen/database-component/database-component.component';
 import { DatabaseScreenComponent } from './DashSetup/screens/database-screen/database-screen.component';
 import { ChartsComponent } from './DashSetup/screens/folders-screen/charts/charts.component';
-import { CreateFoldersComponent } from './DashSetup/screens/folders-screen/create-folders/create-folders.component';
-import { FoldersComponent } from './DashSetup/screens/folders-screen/folders/folders.component';
+
 import { GroupComponent } from './DashSetup/screens/folders-screen/group/group.component';
 import { SQLRunnerUpdateComponent } from './DashSetup/screens/folders-screen/sqlrunner-update/sqlrunner-update.component';
 import { GraphicEditingComponent } from './DashSetup/screens/graphic-editing/graphic-editing.component';
@@ -162,22 +161,7 @@ export const routes: Routes = [
           },
         ],
       },
-      {
-        path: '',
-        component: FoldersComponent,
-        title: 'Koios - Administrador',
-        data: {
-          breadcrumb: '',
-        },
-      },
-      {
-        path: 'create_group',
-        component: CreateFoldersComponent,
-        title: 'Koios - Administrador',
-        data: {
-          breadcrumb: 'Criar Grupo',
-        },
-      },
+
       {
         path: 'groups',
         component: GroupComponent,

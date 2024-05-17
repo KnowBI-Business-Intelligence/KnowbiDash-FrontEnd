@@ -186,17 +186,87 @@
             />
           </div>
         </div>
-        <div class="form-group-input-side">
-          <div class="form-group-input-drop">
-            <label for="chartPath">Pasta: </label>
-            <p-dropdown
-              class="drop"
-              name="chartPath"
-              placeholder="Vincule e pasta"
-              [options]="chartPaths"
-              optionLabel="name"
-              formControlName="chartPath"
-            ></p-dropdown>
+        <div class="paths">
+          <span>Vincular pasta</span>
+          <div style="overflow-y: auto; overflow-x: hidden; margin-top: 8px">
+            <p-table
+              #tableCreate
+              matSort
+              class="mat-elevation-z8 demo-table"
+              selectionMode="single"
+              [value]="chartPaths"
+              (matSortChange)="announceSortChange($event)"
+              [rows]="10"
+              [paginator]="true"
+              [resizableColumns]="true"
+              scrollHeight="220px"
+              styleClass="p-datatable-gridlines"
+              [globalFilterFields]="['id', 'name']"
+            >
+              <ng-template pTemplate="caption">
+                <div class="filter">
+                  <fa-icon
+                    class="icon"
+                    [icon]="icons.search"
+                    [size]="'xl'"
+                  ></fa-icon>
+                  <span class="p-input-icon-left">
+                    <input
+                      pInputText
+                      type="text"
+                      (input)="onInputChange($event, tableCreate)"
+                      placeholder="Pesquisar"
+                    />
+                  </span>
+                </div>
+              </ng-template>
+              <ng-template pTemplate="header">
+                <tr>
+                  <th style="width: 1rem">
+                    <div class="flex align-items-center"></div>
+                  </th>
+                  <th
+                    pResizableColumn
+                    style="min-width: 5rem"
+                    pSortableColumn="id"
+                  >
+                    <div class="flex align-items-center">Código</div>
+                  </th>
+                  <th
+                    pResizableColumn
+                    style="min-width: 12rem"
+                    pSortableColumn="name"
+                  >
+                    <div class="flex align-items-center">Pasta</div>
+                  </th>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="body" let-chartPaths>
+                <tr
+                  #tr
+                  pSelectableRow="chartPaths"
+                  pContextMenuRow="chartPaths"
+                  [pSelectableRow]="chartPaths"
+                >
+                  <td>
+                    <input
+                      class="checkbox"
+                      type="checkbox"
+                      (change)="printDetails($event, chartPaths.id)"
+                    />
+                  </td>
+                  <td>{{ chartPaths.id }}</td>
+                  <td>{{ chartPaths.name }}</td>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="emptymessage">
+                <tr>
+                  <td colspan="7">Sem registros encontrados</td>
+                </tr>
+              </ng-template>
+            </p-table>
           </div>
         </div>
       </form>
@@ -208,55 +278,166 @@
     </div>
   </div>
 
-  <div class="modal-delete-profile" *ngIf="deleteProfile">
-    <div class="container_delete-profile">
-      <span>Tem certeza de que deseja excluir este registro?</span>
-      <div class="buttons_delete-profile">
-        <button
-          class="action-buttons_delete-profile yes"
-          (click)="confirmDelete()"
-        >
-          Sim
-        </button>
-        <button
-          class="action-buttons_delete-profile no"
-          (click)="cancelDelete()"
-        >
-          Não
-        </button>
-      </div>
-    </div>
+  <div class="message">
+    <p-toast [life]="2500"></p-toast>
   </div>
 
   <div class="modal-view-profile" *ngIf="isViewDashboard">
-    <div class="container_view-profile">
-      <span>Informações do dashboard:</span>
-      <div class="container_profile-infos">
-        <div class="container_profile-left">
-          <span>Nome: </span>
-          <span> {{ selectedRow?.name }}</span>
-          <br />
-          <span>Tabela: </span>
-          <span>{{ selectedRow?.pgTableName }}</span>
-          <br />
-          <span>Pasta: </span>
-          <span>{{ selectedRowChartGroup.name }}</span>
-        </div>
+    <div class="container-edit-content">
+      <h2>Editar</h2>
+    </div>
+    <div class="container-edit-body">
+      <form class="form-search" [formGroup]="editDashForm">
+        <div>
+          <div class="form-group-input">
+            <label for="name">Nome do dashboard</label>
+            <input
+              type="text"
+              class="form-control"
+              name="name"
+              autocomplete="off"
+              formControlName="name"
+              required
+              maxlength="60"
+              [(ngModel)]="selectedRow!.name"
+            />
+          </div>
 
-        <div class="container_profile-right">
-          <span>Código SQL: </span>
-          <br />
-          <span> {{ selectedRow?.sql }}</span>
+          <div class="form-group-input">
+            <label for="pgTableName">Nome da tabela</label>
+            <input
+              type="text"
+              class="form-control"
+              name="pgTableName"
+              autocomplete="off"
+              formControlName="pgTableName"
+              required
+              maxlength="80"
+              [(ngModel)]="selectedRow!.pgTableName"
+            />
+          </div>
         </div>
-      </div>
-      <div class="footer_view-profile">
-        <p></p>
-        <button (click)="notViewDashInfo()">Voltar</button>
+        <div class="paths">
+          <span>Vincular pasta</span>
+          <div
+            style="
+              max-height: 90%;
+              overflow-y: auto;
+              overflow-x: hidden;
+              margin-top: 8px;
+            "
+          >
+            <p-table
+              #tableEdit
+              matSort
+              class="mat-elevation-z8 demo-table"
+              selectionMode="single"
+              [value]="chartPaths"
+              (matSortChange)="announceSortChange($event)"
+              [rows]="10"
+              [paginator]="true"
+              [resizableColumns]="true"
+              scrollHeight="250px"
+              styleClass="p-datatable-gridlines"
+              [globalFilterFields]="['id', 'name']"
+            >
+              <ng-template pTemplate="caption">
+                <div class="filter">
+                  <fa-icon
+                    class="icon"
+                    [icon]="icons.search"
+                    [size]="'xl'"
+                  ></fa-icon>
+                  <span class="p-input-icon-left">
+                    <input
+                      pInputText
+                      type="text"
+                      (input)="onInputChange($event, tableEdit)"
+                      placeholder="Pesquisar"
+                    />
+                  </span>
+                </div>
+              </ng-template>
+              <ng-template pTemplate="header">
+                <tr>
+                  <th style="width: 1rem">
+                    <div class="flex align-items-center"></div>
+                  </th>
+                  <th
+                    pResizableColumn
+                    style="min-width: 5rem"
+                    pSortableColumn="id"
+                  >
+                    <div class="flex align-items-center">Código</div>
+                  </th>
+                  <th
+                    pResizableColumn
+                    style="min-width: 12rem"
+                    pSortableColumn="name"
+                  >
+                    <div class="flex align-items-center">Pasta</div>
+                  </th>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="body" let-chartPaths>
+                <tr
+                  #tr
+                  pSelectableRow="chartPaths"
+                  pContextMenuRow="chartPaths"
+                  [pSelectableRow]="chartPaths"
+                >
+                  <td>
+                    <input
+                      type="checkbox"
+                      class="checkbox"
+                      (change)="printDetails($event, chartPaths.id)"
+                      [checked]="isSelected(chartPaths)"
+                    />
+                  </td>
+                  <td>{{ chartPaths.id }}</td>
+                  <td>{{ chartPaths.name }}</td>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="emptymessage">
+                <tr>
+                  <td colspan="7">Sem registros encontrados</td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="container-add-footer">
+      <button id="cancel" (click)="notViewDashInfo()">Voltar</button>
+      <button (click)="updateRegister()">Salvar</button>
+    </div>
+  </div>
+
+  <div
+    class="modal"
+    *ngIf="deleteProfile"
+    id="modal"
+    [style.display]="deleteProfile ? 'flex' : 'none'"
+  >
+    <div class="modal-content">
+      <span class="close" (click)="cancelDelete()">&times;</span>
+      <div>
+        <h2>Tem certeza de que deseja excluir este registro?</h2>
+        <p>Esta ação não pode ser desfeita</p>
+        <div class="modal-buttons">
+          <button class="cancel" (click)="cancelDelete()">cancelar</button>
+          <button class="exclude" (click)="confirmDelete()">
+            <span>Excluir</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
 
-  <p-toast [life]="1500"></p-toast>
+  <p-toast [life]="2500"></p-toast>
 </div>
 
 <div class="container-sql" *ngIf="isSQL">
@@ -265,7 +446,7 @@
       <h2>Editor de SQL</h2>
       <div class="content-sql_buttons">
         <div class="content-sql_buttons-action">
-          <button (click)="updateRegister()">
+          <button (click)="updateRegisterSql()">
             <span class="material-symbols-outlined"> play_circle </span>
           </button>
           <button (click)="refreshRegister()">
@@ -300,5 +481,5 @@
     </div>
   </div>
 
-  <p-toast [life]="1000"></p-toast>
+  <p-toast [life]="2500"></p-toast>
 </div>

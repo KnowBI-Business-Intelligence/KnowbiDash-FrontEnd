@@ -163,9 +163,14 @@ export class DashboardsViewComponent implements OnInit {
 
   processDashboardsData(groupData: any, pathData: string[]) {
     groupData.forEach((data: any) => {
-      if (pathData.includes(data.chartPath.id)) {
-        this.paths[data.chartPath.id].push(data);
-      }
+      data.chartPath.forEach((path: any) => {
+        if (pathData.includes(path.id)) {
+          if (!this.paths[path.id]) {
+            this.paths[path.id] = [];
+          }
+          this.paths[path.id].push(data);
+        }
+      });
     });
   }
 

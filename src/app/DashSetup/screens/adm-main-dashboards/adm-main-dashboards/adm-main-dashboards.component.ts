@@ -30,6 +30,7 @@ export class AdmMainDashboardsComponent implements OnInit {
     search: faMagnifyingGlass,
   };
   searchTerm: string = '';
+  pathName: string = '';
   listpages: any;
   filteredItems: any;
   groups: Group[] = [];
@@ -64,15 +65,17 @@ export class AdmMainDashboardsComponent implements OnInit {
     this.selectedChartPath = JSON.parse(
       this.localStorage.getDecryptedItem('selectedChartPath') || 'null'
     );
-
+    this.pathName = this.selectedChartPath.name;
     data.forEach((dataItem: any) => {
-      const group: any[] = [];
-      if (dataItem.chartPath.id == this.selectedChartPath) {
-        group.push(dataItem);
-        this.chartgroups[dataItem.name] = group;
-        this.groups.push(dataItem);
-        this.filteredItems = this.groups;
-      }
+      dataItem.chartPath.forEach((path: any) => {
+        const group: any[] = [];
+        if (path.id == this.selectedChartPath.id) {
+          group.push(dataItem);
+          this.chartgroups[dataItem.name] = group;
+          this.groups.push(dataItem);
+          this.filteredItems = this.groups;
+        }
+      });
     });
   }
 

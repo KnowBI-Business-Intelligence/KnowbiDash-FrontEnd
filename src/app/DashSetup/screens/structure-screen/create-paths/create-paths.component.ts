@@ -14,7 +14,7 @@ import { FilterMetadata, MessageService } from 'primeng/api';
 import { DropdownModule } from 'primeng/dropdown';
 import { Table, TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
-import { PathTable, ProfileTable } from '../../../../core/modules/interfaces';
+import { PathTable } from '../../../../core/modules/interfaces';
 import { ChartsService } from '../../../../core/services/charts/charts.service';
 import { ProfilesService } from '../../../../core/services/profiles/profiles.service';
 import { StorageService } from '../../../../core/services/user/storage.service';
@@ -24,6 +24,7 @@ import {
   faFilterCircleXmark,
   faMagnifyingGlass,
 } from '@fortawesome/free-solid-svg-icons';
+import { MatTabsModule } from '@angular/material/tabs';
 
 @Component({
   selector: 'app-create-paths',
@@ -34,6 +35,7 @@ import {
     ReactiveFormsModule,
     TableModule,
     MatPaginator,
+    MatTabsModule,
     MatSortModule,
     ToastModule,
     DropdownModule,
@@ -78,7 +80,8 @@ export class CreatePathsComponent implements OnInit {
   profileId: any[] = [];
   dataSource: any;
   dataSourceGroup: any = [];
-  requestChartPaths: any[] = [];
+  requestProfiles: any[] = [];
+  requestDashboards: any[] = [];
 
   private headers: any;
 
@@ -88,6 +91,7 @@ export class CreatePathsComponent implements OnInit {
   selectedRow: PathTable | null = null;
   selectedRowChart: any;
   listProfiles: any;
+  listDashboards: any;
 
   constructor(
     private _liveAnnouncer: LiveAnnouncer,
@@ -102,6 +106,7 @@ export class CreatePathsComponent implements OnInit {
   ngOnInit(): void {
     this.getChartsPath();
     this.getProfiles();
+    this.getGroupChart();
   }
 
   private getChartsPath() {
@@ -127,6 +132,7 @@ export class CreatePathsComponent implements OnInit {
   private getGroupChart() {
     this.charts.getChartGroup(this.headers).subscribe({
       next: (value: any) => {
+        this.listDashboards = value;
         this.dataSourceGroup = this.dataSource.map((folder: any) => {
           const sameValue = value.find(
             (group: any) => group.chartPath && group.chartPath.id === folder.id
@@ -135,7 +141,8 @@ export class CreatePathsComponent implements OnInit {
           return {
             id: sameValue ? sameValue.id : folder.id,
             name: folder.name,
-            path: sameValue ? sameValue?.name : 'Sem vinculo',
+            path: folder.chartGroups.length > 0 ? 'Vinculado' : 'Sem vínculo',
+            chartGroups: folder.chartGroups,
           };
         });
       },
@@ -158,17 +165,30 @@ export class CreatePathsComponent implements OnInit {
 
   printDetails(event: any, path: any) {
     if (event.target.checked) {
-      console.log('marcado ', path);
-      if (!this.requestChartPaths.some((item) => item.id == path)) {
-        this.requestChartPaths.push({ id: path });
-        console.log(this.requestChartPaths);
+      if (!this.requestProfiles.some((item) => item.id == path)) {
+        this.requestProfiles.push({ id: path });
+        console.log(this.requestProfiles);
       }
     } else {
-      console.log('desmarcado ', path);
-      const index = this.requestChartPaths.findIndex((item) => item.id == path);
+      const index = this.requestProfiles.findIndex((item) => item.id == path);
       if (index != -1) {
-        this.requestChartPaths.splice(index, 1);
-        console.log(this.requestChartPaths);
+        this.requestProfiles.splice(index, 1);
+        console.log(this.requestProfiles);
+      }
+    }
+  }
+
+  printDetailsDashboards(event: any, path: any) {
+    if (event.target.checked) {
+      if (!this.requestDashboards.some((item) => item.id == path)) {
+        this.requestDashboards.push({ id: path });
+        console.log(this.requestDashboards);
+      }
+    } else {
+      const index = this.requestDashboards.findIndex((item) => item.id == path);
+      if (index != -1) {
+        this.requestDashboards.splice(index, 1);
+        console.log(this.requestDashboards);
       }
     }
   }
@@ -188,6 +208,19 @@ export class CreatePathsComponent implements OnInit {
     } else {
       return false;
     }
+  }
+
+  isSelectedDash(path: any): boolean {
+    if (
+      this.selectedRow?.chartGroups &&
+      Array.isArray(this.selectedRow.chartGroups)
+    ) {
+      return this.selectedRow.chartGroups.some(
+        (chartGroup) =>
+          chartGroup.id === path.id && chartGroup.name === path.name
+      );
+    }
+    return false;
   }
 
   clear(table: Table): void {
@@ -226,7 +259,7 @@ export class CreatePathsComponent implements OnInit {
     }
   }
 
-  selectRow(row: ProfileTable) {
+  selectRow(row: PathTable) {
     this.selectedRow = row;
     this.actionButton = false;
     this.deleteButton =
@@ -242,21 +275,33 @@ export class CreatePathsComponent implements OnInit {
   }
 
   viewProfile() {
-    this.getProfiles();
     this.profileId = [];
-    this.requestChartPaths = [];
+    this.requestProfiles = [];
+    this.requestDashboards = [];
     this.isViewProfile = !this.isViewProfile;
     this.selectedRowChart = this.selectedRow;
-    console.log(this.listProfiles);
+
     this.listProfiles.some((path: any) => {
       path.chartPaths.some((content: any) => {
         if (this.selectedRowChart.id == content.id) {
-          this.requestChartPaths.push({ id: path.id });
+          this.requestProfiles.push({ id: path.id });
         }
       });
     });
 
-    console.log(this.requestChartPaths);
+    this.selectedRowChart.chartGroups.forEach((data: any) => {
+      if (
+        this.listDashboards &&
+        this.listDashboards.some(
+          (path: any) => path.id === data.id && path.name === data.name
+        )
+      ) {
+        this.requestDashboards.push({ id: data.id });
+      }
+    });
+
+    console.log(this.requestProfiles);
+    console.log(this.requestDashboards);
   }
 
   notViewProfile() {
@@ -270,7 +315,7 @@ export class CreatePathsComponent implements OnInit {
     this.getChartsPath();
   }
 
-  onRowDoubleClick(row: ProfileTable) {
+  onRowDoubleClick(row: PathTable) {
     console.log('double click:', row);
   }
 
@@ -287,7 +332,8 @@ export class CreatePathsComponent implements OnInit {
 
   addRegister() {
     this.getProfiles();
-    this.requestChartPaths = [];
+    this.getGroupChart();
+    this.requestProfiles = [];
     this.list = this.elementRef.nativeElement.querySelector('#list');
     this.add = this.elementRef.nativeElement.querySelector('#add');
 
@@ -327,7 +373,7 @@ export class CreatePathsComponent implements OnInit {
             this.messageService.add({
               severity: 'error',
               summary: 'Erro',
-              detail: 'Erro ao excluir.',
+              detail: 'Verifique os vinculos da pasta',
             });
           },
         });
@@ -351,14 +397,21 @@ export class CreatePathsComponent implements OnInit {
   createPath() {
     const name = this.createFolderForm.get('name')?.value as string;
 
-    const chartProfiles = this.requestChartPaths.map((profile: any) => {
+    const profiles = this.requestProfiles.map((profile: any) => {
       return { id: profile.id.toString() };
+    });
+
+    const dashboards = this.requestDashboards.map((path: any) => {
+      return { id: path.id.toString() };
     });
 
     const requestBody = {
       name: name,
-      perfis: chartProfiles,
+      perfis: profiles,
+      chartGroups: dashboards,
     };
+
+    console.log(requestBody);
 
     this.charts.createChartsPath(requestBody, this.headers).subscribe({
       next: () => {
@@ -387,13 +440,18 @@ export class CreatePathsComponent implements OnInit {
     this.actionButton = true;
     const name = this.editPathForm.get('name')?.value as string;
 
-    const chartPaths = this.requestChartPaths.map((path: any) => {
+    const profiles = this.requestProfiles.map((path: any) => {
+      return { id: path.id.toString() };
+    });
+
+    const dashboards = this.requestDashboards.map((path: any) => {
       return { id: path.id.toString() };
     });
 
     const requestBody = {
       name: name,
-      perfis: chartPaths,
+      perfis: profiles,
+      chartGroups: dashboards,
     };
 
     console.log(requestBody);
@@ -418,5 +476,6 @@ export class CreatePathsComponent implements OnInit {
         },
       });
     this.getProfiles();
+    this.getGroupChart();
   }
 }

@@ -27,22 +27,17 @@
   flex-direction: column;
   min-width: 240px;
   height: calc(93vh - 5px);
-  overscroll-behavior-y: auto;
   border-right: solid 1px #e6e6e6;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column-reverse;
+  display: flex;
+  flex-direction: column-reverse;
   overflow-y: auto;
-}
-
-.list-dashboards .panel::-webkit-scrollbar {
-  width: 0.1875rem;
-}
-
-.list-dashboards .panel::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.list-dashboards .panel::-webkit-scrollbar-thumb {
-  background: #868bbb;
-  border-radius: 10rem;
+  overflow-x: hidden;
+  overscroll-behavior-y: auto;
 }
 
 .dashboards-label {
