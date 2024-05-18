@@ -315,6 +315,8 @@
               required
               maxlength="80"
               [(ngModel)]="selectedRow!.pgTableName"
+              [readOnly]="isReadOnly"
+              [ngClass]="{ 'readonly-bg': isReadOnly }"
             />
           </div>
         </div>
@@ -448,13 +450,21 @@
       <h2>Query builder</h2>
       <div class="content-sql_buttons">
         <div class="content-sql_buttons-action">
-          <button (click)="updateRegisterSql()">
-            <span class="material-symbols-outlined"> play_circle </span>
+          <button (click)="updateRegisterSql()" title="Executar">
+            <span *ngIf="!isLoadingRun" class="material-symbols-outlined">
+              play_circle
+            </span>
+            <span *ngIf="isLoadingRun"><div class="login-spinner"></div></span>
           </button>
-          <button (click)="refreshRegister()">
-            <span class="material-symbols-outlined"> refresh </span>
+          <button (click)="showTable()" title="Exibir tabela">
+            <span *ngIf="!isLoadingTable" class="material-symbols-outlined">
+              table
+            </span>
+            <span *ngIf="isLoadingTable"
+              ><div class="login-spinner"></div
+            ></span>
           </button>
-          <button (click)="clearSQL()">
+          <button (click)="clearSQL()" title="Limpar">
             <span class="material-symbols-outlined"> delete </span>
           </button>
         </div>

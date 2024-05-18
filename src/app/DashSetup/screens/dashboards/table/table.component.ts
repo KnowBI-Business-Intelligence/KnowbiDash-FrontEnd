@@ -1,12 +1,5 @@
 import { HttpHeaders } from '@angular/common/http';
-import {
-  AfterViewInit,
-  Component,
-  EventEmitter,
-  OnInit,
-  Output,
-  ViewChild,
-} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { StorageService } from '../../../../core/services/user/storage.service';
 import { LocalstorageService } from '../../../../core/services/local-storage/local-storage.service';
 import { ChartsService } from '../../../../core/services/charts/charts.service';
@@ -36,27 +29,9 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { ChartgroupService } from '../../../../core/services/chartgroup/chartgroup.service';
 import { Subscription } from 'rxjs';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { MatSort, MatSortModule, Sort } from '@angular/material/sort';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
-
-interface Axis {
-  name: string;
-  type: string;
-  identifier: string;
-  value: string;
-}
-
-interface TableRow {
-  [key: string]: any;
-}
-
-export interface PeriodicElement {
-  name: string;
-  position: number;
-  weight: string;
-  symbol: string;
-}
+import { Axis, PeriodicElement } from '../../../../core/modules/interfaces';
+import { TableModule } from 'primeng/table';
 
 @Component({
   selector: 'app-table',
@@ -73,14 +48,12 @@ export interface PeriodicElement {
     CdkMenuItemCheckbox,
     CdkMenuGroup,
     CdkMenuItem,
-    MatTableModule,
-    MatSortModule,
+    TableModule,
   ],
   templateUrl: './table.component.html',
   styleUrl: './table.component.css',
 })
 export class TableComponent implements OnInit {
-  @Output() returnToCreate = new EventEmitter<void>();
   icons = {
     database: faDatabase,
     close: faXmark,
@@ -94,10 +67,12 @@ export class TableComponent implements OnInit {
   database: any[] = [];
   tabledata: any[] = [];
   filters: any[] = [];
+  showTableColumns: any[] = [];
+  showTableData: any[] = [];
+
   displayedColumns: string[] = [];
-  displayedRows: TableRow[] = [];
-  dataSource = new MatTableDataSource(this.displayedRows);
   selectedRow: PeriodicElement | null = null;
+
   selectedChartButton: string = '';
   tableTitle: string = '';
   chartType: string = '';
@@ -106,10 +81,13 @@ export class TableComponent implements OnInit {
   tableName: string = '';
   identifier: string = '';
   selectedAggregation: string = '';
+
   dashBoard: any;
   tableId: any;
+
   showPreviewButton: boolean = true;
   showModal: boolean = false;
+
   modal: HTMLElement | undefined;
   selectedtabledata: Axis = { name: '', type: '', identifier: '', value: '' };
   buildData: { name: any; identifier: any }[] = [];
@@ -474,31 +452,26 @@ export class TableComponent implements OnInit {
   }
 
   tablePreView(data: any) {
-    if (data && data.tableData && data.tableData.length > 0) {
-      this.displayedColumns = [];
-      this.displayedRows = [];
+    console.log(data);
 
-      data.tableData.forEach((rowData: any) => {
-        rowData.th.forEach((th: string) => {
-          this.displayedColumns.push(th);
-        });
+    this.showTableColumns = [];
+    this.showTableData = [];
+
+    const columns = data.tableData.map((td: any) => td.column).flat();
+    this.showTableColumns = columns.map((col: string) => ({ name: col }));
+
+    const rowCount = data.tableData[0].td.length;
+
+    for (let i = 0; i < rowCount; i++) {
+      const row: any = {};
+      data.tableData.forEach((td: any) => {
+        row[td.column[0]] = td.td[i];
       });
-
-      const numRows = data.tableData[0].td.length;
-      for (let i = 0; i < numRows; i++) {
-        const row: any = {};
-        data.tableData.forEach((rowData: any) => {
-          rowData.th.forEach((th: string, index: number) => {
-            row[th] = rowData.td[i];
-          });
-        });
-        this.displayedRows.push(row);
-      }
-
-      this.displayedColumns.forEach((column) => {
-        this.sortDescriptions[column] = `Sort by ${column}`;
-      });
+      this.showTableData.push(row);
     }
+
+    console.log(this.showTableColumns);
+    console.log(this.showTableData);
   }
 
   formatterResultWhenDecimal(result: number): string {
@@ -551,7 +524,7 @@ export class TableComponent implements OnInit {
     this.selectedTab = tabName;
   }
 
-  announceSortChange(sortState: Sort) {
+  announceSortChange(sortState: any) {
     if (sortState.direction) {
       this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
     } else {

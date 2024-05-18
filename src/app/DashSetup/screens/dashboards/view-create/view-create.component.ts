@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
 import {
-  AfterViewInit,
   Component,
   ElementRef,
   OnDestroy,
@@ -15,30 +14,18 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AngularDraggableModule } from 'angular2-draggable';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { SkeletonModule } from 'primeng/skeleton';
-import { Subject, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import Highcharts from 'highcharts';
 import { ChartsService } from '../../../../core/services/charts/charts.service';
 import { StorageService } from '../../../../core/services/user/storage.service';
 import { ChartgroupService } from '../../../../core/services/chartgroup/chartgroup.service';
-import { MatTableModule } from '@angular/material/table';
-
-interface Group {
-  id: string;
-  name: string;
-}
-
-interface TableRow {
-  [key: string]: any;
-}
-
-interface ChartData {
-  id: string;
-  title: string;
-  graphType: string;
-  xAxisColumns: any[];
-  yAxisColumns: any[];
-  filters: any[];
-}
+import {
+  ChartData,
+  Group,
+  TableRow,
+} from '../../../../core/modules/interfaces';
+import { TableModule } from 'primeng/table';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
 
 interface ExtendedOptions extends Highcharts.Options {
   filters?: any;
@@ -55,7 +42,7 @@ interface ExtendedOptions extends Highcharts.Options {
     HighchartsChartModule,
     FormsModule,
     AngularDraggableModule,
-    MatTableModule,
+    TableModule,
   ],
   templateUrl: './view-create.component.html',
   styleUrl: './view-create.component.css',
@@ -68,12 +55,17 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   position!: string;
   groupName: string = '';
   tableTitle: string = '';
+
   chartConfig: any;
   currentView: any;
+
   changeBg: HTMLElement | null = null;
+
   paths: { [key: string]: Group[] } = {};
   pathNames: { [key: string]: string } = {};
+
   Highcharts: typeof Highcharts = Highcharts;
+
   displayedColumns: string[] = [];
   displayedRows: TableRow[] = [];
   chartGroupsData: Highcharts.Options[] = [];
@@ -88,6 +80,9 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   chartData: ChartData[] = [];
   cardsData: any[] = [];
   tableData: any[] = [];
+  showTableColumns: any[] = [];
+  showTableData: any[] = [];
+
   showModal: boolean = false;
   isLoginLoading: boolean = false;
   user = this.storageService.getUser();
@@ -96,6 +91,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   });
 
   constructor(
+    private _liveAnnouncer: LiveAnnouncer,
     private router: Router,
     private chartsService: ChartsService,
     private storageService: StorageService,
@@ -177,6 +173,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
 
   loadTables(tableData: any, groupId: any) {
     this.tableGroupsData = [];
+
     tableData.forEach((table: any) => {
       if (
         table.chartGroup.id == groupId &&
@@ -185,32 +182,30 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       ) {
         const tableGroup: any = {
           title: table.title,
-          columns: [],
-          rows: [],
+          showTableColumns: [],
+          showTableData: [],
         };
 
-        table.tableData.forEach((rowData: any) => {
-          rowData.th.forEach((th: string) => {
-            if (!tableGroup.columns.includes(th)) {
-              tableGroup.columns.push(th);
-            }
-          });
-        });
+        const columns = table.tableData.map((td: any) => td.column).flat();
+        tableGroup.showTableColumns = columns.map((col: string) => ({
+          name: col,
+        }));
 
-        const numRows = table.tableData[0].td.length;
-        for (let i = 0; i < numRows; i++) {
+        const rowCount = table.tableData[0].td.length;
+
+        for (let i = 0; i < rowCount; i++) {
           const row: any = {};
-          table.tableData.forEach((rowData: any) => {
-            rowData.th.forEach((th: string, index: number) => {
-              row[th] = rowData.td[i];
-            });
+          table.tableData.forEach((td: any) => {
+            row[td.column[0]] = td.td[i];
           });
-          tableGroup.rows.push(row);
+          tableGroup.showTableData.push(row);
         }
 
         this.tableGroupsData.push(tableGroup);
       }
     });
+
+    console.log(this.tableGroupsData);
   }
 
   loadData(chartData: ChartData[], groupId: any) {
@@ -477,6 +472,14 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     });
 
     this.showModal = true;
+  }
+
+  announceSortChange(sortState: any) {
+    if (sortState.direction) {
+      this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
+    } else {
+      this._liveAnnouncer.announce('Sorting cleared');
+    }
   }
 
   closeModal(): void {

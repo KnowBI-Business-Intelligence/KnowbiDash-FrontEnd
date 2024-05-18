@@ -64,27 +64,52 @@
           (mouseup)="newPosition($event); resizeChart()"
         >
           <h2>{{ tableGroup.title }}</h2>
-          <section class="table-container-overflow">
-            <table mat-table [dataSource]="tableGroup.rows" matSort>
-              <ng-container
-                *ngFor="let column of tableGroup.columns"
-                [matColumnDef]="column"
-              >
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                  {{ column }}
-                </th>
-                <td mat-cell *matCellDef="let row">{{ row[column] }}</td>
-              </ng-container>
-              <tr
-                mat-header-row
-                *matHeaderRowDef="tableGroup.columns; sticky: true"
-              ></tr>
-              <tr
-                mat-header-row
-                *matRowDef="let row; columns: tableGroup.columns"
-              ></tr>
-            </table>
-          </section>
+          <div style="max-height: 90%; overflow: auto; margin-top: 8px">
+            <p-table
+              matSort
+              class="mat-elevation-z8 demo-table"
+              selectionMode="single"
+              [value]="tableGroup.showTableData"
+              (matSortChange)="announceSortChange($event)"
+              [resizableColumns]="true"
+              [scrollable]="true"
+              scrollHeight="230px"
+              styleClass="p-datatable-gridlines"
+              [globalFilterFields]="tableGroup.showTableColumns"
+            >
+              <ng-template pTemplate="header">
+                <tr>
+                  <th
+                    *ngFor="let column of tableGroup.showTableColumns"
+                    pResizableColumn
+                    [pSortableColumn]="column.name"
+                    style="min-width: 12rem"
+                  >
+                    <div class="flex align-items-center">{{ column.name }}</div>
+                  </th>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="body" let-rowData>
+                <tr
+                  #tr
+                  pSelectableRow="rowData"
+                  pContextMenuRow="rowData"
+                  [pSelectableRow]="rowData"
+                >
+                  <td *ngFor="let column of tableGroup.showTableColumns">
+                    {{ rowData[column.name] }}
+                  </td>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="emptymessage">
+                <tr>
+                  <td colspan="7">Sem registros encontrados</td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
         </section>
       </div>
     </div>

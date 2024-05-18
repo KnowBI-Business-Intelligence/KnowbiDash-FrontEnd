@@ -150,37 +150,52 @@
     <div *ngIf="!showPreviewButton" class="chart-container">
       <section class="table-container mat-elevation-z8" tabindex="0">
         <h2>{{ tableTitle }}</h2>
-        <section class="table-container-overflow">
-          <table
-            mat-table
-            [dataSource]="displayedRows"
+        <div style="max-height: 90%; overflow: auto; margin-top: 8px">
+          <p-table
             matSort
+            class="mat-elevation-z8 demo-table"
+            selectionMode="single"
+            [value]="showTableData"
             (matSortChange)="announceSortChange($event)"
+            [resizableColumns]="true"
+            [scrollable]="true"
+            scrollHeight="230px"
+            styleClass="p-datatable-gridlines"
+            [globalFilterFields]="showTableColumns"
           >
-            <ng-container
-              *ngFor="let column of displayedColumns"
-              [matColumnDef]="column"
-            >
-              <th
-                mat-header-cell
-                *matHeaderCellDef
-                mat-sort-header
-                [sortActionDescription]="sortDescriptions[column]"
+            <ng-template pTemplate="header">
+              <tr>
+                <th
+                  *ngFor="let column of showTableColumns"
+                  pResizableColumn
+                  [pSortableColumn]="column.name"
+                  style="min-width: 12rem"
+                >
+                  <div class="flex align-items-center">{{ column.name }}</div>
+                </th>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-rowData>
+              <tr
+                #tr
+                pSelectableRow="rowData"
+                pContextMenuRow="rowData"
+                [pSelectableRow]="rowData"
               >
-                {{ column }}
-              </th>
-              <td mat-cell *matCellDef="let row">{{ row[column] }}</td>
-            </ng-container>
-            <tr
-              mat-header-row
-              *matHeaderRowDef="displayedColumns; sticky: true"
-            ></tr>
-            <tr
-              mat-header-row
-              *matRowDef="let row; columns: displayedColumns"
-            ></tr>
-          </table>
-        </section>
+                <td *ngFor="let column of showTableColumns">
+                  {{ rowData[column.name] }}
+                </td>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="7">Sem registros encontrados</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
       </section>
     </div>
 

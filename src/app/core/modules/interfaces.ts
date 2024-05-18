@@ -51,3 +51,35 @@ export interface Path {
   name: string;
   checked: boolean;
 }
+
+export interface Axis {
+  name: string;
+  type: string;
+  identifier: string;
+  value: string;
+}
+
+export interface PeriodicElement {
+  name: string;
+  position: number;
+  weight: string;
+  symbol: string;
+}
+
+export interface Group {
+  id: string;
+  name: string;
+}
+
+export interface TableRow {
+  [key: string]: any;
+}
+
+export interface ChartData {
+  id: string;
+  title: string;
+  graphType: string;
+  xAxisColumns: any[];
+  yAxisColumns: any[];
+  filters: any[];
+}

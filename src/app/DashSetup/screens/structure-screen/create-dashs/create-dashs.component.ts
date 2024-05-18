@@ -8,7 +8,6 @@ import {
   Validators,
 } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { FilterMetadata, MenuItem, MessageService } from 'primeng/api';
 import { DropdownModule } from 'primeng/dropdown';
 import { Table, TableModule } from 'primeng/table';
@@ -22,6 +21,7 @@ import {
   faClose,
   faFilterCircleXmark,
   faMagnifyingGlass,
+  faTable,
 } from '@fortawesome/free-solid-svg-icons';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 
@@ -47,6 +47,7 @@ export class CreateDashsComponent implements OnInit {
     filter: faFilterCircleXmark,
     closed: faClose,
     search: faMagnifyingGlass,
+    table: faTable,
   };
 
   createRegisterForm = this.formBuilder.group({
@@ -90,7 +91,9 @@ export class CreateDashsComponent implements OnInit {
   actionSQLButton: boolean = false;
   isSQL: boolean = false;
   showModal: boolean = false;
-  progressBar: boolean = false;
+  isLoadingRun: boolean = false;
+  isLoadingTable: boolean = false;
+  isReadOnly: boolean = false;
 
   dataSource: any;
   chartPaths: any;
@@ -164,11 +167,16 @@ export class CreateDashsComponent implements OnInit {
         console.log(value);
         this.tableColumns = value.columns;
         this.tableData = value.data;
-        console.log('Columns:', this.tableColumns);
-        console.log('Data:', this.tableData);
+        this.isLoadingTable = false;
       },
       error: (err) => {
         console.log(err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Este dashboard ainda não tem dados',
+        });
+        this.isLoadingTable = false;
       },
     });
   }
@@ -257,13 +265,23 @@ export class CreateDashsComponent implements OnInit {
 
   viewDashInfo() {
     this.requestChartPaths = [];
+    this.isReadOnly = true;
+    this.actionButton = true;
     this.isViewDashboard = true;
     this.selectedRowChartGroup = this.selectedRow;
     this.getChartPath();
-    this.actionButton = true;
 
+    const hasColumns =
+      Array.isArray(this.selectedRowChartGroup.columns) &&
+      this.selectedRowChartGroup.columns.length > 0;
+    const hasSql =
+      this.selectedRowChartGroup.sql &&
+      this.selectedRowChartGroup.sql.trim() !== '';
+
+    this.isReadOnly = hasColumns && hasSql;
+
+    console.log(this.selectedRowChartGroup);
     this.selectedRowChartGroup.chartPath.forEach((data: any) => {
-      console.log(data);
       this.requestChartPaths.push({ id: data.id });
     });
   }
@@ -409,7 +427,6 @@ export class CreateDashsComponent implements OnInit {
       chartPath: chartPath,
     };
 
-    console.log(object);
     this.charts.updateChartGroup(this.headers, object, this.dashId).subscribe({
       next: () => {
         this.messageService.add({
@@ -440,6 +457,7 @@ export class CreateDashsComponent implements OnInit {
         detail: 'Verifique o código SQL',
       });
     } else {
+      this.isLoadingRun = true;
       this.charts.updateChartGroupSQL(this.headers, sqlCode, id).subscribe({
         next: (value: any) => {
           console.log(value);
@@ -449,7 +467,7 @@ export class CreateDashsComponent implements OnInit {
             detail: 'SQL Atualizado',
           });
           this.getTableData(this.chartGroupID);
-          this.progressBar = false;
+          this.isLoadingRun = false;
         },
         error: (err) => {
           console.log(err);
@@ -458,34 +476,16 @@ export class CreateDashsComponent implements OnInit {
             summary: 'Erro',
             detail: err.error,
           });
+          this.isLoadingRun = false;
         },
       });
     }
   }
 
-  refreshRegister() {
-    console.log('refresh', this.sqlPlaceholder);
-
-    this.progressBar = true;
-    this.charts
-      .updateChartGroupSQL(this.headers, this.chartGroupID, this.sqlPlaceholder)
-      .subscribe({
-        next: (value: any) => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Sucesso',
-            detail: 'SQL Atualizado',
-          });
-          this.progressBar = false;
-        },
-        error: () => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Erro',
-            detail: 'Erro no processo.',
-          });
-        },
-      });
+  showTable() {
+    const id = Number(this.chartGroupID);
+    this.isLoadingTable = true;
+    this.getTableData(id);
   }
 
   onRowDoubleClick(row: DashboardTable) {

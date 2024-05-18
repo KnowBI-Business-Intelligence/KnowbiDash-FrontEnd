@@ -82,7 +82,6 @@ button {
 
 .mat-elevation-z8 {
   box-shadow: none;
-
   outline: none;
 }
 
@@ -295,6 +294,10 @@ td {
   border-radius: 0.25rem;
   outline: none;
   padding: 5px 10px;
+}
+
+.readonly-bg {
+  background-color: transparent;
 }
 
 textarea {
@@ -516,6 +519,17 @@ textarea {
   cursor: pointer;
 }
 
+.login-spinner {
+  transform: translate(-50%, -50%);
+  border: 3px solid #4f80e1;
+  border-radius: 50%;
+  border-top: 3px solid transparent;
+  width: 19px;
+  height: 19px;
+  -webkit-animation: spin 1s linear infinite;
+  animation: spin 1s linear infinite;
+}
+
 .content-sql_buttons-action button span {
   font-size: 20px;
 }
@@ -611,4 +625,22 @@ textarea {
 
 :host ::ng-deep .p-paginator .p-paginator-pages .p-paginator-page {
   font-size: 12px;
+}
+
+@-webkit-keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

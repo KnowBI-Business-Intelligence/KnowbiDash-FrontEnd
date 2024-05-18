@@ -178,7 +178,7 @@ export class ChartsService {
 
   updateChartGroupSQL(
     headers: HttpHeaders,
-    sql: string,
+    sql: number,
     ID_chartPath: number
   ): Observable<any> {
     let headerObj: { [header: string]: string } = {};
