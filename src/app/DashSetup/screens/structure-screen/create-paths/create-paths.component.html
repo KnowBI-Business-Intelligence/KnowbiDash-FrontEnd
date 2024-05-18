@@ -40,6 +40,7 @@
           [rows]="10"
           [paginator]="true"
           [resizableColumns]="true"
+          [scrollable]="true"
           scrollHeight="350px"
           styleClass="p-datatable-gridlines"
           currentPageReportTemplate="Exibindo de {first} a {last} de {totalRecords} registros"
@@ -94,13 +95,13 @@
               (click)="selectRow(dataSourceGroup)"
               [pSelectableRow]="dataSourceGroup"
             >
-              <td [title]="dataSource.id">
+              <td [title]="dataSourceGroup.id">
                 {{ dataSourceGroup.id }}
               </td>
-              <td [title]="dataSource.name">
+              <td [title]="dataSourceGroup.name">
                 {{ dataSourceGroup.name }}
               </td>
-              <td [title]="dataSource.path">
+              <td [title]="dataSourceGroup.path">
                 {{ dataSourceGroup.path }}
               </td>
             </tr>
@@ -156,6 +157,7 @@
                   [rows]="10"
                   [paginator]="true"
                   [resizableColumns]="true"
+                  [scrollable]="true"
                   scrollHeight="220px"
                   styleClass="p-datatable-gridlines"
                   [globalFilterFields]="['id', 'name']"
@@ -240,6 +242,7 @@
                   [rows]="10"
                   [paginator]="true"
                   [resizableColumns]="true"
+                  [scrollable]="true"
                   scrollHeight="220px"
                   styleClass="p-datatable-gridlines"
                   [globalFilterFields]="['id', 'name']"
@@ -365,6 +368,7 @@
                   [rows]="10"
                   [paginator]="true"
                   [resizableColumns]="true"
+                  [scrollable]="true"
                   scrollHeight="220px"
                   styleClass="p-datatable-gridlines"
                   [globalFilterFields]="['id', 'name']"
@@ -448,6 +452,7 @@
                   [rows]="10"
                   [paginator]="true"
                   [resizableColumns]="true"
+                  [scrollable]="true"
                   scrollHeight="220px"
                   styleClass="p-datatable-gridlines"
                   [globalFilterFields]="['id', 'name']"

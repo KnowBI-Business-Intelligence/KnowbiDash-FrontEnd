@@ -15,40 +15,17 @@ export class DatabaseConnectionService {
   private SERVICE_DB = API_ORACLE_DATABASE;
   private SERVICE_EXECUTE = API_ECXECUTE_SQL;
 
-  connection(
-    url: string,
-    username: string,
-    password: string
-  ): Observable<string> {
+  connection(url: string, username: string, password: string) {
     const body = {
       url,
       username,
       password,
     };
 
-    return this.http
-      .post(this.SERVICE_DB, body, { responseType: 'text' })
-      .pipe(catchError(this.handleError));
-  }
-
-  private handleError(error: HttpErrorResponse): Observable<never> {
-    if (error.error instanceof ErrorEvent) {
-      console.error('Ocorreu um erro:', error.error.message);
-    } else {
-      console.error(
-        `Erro no servidor ${error.status}, ` + `detalhes: ${error.error}`
-      );
-    }
-    return throwError(() => {
-      return new Error(
-        'Ocorreu um erro ao processar sua solicitação. Por favor, tente novamente mais tarde.'
-      );
-    });
+    return this.http.post(this.SERVICE_DB, body);
   }
 
   executeSQL(code: string) {
-    return this.http
-      .post(this.SERVICE_EXECUTE, code, { responseType: 'text' })
-      .pipe(catchError(this.handleError));
+    return this.http.post(this.SERVICE_EXECUTE, code, { responseType: 'text' });
   }
 }

@@ -87,16 +87,18 @@ export class CreateDashsComponent implements OnInit {
   deleteProfile: boolean = false;
   isViewDashboard: boolean = false;
   actionButton: boolean = false;
+  actionSQLButton: boolean = false;
   isSQL: boolean = false;
   showModal: boolean = false;
   progressBar: boolean = false;
 
   dataSource: any;
   chartPaths: any;
-  sqlResult: any;
   dashId: any;
 
   requestChartPaths: any[] = [];
+  tableColumns: any[] = [];
+  tableData: any[] = [];
 
   selectedTab: string = '---';
   searchValue?: string;
@@ -148,8 +150,25 @@ export class CreateDashsComponent implements OnInit {
 
         this.resultsLength = value?.length;
       },
-      error(err: any) {
+      error: (err: any) => {
         console.error(err);
+      },
+    });
+  }
+
+  private getTableData(id: any) {
+    this.tableColumns = [];
+    this.tableData = [];
+    this.charts.getChartsTableData(id, this.headers).subscribe({
+      next: (value: any) => {
+        console.log(value);
+        this.tableColumns = value.columns;
+        this.tableData = value.data;
+        console.log('Columns:', this.tableColumns);
+        console.log('Data:', this.tableData);
+      },
+      error: (err) => {
+        console.log(err);
       },
     });
   }
@@ -237,10 +256,16 @@ export class CreateDashsComponent implements OnInit {
   }
 
   viewDashInfo() {
+    this.requestChartPaths = [];
     this.isViewDashboard = true;
-    this.selectedRowChartGroup = this.selectedRow?.chartPath;
+    this.selectedRowChartGroup = this.selectedRow;
     this.getChartPath();
     this.actionButton = true;
+
+    this.selectedRowChartGroup.chartPath.forEach((data: any) => {
+      console.log(data);
+      this.requestChartPaths.push({ id: data.id });
+    });
   }
 
   notViewDashInfo() {
@@ -407,41 +432,34 @@ export class CreateDashsComponent implements OnInit {
 
   updateRegisterSql() {
     const sqlCode = this.createRegisterForm.get('sql')?.value as any;
-
+    const id = Number(this.chartGroupID);
     if (sqlCode.trim() === '') {
       this.messageService.add({
         severity: 'error',
         summary: 'Erro',
-        detail: 'Verifique o campo.',
+        detail: 'Verifique o código SQL',
       });
     } else {
-      this.progressBar = true;
-      this.messageService.add({
-        severity: '-',
-        summary: 'Aguarde',
-        detail: 'Criando metadado!',
+      this.charts.updateChartGroupSQL(this.headers, sqlCode, id).subscribe({
+        next: (value: any) => {
+          console.log(value);
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Sucesso',
+            detail: 'SQL Atualizado',
+          });
+          this.getTableData(this.chartGroupID);
+          this.progressBar = false;
+        },
+        error: (err) => {
+          console.log(err);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erro',
+            detail: err.error,
+          });
+        },
       });
-
-      this.charts
-        .updateChartGroupSQL(this.headers, this.chartGroupID, sqlCode)
-        .subscribe({
-          next: (value: any) => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Sucesso',
-              detail: 'SQL Atualizado',
-            });
-            this.sqlResult = value;
-            this.progressBar = false;
-          },
-          error: () => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Erro',
-              detail: 'Erro no processo.',
-            });
-          },
-        });
     }
   }
 
@@ -454,12 +472,10 @@ export class CreateDashsComponent implements OnInit {
       .subscribe({
         next: (value: any) => {
           this.messageService.add({
-            severity: 'sucess',
+            severity: 'success',
             summary: 'Sucesso',
-            detail: 'SQL Atualizado!',
+            detail: 'SQL Atualizado',
           });
-
-          this.sqlResult = value;
           this.progressBar = false;
         },
         error: () => {
@@ -476,10 +492,14 @@ export class CreateDashsComponent implements OnInit {
     this.isSQL = true;
     this.chartGroupID = row.id;
     this.sqlPlaceholder = row.sql;
+    console.log(row.sql);
   }
 
   goBack() {
     this.isSQL = false;
+    this.tableColumns = [];
+    this.tableData = [];
+    this.getChartsGroup();
   }
 
   clearSQL() {

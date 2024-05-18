@@ -1,22 +1,43 @@
-.container {
+.container-nav-line {
+  width: 60%;
+  padding: 5px 10px;
+  position: relative;
+  top: -39px;
+  left: 145px;
+  align-self: baseline;
   display: flex;
-  justify-content: start;
-  flex-direction: column;
-  align-items: center;
-  width: 95vw;
-  height: 88vh;
-  margin: 1rem;
+}
+
+.container-nav-line span {
+  color: #00000074;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.container {
+  width: 100%;
+  z-index: 1;
+  margin-top: -5px;
+  padding: 0 38px;
 }
 
 header {
   display: flex;
   justify-content: space-between;
-  align-items: start;
-  width: 95%;
+  align-items: center;
+  width: 100%;
+  margin-top: -10px;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 21px;
+}
+
+header h2 {
+  font-size: 14px;
+  font-weight: 400;
 }
 
 .form {
-  margin-top: 5rem;
+  margin-top: 1rem;
 }
 
 .form-group {
@@ -29,22 +50,46 @@ header {
 
 .form label {
   margin-bottom: 0.2rem;
+  font-size: 12px;
 }
 
 .form input {
   max-width: 40rem;
   width: 40rem;
-  padding: 12px;
-  border: none;
-  border-radius: 4px;
-  box-shadow: 2px 2px 7px 0 rgb(0, 0, 0, 0.2);
+  padding: 5px 10px;
+  border-radius: 3px;
+  font-size: 12px;
+  align-items: center;
+  border: 1px solid gainsboro;
   outline: none;
-  color: dimgray;
 }
 
-.form input:invalid {
-  animation: justshake 0.3s forwards;
-  color: red;
+.form-origin {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 3px;
+  width: 16em;
+  height: 30px;
+  cursor: default;
+  background-color: #d7d7d7;
+}
+
+.icon {
+  font-size: 10px;
+}
+
+.form-origin button {
+  cursor: default;
+}
+
+.form-origin input {
+  border: solid 1px #b4b4b4;
+  background-color: transparent;
+  height: 23px;
+  margin-left: 10px;
+  cursor: not-allowed;
 }
 
 button {
@@ -55,22 +100,32 @@ button {
   cursor: pointer;
 }
 
-button {
-  --primary-color: #280769;
-  --hovered-color: #081e6c;
-  position: relative;
+.buttons button {
+  border-radius: 3px;
   display: flex;
-  font-weight: 600;
-  font-size: 20px;
-  gap: 0.5rem;
+  justify-content: center;
   align-items: center;
+  padding: 0.4rem 0.6rem;
+  border: none;
+  background-color: #751a7e;
+  color: #fff;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 300;
+  line-height: 1.2rem;
+  cursor: pointer;
+  width: 75px;
 }
 
-button p {
-  margin: 0;
-  position: relative;
-  font-size: 20px;
-  color: var(--primary-color);
+.login-spinner {
+  transform: translate(-50%, -50%);
+  border: 3px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 3px solid #751a7e;
+  width: 19px;
+  height: 19px;
+  -webkit-animation: spin 1s linear infinite;
+  animation: spin 1s linear infinite;
 }
 
 button::after {
@@ -102,37 +157,12 @@ button:hover p::before {
   width: 100%;
 }
 
-button:hover svg {
-  transform: translateX(4px);
-  color: var(--hovered-color);
-}
-
 button svg {
   color: var(--primary-color);
   transition: 0.2s;
   position: relative;
   width: 15px;
   transition-delay: 0.2s;
-}
-
-/*  */
-
-@keyframes justshake {
-  25% {
-    transform: translateX(5px);
-  }
-
-  50% {
-    transform: translateX(-5px);
-  }
-
-  75% {
-    transform: translateX(5px);
-  }
-
-  100% {
-    transform: translateX-(5px);
-  }
 }
 
 .buttons {
@@ -154,4 +184,71 @@ button svg {
 
 .db-conected img {
   width: 30rem;
+}
+
+:host ::ng-deep .p-toast .p-toast-message .p-toast-message-content {
+  padding: 1rem;
+  border-width: 0 0 0 6px;
+  font-size: 15px;
+  border-radius: 2px;
+}
+
+:host ::ng-deep .p-toast .p-toast-message .p-toast-icon-close {
+  border-radius: 50%;
+  background: transparent;
+  transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+  width: 13px;
+  height: 13px;
+  color: #444444;
+}
+
+:host
+  ::ng-deep
+  .p-toast
+  .p-toast-message
+  .p-toast-message-content
+  .p-icon:not(.p-toast-icon-close-icon) {
+  width: 2rem;
+  height: 23px;
+  margin: 0 10px 0 0 !important;
+}
+
+:host ::ng-deep a {
+  font-size: 12px !important;
+}
+
+:host ::ng-deep .p-paginator-current,
+.p-paginator-rpp-options {
+  font-size: 12px;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-header {
+  border-left: none;
+  border-right: none;
+}
+
+:host ::ng-deep .p-datatable .p-paginator-bottom {
+  padding: 2px;
+}
+
+:host ::ng-deep .p-paginator .p-paginator-pages .p-paginator-page {
+  font-size: 12px;
+}
+
+@-webkit-keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

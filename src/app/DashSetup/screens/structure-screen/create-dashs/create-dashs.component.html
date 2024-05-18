@@ -119,16 +119,16 @@
               (click)="selectRow(dataSource)"
               (dblclick)="onRowDoubleClick(dataSource)"
             >
-              <td>
+              <td [title]="dataSource.id">
                 {{ dataSource.id }}
               </td>
-              <td>
+              <td [title]="dataSource.name">
                 {{ dataSource.name }}
               </td>
-              <td>
+              <td [title]="dataSource.pgTableName">
                 {{ dataSource.pgTableName }}
               </td>
-              <td>
+              <td [title]="dataSource.chartPath ? 'Sim' : 'Não'">
                 {{ dataSource.chartPath ? "Sim" : "Não" }}
               </td>
               <td
@@ -155,7 +155,7 @@
 
   <div class="container-add" id="add">
     <div class="container-content-add">
-      <h2>Cadastro de Dashboards</h2>
+      <h2>Adicionar</h2>
     </div>
     <div class="container-add-body">
       <form class="form-search" [formGroup]="createRegisterForm">
@@ -199,6 +199,7 @@
               [rows]="10"
               [paginator]="true"
               [resizableColumns]="true"
+              [scrollable]="true"
               scrollHeight="220px"
               styleClass="p-datatable-gridlines"
               [globalFilterFields]="['id', 'name']"
@@ -337,6 +338,7 @@
               [rows]="10"
               [paginator]="true"
               [resizableColumns]="true"
+              [scrollable]="true"
               scrollHeight="250px"
               styleClass="p-datatable-gridlines"
               [globalFilterFields]="['id', 'name']"
@@ -443,7 +445,7 @@
 <div class="container-sql" *ngIf="isSQL">
   <div class="content-sql">
     <div class="content-sql_header">
-      <h2>Editor de SQL</h2>
+      <h2>Query builder</h2>
       <div class="content-sql_buttons">
         <div class="content-sql_buttons-action">
           <button (click)="updateRegisterSql()">
@@ -466,18 +468,72 @@
           name="sql_code"
           formControlName="sql"
           minlength="10"
-          maxlength="400"
-          [placeholder]="
-            sqlPlaceholder?.length > 0 ? sqlPlaceholder : 'Insira o SQL'
-          "
+          [(ngModel)]="sqlPlaceholder"
           spellcheck
           required
         >
         </textarea>
       </div>
+
       <div class="sql-body_result">
-        <p>{{ sqlResult }}</p>
+        <div class="paths">
+          <div
+            style="
+              max-height: 90%;
+              overflow-y: auto;
+              overflow-x: auto;
+              margin-top: 8px;
+            "
+          >
+            <p-table
+              matSort
+              class="mat-elevation-z8 demo-table"
+              selectionMode="single"
+              [value]="tableData"
+              (matSortChange)="announceSortChange($event)"
+              [resizableColumns]="true"
+              [scrollable]="true"
+              scrollHeight="230px"
+              styleClass="p-datatable-gridlines"
+              [globalFilterFields]="tableColumns"
+              [tableStyle]="{ 'min-width': '75rem' }"
+            >
+              <ng-template pTemplate="header">
+                <tr>
+                  <th
+                    *ngFor="let column of tableColumns"
+                    pResizableColumn
+                    [pSortableColumn]="column.name"
+                    style="min-width: 12rem"
+                  >
+                    <div class="flex align-items-center">{{ column.name }}</div>
+                  </th>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="body" let-rowData>
+                <tr
+                  #tr
+                  pSelectableRow="rowData"
+                  pContextMenuRow="rowData"
+                  [pSelectableRow]="rowData"
+                >
+                  <td *ngFor="let column of tableColumns">
+                    {{ rowData[column.name] }}
+                  </td>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="emptymessage">
+                <tr>
+                  <td colspan="7">Sem registros encontrados</td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+        </div>
       </div>
+      <span>Total de linhas: {{ tableData.length }}</span>
     </div>
   </div>
 

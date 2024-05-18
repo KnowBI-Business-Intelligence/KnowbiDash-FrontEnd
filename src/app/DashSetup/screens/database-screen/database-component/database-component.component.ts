@@ -41,6 +41,7 @@ export class DatabaseComponentComponent {
 
   isConected: any;
   showForm!: boolean;
+  isLoginLoading: boolean = false;
 
   icons = {
     menu: faBars,
@@ -62,26 +63,27 @@ export class DatabaseComponentComponent {
 
   connectDatabase() {
     const that = this;
-
+    this.isLoginLoading = true;
     const { url, username, password } = this.form;
 
     this.database.connection(url, username, password).subscribe({
-      next() {
+      next: (data) => {
         that.messageService.add({
-          summary: 'Sucesso!',
-          detail: 'Banco de dados configurado',
+          summary: 'Sucesso',
+          detail: `Conectado a base de dados`,
           severity: 'success',
         });
         that.f.reset();
         that.isConected = true;
+        this.isLoginLoading = false;
       },
-      error(err) {
+      error: (err) => {
+        this.isLoginLoading = false;
         that.messageService.add({
-          summary: 'Erro!',
-          detail: 'Banco de dados não configurado',
+          summary: 'Erro',
+          detail: err.error.erro,
           severity: 'error',
         });
-        console.error(err);
       },
     });
   }

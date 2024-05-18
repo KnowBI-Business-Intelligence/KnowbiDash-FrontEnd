@@ -75,6 +75,12 @@ export class ChartsService {
     return this.http.get(`${API_CHARTGROUP}/get/${id}`, { headers: headers });
   }
 
+  getChartsTableData(id: number, headers: any): Observable<any> {
+    return this.http.get(`${API_CHARTGROUP}/tabledata/${id}`, {
+      headers: headers,
+    });
+  }
+
   // CREATES
 
   createCharts(headers: HttpHeaders, chartData: any): Observable<any> {
@@ -173,7 +179,7 @@ export class ChartsService {
   updateChartGroupSQL(
     headers: HttpHeaders,
     sql: string,
-    ID_chartPath: string
+    ID_chartPath: number
   ): Observable<any> {
     let headerObj: { [header: string]: string } = {};
 

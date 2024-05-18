@@ -1,16 +1,38 @@
+<div class="container-nav-line">
+  <span>Databse</span>
+</div>
 <div class="container">
   <header>
-    <h2>Configuração com o banco</h2>
+    <h2>Configurar conexão</h2>
   </header>
   <form class="form" #f="ngForm" *ngIf="!showForm">
+    <div class="form-origin">
+      <button mat-raised-button disabled>
+        <fa-icon
+          class="icon"
+          [icon]="icons.database"
+          [size]="'xl'"
+          title="Dashboards"
+        ></fa-icon>
+      </button>
+      <input
+        required=""
+        name="username"
+        id="username"
+        type="text"
+        placeholder="Oracle"
+        readonly
+      />
+    </div>
     <div class="form-group">
-      <label for="username">Nome de usuário</label>
+      <label for="username">Usuário</label>
       <input
         required=""
         name="username"
         id="username"
         type="text"
         [(ngModel)]="form.username"
+        autocomplete="off"
       />
     </div>
     <div class="form-group">
@@ -21,24 +43,24 @@
         id="password"
         type="password"
         [(ngModel)]="form.password"
+        autocomplete="off"
       />
     </div>
     <div class="form-group">
-      <label for="url">Database URL</label>
+      <label for="url">Host:porta/serviço</label>
       <input
         required=""
         name="url"
         id="url"
         type="text"
         [(ngModel)]="form.url"
+        autocomplete="off"
       />
     </div>
     <div class="buttons">
-      <button [routerLink]="['../']" routerLinkActive="router-link-active">
-        <p>Cancelar</p>
-      </button>
       <button (click)="connectDatabase()">
-        <p>Conectar</p>
+        <span *ngIf="!isLoginLoading">Conectar</span>
+        <span *ngIf="isLoginLoading"><div class="login-spinner"></div></span>
       </button>
     </div>
   </form>
@@ -51,5 +73,5 @@
   </div>
 </div>
 <div class="message">
-  <p-toast [life]="1500"></p-toast>
+  <p-toast [life]="2500"></p-toast>
 </div>
