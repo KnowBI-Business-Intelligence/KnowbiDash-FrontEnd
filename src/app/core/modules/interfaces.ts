@@ -84,6 +84,14 @@ export interface ChartData {
   filters: any[];
 }
 
+export interface CardData {
+  title: string;
+  type: string;
+  content: string;
+  workspace: any;
+  chartgroup: any;
+}
+
 export interface LayoutItemWorkspace {
   id: string;
   identifier: string;

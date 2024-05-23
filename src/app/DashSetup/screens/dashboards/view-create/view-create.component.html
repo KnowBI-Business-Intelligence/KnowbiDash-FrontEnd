@@ -26,7 +26,7 @@
 <div class="main-content">
   <div class="bound-box" #myBounds>
     <div class="container-charts">
-      <div class="left">
+      <div class="left" style="display: none">
         <div
           *ngFor="let chartConfig of chartGroupsData"
           class="chart-container"
@@ -181,22 +181,16 @@
         [resizable]="!disableResize"
       >
         <div *ngIf="item.type == 'card'">
-          <div *ngFor="let cardData of cardGroupsData" class="card">
+          <div class="card">
             <div class="card-header">
-              {{ cardData.title }}
+              {{ item.title }}
             </div>
             <div class="card-body">
-              <p>{{ cardData.content }}</p>
+              <p>{{ item.content }}</p>
             </div>
           </div>
         </div>
         <!--<div class="grid-item-content">{{ item.type }}</div>-->
-        <div
-          class="grid-item-remove-handle"
-          *ngIf="!disableRemove"
-          (mousedown)="stopEventPropagation($event)"
-          (click)="removeItem(item.id)"
-        ></div>
       </ktd-grid-item>
     </ktd-grid>
   </div>

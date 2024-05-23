@@ -34,6 +34,7 @@ import { ChartsService } from '../../../../core/services/charts/charts.service';
 import { StorageService } from '../../../../core/services/user/storage.service';
 import { ChartgroupService } from '../../../../core/services/chartgroup/chartgroup.service';
 import {
+  CardData,
   ChartData,
   Group,
   TableRow,
@@ -111,7 +112,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   displayedColumns: string[] = [];
   displayedRows: TableRow[] = [];
   chartGroupsData: Highcharts.Options[] = [];
-  cardGroupsData: any[] = [];
+  cardGroupsData: CardData[] = [];
   tableGroupsData: any[] = [];
   filters: any[] = [];
   selectedFilters: any = {};
@@ -430,21 +431,28 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   }
 
   updateLayout(data: any) {
+    console.log(data);
     this.layout = [];
     const chardgroupId = data.map((info: any) => info.chartgroup.id);
     const isEqual = chardgroupId.every((id: any) => id === this.groupInfo.id);
 
     if (isEqual) {
       this.layout = [
-        ...data.map((item: any) => ({
-          id: item.workspace.identifier,
-          type: item.workspace.type,
-          x: item.workspace.x,
-          y: item.workspace.y,
-          w: item.workspace.w,
-          h: item.workspace.h,
-          ...item.workspace,
-        })),
+        ...data.map((item: any) => {
+          if (item.type == 'card') {
+            return {
+              id: item.workspace.identifier,
+              type: item.workspace.type,
+              title: item.title,
+              content: item.content,
+              x: item.workspace.x,
+              y: item.workspace.y,
+              w: item.workspace.w,
+              h: item.workspace.h,
+              ...item.workspace,
+            };
+          }
+        }),
       ];
 
       this.originalLayout = JSON.parse(JSON.stringify(this.layout));
@@ -502,8 +510,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
           },
         });
     });
-
-    //this.chartsService.updateWorkspace(this.headers, this.saveNewLayoutUpdated )
   }
 
   onCheckboxChange(column: string, value: string) {
