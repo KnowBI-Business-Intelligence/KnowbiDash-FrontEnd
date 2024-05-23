@@ -319,7 +319,7 @@ export class CreateDashsComponent implements OnInit {
 
     const object = {
       name: name,
-      pgTableName: pgTableName,
+      pgTableName: pgTableName + '_',
       chartPath: chartPath,
     };
 
@@ -423,7 +423,7 @@ export class CreateDashsComponent implements OnInit {
 
     const object = {
       name: name,
-      pgTableName: pgTableName,
+      pgTableName: pgTableName + '_',
       chartPath: chartPath,
     };
 

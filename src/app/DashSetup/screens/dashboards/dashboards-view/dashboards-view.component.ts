@@ -156,6 +156,7 @@ export class DashboardsViewComponent implements OnInit {
 
     this.chartsService.getChartGroup(headers).subscribe({
       next: (data) => {
+        console.log(data);
         this.processDashboardsData(data, dataPath);
       },
     });
@@ -183,6 +184,7 @@ export class DashboardsViewComponent implements OnInit {
     const encryptedData = {
       id: group.id,
       name: group.name,
+      workSpaces: group.workSpaces,
     };
     const clickedButton = event ? event.currentTarget : null;
     const allButtons =

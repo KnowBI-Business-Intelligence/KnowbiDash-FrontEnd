@@ -1,3 +1,12 @@
+<div class="container-save-disposition">
+  <button (click)="updateCombinedLayout()">
+    <fa-icon class="iconview" [icon]="icons.back" [size]="'xl'"></fa-icon
+    >Reorndenar
+  </button>
+  <button (click)="saveLayoutUpdated()">
+    <fa-icon class="iconview" [icon]="icons.save" [size]="'xl'"></fa-icon>Salvar
+  </button>
+</div>
 <div class="filter">
   <div class="filter-button">
     <button (click)="openModal()">
@@ -14,7 +23,6 @@
     </div>
   </div>
 </div>
-
 <div class="main-content">
   <div class="bound-box" #myBounds>
     <div class="container-charts">
@@ -35,23 +43,7 @@
             [options]="chartConfig"
           ></highcharts-chart>
         </div>
-        <div
-          *ngFor="let cardData of cardGroupsData"
-          class="card"
-          ngResizable
-          ngDraggable
-          rzHandles="all"
-          [rzMinWidth]="200"
-          [rzMinHeight]="83"
-          (mouseup)="newPosition($event); resizeChart()"
-        >
-          <div class="card-header">
-            {{ cardData.title }}
-          </div>
-          <div class="card-body">
-            <p>{{ cardData.content }}</p>
-          </div>
-        </div>
+
         <section
           *ngFor="let tableGroup of tableGroupsData"
           class="table-container mat-elevation-z8"
@@ -115,7 +107,6 @@
     </div>
   </div>
 </div>
-
 <div
   class="modal"
   *ngIf="showModal"
@@ -163,5 +154,50 @@
         </button>
       </div>
     </div>
+  </div>
+</div>
+<div class="playground-container">
+  <div class="grid-container">
+    <ktd-grid
+      [cols]="cols"
+      [rowHeight]="rowHeight"
+      [layout]="layout"
+      [compactType]="compactType"
+      [preventCollision]="preventCollision"
+      [scrollableParent]="autoScroll ? document : null"
+      scrollSpeed="4"
+      (dragStarted)="onDragStarted($event)"
+      (resizeStarted)="onResizeStarted($event)"
+      (dragEnded)="onDragEnded($event)"
+      (resizeEnded)="onResizeEnded($event)"
+      (layoutUpdated)="onLayoutUpdated($event)"
+    >
+      <ktd-grid-item
+        *ngFor="let item of layout; trackBy: trackById"
+        [id]="item.id"
+        [transition]="currentTransition"
+        [dragStartThreshold]="dragStartThreshold"
+        [draggable]="!disableDrag"
+        [resizable]="!disableResize"
+      >
+        <div *ngIf="item.type == 'card'">
+          <div *ngFor="let cardData of cardGroupsData" class="card">
+            <div class="card-header">
+              {{ cardData.title }}
+            </div>
+            <div class="card-body">
+              <p>{{ cardData.content }}</p>
+            </div>
+          </div>
+        </div>
+        <!--<div class="grid-item-content">{{ item.type }}</div>-->
+        <div
+          class="grid-item-remove-handle"
+          *ngIf="!disableRemove"
+          (mousedown)="stopEventPropagation($event)"
+          (click)="removeItem(item.id)"
+        ></div>
+      </ktd-grid-item>
+    </ktd-grid>
   </div>
 </div>

@@ -11,6 +11,7 @@ import {
   API_CHARTPATH,
   API_CHARTS,
   API_TABLES,
+  API_WORKSPACE,
 } from '../../../../env/environment';
 
 @Injectable({
@@ -20,6 +21,7 @@ export class ChartsService {
   private ENV_CHARTS = API_CHARTS;
   private ENV_CARDS = API_CARDS;
   private ENV_TABLES = API_TABLES;
+  private ENV_WORKSPACE = API_WORKSPACE;
   private ENV_CHARTPATH = API_CHARTPATH;
   private ENV_CHARTGROUP = API_CHARTGROUP;
 
@@ -49,6 +51,14 @@ export class ChartsService {
     };
 
     return this.http.get(`${this.ENV_TABLES}/get`, myHeaders);
+  }
+
+  getWorkspace(headers: HttpHeaders): Observable<any> {
+    const myHeaders = {
+      headers: headers,
+    };
+
+    return this.http.get(`${this.ENV_WORKSPACE}/get`, myHeaders);
   }
 
   getChartsPath(headers: HttpHeaders): Observable<any> {
@@ -107,6 +117,14 @@ export class ChartsService {
     return this.http.post(`${this.ENV_TABLES}/create`, chartData, myHeaders);
   }
 
+  createWorkspace(headers: HttpHeaders, wsData: any): Observable<any> {
+    const myHeaders = {
+      headers: headers,
+    };
+
+    return this.http.post(`${this.ENV_WORKSPACE}/create`, wsData, myHeaders);
+  }
+
   createChartsPath(pathData: any, headers: HttpHeaders): Observable<any> {
     const myHeaders = {
       headers: headers,
@@ -160,6 +178,18 @@ export class ChartsService {
     return this.http.patch(
       `${this.ENV_TABLES}/update/${id}`,
       chartData,
+      options
+    );
+  }
+
+  updateWorkspace(headers: HttpHeaders, wsData: any, id: any) {
+    const options = {
+      headers: headers,
+    };
+
+    return this.http.patch(
+      `${this.ENV_WORKSPACE}/update/${id}`,
+      wsData,
       options
     );
   }

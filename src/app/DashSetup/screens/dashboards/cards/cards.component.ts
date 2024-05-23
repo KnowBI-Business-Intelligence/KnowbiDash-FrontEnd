@@ -97,6 +97,9 @@ export class CardsComponent implements OnInit, OnDestroy {
   yaxisIdentifiers: { [key: string]: string } = {};
 
   user = this.storageService.getUser();
+  headers = new HttpHeaders({
+    Authorization: `Bearer ${this.user.token}`,
+  });
   constructor(
     private router: Router,
     private storageService: StorageService,
@@ -342,17 +345,14 @@ export class CardsComponent implements OnInit, OnDestroy {
         id: this.dashBoard.id,
       },
     };
-
+    console.log(cardData);
     this.createCard(cardData);
   }
 
-  createCard(chartData: any) {
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${this.user.token}`,
-    });
-
-    this.chartsService.createCards(headers, chartData).subscribe({
+  createCard(cardData: any) {
+    this.chartsService.createCards(this.headers, cardData).subscribe({
       next: (data) => {
+        console.log(data);
         this.cardPreView(data);
         this.chartId = data.id;
         this.updateChart();
@@ -388,15 +388,13 @@ export class CardsComponent implements OnInit, OnDestroy {
       },
     };
 
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${this.user.token}`,
-    });
-
-    this.chartsService.updateCards(headers, cardData, this.chartId).subscribe({
-      next: (data) => {
-        this.cardPreView(data);
-      },
-    });
+    this.chartsService
+      .updateCards(this.headers, cardData, this.chartId)
+      .subscribe({
+        next: (data) => {
+          this.cardPreView(data);
+        },
+      });
   }
 
   cardPreView(data: any) {
@@ -424,10 +422,7 @@ export class CardsComponent implements OnInit, OnDestroy {
   }
 
   openModalCancel() {
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${this.user.token}`,
-    });
-    this.chartsService.deleteCards(headers, this.chartId).subscribe({
+    this.chartsService.deleteCards(this.headers, this.chartId).subscribe({
       next: (data) => {
         console.log(data);
       },

@@ -1,20 +1,34 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, DOCUMENT } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
 import {
   Component,
   ElementRef,
+  Inject,
+  NgZone,
   OnDestroy,
   OnInit,
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import {
+  KtdDragEnd,
+  KtdDragStart,
+  KtdGridComponent,
+  KtdGridLayout,
+  KtdGridLayoutItem,
+  KtdGridModule,
+  KtdResizeEnd,
+  KtdResizeStart,
+  ktdTrackById,
+} from '@katoid/angular-grid-layout';
+import { ktdArrayRemoveItem } from './utils';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AngularDraggableModule } from 'angular2-draggable';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { SkeletonModule } from 'primeng/skeleton';
-import { Subscription } from 'rxjs';
+import { Subscription, debounceTime, filter, fromEvent, merge } from 'rxjs';
 import Highcharts from 'highcharts';
 import { ChartsService } from '../../../../core/services/charts/charts.service';
 import { StorageService } from '../../../../core/services/user/storage.service';
@@ -24,8 +38,12 @@ import {
   Group,
   TableRow,
 } from '../../../../core/modules/interfaces';
+import { faRotateLeft, faFloppyDisk } from '@fortawesome/free-solid-svg-icons';
 import { TableModule } from 'primeng/table';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { MatSelectChange } from '@angular/material/select';
+import { coerceNumberProperty } from '@angular/cdk/coercion';
+import { LayoutService } from './layoutservice';
 
 interface ExtendedOptions extends Highcharts.Options {
   filters?: any;
@@ -43,21 +61,45 @@ interface ExtendedOptions extends Highcharts.Options {
     FormsModule,
     AngularDraggableModule,
     TableModule,
+    KtdGridModule,
   ],
   templateUrl: './view-create.component.html',
   styleUrl: './view-create.component.css',
 })
 export class ViewCreateComponent implements OnInit, OnDestroy {
   @ViewChild('chartContainer') chartContainer!: ElementRef;
+  @ViewChild(KtdGridComponent, { static: true }) grid!: KtdGridComponent;
   private encryptedDataSubscription: Subscription | undefined;
+
+  icons = {
+    back: faRotateLeft,
+    save: faFloppyDisk,
+  };
+
+  cols: number = 6;
+  rowHeight: number = 100;
+  compactType: 'vertical' | 'horizontal' | null = 'horizontal';
+
+  layout: KtdGridLayout = [];
+
+  dragStartThreshold = 0;
+  autoScroll = true;
+  disableDrag = false;
+  disableResize = false;
+  disableRemove = false;
+  autoResize = true;
+  preventCollision = false;
+  isDragging = false;
+  isResizing = false;
+  resizeSubscription!: Subscription;
 
   name = 'Angular';
   position!: string;
-  groupName: string = '';
   tableTitle: string = '';
 
   chartConfig: any;
   currentView: any;
+  groupInfo: any;
 
   changeBg: HTMLElement | null = null;
 
@@ -82,6 +124,9 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   tableData: any[] = [];
   showTableColumns: any[] = [];
   showTableData: any[] = [];
+  originalLayout: any[] = [];
+  saveNewLayoutUpdated: KtdGridLayout = [];
+  workspaceGroup: any[] = [];
 
   showModal: boolean = false;
   isLoginLoading: boolean = false;
@@ -90,34 +135,86 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     Authorization: `Bearer ${this.user.token}`,
   });
 
+  trackById = ktdTrackById;
+  transitions: { name: string; value: string }[] = [
+    {
+      name: 'ease',
+      value: 'transform 500ms ease, width 500ms ease, height 500ms ease',
+    },
+    {
+      name: 'ease-out',
+      value:
+        'transform 500ms ease-out, width 500ms ease-out, height 500ms ease-out',
+    },
+    {
+      name: 'linear',
+      value: 'transform 500ms linear, width 500ms linear, height 500ms linear',
+    },
+    {
+      name: 'overflowing',
+      value:
+        'transform 500ms cubic-bezier(.28,.49,.79,1.35), width 500ms cubic-bezier(.28,.49,.79,1.35), height 500ms cubic-bezier(.28,.49,.79,1.35)',
+    },
+    {
+      name: 'fast',
+      value: 'transform 200ms ease, width 200ms linear, height 200ms linear',
+    },
+    {
+      name: 'slow-motion',
+      value:
+        'transform 1000ms linear, width 1000ms linear, height 1000ms linear',
+    },
+    { name: 'transform-only', value: 'transform 500ms ease' },
+  ];
+  currentTransition: string = this.transitions[0].value;
+
   constructor(
     private _liveAnnouncer: LiveAnnouncer,
     private router: Router,
     private chartsService: ChartsService,
     private storageService: StorageService,
-    private chartGroupService: ChartgroupService
+    private chartGroupService: ChartgroupService,
+    private ngZone: NgZone,
+    public elementRef: ElementRef,
+    private layoutService: LayoutService,
+    @Inject(DOCUMENT) public document: Document
   ) {
     this.currentView = null;
   }
 
   ngOnInit(): void {
     this.startDashboarData();
+
+    this.resizeSubscription = merge(
+      fromEvent(window, 'resize'),
+      fromEvent(window, 'orientationchange')
+    )
+      .pipe(
+        debounceTime(50),
+        filter(() => this.autoResize)
+      )
+      .subscribe(() => {
+        this.grid.resize();
+      });
+
+    this.layout = this.layoutService.getLayout();
   }
 
   ngOnDestroy() {
     if (this.encryptedDataSubscription) {
       this.encryptedDataSubscription.unsubscribe();
+      this.resizeSubscription.unsubscribe();
     }
   }
 
   startDashboarData() {
     this.encryptedDataSubscription =
       this.chartGroupService.encryptedData$.subscribe((encryptedData) => {
-        this.groupName = encryptedData.name;
+        console.log(encryptedData);
+        this.groupInfo = encryptedData;
         this.getCharts(encryptedData.id);
         this.getCards(encryptedData.id);
         this.getTables(encryptedData.id);
-        console.log(encryptedData);
       });
   }
 
@@ -150,8 +247,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     this.cardGroupsData = [];
     cardData.forEach((card: any) => {
       if (card.chartGroup.id == groupId) {
-        console.log(card);
-
         let result = null;
         if (typeof card.result === 'number') {
           result = this.formatterResultWhenDecimal(card.result);
@@ -163,12 +258,17 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
 
         let finalData = {
           title: cardTitle,
+          type: 'card',
           content: cardResult,
+          workspace: card.workspace,
+          chartgroup: card.chartGroup,
         };
 
         this.cardGroupsData.push(finalData);
       }
     });
+
+    this.updateCombinedLayout();
   }
 
   loadTables(tableData: any, groupId: any) {
@@ -181,6 +281,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
         table.tableData.length > 0
       ) {
         const tableGroup: any = {
+          type: 'table',
           title: table.title,
           showTableColumns: [],
           showTableData: [],
@@ -205,7 +306,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       }
     });
 
-    console.log(this.tableGroupsData);
+    this.updateCombinedLayout();
   }
 
   loadData(chartData: ChartData[], groupId: any) {
@@ -320,6 +421,89 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
         this.chartGroupsData.push(chartConfig);
       }
     });
+    this.updateCombinedLayout();
+  }
+
+  updateCombinedLayout() {
+    const combinedData = [...this.cardGroupsData];
+    this.updateLayout(combinedData);
+  }
+
+  updateLayout(data: any) {
+    this.layout = [];
+    const chardgroupId = data.map((info: any) => info.chartgroup.id);
+    const isEqual = chardgroupId.every((id: any) => id === this.groupInfo.id);
+
+    if (isEqual) {
+      this.layout = [
+        ...data.map((item: any) => ({
+          id: item.workspace.identifier,
+          type: item.workspace.type,
+          x: item.workspace.x,
+          y: item.workspace.y,
+          w: item.workspace.w,
+          h: item.workspace.h,
+          ...item.workspace,
+        })),
+      ];
+
+      this.originalLayout = JSON.parse(JSON.stringify(this.layout));
+      this.saveNewLayoutUpdated = this.layout;
+      console.log(this.layout);
+    }
+  }
+
+  onLayoutUpdated(layout: KtdGridLayout) {
+    this.saveNewLayoutUpdated = [];
+    this.layout = layout.map((updatedItem: any) => {
+      const originalItem = this.originalLayout.find(
+        (item) => item.id === updatedItem.id
+      );
+      return {
+        ...originalItem,
+        ...updatedItem,
+      };
+    });
+
+    console.log('on layout updated', this.layout);
+    this.saveNewLayoutUpdated = this.layout;
+    /*this.layout.forEach((data: any) => {
+      if (data.type == 'chart') {
+        console.log(this.chartGroupsData);
+      }
+      if (data.type == 'table') {
+        console.log(this.tableGroupsData);
+      }
+      if (data.type == 'card') {
+        console.log(this.cardGroupsData);
+      }
+    });*/
+  }
+
+  saveLayoutUpdated() {
+    console.log('update', this.saveNewLayoutUpdated);
+    this.saveNewLayoutUpdated.map((data: any) => {
+      console.log(data.identifier);
+
+      const requestUpdateData = {
+        identifier: data.identifier,
+        type: data.type,
+        x: data.x,
+        y: data.y,
+        w: data.w,
+        h: data.h,
+      };
+
+      this.chartsService
+        .updateWorkspace(this.headers, requestUpdateData, data.id)
+        .subscribe({
+          next: (value) => {
+            console.log(value);
+          },
+        });
+    });
+
+    //this.chartsService.updateWorkspace(this.headers, this.saveNewLayoutUpdated )
   }
 
   onCheckboxChange(column: string, value: string) {
@@ -352,7 +536,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   }
 
   allValuesMatchAllFilters(values: any[], allFilters: any[]): boolean {
-    console.log(values, allFilters);
     return values.every((value) => allFilters.includes(value));
   }
 
@@ -418,8 +601,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       yAxisColumns: formattedYAxisColumns,
       filters: formattedFilters,
     };
-
-    console.log('Dados formatados:', requestData);
 
     const user = this.storageService.getUser();
     const headers = new HttpHeaders({
@@ -507,5 +688,116 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       this.chartConfig.chart.width = chartWidth;
       this.chartConfig.chart.height = chartHeight;
     }
+  }
+
+  onDragStarted(event: KtdDragStart) {
+    this.isDragging = true;
+  }
+
+  onResizeStarted(event: KtdResizeStart) {
+    this.isResizing = true;
+  }
+
+  onDragEnded(event: KtdDragEnd) {
+    this.isDragging = false;
+  }
+
+  onResizeEnded(event: KtdResizeEnd) {
+    this.isResizing = false;
+  }
+
+  onCompactTypeChange(change: MatSelectChange) {
+    console.log('onCompactTypeChange', change);
+    this.compactType = change.value;
+  }
+
+  onTransitionChange(change: MatSelectChange) {
+    console.log('onTransitionChange', change);
+    this.currentTransition = change.value;
+  }
+
+  onAutoScrollChange(checked: boolean) {
+    this.autoScroll = checked;
+  }
+
+  onDisableDragChange(checked: boolean) {
+    this.disableDrag = checked;
+  }
+
+  onDisableResizeChange(checked: boolean) {
+    this.disableResize = checked;
+  }
+
+  onDisableRemoveChange(checked: boolean) {
+    this.disableRemove = checked;
+  }
+
+  onAutoResizeChange(checked: boolean) {
+    this.autoResize = checked;
+  }
+
+  onPreventCollisionChange(checked: boolean) {
+    this.preventCollision = checked;
+  }
+
+  onColsChange(event: Event) {
+    this.cols = coerceNumberProperty((event.target as HTMLInputElement).value);
+  }
+
+  onRowHeightChange(event: Event) {
+    this.rowHeight = coerceNumberProperty(
+      (event.target as HTMLInputElement).value
+    );
+  }
+
+  onDragStartThresholdChange(event: Event) {
+    this.dragStartThreshold = coerceNumberProperty(
+      (event.target as HTMLInputElement).value
+    );
+  }
+
+  generateLayout() {
+    const layout: KtdGridLayout = [];
+    for (let i = 0; i < this.cols; i++) {
+      const y = Math.ceil(Math.random() * 4) + 1;
+      layout.push({
+        x: Math.round(Math.random() * Math.floor(this.cols / 2 - 1)) * 2,
+        y: Math.floor(i / 6) * y,
+        w: 2,
+        h: y,
+        id: i.toString(),
+      });
+    }
+    console.log('layout', layout);
+    this.layout = layout;
+  }
+
+  addItemToLayout() {
+    const maxId = this.layout.reduce(
+      (acc, cur) => Math.max(acc, parseInt(cur.id, 10)),
+      -1
+    );
+    const nextId = maxId + 1;
+
+    const newLayoutItem: KtdGridLayoutItem = {
+      id: nextId.toString(),
+      x: 0,
+      y: 0,
+      w: 2,
+      h: 2,
+    };
+    this.layout = [newLayoutItem, ...this.layout];
+  }
+
+  stopEventPropagation(event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  removeItem(id: string) {
+    this.layout = ktdArrayRemoveItem(
+      this.layout,
+      (item: any) => item.id === id
+    );
   }
 }

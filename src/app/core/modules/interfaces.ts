@@ -83,3 +83,12 @@ export interface ChartData {
   yAxisColumns: any[];
   filters: any[];
 }
+
+export interface LayoutItemWorkspace {
+  id: string;
+  identifier: string;
+  type: string;
+  x: number;
+  y: number;
+  w: number;
+}

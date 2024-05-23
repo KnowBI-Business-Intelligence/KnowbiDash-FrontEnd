@@ -243,6 +243,7 @@ time {
   display: flex;
   align-items: center;
   border-bottom: solid 1px #e6e6e6;
+  background-color: #fff;
 }
 
 .createview span {
@@ -255,7 +256,7 @@ time {
   justify-content: flex-start;
   align-items: center;
   cursor: pointer;
-  border: dashed 2px #e6e6e6;
+  border: solid 1px #ffffff;
   background-color: #ffffff;
   padding: 4px 9px;
   margin: 3px;
@@ -267,11 +268,11 @@ time {
 }
 
 .createview button:hover {
-  border: solid 2px #e6e6e6;
+  border: solid 1px #e6e6e6;
 }
 
 .iconview {
-  color: #5f65a5;
+  color: #4570c6;
   margin-right: 5px;
 }
 

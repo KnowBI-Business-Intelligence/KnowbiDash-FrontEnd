@@ -166,7 +166,7 @@
     symbol-observable "4.0.0"
     yargs "17.7.2"
 
-"@angular/common@^17.0.0", "@angular/common@^17.0.0 || ^18.0.0", "@angular/common@>=16.0.0", "@angular/common@>=17.0.0", "@angular/common@17.1.2":
+"@angular/common@^17.0.0", "@angular/common@^17.0.0 || ^18.0.0", "@angular/common@>=14.0.0", "@angular/common@>=16.0.0", "@angular/common@>=17.0.0", "@angular/common@17.1.2":
   version "17.1.2"
   resolved "https://registry.npmjs.org/@angular/common/-/common-17.1.2.tgz"
   integrity sha512-y/wD+zuPaPgK3dB80Q63qBtuu5TuryKuUgjWrOmrguBWV9oiJRhKQrcp1gVw9vVrowmbDBKGtPMS622Q4oxOWQ==
@@ -194,7 +194,7 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/core@^17.0.0", "@angular/core@^17.0.0 || ^18.0.0", "@angular/core@>=16.0.0", "@angular/core@>=17.0.0", "@angular/core@17.1.2":
+"@angular/core@^17.0.0", "@angular/core@^17.0.0 || ^18.0.0", "@angular/core@>=14.0.0", "@angular/core@>=16.0.0", "@angular/core@>=17.0.0", "@angular/core@17.1.2":
   version "17.1.2"
   resolved "https://registry.npmjs.org/@angular/core/-/core-17.1.2.tgz"
   integrity sha512-0M787BZVgYSVogHCUzo/dFrT56TgfQoEsOQngHMpyERJZv6dycXZlRdHc6TzvHUa+Uu/MNjn/RclBR8063bdWA==
@@ -1393,6 +1393,13 @@
   dependencies:
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
+
+"@katoid/angular-grid-layout@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.npmjs.org/@katoid/angular-grid-layout/-/angular-grid-layout-2.2.0.tgz"
+  integrity sha512-DImdtfUCLmU15lLqLTdghjbD5iqqXnVDMsnMdqqmEETLLzdJ7rihp/Q8XZUts3xgdvBbR/WSJEcvIqqSGVa69A==
+  dependencies:
+    tslib "^2.3.1"
 
 "@kurkle/color@^0.3.0":
   version "0.3.2"
@@ -6994,7 +7001,7 @@ ts-interface-checker@^0.1.9:
   resolved "https://registry.npmjs.org/ts-interface-checker/-/ts-interface-checker-0.1.13.tgz"
   integrity sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==
 
-tslib@^2.0.0, tslib@^2.1.0, tslib@^2.3.0, tslib@^2.6.0, tslib@^2.6.2, tslib@2.6.2:
+tslib@^2.0.0, tslib@^2.1.0, tslib@^2.3.0, tslib@^2.3.1, tslib@^2.6.0, tslib@^2.6.2, tslib@2.6.2:
   version "2.6.2"
   resolved "https://registry.npmjs.org/tslib/-/tslib-2.6.2.tgz"
   integrity sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==

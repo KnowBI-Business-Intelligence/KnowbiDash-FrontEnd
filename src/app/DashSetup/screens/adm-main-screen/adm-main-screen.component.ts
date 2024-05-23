@@ -9,6 +9,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { LocalstorageService } from '../../../core/services/local-storage/local-storage.service';
+import { ProfilesService } from '../../../core/services/profiles/profiles.service';
 
 @Component({
   selector: 'app-adm-main-screen',
@@ -24,6 +25,7 @@ export class ADMMainScreenComponent implements OnInit {
 
   searchTerm: string = '';
   profiles: any[] = [];
+  profilesData: any[] = [];
   pathsByProfile: { [key: string]: any[] } = {};
   private user = this.storageService.getUser();
   headers = new HttpHeaders({
@@ -31,7 +33,7 @@ export class ADMMainScreenComponent implements OnInit {
   });
 
   constructor(
-    private charts: ChartsService,
+    private profilesService: ProfilesService,
     private authService: AuthService,
     private storageService: StorageService,
     private localStorage: LocalstorageService,
@@ -45,13 +47,28 @@ export class ADMMainScreenComponent implements OnInit {
   getUserById(id: number, token: any) {
     this.authService.getById(id, this.headers).subscribe({
       next: (data: any) => {
-        this.processData(data);
+        this.getProfilesData(data.id);
+      },
+    });
+  }
+
+  getProfilesData(data: string) {
+    this.profilesService.getProfiles(this.headers).subscribe({
+      next: (value: any) => {
+        value.map((profileData: any) => {
+          profileData.users.map((userData: any) => {
+            if (userData.id == data) {
+              this.profilesData.push(profileData);
+            }
+          });
+        });
+        this.processData(this.profilesData);
       },
     });
   }
 
   processData(data: any) {
-    data.perfis.forEach((profile: any) => {
+    data.forEach((profile: any) => {
       const paths: string[] = [];
       if (profile && profile.chartPaths) {
         profile.chartPaths.forEach((chartPath: any) => {
