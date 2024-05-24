@@ -286,6 +286,8 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
           title: table.title,
           showTableColumns: [],
           showTableData: [],
+          chartgroup: table.chartGroup,
+          workspace: table.workspace,
         };
 
         const columns = table.tableData.map((td: any) => td.column).flat();
@@ -426,39 +428,34 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   }
 
   updateCombinedLayout() {
-    const combinedData = [...this.cardGroupsData];
+    const combinedData = [...this.cardGroupsData, ...this.tableGroupsData];
     this.updateLayout(combinedData);
   }
 
   updateLayout(data: any) {
     console.log(data);
     this.layout = [];
-    const chardgroupId = data.map((info: any) => info.chartgroup.id);
-    const isEqual = chardgroupId.every((id: any) => id === this.groupInfo.id);
+    this.layout = [
+      ...data.map((item: any) => {
+        if (item.type == 'card') {
+          return {
+            id: item.workspace.id,
+            type: item.workspace.type,
+            title: item.title,
+            content: item.content,
+            x: item.workspace.x,
+            y: item.workspace.y,
+            w: item.workspace.w,
+            h: item.workspace.h,
+            ...item.workspace,
+          };
+        }
+      }),
+    ];
 
-    if (isEqual) {
-      this.layout = [
-        ...data.map((item: any) => {
-          if (item.type == 'card') {
-            return {
-              id: item.workspace.identifier,
-              type: item.workspace.type,
-              title: item.title,
-              content: item.content,
-              x: item.workspace.x,
-              y: item.workspace.y,
-              w: item.workspace.w,
-              h: item.workspace.h,
-              ...item.workspace,
-            };
-          }
-        }),
-      ];
-
-      this.originalLayout = JSON.parse(JSON.stringify(this.layout));
-      this.saveNewLayoutUpdated = this.layout;
-      console.log(this.layout);
-    }
+    this.originalLayout = JSON.parse(JSON.stringify(this.layout));
+    this.saveNewLayoutUpdated = this.layout;
+    console.log(this.layout);
   }
 
   onLayoutUpdated(layout: KtdGridLayout) {
