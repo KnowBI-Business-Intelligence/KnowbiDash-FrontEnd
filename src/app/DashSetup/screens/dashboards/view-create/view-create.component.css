@@ -153,6 +153,7 @@
   padding: 10px 15px;
   margin: 5px;
   min-height: 89px;
+  border: solid 1px #00000020;
   background-color: #fff;
   display: flex;
   align-items: baseline;
@@ -177,11 +178,11 @@
 }
 
 .table-container {
-  width: 400px;
-  height: 280px;
+  height: 290px;
   outline: none;
   background-color: #fff;
   border: solid 1px #00000020;
+  border-radius: 5px;
   padding: 5px;
   margin: 4px 5px;
 }
@@ -479,7 +480,7 @@ td {
 }
 
 :host ktd-grid-item.ng-star-inserted {
-  background-color: #ccc;
+  background-color: transparent;
 }
 
 :host mat-chip-list,

@@ -111,7 +111,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
 
   displayedColumns: string[] = [];
   displayedRows: TableRow[] = [];
-  chartGroupsData: Highcharts.Options[] = [];
+  chartGroupsData: any[] = [];
   cardGroupsData: CardData[] = [];
   tableGroupsData: any[] = [];
   filters: any[] = [];
@@ -341,6 +341,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
 
     chartData.forEach((dataItem: any) => {
       if (dataItem.chartGroup.id == groupId) {
+        console.log(dataItem);
         this.copydataJSON.push(dataItem);
         const uniqueCategories: any = Array.from(
           new Set(dataItem.xAxisColumns[0].data)
@@ -421,14 +422,25 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
           filters: dataItem.filters,
         };
 
-        this.chartGroupsData.push(chartConfig);
+        const chartDataFinal = {
+          data: chartConfig,
+          type: 'chart',
+          chartgroup: dataItem.chartGroup,
+          workspace: dataItem.workspace,
+        };
+
+        this.chartGroupsData.push(chartDataFinal);
       }
     });
     this.updateCombinedLayout();
   }
 
   updateCombinedLayout() {
-    const combinedData = [...this.cardGroupsData, ...this.tableGroupsData];
+    const combinedData = [
+      ...this.cardGroupsData,
+      ...this.tableGroupsData,
+      ...this.chartGroupsData,
+    ];
     this.updateLayout(combinedData);
   }
 
@@ -443,6 +455,30 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
             type: item.workspace.type,
             title: item.title,
             content: item.content,
+            x: item.workspace.x,
+            y: item.workspace.y,
+            w: item.workspace.w,
+            h: item.workspace.h,
+            ...item.workspace,
+          };
+        } else if (item.type == 'table') {
+          return {
+            id: item.workspace.id,
+            type: item.workspace.type,
+            title: item.title,
+            showTableColumns: item.showTableColumns,
+            showTableData: item.showTableData,
+            x: item.workspace.x,
+            y: item.workspace.y,
+            w: item.workspace.w,
+            h: item.workspace.h,
+            ...item.workspace,
+          };
+        } else if (item.type == 'chart') {
+          return {
+            id: item.workspace.id,
+            type: item.workspace.type,
+            data: item.data,
             x: item.workspace.x,
             y: item.workspace.y,
             w: item.workspace.w,

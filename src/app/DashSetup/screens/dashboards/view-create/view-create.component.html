@@ -134,12 +134,6 @@
           *ngIf="item.type == 'table'"
           class="table-container mat-elevation-z8"
           tabindex="0"
-          ngResizable
-          ngDraggable
-          rzHandles="all"
-          [rzMinWidth]="350"
-          [rzMinHeight]="250"
-          (mouseup)="newPosition($event); resizeChart()"
         >
           <h2>{{ item.title }}</h2>
           <div style="max-height: 90%; overflow: auto; margin-top: 8px">
