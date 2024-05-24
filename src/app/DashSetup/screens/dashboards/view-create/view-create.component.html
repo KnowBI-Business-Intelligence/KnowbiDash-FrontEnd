@@ -26,24 +26,7 @@
 <div class="main-content">
   <div class="bound-box" #myBounds>
     <div class="container-charts">
-      <div class="left" style="display: none">
-        <div
-          *ngFor="let chartConfig of chartGroupsData"
-          class="chart-container"
-          ngResizable
-          ngDraggable
-          rzHandles="all"
-          [rzMinWidth]="350"
-          [rzMinHeight]="250"
-          (mouseup)="newPosition($event); resizeChart()"
-        >
-          <highcharts-chart
-            style="width: 100%; height: 100%"
-            [Highcharts]="Highcharts"
-            [options]="chartConfig"
-          ></highcharts-chart>
-        </div>
-      </div>
+      <div class="left" style="display: none"></div>
     </div>
   </div>
 </div>
@@ -183,6 +166,13 @@
             </p-table>
           </div>
         </section>
+        <div *ngIf="item.type == 'chart'" class="chart-container">
+          <highcharts-chart
+            style="width: 100%; height: 100%"
+            [Highcharts]="Highcharts"
+            [options]="item.data"
+          ></highcharts-chart>
+        </div>
       </ktd-grid-item>
     </ktd-grid>
   </div>
