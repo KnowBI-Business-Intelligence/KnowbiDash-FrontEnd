@@ -13,10 +13,6 @@
         >
           <mat-icon>menu</mat-icon>
         </button>
-        <img
-          src="../../../../assets/images/logo_principal_reduzida.png"
-          alt=""
-        />
       </div>
 
       <mat-list-item
@@ -29,13 +25,17 @@
         (click)="toggleMenuAtivo('home')"
       >
         <div class="container-icon">
-          <fa-icon
-            class="icon"
-            [icon]="icons.home"
-            [size]="'xl'"
-            title="Home"
-          ></fa-icon>
-          <span class="menu-item">Home</span>
+          <div>
+            <fa-icon
+              class="icon"
+              [icon]="icons.home"
+              [size]="'xl'"
+              title="Home"
+            ></fa-icon>
+          </div>
+          <div>
+            <span class="menu-item">Home</span>
+          </div>
         </div>
       </mat-list-item>
 

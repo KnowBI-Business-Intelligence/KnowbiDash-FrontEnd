@@ -16,6 +16,8 @@ import {
   faChartPie,
   faRectangleList,
   faTableList,
+  faFolderTree,
+  faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import { ChartsService } from '../../../../core/services/charts/charts.service';
 import { LocalstorageService } from '../../../../core/services/local-storage/local-storage.service';
@@ -52,8 +54,11 @@ export class DashboardsViewComponent implements OnInit {
     chartview: faChartLine,
     cardview: faRectangleList,
     tableview: faTableList,
+    folderTree: faFolderTree,
+    close: faXmark,
   };
 
+  @ViewChild('viewCreate') viewCreateComponent!: ViewCreateComponent;
   @ViewChild('chartContainer') chartContainer!: ElementRef;
   name = 'Angular';
   position!: string;
@@ -61,7 +66,7 @@ export class DashboardsViewComponent implements OnInit {
   groupName: string = '';
   currentView: string = '';
 
-  changeBg: HTMLElement | null = null;
+  lsDashboards: HTMLElement | null = null;
   paths: { [key: string]: Group[] } = {};
   pathNames: { [key: string]: string } = {};
 
@@ -69,6 +74,8 @@ export class DashboardsViewComponent implements OnInit {
   selectedFilters: any = {};
   checkedValues: any = {};
   selectedGroupId: any = null;
+
+  isShowStructure: boolean = false;
 
   isLoginLoading: boolean = false;
   user = this.storageService.getUser();
@@ -102,6 +109,24 @@ export class DashboardsViewComponent implements OnInit {
     }
   }
 
+  showStructure() {
+    this.isShowStructure = !this.isShowStructure;
+    this.lsDashboards =
+      this.elementRef.nativeElement.querySelector('#listDashboards');
+    if (this.isShowStructure) {
+      this.lsDashboards!.style.width = '84.5%';
+    } else {
+      this.lsDashboards!.style.width = '100%';
+    }
+    setTimeout(() => {
+      this.viewCreateComponent.updateCombinedLayout();
+    }, 400);
+  }
+
+  closeStructure() {
+    this.viewCreateComponent.updateCombinedLayout();
+  }
+
   getCurrentView() {
     this.chartGroupService
       .getCurrentView()
@@ -120,8 +145,6 @@ export class DashboardsViewComponent implements OnInit {
     } else {
       this.currentView = 'ViewCreateComponent';
     }
-
-    console.log(this.currentView);
   }
 
   loadDataInit() {

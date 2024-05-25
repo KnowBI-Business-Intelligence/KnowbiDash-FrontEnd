@@ -3,65 +3,97 @@
 </div>
 <div class="container">
   <div class="views">
-    <div class="list-dashboards">
-      <span class="dashboards-label">Lista de Dashboards</span>
-      <div class="panel">
-        <details *ngFor="let pathId of getPathsArray()">
-          <summary>
-            <ul>
-              <img src="../../../../assets/icons/folder.svg" alt="" />
-              <span>{{ pathNames[pathId] }}</span>
-            </ul>
-          </summary>
-          <div class="content">
-            <div *ngFor="let group of paths[pathId]">
-              <button (click)="clickPress(group, $event)" class="dashboardbtn">
-                <fa-icon
-                  class="icon"
-                  [icon]="icons.dash"
-                  [size]="'xl'"
-                ></fa-icon>
-                <p>{{ group.name }}</p>
-              </button>
-            </div>
-          </div>
-        </details>
-      </div>
-    </div>
     <div class="container-view-groupment">
       <span class="groupname">Dashboard: {{ groupName }}</span>
       <div class="dashview">
         <div class="createview">
-          <button class="chartview" id="chart" (click)="switchView('chart')">
-            <fa-icon
-              class="iconview"
-              [icon]="icons.chartview"
-              [size]="'xl'"
-              title="Home"
-            ></fa-icon>
-            Gráfico
-          </button>
-          <button class="cardview" id="card" (click)="switchView('card')">
-            <fa-icon
-              class="iconview"
-              [icon]="icons.cardview"
-              [size]="'xl'"
-              title="Home"
-            ></fa-icon>
-            Card
-          </button>
-          <button class="tableview" id="table" (click)="switchView('table')">
-            <fa-icon
-              class="iconview"
-              [icon]="icons.tableview"
-              [size]="'xl'"
-              title="Home"
-            ></fa-icon>
-            Tabela
-          </button>
+          <div class="createview-estructure">
+            <span>Navegar</span>
+            <div>
+              <button class="chartview" id="chart" (click)="showStructure()">
+                <fa-icon
+                  class="iconview"
+                  [icon]="icons.folderTree"
+                  [size]="'xl'"
+                ></fa-icon>
+                Estrutura
+              </button>
+            </div>
+          </div>
+          <div class="createview-content">
+            <span>Conteúdo</span>
+            <div>
+              <button
+                class="chartview"
+                id="chart"
+                (click)="switchView('chart')"
+              >
+                <fa-icon
+                  class="iconview"
+                  [icon]="icons.chartview"
+                  [size]="'xl'"
+                ></fa-icon>
+                Gráfico
+              </button>
+              <button class="cardview" id="card" (click)="switchView('card')">
+                <fa-icon
+                  class="iconview"
+                  [icon]="icons.cardview"
+                  [size]="'xl'"
+                ></fa-icon>
+                Card
+              </button>
+              <button
+                class="tableview"
+                id="table"
+                (click)="switchView('table')"
+              >
+                <fa-icon
+                  class="iconview"
+                  [icon]="icons.tableview"
+                  [size]="'xl'"
+                ></fa-icon>
+                Tabela
+              </button>
+            </div>
+          </div>
         </div>
-        <div *ngIf="currentView === 'ViewCreateComponent'">
-          <app-view-create></app-view-create>
+        <div
+          *ngIf="currentView === 'ViewCreateComponent'"
+          class="view-create-component"
+        >
+          <div class="list-dashboards">
+            <div class="panel">
+              <details *ngFor="let pathId of getPathsArray()">
+                <summary>
+                  <ul>
+                    <img src="../../../../assets/icons/folder.svg" alt="" />
+                    <span>{{ pathNames[pathId] }}</span>
+                  </ul>
+                </summary>
+                <div class="content">
+                  <div *ngFor="let group of paths[pathId]">
+                    <button
+                      (click)="clickPress(group, $event)"
+                      class="dashboardbtn"
+                    >
+                      <fa-icon
+                        class="icon"
+                        [icon]="icons.dash"
+                        [size]="'xl'"
+                      ></fa-icon>
+                      <p>{{ group.name }}</p>
+                    </button>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </div>
+          <app-view-create
+            #viewCreate
+            class="screen"
+            id="listDashboards"
+          ></app-view-create>
         </div>
         <div *ngIf="currentView === 'CardsComponent'">
           <app-cards></app-cards>

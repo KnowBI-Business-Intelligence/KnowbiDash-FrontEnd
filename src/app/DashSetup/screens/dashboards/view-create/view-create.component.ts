@@ -373,7 +373,8 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
           title: {
             text: dataItem.title,
             style: {
-              fontSize: '12px',
+              fontSize: '13px',
+              fontWeight: '450',
             },
           },
           xAxis: {
@@ -435,7 +436,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     this.updateCombinedLayout();
   }
 
-  updateCombinedLayout() {
+  public updateCombinedLayout() {
     const combinedData = [
       ...this.cardGroupsData,
       ...this.tableGroupsData,
@@ -508,17 +509,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
 
     console.log('on layout updated', this.layout);
     this.saveNewLayoutUpdated = this.layout;
-    /*this.layout.forEach((data: any) => {
-      if (data.type == 'chart') {
-        console.log(this.chartGroupsData);
-      }
-      if (data.type == 'table') {
-        console.log(this.tableGroupsData);
-      }
-      if (data.type == 'card') {
-        console.log(this.cardGroupsData);
-      }
-    });*/
   }
 
   saveLayoutUpdated() {

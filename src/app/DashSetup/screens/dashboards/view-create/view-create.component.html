@@ -1,11 +1,15 @@
 <div class="container-save-disposition">
-  <button (click)="updateCombinedLayout()">
-    <fa-icon class="iconview" [icon]="icons.back" [size]="'xl'"></fa-icon
-    >Reordenar
-  </button>
-  <button (click)="saveLayoutUpdated()">
-    <fa-icon class="iconview" [icon]="icons.save" [size]="'xl'"></fa-icon>Salvar
-  </button>
+  <span> Ações </span>
+  <div>
+    <button (click)="updateCombinedLayout()">
+      <fa-icon class="iconview" [icon]="icons.back" [size]="'xl'"></fa-icon
+      >Reordenar
+    </button>
+    <button (click)="saveLayoutUpdated()">
+      <fa-icon class="iconview" [icon]="icons.save" [size]="'xl'"></fa-icon
+      >Salvar
+    </button>
+  </div>
 </div>
 <div class="filter">
   <div class="filter-button">
@@ -20,13 +24,6 @@
         <h3>{{ filter.identifiers }}</h3>
         <span [title]="filter.values">{{ filter.values }}</span>
       </div>
-    </div>
-  </div>
-</div>
-<div class="main-content">
-  <div class="bound-box" #myBounds>
-    <div class="container-charts">
-      <div class="left" style="display: none"></div>
     </div>
   </div>
 </div>
