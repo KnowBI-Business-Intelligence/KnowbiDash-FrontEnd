@@ -114,13 +114,13 @@ export class DashboardsViewComponent implements OnInit {
     this.lsDashboards =
       this.elementRef.nativeElement.querySelector('#listDashboards');
     if (this.isShowStructure) {
-      this.lsDashboards!.style.width = '84.5%';
+      this.lsDashboards!.style.width = '245px';
     } else {
-      this.lsDashboards!.style.width = '100%';
+      this.lsDashboards!.style.width = '0';
     }
     setTimeout(() => {
       this.viewCreateComponent.updateCombinedLayout();
-    }, 400);
+    }, 440);
   }
 
   closeStructure() {
@@ -179,7 +179,6 @@ export class DashboardsViewComponent implements OnInit {
 
     this.chartsService.getChartGroup(headers).subscribe({
       next: (data) => {
-        console.log(data);
         this.processDashboardsData(data, dataPath);
       },
     });

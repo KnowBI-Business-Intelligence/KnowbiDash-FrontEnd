@@ -83,7 +83,7 @@
     />
 
     <div class="message">
-      <p-toast [life]="1500"></p-toast>
+      <p-toast [life]="2500"></p-toast>
     </div>
   </div>
   <footer>
@@ -92,9 +92,9 @@
 
   <div class="modal-choice-view" *ngIf="!isModal">
     <div class="content-modal">
-      <span>Você deseja entrar em qual aplicação?</span>
+      <span>Selecione a aplicação</span>
       <div class="buttons">
-        <button (click)="defaultOrAdm(false)">Padrão</button>
+        <button (click)="defaultOrAdm(false)">Usuário</button>
         <button (click)="defaultOrAdm(true)">Administrador</button>
       </div>
     </div>

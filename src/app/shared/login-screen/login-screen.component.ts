@@ -91,22 +91,32 @@ export class LoginScreenComponent implements OnInit {
           setTimeout(() => {
             this.isLoginLoading = false;
             this.isModal = false;
-          }, 1000); // padrão: 2000
+          }, 1000);
         } else {
           setTimeout(() => {
             this.routes.navigate(['content']);
             this.isLoginLoading = false;
-          }, 1000); // padrão: 2000
+          }, 1000);
         }
       },
       error: (err) => {
+        console.log(err);
         this.isLoginLoading = false;
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Erro na autenticação.',
-        });
-        throw err;
+        if (!username || !password) {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erro',
+            detail: 'Por favor, preencha os campos Usuário e Senha',
+          });
+          return;
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erro',
+            detail: 'Usuário ou Senha incorretos',
+          });
+          throw err;
+        }
       },
     });
   }

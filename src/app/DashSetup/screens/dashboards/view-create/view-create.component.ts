@@ -25,7 +25,6 @@ import { ktdArrayRemoveItem } from './utils';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { AngularDraggableModule } from 'angular2-draggable';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { SkeletonModule } from 'primeng/skeleton';
 import { Subscription, debounceTime, filter, fromEvent, merge } from 'rxjs';
@@ -39,11 +38,13 @@ import {
   Group,
   TableRow,
 } from '../../../../core/modules/interfaces';
-import { faRotateLeft, faFloppyDisk } from '@fortawesome/free-solid-svg-icons';
+import {
+  faRotateLeft,
+  faFloppyDisk,
+  faFilter,
+} from '@fortawesome/free-solid-svg-icons';
 import { TableModule } from 'primeng/table';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
-import { MatSelectChange } from '@angular/material/select';
-import { coerceNumberProperty } from '@angular/cdk/coercion';
 import { LayoutService } from './layoutservice';
 
 interface ExtendedOptions extends Highcharts.Options {
@@ -60,7 +61,6 @@ interface ExtendedOptions extends Highcharts.Options {
     SkeletonModule,
     HighchartsChartModule,
     FormsModule,
-    AngularDraggableModule,
     TableModule,
     KtdGridModule,
   ],
@@ -75,10 +75,11 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   icons = {
     back: faRotateLeft,
     save: faFloppyDisk,
+    filter: faFilter,
   };
 
-  cols: number = 6;
-  rowHeight: number = 100;
+  cols: number = 15;
+  rowHeight: number = 85;
   compactType: 'vertical' | 'horizontal' | null = 'horizontal';
 
   layout: KtdGridLayout = [];
@@ -103,6 +104,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   groupInfo: any;
 
   changeBg: HTMLElement | null = null;
+  filterModal: HTMLElement | null = null;
 
   paths: { [key: string]: Group[] } = {};
   pathNames: { [key: string]: string } = {};
@@ -114,6 +116,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   chartGroupsData: any[] = [];
   cardGroupsData: CardData[] = [];
   tableGroupsData: any[] = [];
+  workspaceGroup: any[] = [];
   filters: any[] = [];
   selectedFilters: any = {};
   checkedValues: any = {};
@@ -126,10 +129,10 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   showTableColumns: any[] = [];
   showTableData: any[] = [];
   originalLayout: any[] = [];
-  saveNewLayoutUpdated: KtdGridLayout = [];
-  workspaceGroup: any[] = [];
 
-  showModal: boolean = false;
+  saveNewLayoutUpdated: KtdGridLayout = [];
+
+  isShowFilterModal: boolean = false;
   isLoginLoading: boolean = false;
   user = this.storageService.getUser();
   headers = new HttpHeaders({
@@ -446,7 +449,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   }
 
   updateLayout(data: any) {
-    console.log(data);
     this.layout = [];
     this.layout = [
       ...data.map((item: any) => {
@@ -492,7 +494,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
 
     this.originalLayout = JSON.parse(JSON.stringify(this.layout));
     this.saveNewLayoutUpdated = this.layout;
-    console.log(this.layout);
   }
 
   onLayoutUpdated(layout: KtdGridLayout) {
@@ -506,13 +507,10 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
         ...updatedItem,
       };
     });
-
-    console.log('on layout updated', this.layout);
     this.saveNewLayoutUpdated = this.layout;
   }
 
   saveLayoutUpdated() {
-    console.log('update', this.saveNewLayoutUpdated);
     this.saveNewLayoutUpdated.map((data: any) => {
       console.log(data.identifier);
 
@@ -533,6 +531,42 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
           },
         });
     });
+  }
+
+  openModal(): void {
+    this.showFilters();
+    console.log(this.filters);
+    /*let filterValuesByColumn: { [key: string]: string[] } = {};
+
+    this.chartGroupsData.forEach((data: any) => {
+      data.filters.forEach((filter: any) => {
+        if (!(filter.column[0] in filterValuesByColumn)) {
+          filterValuesByColumn[filter.column[0]] = [];
+        }
+        filter.value.forEach((value: string) => {
+          if (!filterValuesByColumn[filter.column[0]].includes(value)) {
+            filterValuesByColumn[filter.column[0]].push(value);
+          }
+        });
+      });
+    });
+
+    this.filters.forEach((filter: any) => {
+      filter.values = filterValuesByColumn[filter.column];
+    });*/
+  }
+
+  showFilters() {
+    this.isShowFilterModal = !this.isShowFilterModal;
+    this.filterModal = this.elementRef.nativeElement.querySelector('#modal');
+    if (this.isShowFilterModal) {
+      this.filterModal!.style.width = '330px';
+    } else {
+      this.filterModal!.style.width = '0';
+    }
+    setTimeout(() => {
+      this.updateCombinedLayout();
+    }, 440);
   }
 
   onCheckboxChange(column: string, value: string) {
@@ -581,7 +615,8 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
           }
         }
       }
-      this.updateChartGroupsData(filteredChartData);
+      //this.updateChartGroupsData(filteredChartData);
+      console.log(filteredChartData);
     }
   }
 
@@ -661,29 +696,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     return formattedResult;
   }
 
-  openModal(): void {
-    let filterValuesByColumn: { [key: string]: string[] } = {};
-
-    this.chartGroupsData.forEach((data: any) => {
-      data.filters.forEach((filter: any) => {
-        if (!(filter.column[0] in filterValuesByColumn)) {
-          filterValuesByColumn[filter.column[0]] = [];
-        }
-        filter.value.forEach((value: string) => {
-          if (!filterValuesByColumn[filter.column[0]].includes(value)) {
-            filterValuesByColumn[filter.column[0]].push(value);
-          }
-        });
-      });
-    });
-
-    this.filters.forEach((filter: any) => {
-      filter.values = filterValuesByColumn[filter.column];
-    });
-
-    this.showModal = true;
-  }
-
   announceSortChange(sortState: any) {
     if (sortState.direction) {
       this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
@@ -692,31 +704,8 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     }
   }
 
-  closeModal(): void {
-    this.showModal = false;
-  }
-
   backScreen() {
     this.router.navigate(['/admin']);
-  }
-
-  newPosition(event: any) {
-    const boundingRect = event.currentTarget.getBoundingClientRect();
-    const element = event.currentTarget;
-    const x = element.offsetLeft;
-    const y = element.offsetTop;
-
-    this.position = '(' + x + ', ' + y + ')';
-    console.log('yeah');
-  }
-
-  resizeChart() {
-    const chartWidth = this.chartContainer.nativeElement.offsetWidth;
-    const chartHeight = this.chartContainer.nativeElement.offsetHeight;
-    if (this.chartConfig && this.chartConfig.chart) {
-      this.chartConfig.chart.width = chartWidth;
-      this.chartConfig.chart.height = chartHeight;
-    }
   }
 
   onDragStarted(event: KtdDragStart) {
@@ -733,89 +722,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
 
   onResizeEnded(event: KtdResizeEnd) {
     this.isResizing = false;
-  }
-
-  onCompactTypeChange(change: MatSelectChange) {
-    console.log('onCompactTypeChange', change);
-    this.compactType = change.value;
-  }
-
-  onTransitionChange(change: MatSelectChange) {
-    console.log('onTransitionChange', change);
-    this.currentTransition = change.value;
-  }
-
-  onAutoScrollChange(checked: boolean) {
-    this.autoScroll = checked;
-  }
-
-  onDisableDragChange(checked: boolean) {
-    this.disableDrag = checked;
-  }
-
-  onDisableResizeChange(checked: boolean) {
-    this.disableResize = checked;
-  }
-
-  onDisableRemoveChange(checked: boolean) {
-    this.disableRemove = checked;
-  }
-
-  onAutoResizeChange(checked: boolean) {
-    this.autoResize = checked;
-  }
-
-  onPreventCollisionChange(checked: boolean) {
-    this.preventCollision = checked;
-  }
-
-  onColsChange(event: Event) {
-    this.cols = coerceNumberProperty((event.target as HTMLInputElement).value);
-  }
-
-  onRowHeightChange(event: Event) {
-    this.rowHeight = coerceNumberProperty(
-      (event.target as HTMLInputElement).value
-    );
-  }
-
-  onDragStartThresholdChange(event: Event) {
-    this.dragStartThreshold = coerceNumberProperty(
-      (event.target as HTMLInputElement).value
-    );
-  }
-
-  generateLayout() {
-    const layout: KtdGridLayout = [];
-    for (let i = 0; i < this.cols; i++) {
-      const y = Math.ceil(Math.random() * 4) + 1;
-      layout.push({
-        x: Math.round(Math.random() * Math.floor(this.cols / 2 - 1)) * 2,
-        y: Math.floor(i / 6) * y,
-        w: 2,
-        h: y,
-        id: i.toString(),
-      });
-    }
-    console.log('layout', layout);
-    this.layout = layout;
-  }
-
-  addItemToLayout() {
-    const maxId = this.layout.reduce(
-      (acc, cur) => Math.max(acc, parseInt(cur.id, 10)),
-      -1
-    );
-    const nextId = maxId + 1;
-
-    const newLayoutItem: KtdGridLayoutItem = {
-      id: nextId.toString(),
-      x: 0,
-      y: 0,
-      w: 2,
-      h: 2,
-    };
-    this.layout = [newLayoutItem, ...this.layout];
   }
 
   stopEventPropagation(event: Event) {

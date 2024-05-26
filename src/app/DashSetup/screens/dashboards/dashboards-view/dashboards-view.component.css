@@ -23,13 +23,11 @@
 
 .list-dashboards {
   display: flex;
-  padding: 7px 9px;
+  opacity: 1;
   flex-direction: column;
-  min-width: 240px;
-  width: 240px;
-  height: calc(84vh - 5px);
+  width: 0;
+  max-height: calc(84vh - 5px);
   border-right: solid 1px #e6e6e6;
-  border-bottom: solid 1px #e6e6e6;
   background-color: #fafafa;
   transition: 0.5s;
 }
@@ -48,16 +46,6 @@
   cursor: pointer;
   background-color: transparent;
   height: 20px;
-}
-
-.panel {
-  display: flex;
-  flex-direction: column-reverse;
-  display: flex;
-  flex-direction: column-reverse;
-  overflow-y: auto;
-  overflow-x: hidden;
-  overscroll-behavior-y: auto;
 }
 
 .dashboards-label {
@@ -190,7 +178,8 @@ summary {
   padding: 5px 11px;
   color: #212121;
   position: relative;
-  font-size: 15px;
+  font-size: 14px;
+  width: 170px;
 }
 
 details[open] summary:hover {
@@ -203,6 +192,13 @@ summary ul {
   display: -webkit-flex;
   display: flex;
   align-items: center;
+}
+
+summary ul span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 125px;
 }
 
 summary ul img {
@@ -234,6 +230,23 @@ summary::after {
   top: calc(50% - 12px);
   bottom: 0;
   right: 0;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column-reverse;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior-y: auto;
+  position: relative;
+  margin: 5px;
+}
+
+.dashboardbtn p {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 115px;
 }
 
 .titleValue {
@@ -312,6 +325,7 @@ time {
   transition: 0.5s;
   width: 75px;
   border-radius: 3px;
+  outline: none;
 }
 
 .createview-estructure button {
@@ -325,6 +339,7 @@ time {
 .view-create-component {
   display: flex;
   justify-content: space-between;
+  background-color: #fafafa;
 }
 
 .iconview {
@@ -334,7 +349,6 @@ time {
 
 .dashview {
   width: 100%;
-  height: calc(91.5vh - 5px);
   display: flex;
   flex-direction: column;
   overscroll-behavior-y: auto;
@@ -353,17 +367,20 @@ time {
 }
 
 .groupname {
+  display: flex;
   padding: 2px 5px;
-  font-size: 10px;
-  border-top: solid 1px #e6e6e6;
+  font-size: 11px;
+  border: solid 1px #e6e6e6;
   z-index: 10;
   background-color: #fafafa;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
 }
 
 .screen {
-  position: absolute;
-  right: 0;
   width: 100%;
   transition-duration: 0.5s;
   background-color: #fafafa;
+  z-index: 99;
 }
