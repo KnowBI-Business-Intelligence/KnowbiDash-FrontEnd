@@ -1,6 +1,7 @@
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
 import {
+  ChangeDetectorRef,
   Component,
   ElementRef,
   Inject,
@@ -79,7 +80,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   };
 
   cols: number = 15;
-  rowHeight: number = 85;
+  rowHeight: number = 75;
   compactType: 'vertical' | 'horizontal' | null = 'horizontal';
 
   layout: KtdGridLayout = [];
@@ -98,6 +99,8 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   name = 'Angular';
   position!: string;
   tableTitle: string = '';
+
+  isEditingIndex: number | null = null;
 
   chartConfig: any;
   currentView: any;
@@ -118,9 +121,14 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   tableGroupsData: any[] = [];
   workspaceGroup: any[] = [];
   filters: any[] = [];
+  cardFilters: any[] = [];
+  tableFilters: any[] = [];
+  chartFilters: any[] = [];
   selectedFilters: any = {};
   checkedValues: any = {};
   copydataJSON: any[] = [];
+  copyDataTableJSON: any[] = [];
+  copyDataCardJSON: any[] = [];
   selectedGroupId: any = null;
   originalChartData: ChartData[] = [];
   chartData: ChartData[] = [];
@@ -188,7 +196,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.startDashboarData();
-
     this.resizeSubscription = merge(
       fromEvent(window, 'resize'),
       fromEvent(window, 'orientationchange')
@@ -248,9 +255,18 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   }
 
   loadCards(cardData: any, groupId: any) {
+    this.copyDataCardJSON = [];
+    this.filters = [];
     this.cardGroupsData = [];
     cardData.forEach((card: any) => {
       if (card.chartGroup.id == groupId) {
+        this.copyDataCardJSON.push(card);
+        this.cardFilters.push(card.filters);
+      }
+    });
+
+    cardData.forEach((card: any) => {
+      if (card.chartGroup.id === groupId) {
         let result = null;
         if (typeof card.result === 'number') {
           result = this.formatterResultWhenDecimal(card.result);
@@ -261,13 +277,14 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
         let cardResult = card.prefix + '' + result + ' ' + card.sufix;
 
         let finalData = {
+          id: card.id,
           title: cardTitle,
           type: 'card',
           content: cardResult,
           workspace: card.workspace,
           chartgroup: card.chartGroup,
+          filters: card.filters,
         };
-
         this.cardGroupsData.push(finalData);
       }
     });
@@ -276,21 +293,26 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   }
 
   loadTables(tableData: any, groupId: any) {
+    this.copyDataTableJSON = [];
+    this.filters = [];
     this.tableGroupsData = [];
+    tableData.forEach((table: any) => {
+      this.copyDataCardJSON.push(table);
+      this.tableFilters.push(table.filters);
+    });
 
     tableData.forEach((table: any) => {
-      if (
-        table.chartGroup.id == groupId &&
-        table.tableData &&
-        table.tableData.length > 0
-      ) {
+      if (table.chartGroup.id === groupId) {
+        this.copyDataTableJSON.push(table);
         const tableGroup: any = {
+          id: table.id,
           type: 'table',
           title: table.title,
           showTableColumns: [],
           showTableData: [],
           chartgroup: table.chartGroup,
           workspace: table.workspace,
+          filters: table.filters,
         };
 
         const columns = table.tableData.map((td: any) => td.column).flat();
@@ -316,35 +338,16 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   }
 
   loadData(chartData: ChartData[], groupId: any) {
-    this.chartGroupsData = [];
     this.copydataJSON = [];
     this.filters = [];
-
+    this.chartGroupsData = [];
     chartData.forEach((chart: any) => {
-      if (chart.chartGroup && chart.chartGroup.id == groupId) {
-        chart.filters.forEach((filter: any) => {
-          const existingFilter = this.filters.find(
-            (f) => f.column === filter.column[0]
-          );
-          if (existingFilter) {
-            if (!existingFilter.values.includes(filter.value[0])) {
-              existingFilter.values.push(filter.value[0]);
-            }
-          } else {
-            this.filters.push({
-              column: filter.column[0],
-              values: filter.value,
-              identifiers: filter.identifiers,
-              allfilters: filter.allfilters,
-            });
-          }
-        });
-      }
+      this.copyDataCardJSON.push(chart);
+      this.chartFilters.push(chart.filters);
     });
 
     chartData.forEach((dataItem: any) => {
-      if (dataItem.chartGroup.id == groupId) {
-        console.log(dataItem);
+      if (dataItem.chartGroup.id === groupId) {
         this.copydataJSON.push(dataItem);
         const uniqueCategories: any = Array.from(
           new Set(dataItem.xAxisColumns[0].data)
@@ -427,10 +430,12 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
         };
 
         const chartDataFinal = {
+          id: dataItem.id,
           data: chartConfig,
           type: 'chart',
           chartgroup: dataItem.chartGroup,
           workspace: dataItem.workspace,
+          filters: dataItem.filters,
         };
 
         this.chartGroupsData.push(chartDataFinal);
@@ -446,6 +451,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       ...this.chartGroupsData,
     ];
     this.updateLayout(combinedData);
+    this.initFilters(this.groupInfo.id, combinedData);
   }
 
   updateLayout(data: any) {
@@ -497,6 +503,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   }
 
   onLayoutUpdated(layout: KtdGridLayout) {
+    console.log('update: ', layout);
     this.saveNewLayoutUpdated = [];
     this.layout = layout.map((updatedItem: any) => {
       const originalItem = this.originalLayout.find(
@@ -533,27 +540,98 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     });
   }
 
+  updateFilterLabel(index: number): void {
+    this.isEditingIndex = index;
+  }
+
+  saveFilterLabel(): void {
+    if (this.isEditingIndex !== null) {
+      const updatedIdentifiers =
+        this.filters[this.isEditingIndex].identifiers.flat(Infinity);
+      this.filters[this.isEditingIndex].identifiers = updatedIdentifiers;
+
+      this.printNewValue(updatedIdentifiers);
+      this.isEditingIndex = null;
+      this.executeFilter();
+    }
+  }
+
+  printNewValue(value: string[]): void {
+    console.log('Novo valor:', JSON.stringify(value, null, 2));
+    console.log(JSON.stringify(this.filters, null, 2));
+  }
+
+  addFilters(filters: any[]) {
+    this.selectedFilters = [];
+    if (!filters) {
+      console.error('filters is undefined or null');
+      return;
+    }
+
+    filters.forEach((filter: any) => {
+      if (filter) {
+        const column = filter.column[0];
+        const existingFilter = this.filters.find((f) => f.column === column);
+        if (existingFilter) {
+          existingFilter.values = Array.from(
+            new Set([...(existingFilter.values || []), ...(filter.value || [])])
+          );
+
+          existingFilter.allfilters = Array.from(
+            new Set([
+              ...(existingFilter.allfilters || []),
+              ...(filter.allfilters || []),
+            ])
+          );
+          existingFilter.operator = filter.operator;
+          if (filter.identifiers !== undefined) {
+            existingFilter.identifiers = [filter.identifiers];
+          }
+        } else {
+          const identifiers =
+            filter.identifiers !== undefined ? [filter.identifiers] : [];
+          this.filters.push({
+            column: filter.column[0],
+            values: filter.value || [],
+            identifiers: identifiers,
+            allfilters: filter.allfilters || [],
+            operator: filter.operator || [],
+          });
+        }
+      }
+    });
+
+    console.log(this.filters);
+  }
+
+  initFilters(groupInfo: any, combinedData: any) {
+    combinedData.map((data: any) => {
+      if (groupInfo == data.chartgroup.id) {
+        this.addFilters(data.filters);
+      }
+    });
+  }
+
   openModal(): void {
     this.showFilters();
-    console.log(this.filters);
-    /*let filterValuesByColumn: { [key: string]: string[] } = {};
-
-    this.chartGroupsData.forEach((data: any) => {
-      data.filters.forEach((filter: any) => {
-        if (!(filter.column[0] in filterValuesByColumn)) {
-          filterValuesByColumn[filter.column[0]] = [];
-        }
+    let filterValuesByColumn: { [key: string]: string[] } = {};
+    this.filters.forEach((filter: any) => {
+      if (!(filter.column[0] in filterValuesByColumn)) {
+        filterValuesByColumn[filter.column[0]] = [];
+      }
+      if (filter.value) {
         filter.value.forEach((value: string) => {
           if (!filterValuesByColumn[filter.column[0]].includes(value)) {
             filterValuesByColumn[filter.column[0]].push(value);
           }
         });
-      });
+      }
     });
 
     this.filters.forEach((filter: any) => {
       filter.values = filterValuesByColumn[filter.column];
-    });*/
+    });
+    console.log(this.filters);
   }
 
   showFilters() {
@@ -585,39 +663,113 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   }
 
   isChecked(column: string, value: string): boolean {
-    return (
-      this.checkedValues[column] && this.checkedValues[column].includes(value)
-    );
+    const filter = this.filters.find((f) => f.column === column);
+    if (filter) {
+      // Verifica se o valor está nos valores do filtro correspondente
+      const isValueInFilters = filter.values.includes(value);
+      // Verifica se o valor está na lista de valores marcados
+      const isValueChecked =
+        this.checkedValues[column]?.includes(value) || false;
+      // Retorna verdadeiro se o valor estiver em qualquer uma das listas
+      return isValueInFilters || isValueChecked;
+    }
+    return false;
   }
 
-  updateDropdownLabel(column: string): void {
-    if (this.checkedValues[column] && this.checkedValues[column].length > 0) {
-      this.selectedFilters[column] = this.checkedValues[column].join(', ');
+  updateDropdownLabel(column: string) {
+    const selectedValues = this.checkedValues[column];
+    if (selectedValues && selectedValues.length > 0) {
+      this.selectedFilters[column] = selectedValues.join(', ');
     } else {
       this.selectedFilters[column] = 'Todos';
     }
   }
 
-  allValuesMatchAllFilters(values: any[], allFilters: any[]): boolean {
-    return values.every((value) => allFilters.includes(value));
+  alfilters(values: string[], allfilters: string[]): string | string[] {
+    if (values.length === allfilters.length) {
+      const arraysIguais = values.every((value) => allfilters.includes(value));
+      if (arraysIguais) {
+        return 'todos';
+      }
+    }
+    return values;
   }
 
   executeFilter() {
-    if (this.copydataJSON.length > 0) {
-      const filteredChartData = JSON.parse(JSON.stringify(this.copydataJSON));
-      for (const chartGroup of filteredChartData) {
-        if (chartGroup.filters) {
-          for (const filter of chartGroup.filters) {
-            const selectedValue = this.selectedFilters[filter.column[0]];
-            if (selectedValue && selectedValue !== 'Todos') {
-              filter.value = selectedValue.split(', ');
+    const flattenIdentifiers = (identifiers: any[]) =>
+      identifiers.flat(Infinity);
+
+    const filteredChartData = JSON.parse(JSON.stringify(this.copydataJSON));
+    for (const chartGroup of filteredChartData) {
+      if (chartGroup.filters) {
+        for (const filter of chartGroup.filters) {
+          this.filters.map((data) => {
+            if (filter.column == data.column) {
+              filter.identifiers[0] = flattenIdentifiers(data.identifiers);
             }
+          });
+          const selectedValue = this.selectedFilters[filter.column[0]];
+          if (selectedValue && selectedValue !== 'Todos') {
+            filter.value = selectedValue.split(', ');
+          } else if (selectedValue && selectedValue === 'Todos') {
+            console.log(selectedValue);
+            filter.value = [];
           }
         }
       }
-      //this.updateChartGroupsData(filteredChartData);
-      console.log(filteredChartData);
     }
+
+    const filteredTableData = JSON.parse(
+      JSON.stringify(this.copyDataTableJSON)
+    );
+    for (const tableGroup of filteredTableData) {
+      if (tableGroup.filters) {
+        for (const filter of tableGroup.filters) {
+          this.filters.map((data) => {
+            if (filter.column == data.column) {
+              filter.identifiers[0] = flattenIdentifiers(data.identifiers);
+            }
+          });
+          const selectedValue = this.selectedFilters[filter.column[0]];
+          console.log(selectedValue);
+          if (selectedValue && selectedValue !== 'Todos') {
+            console.log(selectedValue);
+            filter.value = selectedValue.split(', ');
+          } else if (selectedValue && selectedValue === 'Todos') {
+            console.log(selectedValue);
+            filter.value = [];
+          }
+        }
+      }
+    }
+
+    const filteredCardData = JSON.parse(JSON.stringify(this.copyDataCardJSON));
+    for (const cardGroup of filteredCardData) {
+      if (cardGroup.filters) {
+        for (const filter of cardGroup.filters) {
+          this.filters.map((data) => {
+            if (filter.column == data.column) {
+              filter.identifiers[0] = flattenIdentifiers(data.identifiers);
+            }
+          });
+          const selectedValue = this.selectedFilters[filter.column[0]];
+          if (selectedValue && selectedValue !== 'Todos') {
+            filter.value = selectedValue.split(', ');
+          } else if (selectedValue && selectedValue === 'Todos') {
+            console.log(selectedValue);
+            filter.value = [];
+          }
+        }
+      }
+    }
+
+    console.log(filteredChartData);
+    console.log(filteredTableData);
+    console.log(filteredCardData);
+
+    this.updateChartGroupsData(filteredChartData);
+    this.updateTableGroupsData(filteredTableData);
+    this.updateCardGroupsData(filteredCardData);
   }
 
   updateChartGroupsData(filteredChartData: any[]) {
@@ -630,8 +782,21 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
         data.sql,
         data.xAxisColumns,
         data.yAxisColumns,
+        data.series,
         data.filters
       );
+    });
+  }
+
+  updateTableGroupsData(filteredTableGroupsData: any) {
+    filteredTableGroupsData.forEach((data: any) => {
+      this.updateTables(data.id, data.tableData, data.filters);
+    });
+  }
+
+  updateCardGroupsData(cardGroupsData: any) {
+    cardGroupsData.forEach((data: any) => {
+      this.updateCards(data.id, data.sql, data.filters);
     });
   }
 
@@ -640,6 +805,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     sql: string,
     xAxisColumns: any[],
     yAxisColumns: any[],
+    series: any[],
     filters: any[]
   ) {
     const formattedXAxisColumns = xAxisColumns.map((column) => ({
@@ -648,6 +814,11 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     }));
 
     const formattedYAxisColumns = yAxisColumns.map((column) => ({
+      name: column.column,
+      identifiers: column.name,
+    }));
+
+    const formattedSeries = series.map((column) => ({
       name: column.column,
       identifiers: column.name,
     }));
@@ -663,22 +834,70 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       sql: sql,
       xAxisColumns: formattedXAxisColumns,
       yAxisColumns: formattedYAxisColumns,
+      series: formattedSeries,
       filters: formattedFilters,
     };
 
-    const user = this.storageService.getUser();
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${user.token}`,
-    });
-    this.chartsService.updateCharts(headers, requestData, id).subscribe({
+    this.chartsService.updateCharts(this.headers, requestData, id).subscribe({
       next: (data: any) => {
-        console.log('Gráfico atualizado:', data);
-        this.getCharts(id);
-        this.chartGroupsData = [];
-        this.copydataJSON = [];
+        console.log('chart: ', data);
+        this.getCharts(data.chartGroup.id);
       },
       error: (error: any) => {
         console.error('Erro ao atualizar o gráfico:', error);
+      },
+    });
+  }
+
+  updateTables(id: string, tableData: any[], filters: any[]) {
+    const formattedTableData = tableData.map((column) => ({
+      name: column.column,
+      identifiers: column.th,
+    }));
+
+    const formattedFilters = filters.map((filter) => ({
+      column: filter.column,
+      operator: filter.operator,
+      value: filter.value,
+      identifiers: filter.identifiers,
+    }));
+
+    const requestData = {
+      tableData: formattedTableData,
+      filters: formattedFilters,
+    };
+
+    this.chartsService.updateTables(this.headers, requestData, id).subscribe({
+      next: (data: any) => {
+        console.log('table: ', data);
+        this.getTables(data.chartGroup.id);
+      },
+      error: (err: any) => {
+        console.log('erro ao atualizar tabela', err);
+      },
+    });
+  }
+
+  updateCards(id: string, sql: string, filters: any) {
+    const formattedFilters = filters.map((filter: any) => ({
+      column: filter.column,
+      operator: filter.operator,
+      value: filter.value,
+      identifiers: filter.identifiers,
+    }));
+
+    const requestData = {
+      sql: sql,
+      filters: formattedFilters,
+    };
+
+    this.chartsService.updateCards(this.headers, requestData, id).subscribe({
+      next: (data: any) => {
+        console.log('card: ', data);
+        this.getCards(data.chartGroup.id);
+      },
+      error(err) {
+        console.log('erro ao atualizar card', err);
       },
     });
   }

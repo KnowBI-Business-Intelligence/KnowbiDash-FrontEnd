@@ -36,7 +36,7 @@
     </div>
   </div>
 </div>
-<div class="main-container">
+<div class="main-container" (click)="saveFilterLabel()">
   <div class="playground-container">
     <div class="grid-container">
       <ktd-grid
@@ -61,7 +61,10 @@
           [draggable]="!disableDrag"
           [resizable]="!disableResize"
         >
-          <div *ngIf="item.type == 'card'">
+          <section
+            *ngIf="item.type == 'card'"
+            style="width: 100%; height: 100%"
+          >
             <div class="card">
               <div class="card-header">
                 {{ item.title }}
@@ -70,14 +73,14 @@
                 <p>{{ item.content }}</p>
               </div>
             </div>
-          </div>
+          </section>
           <section
             *ngIf="item.type == 'table'"
             class="table-container mat-elevation-z8"
             tabindex="0"
           >
             <h2>{{ item.title }}</h2>
-            <div style="max-height: 90%; overflow: auto; margin-top: 8px">
+            <div style="overflow: auto">
               <p-table
                 matSort
                 class="mat-elevation-z8 demo-table"
@@ -86,7 +89,9 @@
                 (matSortChange)="announceSortChange($event)"
                 [resizableColumns]="true"
                 [scrollable]="true"
-                scrollHeight="230px"
+                scrollHeight="100%"
+                [tableStyle]="{ 'min-width': '20rem' }"
+                scrollHeight="300px"
                 styleClass="p-datatable-gridlines"
                 [globalFilterFields]="item.showTableColumns"
               >
@@ -148,11 +153,29 @@
         >
       </div>
       <div class="modal-body">
-        <div class="modal-fields" *ngFor="let filter of filters">
-          <label for="filter.column">{{ filter.identifiers }}</label>
+        <div class="modal-fields" *ngFor="let filter of filters; let i = index">
+          <div>
+            <label
+              *ngIf="isEditingIndex !== i"
+              (click)="updateFilterLabel(i); $event.stopPropagation()"
+              [attr.for]="filter.identifiers"
+              >{{ filter.identifiers[0] }}</label
+            >
+
+            <input
+              *ngIf="isEditingIndex === i"
+              [(ngModel)]="filter.identifiers[0]"
+              (click)="$event.stopPropagation()"
+              (blur)="saveFilterLabel()"
+            />
+          </div>
+
           <div class="dropdown">
             <button class="dropbtn">
-              {{ selectedFilters[filter.column] || "Todos" }}
+              {{
+                selectedFilters[filter.column] ||
+                  alfilters(filter.values, filter.allfilters)
+              }}
             </button>
             <div class="dropdown-content">
               <div class="dropdown-cl" *ngFor="let value of filter.allfilters">
