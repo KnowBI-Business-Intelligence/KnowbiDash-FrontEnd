@@ -515,3 +515,14 @@ td {
   pointer-events: none;
   user-select: none;
 }
+
+::ng-deep :host .ngx-slider.ngx-slider-pointer:after {
+  display: none;
+}
+
+::ng-deep span .ngx-slider .ngx-slider-pointer {
+  cursor: pointer;
+  width: 22px !important;
+  height: 22px !important;
+  top: -10px;
+}

@@ -50,6 +50,11 @@ import { MatInputModule } from '@angular/material/input';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import {
+  NgxSliderModule,
+  Options,
+  LabelType,
+} from '@angular-slider/ngx-slider';
+import {
   MatMomentDateModule,
   MAT_MOMENT_DATE_ADAPTER_OPTIONS,
 } from '@angular/material-moment-adapter';
@@ -93,6 +98,7 @@ interface ExtendedOptions extends Highcharts.Options {
     MatInputModule,
     MatNativeDateModule,
     MatMomentDateModule,
+    NgxSliderModule,
     FontAwesomeModule,
     CommonModule,
     SkeletonModule,
@@ -109,7 +115,7 @@ interface ExtendedOptions extends Highcharts.Options {
     DatePipe,
   ],
   templateUrl: './view-create.component.html',
-  styleUrl: './view-create.component.css',
+  styleUrls: ['./view-create.component.scss', './view-create.component.css'],
 })
 export class ViewCreateComponent implements OnInit, OnDestroy {
   @ViewChild('chartContainer') chartContainer!: ElementRef;
@@ -606,6 +612,12 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     }
   }
 
+  minValue: number = 100;
+  maxValue: number = 400;
+  values: number[] = [];
+  numberFilterValues: any[] = [];
+  options!: Options;
+
   addFilters(filters: any[]) {
     this.selectedFilters = [];
     if (!filters) {
@@ -645,6 +657,29 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
             operator: filter.operator || [],
             type: filter.type || [],
           });
+        }
+
+        if (filter.type == 'numeric') {
+          console.log(filter);
+          this.minValue = 0;
+          this.maxValue = filter.value[1];
+          this.options = {
+            floor: 0,
+            ceil: filter.value[1],
+            translate: (value: number, label: LabelType): string => {
+              switch (label) {
+                case LabelType.Low:
+                  this.values[0] = value;
+                  return '<b>Min:</b> ' + value;
+                case LabelType.High:
+                  this.values[1] = value;
+                  return '<b>Max:</b> ' + value;
+                default:
+                  return '' + value;
+              }
+            },
+          };
+          this.numberFilterValues = [filter.column, this.values, filter.type];
         }
       }
     });
@@ -758,6 +793,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   }
 
   executeFilter() {
+    console.log(this.numberFilterValues);
     const flattenIdentifiers = (identifiers: any[]) =>
       identifiers.flat(Infinity);
 
@@ -766,6 +802,12 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       if (chartGroup.filters) {
         for (const filter of chartGroup.filters) {
           this.filters.map((data) => {
+            if (
+              this.numberFilterValues[0] == data.column &&
+              filter.type == 'numeric'
+            ) {
+              filter.value = this.numberFilterValues[1];
+            }
             if (filter.column == data.column) {
               filter.identifiers[0] = flattenIdentifiers(data.identifiers);
             }
@@ -788,6 +830,12 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       if (tableGroup.filters) {
         for (const filter of tableGroup.filters) {
           this.filters.map((data) => {
+            if (
+              this.numberFilterValues[0] == data.column &&
+              filter.type == 'numeric'
+            ) {
+              filter.value = this.numberFilterValues[1];
+            }
             if (filter.column == data.column) {
               filter.identifiers[0] = flattenIdentifiers(data.identifiers);
             }
@@ -809,6 +857,12 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       if (cardGroup.filters) {
         for (const filter of cardGroup.filters) {
           this.filters.map((data) => {
+            if (
+              this.numberFilterValues[0] == data.column &&
+              filter.type == 'numeric'
+            ) {
+              filter.value = this.numberFilterValues[1];
+            }
             if (filter.column == data.column) {
               filter.identifiers[0] = flattenIdentifiers(data.identifiers);
             }

@@ -172,9 +172,17 @@
           </div>
 
           <div class="dropdown">
-            <ng-container
-              *ngIf="filter.type == 'timestamp'; else defaultFilter"
-            >
+            <ng-container *ngIf="filter.type == 'numeric'">
+              <div class="custom-slider">
+                <ngx-slider
+                  [(value)]="filter.values[0]"
+                  [(highValue)]="filter.values[1]"
+                  [options]="options"
+                ></ngx-slider>
+              </div>
+            </ng-container>
+
+            <ng-container *ngIf="filter.type == 'timestamp'">
               <div class="dropdown-date">
                 <mat-date-range-input [rangePicker]="picker">
                   <input
@@ -198,14 +206,17 @@
                 <mat-date-range-picker #picker></mat-date-range-picker>
               </div>
             </ng-container>
-            <ng-template #defaultFilter>
+
+            <ng-container
+              *ngIf="filter.type != 'timestamp' && filter.type != 'numeric'"
+            >
               <button class="dropbtn" (click)="showContentFilter(i)">
                 {{
                   selectedFilters[filter.column] ||
                     alfilters(filter.values, filter.allfilters)
                 }}
               </button>
-            </ng-template>
+            </ng-container>
             <div class="dropdown-content" *ngIf="showContentFilterSwitch[i]">
               <div class="dropdown-cl" *ngFor="let value of filter.allfilters">
                 <div>

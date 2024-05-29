@@ -96,10 +96,11 @@ export class CardsComponent implements OnInit, OnDestroy {
   yaxisData: { [key: string]: string } = {};
   yaxisIdentifiers: { [key: string]: string } = {};
 
-  user = this.storageService.getUser();
-  headers = new HttpHeaders({
+  private user = this.storageService.getUser();
+  private headers = new HttpHeaders({
     Authorization: `Bearer ${this.user.token}`,
   });
+
   constructor(
     private router: Router,
     private storageService: StorageService,
@@ -161,11 +162,7 @@ export class CardsComponent implements OnInit, OnDestroy {
   }
 
   loadDataView(id: string) {
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${this.user.token}`,
-    });
-
-    this.chartsService.getChartGroup(headers).subscribe({
+    this.chartsService.getChartGroup(this.headers).subscribe({
       next: (data) => {
         data.forEach((getId: any) => {
           if (id == getId.id) {
@@ -328,10 +325,16 @@ export class CardsComponent implements OnInit, OnDestroy {
       sql: this.sql,
       filters: this.filters.map((filter) => {
         let operator;
-        if (filter.type === 'timestamp' || filter.type === 'number') {
+        if (filter.type === 'timestamp' || filter.type === 'numeric') {
           operator = 'BETWEEN';
         } else {
           operator = 'IN';
+        }
+
+        if (filter.type === 'numeric') {
+          filter.identifiers = this.rmTimeStamp(filter.name);
+        } else {
+          filter.identifiers = filter.identifier;
         }
 
         return {
@@ -339,6 +342,7 @@ export class CardsComponent implements OnInit, OnDestroy {
           operator: [operator],
           value: [],
           identifiers: [filter.identifier],
+          type: [filter.type],
         };
       }),
       chartGroup: {

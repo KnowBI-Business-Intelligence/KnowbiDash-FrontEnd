@@ -106,7 +106,11 @@ export class ChartComponent implements OnInit {
   group: any;
 
   chartButtons = chartButtonsData;
-  user = this.storageService.getUser();
+  private user = this.storageService.getUser();
+  private headers = new HttpHeaders({
+    Authorization: `Bearer ${this.user.token}`,
+  });
+
   constructor(
     private router: Router,
     private storageService: StorageService,
@@ -160,11 +164,7 @@ export class ChartComponent implements OnInit {
   }
 
   loadDataView(id: string) {
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${this.user.token}`,
-    });
-
-    this.chartsService.getChartGroup(headers).subscribe({
+    this.chartsService.getChartGroup(this.headers).subscribe({
       next: (data) => {
         data.forEach((getId: any) => {
           if (id == getId.id) {
@@ -382,10 +382,16 @@ export class ChartComponent implements OnInit {
 
     this.filtersData = this.filters.map((filter) => {
       let operator;
-      if (filter.type === 'timestamp' || filter.type === 'number') {
+      if (filter.type === 'timestamp' || filter.type === 'numeric') {
         operator = 'BETWEEN';
       } else {
         operator = 'IN';
+      }
+
+      if (filter.type === 'numeric') {
+        filter.identifiers = this.rmTimeStamp(filter.name);
+      } else {
+        filter.identifiers = filter.identifier;
       }
 
       return {
@@ -393,6 +399,7 @@ export class ChartComponent implements OnInit {
         operator: [operator],
         value: [],
         identifiers: [filter.identifier],
+        type: [filter.type],
       };
     });
   }
@@ -423,11 +430,7 @@ export class ChartComponent implements OnInit {
   }
 
   createChart(chartData: any) {
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${this.user.token}`,
-    });
-
-    this.chartsService.createCharts(headers, chartData).subscribe({
+    this.chartsService.createCharts(this.headers, chartData).subscribe({
       next: (data) => {
         this.showPreviewButton = false;
         this.chartPreView(data);
@@ -458,12 +461,8 @@ export class ChartComponent implements OnInit {
 
     console.log(chartData);
 
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${this.user.token}`,
-    });
-
     this.chartsService
-      .updateCharts(headers, chartData, this.chartId)
+      .updateCharts(this.headers, chartData, this.chartId)
       .subscribe({
         next: (data) => {
           this.chartPreView(data);
@@ -473,10 +472,7 @@ export class ChartComponent implements OnInit {
 
   openModalCancel() {
     console.log(this.chartId);
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${this.user.token}`,
-    });
-    this.chartsService.deleteCharts(headers, this.chartId).subscribe({
+    this.chartsService.deleteCharts(this.headers, this.chartId).subscribe({
       next: (data) => {
         console.log(data);
       },
