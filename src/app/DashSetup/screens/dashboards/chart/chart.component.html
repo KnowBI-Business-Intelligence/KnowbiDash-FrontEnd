@@ -16,7 +16,7 @@
             [size]="'xl'"
             title="Dashboards"
           ></fa-icon>
-          {{ item?.name }}
+          <span [title]="item.name">{{ item?.name }}</span>
         </div>
       </div>
     </div>
@@ -129,7 +129,9 @@
                   [icon]="icons.database"
                   [size]="'xl'"
                 ></fa-icon>
-                {{ item.name }}
+                <span>
+                  {{ item.name }}
+                </span>
               </div>
               <div class="series-buttons">
                 <button

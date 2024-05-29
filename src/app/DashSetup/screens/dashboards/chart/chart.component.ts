@@ -423,13 +423,13 @@ export class ChartComponent implements OnInit {
         id: this.dashBoard.id,
       },
     };
-
-    console.log(chartData);
-
-    this.createChart(chartData);
+    if (this.yaxis.length > 0 && this.xaxis.length > 0) {
+      this.createChart(chartData);
+    }
   }
 
   createChart(chartData: any) {
+    console.log(chartData);
     this.chartsService.createCharts(this.headers, chartData).subscribe({
       next: (data) => {
         this.showPreviewButton = false;

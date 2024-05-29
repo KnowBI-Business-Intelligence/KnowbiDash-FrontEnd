@@ -38,15 +38,16 @@
 </div>
 <div class="main-container" (click)="saveFilterLabel()">
   <div class="playground-container">
-    <div class="grid-container">
+    <div class="grid-container" #gridContainer>
       <ktd-grid
         [cols]="cols"
         [rowHeight]="rowHeight"
         [layout]="layout"
+        [gap]="6"
         [compactType]="compactType"
         [preventCollision]="preventCollision"
-        [scrollableParent]="autoScroll ? document : null"
-        scrollSpeed="4"
+        [scrollableParent]="gridContainer"
+        scrollSpeed="2"
         (dragStarted)="onDragStarted($event)"
         (resizeStarted)="onResizeStarted($event)"
         (dragEnded)="onDragEnded($event)"

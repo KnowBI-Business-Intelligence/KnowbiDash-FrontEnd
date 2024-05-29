@@ -2,7 +2,7 @@
   display: flex;
   position: fixed;
   top: 46px;
-  width: calc(82% - 5px);
+  width: calc(96% - 5px);
   background-color: #fafafa;
 }
 
@@ -11,12 +11,13 @@
 }
 
 .container-data-group {
-  width: 60%;
+  width: 80%;
   display: flex;
 }
 
 .container-data {
-  width: 35%;
+  width: 250px;
+  min-width: 230px;
   display: flex;
   flex-direction: column;
   padding: 10px 10px;
@@ -24,7 +25,8 @@
 }
 
 .container-create {
-  width: 65%;
+  width: 585px;
+  min-width: 420px;
   display: flex;
   flex-direction: column;
   border-right: solid 0.2px #e6e6e6;
@@ -118,7 +120,7 @@
   border-bottom: 1px solid #e6e6e6;
 }
 .container-pre-view {
-  width: 40%;
+  width: 80%;
   height: calc(97vh - 5px);
   display: flex;
   flex-direction: column;
@@ -128,7 +130,7 @@
 .visualize,
 .visualize div {
   height: calc(90vh - 5px);
-  width: calc(32vw - 5px);
+  width: calc(42vw - 5px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -175,7 +177,7 @@
 
 .chart-container {
   width: 100%;
-  height: calc(83vh - 5px);
+  height: calc(81vh - 8px);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -238,8 +240,22 @@
   max-height: 23px;
 }
 
+.example-box span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 151px;
+}
+
 .series-box {
   justify-content: space-between;
+}
+
+.series-box span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 25px;
 }
 
 .series-buttons {

@@ -89,6 +89,26 @@ interface ExtendedOptions extends Highcharts.Options {
   filters?: any;
 }
 
+function generateLayout2(cols: number, size: number) {
+  const rows = cols;
+  const layout: any[] = [];
+  let counter = 0;
+  for (let i = 0; i < rows; i += size) {
+    for (let j = i; j < cols; j += size) {
+      layout.push({
+        id: `${counter}`,
+        x: j,
+        y: i,
+        w: size,
+        h: size,
+      });
+      counter++;
+    }
+  }
+
+  return layout;
+}
+
 @Component({
   selector: 'app-view-create',
   standalone: true,
@@ -128,11 +148,11 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     filter: faFilter,
   };
 
-  cols: number = 15;
+  cols: number = 50;
   rowHeight: number = 75;
   compactType: 'vertical' | 'horizontal' | null = 'horizontal';
 
-  layout: KtdGridLayout = [];
+  layout: KtdGridLayout = generateLayout2(this.cols, 3);
 
   dragStartThreshold = 0;
   autoScroll = true;
@@ -267,9 +287,9 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.resizeSubscription.unsubscribe();
     if (this.encryptedDataSubscription) {
       this.encryptedDataSubscription.unsubscribe();
-      this.resizeSubscription.unsubscribe();
     }
   }
 
@@ -559,7 +579,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   }
 
   onLayoutUpdated(layout: KtdGridLayout) {
-    console.log('update: ', layout);
+    console.log('update', layout);
     this.saveNewLayoutUpdated = [];
     this.layout = layout.map((updatedItem: any) => {
       const originalItem = this.originalLayout.find(
@@ -575,8 +595,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
 
   saveLayoutUpdated() {
     this.saveNewLayoutUpdated.map((data: any) => {
-      console.log(data.identifier);
-
       const requestUpdateData = {
         identifier: data.identifier,
         type: data.type,
@@ -590,7 +608,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
         .updateWorkspace(this.headers, requestUpdateData, data.id)
         .subscribe({
           next: (value) => {
-            console.log(value);
             this.startDashboarData();
           },
         });
@@ -608,7 +625,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       this.filters[this.isEditingIndex].identifiers = updatedIdentifiers;
       this.isEditingIndex = null;
       this.executeFilter();
-      console.log(updatedIdentifiers);
     }
   }
 
@@ -621,13 +637,11 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   addFilters(filters: any[]) {
     this.selectedFilters = [];
     if (!filters) {
-      console.error('filters is undefined or null');
       return;
     }
 
     filters.forEach((filter: any) => {
       if (filter) {
-        console.log(filter);
         const column = filter.column[0];
         const existingFilter = this.filters.find((f) => f.column === column);
         if (existingFilter) {
@@ -658,14 +672,13 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
             type: filter.type || [],
           });
         }
-
+        console.log(filter);
         if (filter.type == 'numeric') {
-          console.log(filter);
-          this.minValue = 0;
-          this.maxValue = filter.value[1];
+          this.minValue = filter.allfilters[0];
+          this.maxValue = filter.allfilters[1];
           this.options = {
             floor: 0,
-            ceil: filter.value[1],
+            ceil: filter.allfilters[1],
             translate: (value: number, label: LabelType): string => {
               switch (label) {
                 case LabelType.Low:
@@ -760,7 +773,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     } else {
       this.selectedFilters[column] = 'Todos';
     }
-    console.log(this.selectedFilters);
   }
 
   alfilters(values: string[], allfilters: string[]): string | string[] {
@@ -784,7 +796,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   }
 
   printDates(filter: any) {
-    console.log(filter.column);
     const startDate = this.datePipe.transform(filter.startDate, 'dd/MM/yyyy');
     const endDate = this.datePipe.transform(filter.endDate, 'dd/MM/yyyy');
     const dateUpdate = `${startDate}` + `, ` + `${endDate}`;
@@ -816,7 +827,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
           if (selectedValue && selectedValue !== 'Todos') {
             filter.value = selectedValue.split(', ');
           } else if (selectedValue && selectedValue === 'Todos') {
-            console.log(selectedValue);
             filter.value = [];
           }
         }
@@ -842,10 +852,8 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
           });
           const selectedValue = this.selectedFilters[filter.column[0]];
           if (selectedValue && selectedValue !== 'Todos') {
-            console.log(selectedValue);
             filter.value = selectedValue.split(', ');
           } else if (selectedValue && selectedValue === 'Todos') {
-            console.log(selectedValue);
             filter.value = [];
           }
         }
@@ -871,7 +879,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
           if (selectedValue && selectedValue !== 'Todos') {
             filter.value = selectedValue.split(', ');
           } else if (selectedValue && selectedValue === 'Todos') {
-            console.log(selectedValue);
             filter.value = [];
           }
         }
