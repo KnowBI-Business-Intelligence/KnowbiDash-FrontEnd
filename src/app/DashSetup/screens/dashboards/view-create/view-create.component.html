@@ -156,10 +156,11 @@
         <div class="modal-fields" *ngFor="let filter of filters; let i = index">
           <div>
             <label
+              class="filter-label"
               *ngIf="isEditingIndex !== i"
               (click)="updateFilterLabel(i); $event.stopPropagation()"
               [attr.for]="filter.identifiers"
-              >{{ filter.identifiers[0] }}</label
+              >{{ filter.identifiers[0] || "editar" }}</label
             >
 
             <input
@@ -171,16 +172,45 @@
           </div>
 
           <div class="dropdown">
-            <button class="dropbtn">
-              {{
-                selectedFilters[filter.column] ||
-                  alfilters(filter.values, filter.allfilters)
-              }}
-            </button>
-            <div class="dropdown-content">
+            <ng-container
+              *ngIf="filter.type == 'timestamp'; else defaultFilter"
+            >
+              <div class="dropdown-date">
+                <mat-date-range-input [rangePicker]="picker">
+                  <input
+                    matStartDate
+                    [placeholder]="filter.values[0]"
+                    [(ngModel)]="filter.values[0]"
+                    (dateChange)="updateDate('startDate', filter, $event.value)"
+                  />
+                  <input
+                    matEndDate
+                    [placeholder]="filter.values[1]"
+                    [(ngModel)]="filter.values[1]"
+                    (dateChange)="updateDate('endDate', filter, $event.value)"
+                  />
+                </mat-date-range-input>
+                <mat-datepicker-toggle
+                  matIconSuffix
+                  [for]="picker"
+                ></mat-datepicker-toggle>
+                <mat-date-range-picker #picker></mat-date-range-picker>
+                <mat-date-range-picker #picker></mat-date-range-picker>
+              </div>
+            </ng-container>
+            <ng-template #defaultFilter>
+              <button class="dropbtn" (click)="showContentFilter(i)">
+                {{
+                  selectedFilters[filter.column] ||
+                    alfilters(filter.values, filter.allfilters)
+                }}
+              </button>
+            </ng-template>
+            <div class="dropdown-content" *ngIf="showContentFilterSwitch[i]">
               <div class="dropdown-cl" *ngFor="let value of filter.allfilters">
                 <div>
                   <input
+                    class="checkbox"
                     type="checkbox"
                     [checked]="isChecked(filter.column, value)"
                     (change)="onCheckboxChange(filter.column, value)"

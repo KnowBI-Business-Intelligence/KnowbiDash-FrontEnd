@@ -158,26 +158,22 @@ export class ChartsService {
     );
   }
 
-  updateCards(headers: HttpHeaders, chartData: any, id: any) {
+  updateCards(headers: HttpHeaders, cardData: any, id: any) {
     const options = {
       headers: headers,
     };
 
-    return this.http.patch(
-      `${this.ENV_CARDS}/update/${id}`,
-      chartData,
-      options
-    );
+    return this.http.patch(`${this.ENV_CARDS}/update/${id}`, cardData, options);
   }
 
-  updateTables(headers: HttpHeaders, chartData: any, id: any) {
+  updateTables(headers: HttpHeaders, tableData: any, id: any) {
     const options = {
       headers: headers,
     };
 
     return this.http.patch(
       `${this.ENV_TABLES}/update/${id}`,
-      chartData,
+      tableData,
       options
     );
   }

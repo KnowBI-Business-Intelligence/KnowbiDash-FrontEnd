@@ -1,10 +1,10 @@
-import { CommonModule, DOCUMENT } from '@angular/common';
+import { CommonModule, DOCUMENT, DatePipe } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
 import {
-  ChangeDetectorRef,
   Component,
   ElementRef,
   Inject,
+  LOCALE_ID,
   NgZone,
   OnDestroy,
   OnInit,
@@ -16,7 +16,6 @@ import {
   KtdDragStart,
   KtdGridComponent,
   KtdGridLayout,
-  KtdGridLayoutItem,
   KtdGridModule,
   KtdResizeEnd,
   KtdResizeStart,
@@ -47,6 +46,39 @@ import {
 import { TableModule } from 'primeng/table';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { LayoutService } from './layoutservice';
+import { MatInputModule } from '@angular/material/input';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import {
+  MatMomentDateModule,
+  MAT_MOMENT_DATE_ADAPTER_OPTIONS,
+} from '@angular/material-moment-adapter';
+import {
+  MAT_DATE_LOCALE,
+  DateAdapter,
+  MAT_DATE_FORMATS,
+  MatDateFormats,
+} from '@angular/material/core';
+import { registerLocaleData } from '@angular/common';
+import localePt from '@angular/common/locales/pt';
+import * as _moment from 'moment';
+import 'moment/locale/pt-br';
+
+_moment.locale('pt-br');
+
+registerLocaleData(localePt);
+
+export const MY_FORMATS: MatDateFormats = {
+  parse: {
+    dateInput: 'DD/MM/YYYY',
+  },
+  display: {
+    dateInput: 'DD/MM/YYYY',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'DD/MM/YYYY',
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
+};
 
 interface ExtendedOptions extends Highcharts.Options {
   filters?: any;
@@ -57,6 +89,10 @@ interface ExtendedOptions extends Highcharts.Options {
   standalone: true,
   imports: [
     MatIconModule,
+    MatDatepickerModule,
+    MatInputModule,
+    MatNativeDateModule,
+    MatMomentDateModule,
     FontAwesomeModule,
     CommonModule,
     SkeletonModule,
@@ -64,6 +100,13 @@ interface ExtendedOptions extends Highcharts.Options {
     FormsModule,
     TableModule,
     KtdGridModule,
+  ],
+  providers: [
+    { provide: LOCALE_ID, useValue: 'pt' },
+    { provide: MAT_DATE_LOCALE, useValue: 'pt-BR' },
+    { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },
+    { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
+    DatePipe,
   ],
   templateUrl: './view-create.component.html',
   styleUrl: './view-create.component.css',
@@ -142,6 +185,8 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
 
   isShowFilterModal: boolean = false;
   isLoginLoading: boolean = false;
+  showContentFilterSwitch: boolean[] = [];
+
   user = this.storageService.getUser();
   headers = new HttpHeaders({
     Authorization: `Bearer ${this.user.token}`,
@@ -189,6 +234,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     private ngZone: NgZone,
     public elementRef: ElementRef,
     private layoutService: LayoutService,
+    private datePipe: DatePipe,
     @Inject(DOCUMENT) public document: Document
   ) {
     this.currentView = null;
@@ -196,6 +242,9 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.startDashboarData();
+    this.filters.forEach((filter, index) => {
+      this.showContentFilterSwitch[index] = false;
+    });
     this.resizeSubscription = merge(
       fromEvent(window, 'resize'),
       fromEvent(window, 'orientationchange')
@@ -450,6 +499,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       ...this.tableGroupsData,
       ...this.chartGroupsData,
     ];
+    console.log(combinedData);
     this.updateLayout(combinedData);
     this.initFilters(this.groupInfo.id, combinedData);
   }
@@ -535,6 +585,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
         .subscribe({
           next: (value) => {
             console.log(value);
+            this.startDashboarData();
           },
         });
     });
@@ -549,16 +600,10 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       const updatedIdentifiers =
         this.filters[this.isEditingIndex].identifiers.flat(Infinity);
       this.filters[this.isEditingIndex].identifiers = updatedIdentifiers;
-
-      this.printNewValue(updatedIdentifiers);
       this.isEditingIndex = null;
       this.executeFilter();
+      console.log(updatedIdentifiers);
     }
-  }
-
-  printNewValue(value: string[]): void {
-    console.log('Novo valor:', JSON.stringify(value, null, 2));
-    console.log(JSON.stringify(this.filters, null, 2));
   }
 
   addFilters(filters: any[]) {
@@ -570,6 +615,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
 
     filters.forEach((filter: any) => {
       if (filter) {
+        console.log(filter);
         const column = filter.column[0];
         const existingFilter = this.filters.find((f) => f.column === column);
         if (existingFilter) {
@@ -583,6 +629,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
               ...(filter.allfilters || []),
             ])
           );
+
           existingFilter.operator = filter.operator;
           if (filter.identifiers !== undefined) {
             existingFilter.identifiers = [filter.identifiers];
@@ -596,6 +643,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
             identifiers: identifiers,
             allfilters: filter.allfilters || [],
             operator: filter.operator || [],
+            type: filter.type || [],
           });
         }
       }
@@ -647,6 +695,10 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     }, 440);
   }
 
+  showContentFilter(index: number) {
+    this.showContentFilterSwitch[index] = !this.showContentFilterSwitch[index];
+  }
+
   onCheckboxChange(column: string, value: string) {
     if (!this.checkedValues[column]) {
       this.checkedValues[column] = [];
@@ -663,17 +715,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   }
 
   isChecked(column: string, value: string): boolean {
-    const filter = this.filters.find((f) => f.column === column);
-    if (filter) {
-      // Verifica se o valor está nos valores do filtro correspondente
-      const isValueInFilters = filter.values.includes(value);
-      // Verifica se o valor está na lista de valores marcados
-      const isValueChecked =
-        this.checkedValues[column]?.includes(value) || false;
-      // Retorna verdadeiro se o valor estiver em qualquer uma das listas
-      return isValueInFilters || isValueChecked;
-    }
-    return false;
+    return this.checkedValues[column]?.includes(value) || false;
   }
 
   updateDropdownLabel(column: string) {
@@ -683,6 +725,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     } else {
       this.selectedFilters[column] = 'Todos';
     }
+    console.log(this.selectedFilters);
   }
 
   alfilters(values: string[], allfilters: string[]): string | string[] {
@@ -693,6 +736,25 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       }
     }
     return values;
+  }
+
+  updateDate(
+    dateType: 'startDate' | 'endDate',
+    filter: any,
+    selectedDate: Date
+  ) {
+    filter[dateType] = selectedDate;
+    this.updateDropdownLabel(filter.column);
+    this.printDates(filter);
+  }
+
+  printDates(filter: any) {
+    console.log(filter.column);
+    const startDate = this.datePipe.transform(filter.startDate, 'dd/MM/yyyy');
+    const endDate = this.datePipe.transform(filter.endDate, 'dd/MM/yyyy');
+    const dateUpdate = `${startDate}` + `, ` + `${endDate}`;
+    this.selectedFilters[filter.column] = dateUpdate;
+    console.log(this.selectedFilters);
   }
 
   executeFilter() {
@@ -731,7 +793,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
             }
           });
           const selectedValue = this.selectedFilters[filter.column[0]];
-          console.log(selectedValue);
           if (selectedValue && selectedValue !== 'Todos') {
             console.log(selectedValue);
             filter.value = selectedValue.split(', ');
@@ -891,6 +952,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       filters: formattedFilters,
     };
 
+    console.log(formattedFilters);
     this.chartsService.updateCards(this.headers, requestData, id).subscribe({
       next: (data: any) => {
         console.log('card: ', data);

@@ -370,13 +370,18 @@ td {
   gap: 10px;
 }
 
+.filter-label {
+  cursor: pointer;
+}
+
 .modal-fields select {
   width: 100%;
 }
 
 .dropdown {
   position: relative;
-  display: inline-block;
+  display: flex;
+  flex-direction: column;
   width: 100%;
 }
 
@@ -384,7 +389,7 @@ td {
   color: black;
   padding: 5px 10px;
   font-size: 13px;
-  border: solid 1px #bdbdbd;
+  border: solid 1px gainsboro;
   cursor: pointer;
   width: 100%;
   display: flex;
@@ -392,22 +397,11 @@ td {
 }
 
 .dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #f9f9f9;
-  -webkit-box-shadow: 0px 3px 5px 0px rgba(150, 150, 150, 1);
-  -moz-box-shadow: 0px 3px 5px 0px rgba(150, 150, 150, 1);
-  box-shadow: 0px 3px 5px 0px rgba(150, 150, 150, 1);
-  width: 100%;
-  z-index: 1;
-}
-
-.dropdown:hover .dropdown-content {
   display: flex;
   flex-direction: column;
-  -webkit-box-shadow: 0px 3px 5px 0px rgba(150, 150, 150, 1);
-  -moz-box-shadow: 0px 3px 5px 0px rgba(150, 150, 150, 1);
-  box-shadow: 0px 3px 5px 0px rgba(150, 150, 150, 1);
+  background-color: #fff;
+  width: 100%;
+  transition: 0.5s;
 }
 
 .dropdown-cl {
@@ -427,9 +421,31 @@ td {
   align-items: baseline;
 }
 
+.dropdown-date {
+  background-color: #fff;
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  border: solid 1px gainsboro;
+}
+
+.dropdown-date input {
+  border: none;
+  width: fit-content;
+  padding: 0;
+}
+
 .dropdown-content input[type="checkbox"] {
   margin-right: 5px;
   cursor: pointer;
+}
+
+.checkbox {
+  cursor: pointer;
+  width: 14px;
+  height: 14px;
 }
 
 .material-symbols-outlined {
