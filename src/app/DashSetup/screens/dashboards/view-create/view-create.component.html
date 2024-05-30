@@ -65,7 +65,15 @@
           <section
             *ngIf="item.type == 'card'"
             style="width: 100%; height: 100%"
+            class="card-container"
           >
+            <button [cdkMenuTriggerFor]="menuedit" class="buttonMenu">
+              <fa-icon
+                class="iconmenu"
+                [icon]="icons.menu"
+                [size]="'xl'"
+              ></fa-icon>
+            </button>
             <div class="card">
               <div class="card-header">
                 {{ item.title }}
@@ -80,6 +88,13 @@
             class="table-container mat-elevation-z8"
             tabindex="0"
           >
+            <button [cdkMenuTriggerFor]="menuedit" class="buttonMenu">
+              <fa-icon
+                class="iconmenu"
+                [icon]="icons.menu"
+                [size]="'xl'"
+              ></fa-icon>
+            </button>
             <h2>{{ item.title }}</h2>
             <div style="overflow: auto">
               <p-table
@@ -133,12 +148,44 @@
             </div>
           </section>
           <div *ngIf="item.type == 'chart'" class="chart-container">
+            <button [cdkMenuTriggerFor]="menuedit" class="buttonMenu">
+              <fa-icon
+                class="iconmenu"
+                [icon]="icons.menu"
+                [size]="'xl'"
+              ></fa-icon>
+            </button>
             <highcharts-chart
               style="width: 100%; height: 100%"
               [Highcharts]="Highcharts"
               [options]="item.data"
             ></highcharts-chart>
           </div>
+
+          <ng-template #menuedit>
+            <div class="edit-menu" cdkMenu>
+              <button class="edit-button">
+                <fa-icon
+                  class="iconmenu"
+                  [icon]="icons.edit"
+                  [size]="'xl'"
+                ></fa-icon>
+                <span>Editar</span>
+              </button>
+              <mat-divider></mat-divider>
+              <button
+                class="edit-button"
+                (click)="openModalExclude(item.id, item.itemId, item.type)"
+              >
+                <fa-icon
+                  class="icontrash"
+                  [icon]="icons.delete"
+                  [size]="'xl'"
+                ></fa-icon>
+                <span>Excluir</span>
+              </button>
+            </div>
+          </ng-template>
         </ktd-grid-item>
       </ktd-grid>
     </div>
@@ -245,6 +292,34 @@
             ></span>
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+  <div class="message">
+    <p-toast [life]="3500"></p-toast>
+  </div>
+</div>
+
+<div
+  class="modal-exclude"
+  *ngIf="showModal"
+  id="modalExclude"
+  [style.display]="showModal ? 'flex' : 'none'"
+>
+  <div class="modal-exclude-content">
+    <span class="modal-exclude-close" (click)="closeModalExclude()"
+      >&times;</span
+    >
+    <div>
+      <h2>Tem certeza que deseja excluir este item?</h2>
+      <p>Esta ação não poderá ser desfeita</p>
+      <div class="modal-exclude-buttons">
+        <button class="modal-exclude-cancel" (click)="closeModalExclude()">
+          Cancelar
+        </button>
+        <button class="modal-exclude-exclude" (click)="excludeItem()">
+          <span>Excluir</span>
+        </button>
       </div>
     </div>
   </div>

@@ -8,7 +8,9 @@ import {
   NgZone,
   OnDestroy,
   OnInit,
+  QueryList,
   ViewChild,
+  ViewChildren,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
@@ -21,7 +23,7 @@ import {
   KtdResizeStart,
   ktdTrackById,
 } from '@katoid/angular-grid-layout';
-import { ktdArrayRemoveItem } from './utils';
+import { MY_FORMATS, generateLayout2, ktdArrayRemoveItem } from './utils';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -42,6 +44,9 @@ import {
   faRotateLeft,
   faFloppyDisk,
   faFilter,
+  faEllipsisVertical,
+  faPenToSquare,
+  faTrash,
 } from '@fortawesome/free-solid-svg-icons';
 import { TableModule } from 'primeng/table';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
@@ -68,45 +73,15 @@ import { registerLocaleData } from '@angular/common';
 import localePt from '@angular/common/locales/pt';
 import * as _moment from 'moment';
 import 'moment/locale/pt-br';
+import { CdkMenu, CdkMenuItem, CdkMenuTrigger } from '@angular/cdk/menu';
+import { MatDivider } from '@angular/material/divider';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
 
 _moment.locale('pt-br');
-
 registerLocaleData(localePt);
-
-export const MY_FORMATS: MatDateFormats = {
-  parse: {
-    dateInput: 'DD/MM/YYYY',
-  },
-  display: {
-    dateInput: 'DD/MM/YYYY',
-    monthYearLabel: 'MMM YYYY',
-    dateA11yLabel: 'DD/MM/YYYY',
-    monthYearA11yLabel: 'MMMM YYYY',
-  },
-};
-
 interface ExtendedOptions extends Highcharts.Options {
   filters?: any;
-}
-
-function generateLayout2(cols: number, size: number) {
-  const rows = cols;
-  const layout: any[] = [];
-  let counter = 0;
-  for (let i = 0; i < rows; i += size) {
-    for (let j = i; j < cols; j += size) {
-      layout.push({
-        id: `${counter}`,
-        x: j,
-        y: i,
-        w: size,
-        h: size,
-      });
-      counter++;
-    }
-  }
-
-  return layout;
 }
 
 @Component({
@@ -118,6 +93,10 @@ function generateLayout2(cols: number, size: number) {
     MatInputModule,
     MatNativeDateModule,
     MatMomentDateModule,
+    MatDivider,
+    CdkMenuTrigger,
+    CdkMenu,
+    CdkMenuItem,
     NgxSliderModule,
     FontAwesomeModule,
     CommonModule,
@@ -126,6 +105,7 @@ function generateLayout2(cols: number, size: number) {
     FormsModule,
     TableModule,
     KtdGridModule,
+    ToastModule,
   ],
   providers: [
     { provide: LOCALE_ID, useValue: 'pt' },
@@ -135,9 +115,14 @@ function generateLayout2(cols: number, size: number) {
     DatePipe,
   ],
   templateUrl: './view-create.component.html',
-  styleUrls: ['./view-create.component.scss', './view-create.component.css'],
+  styleUrls: [
+    './view-create.component.scss',
+    './view-create.component.css',
+    '../../../../core/globalStyle/toast.css',
+  ],
 })
 export class ViewCreateComponent implements OnInit, OnDestroy {
+  @ViewChildren(CdkMenuTrigger) menuTriggers!: QueryList<CdkMenuTrigger>;
   @ViewChild('chartContainer') chartContainer!: ElementRef;
   @ViewChild(KtdGridComponent, { static: true }) grid!: KtdGridComponent;
   private encryptedDataSubscription: Subscription | undefined;
@@ -146,14 +131,16 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     back: faRotateLeft,
     save: faFloppyDisk,
     filter: faFilter,
+    menu: faEllipsisVertical,
+    edit: faPenToSquare,
+    delete: faTrash,
   };
 
   cols: number = 50;
   rowHeight: number = 75;
   compactType: 'vertical' | 'horizontal' | null = 'horizontal';
-
   layout: KtdGridLayout = generateLayout2(this.cols, 3);
-
+  saveNewLayoutUpdated: KtdGridLayout = [];
   dragStartThreshold = 0;
   autoScroll = true;
   disableDrag = false;
@@ -171,13 +158,15 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
 
   isEditingIndex: number | null = null;
 
+  private layoutId: any;
+  private itemId: any;
+  private itemtype: any;
   chartConfig: any;
   currentView: any;
   groupInfo: any;
 
   changeBg: HTMLElement | null = null;
   filterModal: HTMLElement | null = null;
-
   paths: { [key: string]: Group[] } = {};
   pathNames: { [key: string]: string } = {};
 
@@ -206,9 +195,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   showTableColumns: any[] = [];
   showTableData: any[] = [];
   originalLayout: any[] = [];
-
-  saveNewLayoutUpdated: KtdGridLayout = [];
-
+  showModal: boolean = false;
   isShowFilterModal: boolean = false;
   isLoginLoading: boolean = false;
   showContentFilterSwitch: boolean[] = [];
@@ -224,29 +211,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       name: 'ease',
       value: 'transform 500ms ease, width 500ms ease, height 500ms ease',
     },
-    {
-      name: 'ease-out',
-      value:
-        'transform 500ms ease-out, width 500ms ease-out, height 500ms ease-out',
-    },
-    {
-      name: 'linear',
-      value: 'transform 500ms linear, width 500ms linear, height 500ms linear',
-    },
-    {
-      name: 'overflowing',
-      value:
-        'transform 500ms cubic-bezier(.28,.49,.79,1.35), width 500ms cubic-bezier(.28,.49,.79,1.35), height 500ms cubic-bezier(.28,.49,.79,1.35)',
-    },
-    {
-      name: 'fast',
-      value: 'transform 200ms ease, width 200ms linear, height 200ms linear',
-    },
-    {
-      name: 'slow-motion',
-      value:
-        'transform 1000ms linear, width 1000ms linear, height 1000ms linear',
-    },
     { name: 'transform-only', value: 'transform 500ms ease' },
   ];
   currentTransition: string = this.transitions[0].value;
@@ -257,10 +221,10 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     private chartsService: ChartsService,
     private storageService: StorageService,
     private chartGroupService: ChartgroupService,
-    private ngZone: NgZone,
     public elementRef: ElementRef,
     private layoutService: LayoutService,
     private datePipe: DatePipe,
+    private messageService: MessageService,
     @Inject(DOCUMENT) public document: Document
   ) {
     this.currentView = null;
@@ -525,7 +489,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       ...this.tableGroupsData,
       ...this.chartGroupsData,
     ];
-    console.log(combinedData);
     this.updateLayout(combinedData);
     this.initFilters(this.groupInfo.id, combinedData);
   }
@@ -537,6 +500,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
         if (item.type == 'card') {
           return {
             id: item.workspace.id,
+            itemId: item.id,
             type: item.workspace.type,
             title: item.title,
             content: item.content,
@@ -549,6 +513,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
         } else if (item.type == 'table') {
           return {
             id: item.workspace.id,
+            itemId: item.id,
             type: item.workspace.type,
             title: item.title,
             showTableColumns: item.showTableColumns,
@@ -562,6 +527,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
         } else if (item.type == 'chart') {
           return {
             id: item.workspace.id,
+            itemId: item.id,
             type: item.workspace.type,
             data: item.data,
             x: item.workspace.x,
@@ -576,6 +542,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
 
     this.originalLayout = JSON.parse(JSON.stringify(this.layout));
     this.saveNewLayoutUpdated = this.layout;
+    console.log(this.layout);
   }
 
   onLayoutUpdated(layout: KtdGridLayout) {
@@ -608,7 +575,9 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
         .updateWorkspace(this.headers, requestUpdateData, data.id)
         .subscribe({
           next: (value) => {
-            this.startDashboarData();
+            setTimeout(() => {
+              this.startDashboarData();
+            }, 70);
           },
         });
     });
@@ -672,7 +641,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
             type: filter.type || [],
           });
         }
-        console.log(filter);
         if (filter.type == 'numeric') {
           this.minValue = filter.allfilters[0];
           this.maxValue = filter.allfilters[1];
@@ -1025,6 +993,60 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     });
   }
 
+  openModalExclude(layoutId: any, itemId: any, type: any): void {
+    this.menuTriggers.forEach((trigger) => trigger.close());
+    this.showModal = true;
+    this.layoutId = layoutId;
+    this.itemId = itemId;
+    this.itemtype = type;
+  }
+
+  closeModalExclude(): void {
+    this.showModal = false;
+  }
+
+  excludeItem() {
+    console.log(this.layoutId, this.itemId, this.itemtype);
+    switch (this.itemtype) {
+      case 'card':
+        console.log('card');
+        this.chartsService.deleteCards(this.headers, this.itemId).subscribe({
+          next: (value) => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Sucesso',
+              detail: 'Card Excluído',
+            });
+            this.removeItem(this.layoutId);
+            console.log('excluido: ', value);
+          },
+          error: (err) => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Erro',
+              detail: 'Não foi possível concluir esta ação',
+            });
+          },
+        });
+        break;
+      case 'chart':
+        console.log('chart');
+        break;
+      case 'table':
+        console.log('table');
+        break;
+      default:
+        break;
+    }
+
+    /*this.chartsService.deleteCards(this.headers, this.chartId).subscribe({
+      next: (data) => {
+        console.log(data);
+      },
+    });*/
+    this.closeModalExclude();
+  }
+
   formatterResultWhenDecimal(result: number): string {
     let formattedResult;
     if (Number.isInteger(result)) {
@@ -1072,6 +1094,9 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   }
 
   removeItem(id: string) {
+    setTimeout(() => {
+      this.startDashboarData();
+    }, 130);
     this.layout = ktdArrayRemoveItem(
       this.layout,
       (item: any) => item.id === id

@@ -1,0 +1,30 @@
+:host ::ng-deep .p-toast .p-toast-message .p-toast-message-content {
+  padding: 1rem;
+  border-width: 0 0 0 6px;
+  font-size: 15px;
+  border-radius: 2px;
+}
+
+:host ::ng-deep .p-toast .p-toast-message .p-toast-icon-close {
+  border-radius: 50%;
+  background: transparent;
+  transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+  width: 13px;
+  height: 13px;
+  color: #444444;
+}
+
+:host
+  ::ng-deep
+  .p-toast
+  .p-toast-message
+  .p-toast-message-content
+  .p-icon:not(.p-toast-icon-close-icon) {
+  width: 2rem;
+  height: 23px;
+  margin: 0 10px 0 0 !important;
+}
+
+:host ::ng-deep a {
+  font-size: 12px !important;
+}
