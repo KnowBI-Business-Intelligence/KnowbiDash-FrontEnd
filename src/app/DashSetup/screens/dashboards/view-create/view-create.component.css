@@ -60,6 +60,12 @@
   font-size: 12px;
 }
 
+.menu-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
 .buttonMenu {
   display: block;
   border: none;
@@ -69,10 +75,10 @@
   position: absolute;
   top: 5px;
   right: 5px;
-  z-index: 99;
+  z-index: 11;
 }
 
-.card-container:hover .buttonmenu {
+.menu-container:hover .buttonMenu {
   display: block;
 }
 

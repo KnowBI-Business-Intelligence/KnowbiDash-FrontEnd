@@ -16,7 +16,7 @@
             [size]="'xl'"
             title="Dashboards"
           ></fa-icon>
-          {{ item?.name }}
+          <span>{{ item?.name }}</span>
         </div>
       </div>
     </div>
@@ -158,21 +158,23 @@
   </div>
   <div class="container-pre-view">
     <span>pré visualização</span>
-    <div *ngIf="showPreviewButton" class="visualize">
-      <div>
-        <button (click)="seedData()"><p>Pré-Visualizar</p></button>
-        <button (click)="returnToCreateView()" class="cancel-button">
-          <p>Cancelar</p>
-        </button>
-      </div>
-    </div>
-    <div *ngIf="!showPreviewButton" class="chart-container">
-      <div class="card">
-        <div class="card-header">
-          {{ cardTitle }}
+    <div>
+      <div *ngIf="showPreviewButton" class="visualize">
+        <div>
+          <button (click)="seedData()"><p>Pré-Visualizar</p></button>
+          <button (click)="returnToCreateView()" class="cancel-button">
+            <p>Cancelar</p>
+          </button>
         </div>
-        <div class="card-body">
-          <p>{{ cardData }}</p>
+      </div>
+      <div *ngIf="!showPreviewButton" class="chart-container">
+        <div class="card">
+          <div class="card-header">
+            {{ cardTitle }}
+          </div>
+          <div class="card-body">
+            <p>{{ cardData }}</p>
+          </div>
         </div>
       </div>
     </div>
@@ -233,8 +235,8 @@
       <input
         name="identifier"
         type="text"
-        [(ngModel)]="identifier"
-        [value]="selectedYAxis.identifier"
+        [(ngModel)]="identifiers"
+        [value]="selectedYAxis.identifiers"
       />
     </div>
     <button class="edit-save" cdkMenuItem (click)="editSave()">Salvar</button>

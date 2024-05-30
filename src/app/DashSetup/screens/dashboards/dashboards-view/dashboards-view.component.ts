@@ -27,6 +27,7 @@ import { ViewCreateComponent } from '../view-create/view-create.component';
 import { ChartgroupService } from '../../../../core/services/chartgroup/chartgroup.service';
 import { ChartComponent } from '../chart/chart.component';
 import { TableComponent } from '../table/table.component';
+import { DataService } from '../../../../core/services/dashboard/data.service';
 interface Group {
   id: string;
   name: string;
@@ -86,7 +87,8 @@ export class DashboardsViewComponent implements OnInit {
     private storageService: StorageService,
     private elementRef: ElementRef,
     private localStorageService: LocalstorageService,
-    private chartGroupService: ChartgroupService
+    private chartGroupService: ChartgroupService,
+    private dataService: DataService
   ) {
     this.currentView = 'ViewCreateComponent';
   }
@@ -136,6 +138,7 @@ export class DashboardsViewComponent implements OnInit {
   }
 
   switchView(view: string) {
+    this.dataService.setData(undefined);
     if (view == 'chart') {
       this.currentView = 'ChartComponent';
     } else if (view == 'card') {

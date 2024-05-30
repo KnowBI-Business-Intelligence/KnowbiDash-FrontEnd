@@ -240,6 +240,7 @@ export class TableComponent implements OnInit {
 
   extractValue(aggregation: string) {
     if (this.selectedtabledata) {
+      console.log(this.selectedtabledata);
       const tabledataName = this.selectedtabledata.name;
       const columnNameRegex = /^(?:AVG|COUNT|SUM)\(([^)]+)\)$/;
 
@@ -247,7 +248,7 @@ export class TableComponent implements OnInit {
         const columnName = tabledataName.replace(columnNameRegex, '$1');
         let newAggregationValue;
 
-        if (this.selectedtabledata.type === 'number') {
+        if (this.selectedtabledata.type === 'numeric') {
           newAggregationValue = aggregation + '(' + tabledataName + ')';
         } else {
           newAggregationValue = tabledataName;
@@ -502,7 +503,9 @@ export class TableComponent implements OnInit {
       },
     });
 
-    this.returnToCreateView();
+    setTimeout(() => {
+      this.returnToCreateView();
+    }, 120);
   }
 
   openModal(): void {

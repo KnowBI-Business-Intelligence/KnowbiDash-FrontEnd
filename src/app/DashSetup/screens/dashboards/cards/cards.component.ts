@@ -6,7 +6,7 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { StorageService } from '../../../../core/services/user/storage.service';
 import { LocalstorageService } from '../../../../core/services/local-storage/local-storage.service';
 import { ChartsService } from '../../../../core/services/charts/charts.service';
@@ -36,11 +36,12 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { ChartgroupService } from '../../../../core/services/chartgroup/chartgroup.service';
 import { Subscription } from 'rxjs';
+import { DataService } from '../../../../core/services/dashboard/data.service';
 
 interface Axis {
   name: string;
   type: string;
-  identifier: string;
+  identifiers: string;
   value: '';
 }
 
@@ -78,20 +79,22 @@ export class CardsComponent implements OnInit, OnDestroy {
   cardData: any;
   dashBoard: any;
   chartId: any;
+  layoutId: any;
+  itemId: any;
   cardTitle: string = '';
   prefix: string = '';
   sufix: string = '';
   chartType: string = '';
   sql: string = 'SELECT ';
   tableName: string = '';
-  identifier: string = '';
+  identifiers: string = '';
   selectedAggregation: string = '';
   selectedChartButton: string = '';
   showPreviewButton: boolean = true;
   showModal: boolean = false;
   modal: HTMLElement | undefined;
-  selectedYAxis: Axis = { name: '', type: '', identifier: '', value: '' };
-  buildData: { name: any; identifier: any }[] = [];
+  selectedYAxis: Axis = { name: '', type: '', identifiers: '', value: '' };
+  buildData: { name: any; identifiers: any }[] = [];
   yAxisValueWithoutAggregation: string = '';
   yaxisData: { [key: string]: string } = {};
   yaxisIdentifiers: { [key: string]: string } = {};
@@ -102,15 +105,20 @@ export class CardsComponent implements OnInit, OnDestroy {
   });
 
   constructor(
-    private router: Router,
     private storageService: StorageService,
-    private localStorageService: LocalstorageService,
     private chartsService: ChartsService,
-    private chartGroupService: ChartgroupService
+    private chartGroupService: ChartgroupService,
+    private dataService: DataService
   ) {}
 
   ngOnInit(): void {
     this.startDashboarData();
+  }
+
+  ngOnDestroy() {
+    if (this.encryptedDataSubscription) {
+      this.encryptedDataSubscription.unsubscribe();
+    }
   }
 
   drop(event: CdkDragDrop<string[]>) {
@@ -129,6 +137,7 @@ export class CardsComponent implements OnInit, OnDestroy {
       );
     }
   }
+
   returnToCreateView(): void {
     this.chartGroupService.setCurrentView('ViewCreateComponent');
   }
@@ -141,23 +150,27 @@ export class CardsComponent implements OnInit, OnDestroy {
       });
   }
 
-  ngOnDestroy() {
-    if (this.encryptedDataSubscription) {
-      this.encryptedDataSubscription.unsubscribe();
+  startEditData() {
+    const data = this.dataService.getData();
+    this.itemId = data.itemId;
+    console.log('Item ID:', this.itemId);
+    if (this.itemId != undefined) {
+      this.showPreviewButton = false;
+      this.loadCardEdit(this.itemId);
     }
   }
 
   openMenu(index: number, item: any) {
     this.selectedYAxis = item;
-    this.yaxis[index].identifier = this.identifier;
+    this.yaxis[index].identifiers = this.identifiers;
   }
 
   AxisValue(item: any) {
     this.selectedYAxis = item;
-    if (this.identifier == '' || this.identifier == undefined) {
-      this.identifier = this.selectedYAxis.name;
+    if (this.identifiers == '' || this.identifiers == undefined) {
+      this.identifiers = this.selectedYAxis.name;
     } else {
-      this.identifier = this.selectedYAxis.identifier;
+      this.identifiers = this.selectedYAxis.identifiers;
     }
   }
 
@@ -186,11 +199,12 @@ export class CardsComponent implements OnInit, OnDestroy {
     this.database = [];
     this.clearFilterData();
     this.clearData();
+    this.startEditData();
     data.columns.forEach((setData: any) => {
       this.database.push(setData);
       this.yaxisData[setData.name] = setData;
-      if (!setData.identifier || setData.identifier.trim() === '') {
-        setData.identifier = setData.name;
+      if (!setData.identifiers || setData.identifiers.trim() === '') {
+        setData.identifiers = setData.name;
         setData.value = setData.name;
       }
 
@@ -211,11 +225,11 @@ export class CardsComponent implements OnInit, OnDestroy {
           }
 
           const name = `${setData.name}${part}`;
-          const identifier = `${setData.identifier}${part}`;
+          const identifiers = `${setData.identifiers}${part}`;
           const timestampPart = {
             name: name,
             type: 'timestamp',
-            identifier: this.rmTimeStamp(identifier),
+            identifiers: this.rmTimeStamp(identifiers),
             value: value,
           };
           this.database.push(timestampPart);
@@ -248,8 +262,8 @@ export class CardsComponent implements OnInit, OnDestroy {
 
         const updatedAxis = {
           name: newAggregationValue,
-          identifier: this.selectedYAxis.identifier
-            ? this.selectedYAxis.identifier
+          identifiers: this.selectedYAxis.identifiers
+            ? this.selectedYAxis.identifiers
             : this.selectedYAxis.name,
           type: this.selectedYAxis.type,
           value: columnName,
@@ -265,8 +279,8 @@ export class CardsComponent implements OnInit, OnDestroy {
         if (index !== -1) {
           this.yaxis[index] = {
             name: aggregationValue,
-            identifier: this.selectedYAxis.identifier
-              ? this.selectedYAxis.identifier
+            identifiers: this.selectedYAxis.identifiers
+              ? this.selectedYAxis.identifiers
               : this.selectedYAxis.name,
             type: this.selectedYAxis.type,
             value: yAxisName,
@@ -278,11 +292,11 @@ export class CardsComponent implements OnInit, OnDestroy {
 
   editSave() {
     if (this.selectedYAxis) {
-      this.selectedYAxis.identifier = this.identifier
-        ? this.identifier
+      this.selectedYAxis.identifiers = this.identifiers
+        ? this.identifiers
         : this.selectedYAxis.name;
       this.yaxisIdentifiers[this.selectedYAxis.name] =
-        this.selectedYAxis.identifier;
+        this.selectedYAxis.identifiers;
     }
   }
 
@@ -299,13 +313,13 @@ export class CardsComponent implements OnInit, OnDestroy {
         identifierItem = this.rmAgregateReplace(identifierItem);
       }
 
-      this.buildData.push({ name: yAxisItem, identifier: identifierItem });
+      this.buildData.push({ name: yAxisItem, identifiers: identifierItem });
     }
 
     this.sql = 'SELECT ';
     if (this.buildData.length > 0) {
       const selectClauses = this.buildData.map((item) => {
-        return `${item.name} AS ${item.identifier}`;
+        return `${item.name} AS ${item.identifiers}`;
       });
       this.sql += selectClauses.join(', ');
     }
@@ -316,6 +330,7 @@ export class CardsComponent implements OnInit, OnDestroy {
   }
 
   seedData() {
+    console.log(this.filters);
     this.identifierData();
     this.showPreviewButton = false;
     const cardData = {
@@ -334,14 +349,14 @@ export class CardsComponent implements OnInit, OnDestroy {
         if (filter.type === 'numeric') {
           filter.identifiers = this.rmTimeStamp(filter.name);
         } else {
-          filter.identifiers = filter.identifier;
+          filter.identifiers = filter.identifiers;
         }
 
         return {
           column: [this.rmTimeStamp(filter.name)],
           operator: [operator],
           value: [],
-          identifiers: [filter.identifier],
+          identifiers: [filter.identifiers],
           type: [filter.type],
         };
       }),
@@ -374,7 +389,7 @@ export class CardsComponent implements OnInit, OnDestroy {
       sql: this.sql,
       filters: this.filters.map((filter) => {
         let operator;
-        if (filter.type === 'timestamp' || filter.type === 'number') {
+        if (filter.type === 'timestamp' || filter.type === 'numeric') {
           operator = 'BETWEEN';
         } else {
           operator = 'IN';
@@ -384,7 +399,7 @@ export class CardsComponent implements OnInit, OnDestroy {
           column: [this.rmTimeStamp(filter.name)],
           operator: [operator],
           value: [],
-          identifiers: [filter.identifier],
+          identifiers: [filter.identifiers],
         };
       }),
       chartGroup: {
@@ -392,13 +407,15 @@ export class CardsComponent implements OnInit, OnDestroy {
       },
     };
 
-    this.chartsService
+    console.log(cardData);
+
+    /*this.chartsService
       .updateCards(this.headers, cardData, this.chartId)
       .subscribe({
         next: (data) => {
           this.cardPreView(data);
         },
-      });
+      });*/
   }
 
   cardPreView(data: any) {
@@ -426,13 +443,19 @@ export class CardsComponent implements OnInit, OnDestroy {
   }
 
   openModalCancel() {
-    this.chartsService.deleteCards(this.headers, this.chartId).subscribe({
-      next: (data) => {
-        console.log(data);
-      },
-    });
-
-    this.returnToCreateView();
+    if (this.itemId != undefined) {
+      this.returnToCreateView();
+    } else {
+      console.log(this.chartId);
+      this.chartsService.deleteCards(this.headers, this.chartId).subscribe({
+        next: (data) => {
+          console.log(data);
+        },
+      });
+      setTimeout(() => {
+        this.returnToCreateView();
+      }, 120);
+    }
   }
 
   openModal(): void {
@@ -441,6 +464,34 @@ export class CardsComponent implements OnInit, OnDestroy {
 
   closeModal(): void {
     this.showModal = false;
+  }
+
+  loadCardEdit(id: any) {
+    this.chartsService.getCardsById(id, this.headers).subscribe({
+      next: (value) => {
+        const columnNames = value.filters.map((filter: any) => {
+          console.log(filter);
+          return {
+            name: filter.column,
+            type: filter.type,
+            identifiers: filter.identifiers,
+            value: filter.value,
+            column: filter.column,
+          };
+        });
+        console.log(columnNames);
+        console.log(value);
+        const result = this.formatterResultWhenDecimal(value.result);
+        this.cardTitle = value.title;
+        this.cardData = value.prefix + '' + result + ' ' + value.sufix;
+        this.prefix = value.prefix;
+        this.sufix = value.sufix;
+        this.filters = columnNames;
+      },
+      error: (err) => {
+        console.log(err);
+      },
+    });
   }
 
   rmAgregateReplace(item: string) {

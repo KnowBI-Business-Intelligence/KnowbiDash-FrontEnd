@@ -77,6 +77,7 @@ import { CdkMenu, CdkMenuItem, CdkMenuTrigger } from '@angular/cdk/menu';
 import { MatDivider } from '@angular/material/divider';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { DataService } from '../../../../core/services/dashboard/data.service';
 
 _moment.locale('pt-br');
 registerLocaleData(localePt);
@@ -167,6 +168,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
 
   changeBg: HTMLElement | null = null;
   filterModal: HTMLElement | null = null;
+  buttonMenuItem: HTMLElement | null = null;
   paths: { [key: string]: Group[] } = {};
   pathNames: { [key: string]: string } = {};
 
@@ -225,6 +227,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     private layoutService: LayoutService,
     private datePipe: DatePipe,
     private messageService: MessageService,
+    private dataService: DataService,
     @Inject(DOCUMENT) public document: Document
   ) {
     this.currentView = null;
@@ -993,6 +996,24 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     });
   }
 
+  openModalEdit(layoutId: any, itemId: any, type: any) {
+    console.log(layoutId, itemId, type);
+    this.dataService.setData(itemId);
+    switch (type) {
+      case 'chart':
+        this.chartGroupService.setCurrentView('ChartComponent');
+        break;
+      case 'table':
+        this.chartGroupService.setCurrentView('CardsComponent');
+        break;
+      case 'card':
+        this.chartGroupService.setCurrentView('CardsComponent');
+        break;
+      default:
+        break;
+    }
+  }
+
   openModalExclude(layoutId: any, itemId: any, type: any): void {
     this.menuTriggers.forEach((trigger) => trigger.close());
     this.showModal = true;
@@ -1018,7 +1039,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
               detail: 'Card Excluído',
             });
             this.removeItem(this.layoutId);
-            console.log('excluido: ', value);
           },
           error: (err) => {
             this.messageService.add({
@@ -1031,19 +1051,47 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
         break;
       case 'chart':
         console.log('chart');
+        this.chartsService.deleteCharts(this.headers, this.itemId).subscribe({
+          next: (value) => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Sucesso',
+              detail: 'Gráfico Excluído',
+            });
+            this.removeItem(this.layoutId);
+          },
+          error: (err) => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Erro',
+              detail: 'Não foi possível concluir esta ação',
+            });
+          },
+        });
         break;
       case 'table':
         console.log('table');
+        this.chartsService.deleteTables(this.headers, this.itemId).subscribe({
+          next: (value) => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Sucesso',
+              detail: 'Tabela Excluída',
+            });
+            this.removeItem(this.layoutId);
+          },
+          error: (err) => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Erro',
+              detail: 'Não foi possível concluir esta ação',
+            });
+          },
+        });
         break;
       default:
         break;
     }
-
-    /*this.chartsService.deleteCards(this.headers, this.chartId).subscribe({
-      next: (data) => {
-        console.log(data);
-      },
-    });*/
     this.closeModalExclude();
   }
 
@@ -1094,12 +1142,10 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   }
 
   removeItem(id: string) {
-    setTimeout(() => {
-      this.startDashboarData();
-    }, 130);
     this.layout = ktdArrayRemoveItem(
       this.layout,
       (item: any) => item.id === id
     );
+    this.startDashboarData();
   }
 }

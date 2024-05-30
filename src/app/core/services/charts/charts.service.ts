@@ -45,6 +45,10 @@ export class ChartsService {
     return this.http.get(`${this.ENV_CARDS}/get`, myHeaders);
   }
 
+  getCardsById(id: number, headers: any): Observable<any> {
+    return this.http.get(`${this.ENV_CARDS}/get/${id}`, { headers: headers });
+  }
+
   getTables(headers: HttpHeaders): Observable<any> {
     const myHeaders = {
       headers: headers,
@@ -70,7 +74,9 @@ export class ChartsService {
   }
 
   getChartsPathById(id: number, headers: any): Observable<any> {
-    return this.http.get(`${API_CHARTPATH}/get/${id}`, { headers: headers });
+    return this.http.get(`${this.ENV_CHARTPATH}/get/${id}`, {
+      headers: headers,
+    });
   }
 
   getChartGroup(headers: HttpHeaders): Observable<any> {
@@ -82,11 +88,13 @@ export class ChartsService {
   }
 
   getChartsGroupById(id: number, headers: any): Observable<any> {
-    return this.http.get(`${API_CHARTGROUP}/get/${id}`, { headers: headers });
+    return this.http.get(`${this.ENV_CHARTGROUP}/get/${id}`, {
+      headers: headers,
+    });
   }
 
   getChartsTableData(id: number, headers: any): Observable<any> {
-    return this.http.get(`${API_CHARTGROUP}/tabledata/${id}`, {
+    return this.http.get(`${this.ENV_CHARTGROUP}/tabledata/${id}`, {
       headers: headers,
     });
   }

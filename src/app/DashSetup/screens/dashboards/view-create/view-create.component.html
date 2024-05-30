@@ -65,7 +65,7 @@
           <section
             *ngIf="item.type == 'card'"
             style="width: 100%; height: 100%"
-            class="card-container"
+            class="menu-container"
           >
             <button [cdkMenuTriggerFor]="menuedit" class="buttonMenu">
               <fa-icon
@@ -85,7 +85,7 @@
           </section>
           <section
             *ngIf="item.type == 'table'"
-            class="table-container mat-elevation-z8"
+            class="table-container mat-elevation-z8 menu-container"
             tabindex="0"
           >
             <button [cdkMenuTriggerFor]="menuedit" class="buttonMenu">
@@ -147,7 +147,10 @@
               </p-table>
             </div>
           </section>
-          <div *ngIf="item.type == 'chart'" class="chart-container">
+          <div
+            *ngIf="item.type == 'chart'"
+            class="chart-container menu-container"
+          >
             <button [cdkMenuTriggerFor]="menuedit" class="buttonMenu">
               <fa-icon
                 class="iconmenu"
@@ -164,7 +167,10 @@
 
           <ng-template #menuedit>
             <div class="edit-menu" cdkMenu>
-              <button class="edit-button">
+              <button
+                class="edit-button"
+                (click)="openModalEdit(item.id, item.itemId, item.type)"
+              >
                 <fa-icon
                   class="iconmenu"
                   [icon]="icons.edit"

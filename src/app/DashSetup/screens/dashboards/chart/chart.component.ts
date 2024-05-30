@@ -477,7 +477,9 @@ export class ChartComponent implements OnInit {
         console.log(data);
       },
     });
-    this.returnToCreateView();
+    setTimeout(() => {
+      this.returnToCreateView();
+    }, 120);
   }
 
   chartPreView(data: any) {

@@ -12,6 +12,8 @@ export class ChartgroupService {
     new BehaviorSubject<string>('ViewCreateComponent');
 
   private selectedChartPath: any;
+  private layoutId: any;
+  private itemId: any;
 
   constructor() {}
 
@@ -33,5 +35,14 @@ export class ChartgroupService {
 
   getCurrentView(): Observable<string> {
     return this.currentViewSubject.asObservable();
+  }
+
+  setData(layoutId: any, itemId: any) {
+    this.layoutId = layoutId;
+    this.itemId = itemId;
+  }
+
+  getData() {
+    return { layoutId: this.layoutId, itemId: this.itemId };
   }
 }
