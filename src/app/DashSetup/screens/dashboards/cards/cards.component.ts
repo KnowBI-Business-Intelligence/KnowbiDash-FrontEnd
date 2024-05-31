@@ -37,6 +37,8 @@ import {
 import { ChartgroupService } from '../../../../core/services/chartgroup/chartgroup.service';
 import { Subscription } from 'rxjs';
 import { DataService } from '../../../../core/services/dashboard/data.service';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 interface Axis {
   name: string;
@@ -60,9 +62,13 @@ interface Axis {
     CdkMenuItemCheckbox,
     CdkMenuGroup,
     CdkMenuItem,
+    ToastModule,
   ],
   templateUrl: './cards.component.html',
-  styleUrl: './cards.component.css',
+  styleUrls: [
+    './cards.component.css',
+    '../../../../core/globalStyle/toast.css',
+  ],
 })
 export class CardsComponent implements OnInit, OnDestroy {
   @Output() returnToCreate = new EventEmitter<void>();
@@ -72,13 +78,14 @@ export class CardsComponent implements OnInit, OnDestroy {
     code: faCode,
     edit: faGear,
   };
+
   private encryptedDataSubscription: Subscription | undefined;
   database: any[] = [];
   yaxis: any[] = [];
   filters: any[] = [];
   cardData: any;
   dashBoard: any;
-  chartId: any;
+  cardId: any;
   layoutId: any;
   itemId: any;
   cardTitle: string = '';
@@ -108,7 +115,8 @@ export class CardsComponent implements OnInit, OnDestroy {
     private storageService: StorageService,
     private chartsService: ChartsService,
     private chartGroupService: ChartgroupService,
-    private dataService: DataService
+    private dataService: DataService,
+    private messageService: MessageService
   ) {}
 
   ngOnInit(): void {
@@ -129,12 +137,19 @@ export class CardsComponent implements OnInit, OnDestroy {
         event.currentIndex
       );
     } else {
+      if (event.container.id === 'yaxis' && event.container.data.length >= 1) {
+        // Se o array yaxis já tem um item, não permite adicionar mais
+        return;
+      }
       copyArrayItem(
         event.previousContainer.data,
         event.container.data,
         event.previousIndex,
         event.currentIndex
       );
+      if (event.container.id === 'yaxis' && event.container.data.length > 1) {
+        event.container.data.splice(1); // Mantém apenas o primeiro item
+      }
     }
   }
 
@@ -231,6 +246,7 @@ export class CardsComponent implements OnInit, OnDestroy {
             type: 'timestamp',
             identifiers: this.rmTimeStamp(identifiers),
             value: value,
+            agregator: name,
           };
           this.database.push(timestampPart);
         });
@@ -330,13 +346,12 @@ export class CardsComponent implements OnInit, OnDestroy {
   }
 
   seedData() {
-    console.log(this.filters);
     this.identifierData();
-    this.showPreviewButton = false;
     const cardData = {
       title: this.cardTitle,
       prefix: this.prefix,
       sufix: this.sufix,
+      column: this.yaxis,
       sql: this.sql,
       filters: this.filters.map((filter) => {
         let operator;
@@ -357,6 +372,7 @@ export class CardsComponent implements OnInit, OnDestroy {
           operator: [operator],
           value: [],
           identifiers: [filter.identifiers],
+          agregator: [filter.name],
           type: [filter.type],
         };
       }),
@@ -371,10 +387,23 @@ export class CardsComponent implements OnInit, OnDestroy {
   createCard(cardData: any) {
     this.chartsService.createCards(this.headers, cardData).subscribe({
       next: (data) => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Sucesso',
+          detail: 'Card criado',
+        });
+        this.showPreviewButton = false;
         console.log(data);
         this.cardPreView(data);
-        this.chartId = data.id;
+        this.cardId = data.id;
         this.updateChart();
+      },
+      error: (err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Não foi possível concluir esta ação',
+        });
       },
     });
   }
@@ -386,6 +415,7 @@ export class CardsComponent implements OnInit, OnDestroy {
       title: this.cardTitle,
       prefix: this.prefix,
       sufix: this.sufix,
+      column: this.yaxis,
       sql: this.sql,
       filters: this.filters.map((filter) => {
         let operator;
@@ -399,6 +429,7 @@ export class CardsComponent implements OnInit, OnDestroy {
           column: [this.rmTimeStamp(filter.name)],
           operator: [operator],
           value: [],
+          agregator: [filter.agregator],
           identifiers: [filter.identifiers],
         };
       }),
@@ -409,13 +440,33 @@ export class CardsComponent implements OnInit, OnDestroy {
 
     console.log(cardData);
 
-    /*this.chartsService
-      .updateCards(this.headers, cardData, this.chartId)
+    if (this.cardId == null) {
+      this.cardId = this.itemId;
+    } else if (this.itemId == null) {
+      this.cardId = this.cardId;
+    }
+
+    this.chartsService
+      .updateCards(this.headers, cardData, Number(this.cardId))
       .subscribe({
         next: (data) => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Sucesso',
+            detail: 'Informações do card atualizadas',
+          });
+          console.log(data);
           this.cardPreView(data);
         },
-      });*/
+        error: (err) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erro',
+            detail: 'Não foi possível concluir esta ação',
+          });
+          console.log(err);
+        },
+      });
   }
 
   cardPreView(data: any) {
@@ -446,8 +497,8 @@ export class CardsComponent implements OnInit, OnDestroy {
     if (this.itemId != undefined) {
       this.returnToCreateView();
     } else {
-      console.log(this.chartId);
-      this.chartsService.deleteCards(this.headers, this.chartId).subscribe({
+      console.log(this.cardId);
+      this.chartsService.deleteCards(this.headers, this.cardId).subscribe({
         next: (data) => {
           console.log(data);
         },
@@ -472,11 +523,12 @@ export class CardsComponent implements OnInit, OnDestroy {
         const columnNames = value.filters.map((filter: any) => {
           console.log(filter);
           return {
-            name: filter.column,
-            type: filter.type,
-            identifiers: filter.identifiers,
-            value: filter.value,
-            column: filter.column,
+            name: filter.agregator[0],
+            type: filter.type[0],
+            identifiers: filter.identifiers[0],
+            value: filter.value[0],
+            column: filter.column[0],
+            agregator: filter.agregator[0],
           };
         });
         console.log(columnNames);
@@ -484,6 +536,8 @@ export class CardsComponent implements OnInit, OnDestroy {
         const result = this.formatterResultWhenDecimal(value.result);
         this.cardTitle = value.title;
         this.cardData = value.prefix + '' + result + ' ' + value.sufix;
+        this.yaxis = value.column;
+        this.sql = value.sql;
         this.prefix = value.prefix;
         this.sufix = value.sufix;
         this.filters = columnNames;
@@ -498,8 +552,11 @@ export class CardsComponent implements OnInit, OnDestroy {
     return item.replace(/^(?:AVG|COUNT|SUM|mês)\(([^)]+)\)$/, '$1');
   }
 
-  rmTimeStamp(item: string) {
-    return item.replace(/\((?:dia|mês|ano)\)/, '');
+  rmTimeStamp(item: string): string {
+    if (this.isTimestampField(item)) {
+      return item.replace(/\((?:dia|mês|ano)\)/, '');
+    }
+    return item;
   }
 
   getDateFormat(fieldName: string): string {
