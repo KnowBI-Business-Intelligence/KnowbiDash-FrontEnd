@@ -125,10 +125,6 @@ export class DashboardsViewComponent implements OnInit {
     }, 440);
   }
 
-  closeStructure() {
-    this.viewCreateComponent.updateCombinedLayout();
-  }
-
   getCurrentView() {
     this.chartGroupService
       .getCurrentView()
@@ -223,5 +219,7 @@ export class DashboardsViewComponent implements OnInit {
     this.groupName = group.name;
     this.chartGroupService.setEncryptedData(encryptedData);
     this.localStorageService.setEncryptedItem('chartGroupview', encryptedData);
+    group = [];
+    event = [];
   }
 }

@@ -37,6 +37,10 @@ export class ChartsService {
     return this.http.get(`${this.ENV_CHARTS}/get`, myHeaders);
   }
 
+  getChartsById(id: number, headers: any): Observable<any> {
+    return this.http.get(`${this.ENV_CHARTS}/get/${id}`, { headers: headers });
+  }
+
   getCards(headers: HttpHeaders): Observable<any> {
     const myHeaders = {
       headers: headers,
@@ -55,6 +59,10 @@ export class ChartsService {
     };
 
     return this.http.get(`${this.ENV_TABLES}/get`, myHeaders);
+  }
+
+  getTableById(id: number, headers: any): Observable<any> {
+    return this.http.get(`${this.ENV_TABLES}/get/${id}`, { headers: headers });
   }
 
   getWorkspace(headers: HttpHeaders): Observable<any> {

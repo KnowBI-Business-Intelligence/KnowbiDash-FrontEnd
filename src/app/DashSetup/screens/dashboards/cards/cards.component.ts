@@ -138,7 +138,6 @@ export class CardsComponent implements OnInit, OnDestroy {
       );
     } else {
       if (event.container.id === 'yaxis' && event.container.data.length >= 1) {
-        // Se o array yaxis já tem um item, não permite adicionar mais
         return;
       }
       copyArrayItem(
@@ -148,7 +147,7 @@ export class CardsComponent implements OnInit, OnDestroy {
         event.currentIndex
       );
       if (event.container.id === 'yaxis' && event.container.data.length > 1) {
-        event.container.data.splice(1); // Mantém apenas o primeiro item
+        event.container.data.splice(1);
       }
     }
   }
@@ -246,7 +245,7 @@ export class CardsComponent implements OnInit, OnDestroy {
             type: 'timestamp',
             identifiers: this.rmTimeStamp(identifiers),
             value: value,
-            agregator: name,
+            agregator: name != undefined ? name : setData.column,
           };
           this.database.push(timestampPart);
         });
@@ -355,24 +354,29 @@ export class CardsComponent implements OnInit, OnDestroy {
       sql: this.sql,
       filters: this.filters.map((filter) => {
         let operator;
+        let idenfiersOpt;
         if (filter.type === 'timestamp' || filter.type === 'numeric') {
           operator = 'BETWEEN';
         } else {
           operator = 'IN';
         }
 
-        if (filter.type === 'numeric') {
-          filter.identifiers = this.rmTimeStamp(filter.name);
+        if (filter.type == 'numeric' && filter.identifiers == undefined) {
+          idenfiersOpt = this.rmTimeStamp(filter.name);
         } else {
-          filter.identifiers = filter.identifiers;
+          idenfiersOpt = filter.identifiers;
         }
 
         return {
           column: [this.rmTimeStamp(filter.name)],
           operator: [operator],
           value: [],
-          identifiers: [filter.identifiers],
-          agregator: [filter.name],
+          identifiers: [
+            idenfiersOpt == ''
+              ? this.rmTimeStamp(filter.name)
+              : filter.identifiers,
+          ],
+          agregator: [filter.name != undefined ? filter.name : filter.column],
           type: [filter.type],
         };
       }),
@@ -396,7 +400,6 @@ export class CardsComponent implements OnInit, OnDestroy {
         console.log(data);
         this.cardPreView(data);
         this.cardId = data.id;
-        this.updateChart();
       },
       error: (err) => {
         this.messageService.add({
@@ -419,18 +422,29 @@ export class CardsComponent implements OnInit, OnDestroy {
       sql: this.sql,
       filters: this.filters.map((filter) => {
         let operator;
+        let idenfiersOpt;
         if (filter.type === 'timestamp' || filter.type === 'numeric') {
           operator = 'BETWEEN';
         } else {
           operator = 'IN';
         }
 
+        if (filter.type == 'numeric' && filter.identifiers == undefined) {
+          idenfiersOpt = this.rmTimeStamp(filter.name);
+        } else {
+          idenfiersOpt = filter.identifiers;
+        }
+
         return {
           column: [this.rmTimeStamp(filter.name)],
           operator: [operator],
           value: [],
-          agregator: [filter.agregator],
-          identifiers: [filter.identifiers],
+          agregator: [filter.name != undefined ? filter.name : filter.column],
+          identifiers: [
+            idenfiersOpt == ''
+              ? this.rmTimeStamp(filter.name)
+              : filter.identifiers,
+          ],
         };
       }),
       chartGroup: {

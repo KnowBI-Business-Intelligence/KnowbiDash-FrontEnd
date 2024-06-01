@@ -324,6 +324,9 @@
       </div>
     </div>
   </div>
+  <div class="message">
+    <p-toast [life]="3500"></p-toast>
+  </div>
 </div>
 <ng-template #menuautosum>
   <div class="example-menu" cdkMenu>
@@ -367,8 +370,8 @@
       <input
         name="identifier"
         type="text"
-        [(ngModel)]="identifier"
-        [value]="selectedYAxis.identifier"
+        [(ngModel)]="identifiers"
+        [value]="selectedYAxis.identifiers"
       />
     </div>
     <button class="edit-save" cdkMenuItem (click)="editSave()">Salvar</button>

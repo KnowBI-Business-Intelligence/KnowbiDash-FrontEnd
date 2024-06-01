@@ -138,7 +138,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   };
 
   cols: number = 50;
-  rowHeight: number = 75;
+  rowHeight: number = 79;
   compactType: 'vertical' | 'horizontal' | null = 'horizontal';
   layout: KtdGridLayout = generateLayout2(this.cols, 3);
   saveNewLayoutUpdated: KtdGridLayout = [];
@@ -201,6 +201,12 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   isShowFilterModal: boolean = false;
   isLoginLoading: boolean = false;
   showContentFilterSwitch: boolean[] = [];
+
+  minValue: number = 100;
+  maxValue: number = 400;
+  values: number[] = [];
+  numberFilterValues: any[] = [];
+  options!: Options;
 
   user = this.storageService.getUser();
   headers = new HttpHeaders({
@@ -301,6 +307,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     this.filters = [];
     this.cardGroupsData = [];
     cardData.forEach((card: any) => {
+      console.log(card.filters);
       if (card.chartGroup.id == groupId) {
         this.copyDataCardJSON.push(card);
         this.cardFilters.push(card.filters);
@@ -492,6 +499,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       ...this.tableGroupsData,
       ...this.chartGroupsData,
     ];
+    console.log(combinedData);
     this.updateLayout(combinedData);
     this.initFilters(this.groupInfo.id, combinedData);
   }
@@ -600,12 +608,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     }
   }
 
-  minValue: number = 100;
-  maxValue: number = 400;
-  values: number[] = [];
-  numberFilterValues: any[] = [];
-  options!: Options;
-
   addFilters(filters: any[]) {
     this.selectedFilters = [];
     if (!filters) {
@@ -667,8 +669,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
         }
       }
     });
-
-    console.log(this.filters);
   }
 
   initFilters(groupInfo: any, combinedData: any) {
@@ -746,8 +746,8 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     }
   }
 
-  alfilters(values: string[], allfilters: string[]): string | string[] {
-    if (values.length === allfilters.length) {
+  allfilters(values: string[], allfilters: string[]): string | string[] {
+    if (values.length == allfilters.length) {
       const arraysIguais = values.every((value) => allfilters.includes(value));
       if (arraysIguais) {
         return 'todos';
@@ -771,11 +771,9 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     const endDate = this.datePipe.transform(filter.endDate, 'dd/MM/yyyy');
     const dateUpdate = `${startDate}` + `, ` + `${endDate}`;
     this.selectedFilters[filter.column] = dateUpdate;
-    console.log(this.selectedFilters);
   }
 
   executeFilter() {
-    console.log(this.numberFilterValues);
     const flattenIdentifiers = (identifiers: any[]) =>
       identifiers.flat(Infinity);
 
@@ -904,16 +902,22 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     const formattedXAxisColumns = xAxisColumns.map((column) => ({
       name: column.column,
       identifiers: column.name,
+      type: column.type,
+      agregator: column.agregator,
     }));
 
     const formattedYAxisColumns = yAxisColumns.map((column) => ({
       name: column.column,
       identifiers: column.name,
+      type: column.type,
+      agregator: column.agregator,
     }));
 
     const formattedSeries = series.map((column) => ({
       name: column.column,
       identifiers: column.name,
+      type: column.type,
+      agregator: column.agregator,
     }));
 
     const formattedFilters = filters.map((filter) => ({
@@ -931,9 +935,9 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       filters: formattedFilters,
     };
 
+    console.log(requestData);
     this.chartsService.updateCharts(this.headers, requestData, id).subscribe({
       next: (data: any) => {
-        console.log('chart: ', data);
         this.getCharts(data.chartGroup.id);
       },
       error: (error: any) => {
@@ -946,6 +950,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     const formattedTableData = tableData.map((column) => ({
       name: column.column,
       identifiers: column.th,
+      agregator: column.agregator,
     }));
 
     const formattedFilters = filters.map((filter) => ({
@@ -962,7 +967,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
 
     this.chartsService.updateTables(this.headers, requestData, id).subscribe({
       next: (data: any) => {
-        console.log('table: ', data);
         this.getTables(data.chartGroup.id);
       },
       error: (err: any) => {
@@ -972,6 +976,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   }
 
   updateCards(id: string, sql: string, filters: any) {
+    console.log(filters);
     const formattedFilters = filters.map((filter: any) => ({
       column: filter.column,
       operator: filter.operator,
