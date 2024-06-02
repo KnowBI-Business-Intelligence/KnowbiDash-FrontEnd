@@ -32,6 +32,9 @@ import { Subscription } from 'rxjs';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { Axis, PeriodicElement } from '../../../../core/modules/interfaces';
 import { TableModule } from 'primeng/table';
+import { DataService } from '../../../../core/services/dashboard/data.service';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-table',
@@ -49,9 +52,13 @@ import { TableModule } from 'primeng/table';
     CdkMenuGroup,
     CdkMenuItem,
     TableModule,
+    ToastModule,
   ],
   templateUrl: './table.component.html',
-  styleUrl: './table.component.css',
+  styleUrls: [
+    './table.component.css',
+    '../../../../core/globalStyle/toast.css',
+  ],
 })
 export class TableComponent implements OnInit {
   icons = {
@@ -79,22 +86,23 @@ export class TableComponent implements OnInit {
   selectedTab: string = '---';
   sql: string = 'SELECT ';
   tableName: string = '';
-  identifier: string = '';
+  identifiers: string = '';
   selectedAggregation: string = '';
 
   dashBoard: any;
   tableId: any;
+  itemId: any;
 
   showPreviewButton: boolean = true;
   showModal: boolean = false;
 
   modal: HTMLElement | undefined;
-  selectedtabledata: Axis = { name: '', type: '', identifier: '', value: '' };
-  buildData: { name: any; identifier: any }[] = [];
+  selectedtabledata: Axis = { name: '', type: '', identifiers: '', value: '' };
+  buildData: { name: any; identifiers: any }[] = [];
   sortDescriptions: { [key: string]: string } = {};
   tabledataValueWithoutAggregation: string = '';
   tabledataData: { [key: string]: string } = {};
-  tabledataIdentifiers: { [key: string]: string } = {};
+  tabledataidentifiers: { [key: string]: string } = {};
   private user = this.storageService.getUser();
   private headers = new HttpHeaders({
     Authorization: `Bearer ${this.user.token}`,
@@ -105,11 +113,19 @@ export class TableComponent implements OnInit {
     private storageService: StorageService,
     private localStorageService: LocalstorageService,
     private chartsService: ChartsService,
-    private chartGroupService: ChartgroupService
+    private chartGroupService: ChartgroupService,
+    private dataService: DataService,
+    private messageService: MessageService
   ) {}
 
   ngOnInit(): void {
     this.startDashboarData();
+  }
+
+  ngOnDestroy() {
+    if (this.encryptedDataSubscription) {
+      this.encryptedDataSubscription.unsubscribe();
+    }
   }
 
   drop(event: CdkDragDrop<string[]>) {
@@ -142,23 +158,27 @@ export class TableComponent implements OnInit {
       });
   }
 
-  ngOnDestroy() {
-    if (this.encryptedDataSubscription) {
-      this.encryptedDataSubscription.unsubscribe();
+  startEditData() {
+    const data = this.dataService.getData();
+    this.itemId = data.itemId;
+    console.log('Item ID:', this.itemId);
+    if (this.itemId != undefined) {
+      this.showPreviewButton = false;
+      this.loadTableEdit(this.itemId);
     }
   }
 
   openMenu(index: number, item: any) {
     this.selectedtabledata = item;
-    this.tabledata[index].identifier = this.identifier;
+    this.tabledata[index].identifiers = this.identifiers;
   }
 
   AxisValue(item: any) {
     this.selectedtabledata = item;
-    if (this.identifier == '' || this.identifier == undefined) {
-      this.identifier = this.selectedtabledata.name;
+    if (this.identifiers == '' || this.identifiers == undefined) {
+      this.identifiers = this.selectedtabledata.name;
     } else {
-      this.identifier = this.selectedtabledata.identifier;
+      this.identifiers = this.selectedtabledata.identifiers;
     }
   }
 
@@ -187,11 +207,12 @@ export class TableComponent implements OnInit {
     this.database = [];
     this.clearFilterData();
     this.clearTableData();
+    this.startEditData();
     data.columns.forEach((setData: any) => {
       this.database.push(setData);
       this.tabledataData[setData.name] = setData;
-      if (!setData.identifier || setData.identifier.trim() === '') {
-        setData.identifier = setData.name;
+      if (!setData.identifiers || setData.identifiers.trim() === '') {
+        setData.identifiers = setData.name;
         setData.value = setData.name;
       }
 
@@ -212,12 +233,13 @@ export class TableComponent implements OnInit {
           }
 
           const name = `${setData.name}${part}`;
-          const identifier = `${setData.identifier}${part}`;
+          const identifiers = `${setData.identifiers}${part}`;
           const timestampPart = {
             name: name,
             type: setData.type,
-            identifier: this.rmTimeStamp(identifier),
+            identifiers: this.rmTimeStamp(identifiers),
             value: value,
+            agregator: name != undefined ? name : setData.column,
           };
           this.database.push(timestampPart);
         });
@@ -243,90 +265,78 @@ export class TableComponent implements OnInit {
       console.log(this.selectedtabledata);
       const tabledataName = this.selectedtabledata.name;
       const columnNameRegex = /^(?:AVG|COUNT|SUM)\(([^)]+)\)$/;
+      let columnName;
 
       if (columnNameRegex.test(tabledataName)) {
-        const columnName = tabledataName.replace(columnNameRegex, '$1');
-        let newAggregationValue;
-
-        if (this.selectedtabledata.type === 'numeric') {
-          newAggregationValue = aggregation + '(' + tabledataName + ')';
-        } else {
-          newAggregationValue = tabledataName;
-        }
-
-        const updatedAxis = {
-          name: newAggregationValue,
-          identifier: this.selectedtabledata.identifier
-            ? this.selectedtabledata.identifier
-            : this.selectedtabledata.name,
-          type: this.selectedtabledata.type,
-          value: columnName,
-        };
-
-        const index = this.tabledata.findIndex(
-          (item) => item.name === tabledataName
-        );
-        if (index !== -1) {
-          this.tabledata[index] = updatedAxis;
-        }
+        columnName = tabledataName.replace(columnNameRegex, '$1');
       } else {
-        const aggregationValue = aggregation + '(' + tabledataName + ')';
-        const index = this.tabledata.findIndex(
-          (item) => item.name === tabledataName
-        );
-        if (index !== -1) {
-          this.tabledata[index] = {
-            name: aggregationValue,
-            identifier: this.selectedtabledata.identifier
-              ? this.selectedtabledata.identifier
-              : this.selectedtabledata.name,
-            type: this.selectedtabledata.type,
-            value: tabledataName,
-          };
-        }
+        columnName = tabledataName;
+      }
+
+      let newAggregationValue = aggregation + '(' + columnName + ')';
+
+      const updatedAxis = {
+        name: newAggregationValue,
+        identifiers: this.selectedtabledata.identifiers
+          ? this.selectedtabledata.identifiers
+          : this.selectedtabledata.name,
+        type: this.selectedtabledata.type,
+        value: columnName,
+      };
+
+      const index = this.tabledata.findIndex(
+        (item) => item.name === tabledataName
+      );
+      if (index !== -1) {
+        this.tabledata[index] = updatedAxis;
+      } else {
+        this.tabledata.push(updatedAxis);
       }
     }
   }
 
   editSave() {
     if (this.selectedtabledata) {
-      this.selectedtabledata.identifier = this.identifier
-        ? this.identifier
+      this.selectedtabledata.identifiers = this.identifiers
+        ? this.identifiers
         : this.selectedtabledata.name;
-      this.tabledataIdentifiers[this.selectedtabledata.name] =
-        this.selectedtabledata.identifier;
+      this.tabledataidentifiers[this.selectedtabledata.name] =
+        this.selectedtabledata.identifiers;
     }
   }
 
-  identifierData() {
+  identifiersData() {
     this.buildData = [];
     for (let i = 0; i < this.tabledata.length; i++) {
+      console.log(this.tabledata);
       const tabledataItem = this.tabledata[i].name;
-      const tabledataidentifier = this.tabledata[i].value;
-      let identifierItem = tabledataidentifier;
+      const tabledataidentifiers = this.tabledata[i].value;
+      let identifiersItem = tabledataidentifiers;
       const hasAggregation = /^(?:AVG|COUNT|SUM)\([^)]+\)$/.test(
-        identifierItem
+        identifiersItem
       );
       if (hasAggregation) {
-        identifierItem = this.rmAgregateReplace(identifierItem);
+        identifiersItem = this.rmAgregateReplace(identifiersItem);
       }
       if (this.tabledata[i].type == 'timestamp') {
         this.buildData.push({
-          name: identifierItem,
-          identifier: this.rmTimeStamp(tabledataItem),
+          name: identifiersItem,
+          identifiers: this.rmTimeStamp(tabledataItem),
         });
       } else {
         this.buildData.push({
           name: tabledataItem,
-          identifier: identifierItem,
+          identifiers: identifiersItem,
         });
       }
     }
 
     this.sql = 'SELECT ';
+    console.log(this.buildData);
     if (this.buildData.length > 0) {
+      console.log(this.buildData);
       const selectClauses = this.buildData.map((item) => {
-        return `${item.name} AS ${item.identifier}`;
+        return `${item.name} AS ${item.identifiers}`;
       });
       this.sql += selectClauses.join(', ');
     }
@@ -334,6 +344,7 @@ export class TableComponent implements OnInit {
     if (this.buildData.length > 0) {
       this.sql += ` FROM ${this.tableName}`;
     }
+    console.log(this.sql);
   }
 
   dataRepo() {
@@ -352,25 +363,31 @@ export class TableComponent implements OnInit {
 
     this.filtersData = this.filters.map((filter) => {
       let operator;
+      let idenfiersOpt;
       if (filter.type === 'timestamp' || filter.type === 'numeric') {
         operator = 'BETWEEN';
       } else {
         operator = 'IN';
       }
-      console.log(filter);
-      if (filter.type === 'numeric') {
-        console.log(this.rmTimeStamp(filter.name));
-        filter.identifiers = this.rmTimeStamp(filter.name);
+
+      if (filter.type == 'numeric' && filter.identifiers == undefined) {
+        idenfiersOpt = this.rmTimeStamp(filter.name);
       } else {
-        filter.identifiers = filter.identifier;
+        idenfiersOpt = filter.identifiers;
       }
+
+      console.log(idenfiersOpt);
 
       return {
         column: [this.rmTimeStamp(filter.name)],
         operator: [operator],
         value: [],
-        identifiers: [filter.identifiers],
-        type: [filter.type],
+        identifiers: [
+          idenfiersOpt == ''
+            ? this.rmTimeStamp(filter.name)
+            : filter.identifiers,
+        ],
+        agregator: [filter.name != undefined ? filter.name : filter.column],
       };
     });
 
@@ -378,23 +395,29 @@ export class TableComponent implements OnInit {
       if (axis.type == 'numeric') {
         return {
           name: [this.rmAgregateReplace(axis.name)],
-          identifiers: [axis.identifier],
+          identifiers: [axis.identifiers],
+          agregator: [axis.agregator != null ? axis.agregator : axis.name],
+          type: [axis.type],
         };
       } else if (axis.type == 'timestamp') {
         return {
           name: [this.rmTimeStamp(axis.name)],
-          identifiers: [axis.identifier],
+          identifiers: [axis.identifiers],
+          agregator: [axis.agregator != null ? axis.agregator : axis.name],
+          type: [axis.type],
         };
       }
       return {
         name: [axis.name],
-        identifiers: [axis.identifier],
+        identifiers: [axis.identifiers],
+        agregator: [axis.agregator != null ? axis.agregator : axis.name],
+        type: [axis.type],
       };
     });
   }
 
   seedData() {
-    this.identifierData();
+    this.identifiersData();
     this.dataRepo();
     const tableData = {
       title: this.tableTitle,
@@ -408,12 +431,14 @@ export class TableComponent implements OnInit {
       },
     };
     console.log(tableData);
-    this.createTable(tableData);
+    if (this.tableData.length > 0) {
+      this.createTable(tableData);
+    }
   }
 
   updateData() {
     this.showPreviewButton = false;
-    this.identifierData();
+    this.identifiersData();
     this.dataRepo();
     const tableData = {
       title: this.tableTitle,
@@ -427,7 +452,7 @@ export class TableComponent implements OnInit {
       },
     };
 
-    console.log(tableData);
+    console.log(JSON.stringify(tableData, null, 2));
     this.updateChart(tableData);
   }
 
@@ -435,10 +460,22 @@ export class TableComponent implements OnInit {
     console.log(chartData);
     this.chartsService.createTables(this.headers, chartData).subscribe({
       next: (data) => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Sucesso',
+          detail: 'Tabela criada',
+        });
         console.log(data);
         this.showPreviewButton = false;
         this.tablePreView(data);
         this.tableId = data.id;
+      },
+      error: (err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: 'Não foi possível concluir esta ação',
+        });
       },
     });
   }
@@ -448,11 +485,30 @@ export class TableComponent implements OnInit {
       Authorization: `Bearer ${this.user.token}`,
     });
 
+    if (this.tableId == null) {
+      this.tableId = this.itemId;
+    } else if (this.itemId == null) {
+      this.tableId = this.tableId;
+    }
+
     this.chartsService
       .updateTables(headers, chartData, this.tableId)
       .subscribe({
         next: (data) => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Sucesso',
+            detail: 'Informações da tabela atualizadas',
+          });
           this.tablePreView(data);
+        },
+        error: (err) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erro',
+            detail: 'Não foi possível concluir esta ação',
+          });
+          console.log(err);
         },
       });
   }
@@ -463,8 +519,11 @@ export class TableComponent implements OnInit {
     this.showTableColumns = [];
     this.showTableData = [];
 
-    const columns = data.tableData.map((td: any) => td.column).flat();
-    this.showTableColumns = columns.map((col: string) => ({ name: col }));
+    const columns = data.tableData.map((td: any) => ({
+      field: td.column[0],
+      header: td.th[0],
+    }));
+    this.showTableColumns = columns;
 
     const rowCount = data.tableData[0].td.length;
 
@@ -475,9 +534,6 @@ export class TableComponent implements OnInit {
       });
       this.showTableData.push(row);
     }
-
-    console.log(this.showTableColumns);
-    console.log(this.showTableData);
   }
 
   formatterResultWhenDecimal(result: number): string {
@@ -494,18 +550,19 @@ export class TableComponent implements OnInit {
   }
 
   openModalCancel() {
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${this.user.token}`,
-    });
-    this.chartsService.deleteTables(headers, this.tableId).subscribe({
-      next: (data) => {
-        console.log(data);
-      },
-    });
-
-    setTimeout(() => {
+    if (this.itemId != undefined) {
       this.returnToCreateView();
-    }, 120);
+    } else {
+      this.chartsService.deleteTables(this.headers, this.tableId).subscribe({
+        next: (data) => {
+          console.log(data);
+        },
+      });
+
+      setTimeout(() => {
+        this.returnToCreateView();
+      }, 120);
+    }
   }
 
   openModal(): void {
@@ -516,12 +573,90 @@ export class TableComponent implements OnInit {
     this.showModal = false;
   }
 
+  loadTableEdit(id: any) {
+    this.chartsService.getTableById(id, this.headers).subscribe({
+      next: (value) => {
+        this.dataEditProcessor(value);
+      },
+    });
+  }
+
+  dataEditProcessor(value: any) {
+    const columnFilterNames = value.filters.map((filter: any) => {
+      return {
+        name: filter.agregator[0],
+        type: filter.type[0],
+        identifiers: filter.identifiers[0],
+        value: filter.value[0],
+        column: filter.column[0],
+        agregator: filter.agregator[0],
+      };
+    });
+
+    const tableData = value.tableData.map((axis: any) => {
+      return {
+        name: axis.agregator[0],
+        identifiers: axis.th[0],
+        value:
+          axis.type[0] != 'timestamp'
+            ? axis.agregator[0]
+            : this.returnValueEdit(axis),
+        type: axis.type[0],
+      };
+    });
+
+    console.log(value);
+    const id = value.id;
+    this.tableTitle = value.title;
+    this.sql = value.sql;
+    this.tabledata = tableData;
+    this.filters = columnFilterNames;
+    this.loadInitialEdtTable(id);
+    console.log(this.tabledata);
+  }
+
+  returnValueEdit(data: any) {
+    console.log(data);
+    if (data.type[0] === 'timestamp') {
+      const agregator = data.agregator[0].trim();
+      console.log('Agregator:', agregator);
+
+      if (agregator.includes('(dia)')) {
+        return `DATE_TRUNC('day', ${this.rmTimeStamp(data.column[0])})`;
+      } else if (agregator.includes('(mês)')) {
+        return `mes_por_extenso(DATE_TRUNC('month', ${this.rmTimeStamp(
+          data.column[0]
+        )}))`;
+      } else if (agregator.includes('(ano)')) {
+        return `ano_por_extenso(DATE_TRUNC('year', ${this.rmTimeStamp(
+          data.column[0]
+        )}))`;
+      }
+    }
+
+    return data.column[0];
+  }
+
+  loadInitialEdtTable(id: any) {
+    this.chartsService.getTableById(id, this.headers).subscribe({
+      next: (value) => {
+        this.tablePreView(value);
+      },
+      error(err) {
+        console.log(err);
+      },
+    });
+  }
+
   rmAgregateReplace(item: string) {
     return item.replace(/^(?:AVG|COUNT|SUM|mês)\(([^)]+)\)$/, '$1');
   }
 
   rmTimeStamp(item: string) {
-    return item.replace(/\((?:dia|mês|ano)\)/, '');
+    if (this.isTimestampField(item)) {
+      return item.replace(/\((?:dia|mês|ano)\)/, '');
+    }
+    return item;
   }
 
   getDateFormat(fieldName: string): string {
@@ -546,10 +681,6 @@ export class TableComponent implements OnInit {
 
   isSelected(row: PeriodicElement): boolean {
     return this.selectedRow === row;
-  }
-
-  onRowDoubleClick(row: PeriodicElement) {
-    //console.log('Linha clicada duas vezes:', row);
   }
 
   isTimestampField(fieldName: string): boolean {

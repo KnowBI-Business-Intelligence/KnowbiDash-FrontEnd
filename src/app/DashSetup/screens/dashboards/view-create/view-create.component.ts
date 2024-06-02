@@ -364,9 +364,9 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
           filters: table.filters,
         };
 
-        const columns = table.tableData.map((td: any) => td.column).flat();
-        tableGroup.showTableColumns = columns.map((col: string) => ({
-          name: col,
+        tableGroup.showTableColumns = table.tableData.map((td: any) => ({
+          field: td.column[0],
+          header: td.th[0],
         }));
 
         const rowCount = table.tableData[0].td.length;
@@ -1009,7 +1009,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
         this.chartGroupService.setCurrentView('ChartComponent');
         break;
       case 'table':
-        this.chartGroupService.setCurrentView('CardsComponent');
+        this.chartGroupService.setCurrentView('TableComponent');
         break;
       case 'card':
         this.chartGroupService.setCurrentView('CardsComponent');

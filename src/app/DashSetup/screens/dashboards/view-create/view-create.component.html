@@ -116,11 +116,11 @@
                     <th
                       *ngFor="let column of item.showTableColumns"
                       pResizableColumn
-                      [pSortableColumn]="column.name"
+                      [pSortableColumn]="column.field"
                       style="min-width: 12rem"
                     >
                       <div class="flex align-items-center">
-                        {{ column.name }}
+                        {{ column.header }}
                       </div>
                     </th>
                   </tr>
@@ -134,7 +134,7 @@
                     [pSelectableRow]="rowData"
                   >
                     <td *ngFor="let column of item.showTableColumns">
-                      {{ rowData[column.name] }}
+                      {{ rowData[column.field] }}
                     </td>
                   </tr>
                 </ng-template>

@@ -741,6 +741,9 @@ export class ChartComponent implements OnInit {
       next: (value) => {
         this.chartPreView(value);
       },
+      error(err) {
+        console.log(err);
+      },
     });
   }
 

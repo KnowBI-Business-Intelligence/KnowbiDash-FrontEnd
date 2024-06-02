@@ -55,7 +55,7 @@ export interface Path {
 export interface Axis {
   name: string;
   type: string;
-  identifier: string;
+  identifiers: string;
   value: string;
 }
 
