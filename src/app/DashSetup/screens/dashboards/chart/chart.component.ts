@@ -114,6 +114,7 @@ export class ChartComponent implements OnInit {
   identifiers: string = '';
   selectedAggregation: string = '';
   selectedChartButton: string = '';
+  xaxisShow: boolean = true;
   showPreviewButton: boolean = true;
   showModal: boolean = false;
   modal: HTMLElement | undefined;
@@ -466,6 +467,8 @@ export class ChartComponent implements OnInit {
   seedData() {
     this.identifierData();
     this.dataRepo();
+    const groupSelector =
+      this.xAxisValues.length != 0 ? this.xAxisValues : this.seriesValues;
     const chartData = {
       title: this.titulo,
       graphType: this.chartType.toLowerCase(),
@@ -477,7 +480,7 @@ export class ChartComponent implements OnInit {
       group: this.groupData,
       order: this.order.length
         ? this.order.map((order) => this.rmTimeStamp(order.name))
-        : this.xAxisValues,
+        : groupSelector,
       orderInfo: this.order.length ? this.orderInfo : [],
       chartGroup: {
         id: this.dashBoard.id,
@@ -486,11 +489,7 @@ export class ChartComponent implements OnInit {
 
     console.log(chartData);
 
-    if (
-      this.yaxis.length > 0 &&
-      this.xaxis.length > 0 &&
-      this.chartType != ''
-    ) {
+    if (this.yaxis.length > 0 && this.chartType != '') {
       this.createChart(chartData);
     }
   }
@@ -520,6 +519,8 @@ export class ChartComponent implements OnInit {
   updateChart() {
     this.identifierData();
     this.dataRepo();
+    const groupSelector =
+      this.xAxisValues.length != 0 ? this.xAxisValues : this.seriesValues;
     const chartData = {
       title: this.titulo,
       graphType: this.chartType.toLowerCase(),
@@ -531,7 +532,7 @@ export class ChartComponent implements OnInit {
       group: this.groupData,
       order: this.order.length
         ? this.order.map((order) => this.rmTimeStamp(order.name))
-        : this.xAxisValues,
+        : groupSelector,
       orderInfo: this.order.length ? this.orderInfo : [],
       chartGroup: {
         id: this.dashBoard.id,
@@ -586,7 +587,10 @@ export class ChartComponent implements OnInit {
 
   chartPreView(data: any) {
     console.log(data);
-    const categories: string[] = Array.from(new Set(data.xAxisColumns[0].data));
+    const categories: string[] =
+      data.xAxisColumns.length > 0
+        ? Array.from(new Set(data.xAxisColumns[0].data))
+        : [];
     const yAxisData: number[] = data.yAxisColumns[0].data;
 
     let highchartsSeries: Highcharts.SeriesColumnOptions[] = [];
@@ -605,7 +609,8 @@ export class ChartComponent implements OnInit {
 
       for (let i = 0; i < seriesCategories.length; i++) {
         const seriesCategory = seriesCategories[i];
-        const category = data.xAxisColumns[0].data[i];
+        const category =
+          data.xAxisColumns.length > 0 ? data.xAxisColumns[0].data[i] : [];
         const value = yAxisData[i];
 
         if (!seriesData[seriesCategory]) {
@@ -622,11 +627,26 @@ export class ChartComponent implements OnInit {
           const dataset: number[] = categories.map(
             (category) => seriesData[seriesCategory][category] || 0
           );
-          highchartsSeries.push({
-            type: data.graphType,
-            name: seriesCategory,
-            data: dataset,
-          });
+          const pieData = data.yAxisColumns[0].data.map(
+            (y: number, index: number) => ({
+              name: data.series[0].data[index],
+              y: y,
+            })
+          );
+          if (data.graphType == 'pie') {
+            highchartsSeries.push({
+              type: data.graphType,
+              name: data.series[0].name,
+              colorByPoint: true,
+              data: pieData,
+            });
+          } else {
+            highchartsSeries.push({
+              type: data.graphType,
+              name: seriesCategory,
+              data: dataset,
+            });
+          }
         }
       }
     }
@@ -650,11 +670,23 @@ export class ChartComponent implements OnInit {
             chart: {
               type: data.graphType,
             },
-            yAxis: {
-              title: {
-                text: data.yAxisColumns[0].name[0],
-              },
-            },
+            xAxis:
+              data.graphType === 'pie'
+                ? undefined
+                : {
+                    title: {
+                      text: data.xAxisColumns[0].name[0],
+                    },
+                  },
+            yAxis:
+              data.graphType === 'pie'
+                ? undefined
+                : {
+                    title: {
+                      text: data.yAxisColumns[0].name[0],
+                    },
+                  },
+            series: highchartsSeries,
           },
           false
         );
@@ -668,33 +700,84 @@ export class ChartComponent implements OnInit {
         title: {
           text: data.title,
           align: 'center',
-        },
-        xAxis: {
-          categories: categories,
-          crosshair: true,
-          accessibility: {
-            description: 'Categories',
+          style: {
+            fontSize: '13px',
+            fontWeight: '450',
           },
         },
-        yAxis: {
-          min: 0,
-          title: {
-            text: data.yAxisColumns[0].name[0],
-          },
-        },
+        xAxis:
+          data.graphType === 'pie'
+            ? undefined
+            : {
+                categories: categories,
+                crosshair: true,
+                accessibility: {
+                  description: 'Categories',
+                },
+                title: {
+                  text: data.xAxisColumns[0].name[0],
+                  style: {
+                    fontSize: '11px',
+                  },
+                },
+                labels: {
+                  style: {
+                    fontSize: '10px',
+                  },
+                },
+              },
+        yAxis:
+          data.graphType === 'pie'
+            ? undefined
+            : {
+                min: 0,
+                title: {
+                  text: data.yAxisColumns[0].name[0],
+                  style: {
+                    fontSize: '11px',
+                  },
+                },
+                labels: {
+                  style: {
+                    fontSize: '10px',
+                  },
+                },
+              },
         plotOptions: {
           column: {
             pointPadding: 0.2,
             borderWidth: 0,
           },
+          series: {
+            cursor: 'pointer',
+            point: {
+              events: {
+                click: function () {
+                  //console.log('Coluna clicada:', this.category, this.y);
+                },
+              },
+            },
+          },
         },
         series: highchartsSeries,
+        legend: {
+          maxHeight: 65,
+          itemStyle: {
+            fontSize: '10px',
+          },
+        },
       };
     }
     console.log(this.chartConfig);
   }
 
   selectChartButton(label: string, value: string) {
+    if (value == 'pie') {
+      this.xaxisShow = false;
+      this.xaxis = [];
+    } else {
+      this.xaxisShow = true;
+    }
     this.selectedChartButton = label;
     this.chartType = value;
   }
