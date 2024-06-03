@@ -16,7 +16,13 @@ import {
 } from '@angular/cdk/menu';
 import { CommonModule } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  OnInit,
+  Output,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -38,6 +44,12 @@ interface Axis {
   type: string;
   identifiers: string;
   value: '';
+}
+
+interface ChartData {
+  xAxisColumns: { data: string[] }[];
+  yAxisColumns: { data: number[] }[];
+  series: { data: string[] }[];
 }
 
 interface ExtendedOptions extends Highcharts.Options {
@@ -111,7 +123,8 @@ export class ChartComponent implements OnInit {
   yaxisData: { [key: string]: string } = {};
   yaxisIdentifiers: { [key: string]: string } = {};
   Highcharts: typeof Highcharts = Highcharts;
-  chartConfig!: ExtendedOptions;
+  chart!: Highcharts.Chart;
+  chartConfig!: Highcharts.Options;
   group: any;
 
   chartButtons = chartButtonsData;
@@ -127,7 +140,8 @@ export class ChartComponent implements OnInit {
     private chartsService: ChartsService,
     private chartGroupService: ChartgroupService,
     private dataService: DataService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -359,7 +373,6 @@ export class ChartComponent implements OnInit {
       this.sql = 'SELECT ';
       if (this.buildData.length > 0) {
         const selectClauses = this.buildData.map((item) => {
-          console.log(item);
           return `${item.name} AS ${item.identifiers}`;
         });
         this.sql += selectClauses.join(', ');
@@ -378,8 +391,6 @@ export class ChartComponent implements OnInit {
       }
       return this.rmTimeStamp(axis.name);
     });
-
-    console.log(this.order);
 
     this.seriesValues = this.series.map((series) =>
       this.rmTimeStamp(series.value)
@@ -422,9 +433,7 @@ export class ChartComponent implements OnInit {
         type: orderinfo.type,
       };
     });
-    console.log(this.orderInfo);
     this.filtersData = this.filters.map((filter) => {
-      console.log(filter);
       let operator;
       let idenfiersOpt;
       if (filter.type === 'timestamp' || filter.type === 'numeric') {
@@ -477,13 +486,16 @@ export class ChartComponent implements OnInit {
 
     console.log(chartData);
 
-    if (this.yaxis.length > 0 && this.xaxis.length > 0) {
+    if (
+      this.yaxis.length > 0 &&
+      this.xaxis.length > 0 &&
+      this.chartType != ''
+    ) {
       this.createChart(chartData);
     }
   }
 
   createChart(chartData: any) {
-    console.log(chartData);
     this.chartsService.createCharts(this.headers, chartData).subscribe({
       next: (data) => {
         this.messageService.add({
@@ -543,6 +555,7 @@ export class ChartComponent implements OnInit {
             summary: 'Sucesso',
             detail: 'Informações do gráfico atualizadas',
           });
+          this.chartConfig = {};
           this.chartPreView(data);
         },
         error: (err) => {
@@ -560,7 +573,6 @@ export class ChartComponent implements OnInit {
     if (this.itemId != undefined) {
       this.returnToCreateView();
     } else {
-      console.log(this.chartId);
       this.chartsService.deleteCharts(this.headers, this.chartId).subscribe({
         next: (data) => {
           console.log(data);
@@ -574,71 +586,112 @@ export class ChartComponent implements OnInit {
 
   chartPreView(data: any) {
     console.log(data);
-    const uniqueCategories: any = Array.from(
-      new Set(data.xAxisColumns[0].data)
-    );
+    const categories: string[] = Array.from(new Set(data.xAxisColumns[0].data));
+    const yAxisData: number[] = data.yAxisColumns[0].data;
 
-    const uniqueSubgroups = Array.from(new Set(data.series[0].data));
+    let highchartsSeries: Highcharts.SeriesColumnOptions[] = [];
 
-    const seriesData = uniqueSubgroups.map((subgrupo: any) => {
-      const seriesValues: { name: string; y: any }[] = [];
-      data.xAxisColumns[0].data.forEach((date: string, i: number) => {
-        if (data.series[0].data[i] === subgrupo) {
-          seriesValues.push({
-            name: date,
-            y: data.yAxisColumns[0].data[i],
+    if (data.series.length == 0) {
+      highchartsSeries = [
+        {
+          type: data.graphType,
+          name: 'Dados',
+          data: yAxisData,
+        },
+      ];
+    } else {
+      const seriesCategories: string[] = data.series[0].data;
+      const seriesData: { [key: string]: { [category: string]: number } } = {};
+
+      for (let i = 0; i < seriesCategories.length; i++) {
+        const seriesCategory = seriesCategories[i];
+        const category = data.xAxisColumns[0].data[i];
+        const value = yAxisData[i];
+
+        if (!seriesData[seriesCategory]) {
+          seriesData[seriesCategory] = {};
+        }
+        if (!seriesData[seriesCategory][category]) {
+          seriesData[seriesCategory][category] = 0;
+        }
+        seriesData[seriesCategory][category] += value;
+      }
+
+      for (const seriesCategory in seriesData) {
+        if (seriesData.hasOwnProperty(seriesCategory)) {
+          const dataset: number[] = categories.map(
+            (category) => seriesData[seriesCategory][category] || 0
+          );
+          highchartsSeries.push({
+            type: data.graphType,
+            name: seriesCategory,
+            data: dataset,
           });
         }
-      });
-      return {
-        type: data.graphType,
-        name: subgrupo,
-        height: '20%',
-        data: seriesValues,
+      }
+    }
+
+    if (this.chartConfig && Highcharts.charts[0]) {
+      const chart = Highcharts.charts[0];
+
+      if (chart) {
+        while (chart.series.length > 0) {
+          chart.series[0].remove(false);
+        }
+        highchartsSeries.forEach((series) => {
+          chart.addSeries(series, false);
+        });
+        chart.xAxis[0].setCategories(categories, false);
+        chart.update(
+          {
+            title: {
+              text: data.title,
+            },
+            chart: {
+              type: data.graphType,
+            },
+            yAxis: {
+              title: {
+                text: data.yAxisColumns[0].name[0],
+              },
+            },
+          },
+          false
+        );
+        chart.redraw();
+      }
+    } else {
+      this.chartConfig = {
+        chart: {
+          type: data.graphType,
+        },
+        title: {
+          text: data.title,
+          align: 'center',
+        },
+        xAxis: {
+          categories: categories,
+          crosshair: true,
+          accessibility: {
+            description: 'Categories',
+          },
+        },
+        yAxis: {
+          min: 0,
+          title: {
+            text: data.yAxisColumns[0].name[0],
+          },
+        },
+        plotOptions: {
+          column: {
+            pointPadding: 0.2,
+            borderWidth: 0,
+          },
+        },
+        series: highchartsSeries,
       };
-    });
-    this.chartConfig = {
-      chart: {
-        type: data.graphType,
-      },
-      title: {
-        text: data.title,
-        style: {
-          fontSize: '14px',
-        },
-      },
-      xAxis: {
-        categories: uniqueCategories,
-        title: {
-          text: data.xAxisColumns[0].name[0],
-        },
-        labels: {
-          style: {
-            fontSize: '10px',
-          },
-        },
-      },
-      yAxis: {
-        title: {
-          text: data.yAxisColumns[0].name[0],
-        },
-        labels: {
-          style: {
-            fontSize: '10px',
-          },
-        },
-      },
-      legend: {
-        maxHeight: 65,
-        itemStyle: {
-          fontSize: '12px',
-        },
-      },
-      series: seriesData,
-      tooltip: {
-        shared: true,
-      },
-    };
+    }
+    console.log(this.chartConfig);
   }
 
   selectChartButton(label: string, value: string) {
@@ -694,7 +747,6 @@ export class ChartComponent implements OnInit {
       };
     });
     const yaxis = value.yAxisColumns.map((axis: any) => {
-      console.log(axis);
       return {
         name: axis.agregator[0],
         identifiers: axis.name[0],
@@ -703,7 +755,6 @@ export class ChartComponent implements OnInit {
       };
     });
     const xaxis = value.xAxisColumns.map((axis: any) => {
-      console.log(axis);
       return {
         name: axis.agregator[0],
         identifiers: axis.name[0],
@@ -712,7 +763,6 @@ export class ChartComponent implements OnInit {
       };
     });
     const series = value.series.map((axis: any) => {
-      console.log(axis);
       return {
         name: axis.agregator[0],
         identifiers: axis.name[0],

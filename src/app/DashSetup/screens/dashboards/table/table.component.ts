@@ -154,7 +154,6 @@ export class TableComponent implements OnInit {
       this.chartGroupService.encryptedData$.subscribe((encryptedData) => {
         this.dashBoard = encryptedData;
         this.loadDataView(this.dashBoard.id);
-        console.log(this.dashBoard);
       });
   }
 
@@ -332,9 +331,7 @@ export class TableComponent implements OnInit {
     }
 
     this.sql = 'SELECT ';
-    console.log(this.buildData);
     if (this.buildData.length > 0) {
-      console.log(this.buildData);
       const selectClauses = this.buildData.map((item) => {
         return `${item.name} AS ${item.identifiers}`;
       });
@@ -348,7 +345,6 @@ export class TableComponent implements OnInit {
   }
 
   dataRepo() {
-    console.log(this.filters);
     this.groupData = this.tabledata
       .map((data) => {
         if (data.type !== 'numeric') {
@@ -375,8 +371,6 @@ export class TableComponent implements OnInit {
       } else {
         idenfiersOpt = filter.identifiers;
       }
-
-      console.log(idenfiersOpt);
 
       return {
         column: [this.rmTimeStamp(filter.name)],
@@ -430,7 +424,6 @@ export class TableComponent implements OnInit {
         id: this.dashBoard.id,
       },
     };
-    console.log(tableData);
     if (this.tableData.length > 0) {
       this.createTable(tableData);
     }
@@ -452,12 +445,10 @@ export class TableComponent implements OnInit {
       },
     };
 
-    console.log(JSON.stringify(tableData, null, 2));
     this.updateChart(tableData);
   }
 
   createTable(chartData: any) {
-    console.log(chartData);
     this.chartsService.createTables(this.headers, chartData).subscribe({
       next: (data) => {
         this.messageService.add({
@@ -514,8 +505,6 @@ export class TableComponent implements OnInit {
   }
 
   tablePreView(data: any) {
-    console.log(data);
-
     this.showTableColumns = [];
     this.showTableData = [];
 
@@ -604,22 +593,17 @@ export class TableComponent implements OnInit {
         type: axis.type[0],
       };
     });
-
-    console.log(value);
     const id = value.id;
     this.tableTitle = value.title;
     this.sql = value.sql;
     this.tabledata = tableData;
     this.filters = columnFilterNames;
     this.loadInitialEdtTable(id);
-    console.log(this.tabledata);
   }
 
   returnValueEdit(data: any) {
-    console.log(data);
     if (data.type[0] === 'timestamp') {
       const agregator = data.agregator[0].trim();
-      console.log('Agregator:', agregator);
 
       if (agregator.includes('(dia)')) {
         return `DATE_TRUNC('day', ${this.rmTimeStamp(data.column[0])})`;

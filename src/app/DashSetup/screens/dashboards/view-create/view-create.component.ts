@@ -750,7 +750,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     if (values.length == allfilters.length) {
       const arraysIguais = values.every((value) => allfilters.includes(value));
       if (arraysIguais) {
-        return 'todos';
+        return 'Todos';
       }
     }
     return values;
@@ -951,6 +951,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       name: column.column,
       identifiers: column.th,
       agregator: column.agregator,
+      type: column.type,
     }));
 
     const formattedFilters = filters.map((filter) => ({
@@ -965,8 +966,11 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       filters: formattedFilters,
     };
 
+    console.log(JSON.stringify(requestData, null, 2));
+
     this.chartsService.updateTables(this.headers, requestData, id).subscribe({
       next: (data: any) => {
+        console.log(data);
         this.getTables(data.chartGroup.id);
       },
       error: (err: any) => {

@@ -466,7 +466,6 @@ export class CreateDashsComponent implements OnInit {
             summary: 'Sucesso',
             detail: 'SQL Atualizado',
           });
-          this.getTableData(this.chartGroupID);
           this.isLoadingRun = false;
         },
         error: (err) => {
