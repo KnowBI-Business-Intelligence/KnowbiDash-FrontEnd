@@ -553,12 +553,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
           dataLabels: {
             enabled: true,
             format: '<b">{point.name}</b><br>{point.percentage:.1f} %',
-            distance: -50,
-            filter: {
-              property: 'percentage',
-              operator: '>',
-              value: 4,
-            },
             style: {
               fontSize: '12px',
               fontWeight: '400',
@@ -719,16 +713,20 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
         w: data.w,
         h: data.h,
       };
-
       this.chartsService
         .updateWorkspace(this.headers, requestUpdateData, data.id)
         .subscribe({
           next: (value) => {
             setTimeout(() => {
               this.startDashboarData();
-            }, 70);
+            }, 450);
           },
         });
+    });
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Sucesso',
+      detail: 'Disposição salva',
     });
   }
 

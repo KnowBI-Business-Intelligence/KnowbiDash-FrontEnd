@@ -3,7 +3,6 @@ import { HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { ChartsService } from '../../../core/services/charts/charts.service';
 import { StorageService } from '../../../core/services/user/storage.service';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
@@ -26,6 +25,7 @@ export class ADMMainScreenComponent implements OnInit {
   searchTerm: string = '';
   profiles: any[] = [];
   profilesData: any[] = [];
+  filteredItems: any;
   pathsByProfile: { [key: string]: any[] } = {};
   private user = this.storageService.getUser();
   headers = new HttpHeaders({
@@ -77,7 +77,34 @@ export class ADMMainScreenComponent implements OnInit {
       }
       this.pathsByProfile[profile.name] = paths;
       this.profiles.push({ name: profile.name, paths: paths });
+      this.filteredItems = this.profiles;
     });
+  }
+
+  onInputChange(event: Event) {
+    const searchTerm = (event.target as HTMLInputElement).value
+      .trim()
+      .toLowerCase();
+
+    if (searchTerm === '') {
+      this.filteredItems = this.profiles;
+      return;
+    }
+
+    this.filteredItems = this.profiles
+      .map((profile: any) => {
+        const filteredPaths = profile.paths.filter((path: any) =>
+          path.name.toLowerCase().includes(searchTerm)
+        );
+        if (filteredPaths.length > 0) {
+          return {
+            ...profile,
+            paths: filteredPaths,
+          };
+        }
+        return null;
+      })
+      .filter((profile: any) => profile !== null);
   }
 
   openChartGroup(pathObj: any) {
@@ -86,17 +113,5 @@ export class ADMMainScreenComponent implements OnInit {
       JSON.stringify(pathObj)
     );
     this.router.navigate(['admin/adm_main_dashboard']);
-  }
-
-  applyFilter(term: string) {
-    return (profile: any) => {
-      const lowercaseTerm = term.toLowerCase();
-      return (
-        profile.name.toLowerCase().includes(lowercaseTerm) ||
-        profile.paths.some((path: any) =>
-          path.name.toLowerCase().includes(lowercaseTerm)
-        )
-      );
-    };
   }
 }

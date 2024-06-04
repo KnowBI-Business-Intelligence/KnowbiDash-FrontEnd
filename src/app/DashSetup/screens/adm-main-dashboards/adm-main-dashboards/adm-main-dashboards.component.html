@@ -7,7 +7,19 @@
 <div class="container">
   <div class="container-path">
     <div class="container-path-header">
-      <span>{{ pathName }}</span>
+      <div class="container-estructure">
+        <div>
+          <button (click)="backScreen()">
+            <fa-icon
+              class="iconview"
+              [icon]="icons.backDash"
+              [size]="'xl'"
+            ></fa-icon
+            >Voltar
+          </button>
+        </div>
+        <span>{{ pathName }}</span>
+      </div>
       <header>
         <div class="content-filter">
           <div class="filter">
@@ -32,6 +44,9 @@
     </div>
 
     <div class="container-path-body">
+      <div id="loading-screen" *ngIf="isLoading">
+        <div class="spinner"></div>
+      </div>
       <ng-container *ngFor="let group of filteredItems">
         <button class="container-path-button" (click)="callCharts(group)">
           <fa-icon
@@ -42,6 +57,13 @@
           ></fa-icon>
           <span>{{ group.name }}</span>
         </button>
+      </ng-container>
+      <ng-container
+        *ngIf="filteredItems == undefined || filteredItems.length == 0"
+      >
+        <div class="container-path-no-result">
+          <h2>Sem Resultado</h2>
+        </div>
       </ng-container>
     </div>
   </div>

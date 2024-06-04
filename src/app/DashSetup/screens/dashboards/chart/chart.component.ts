@@ -654,13 +654,6 @@ export class ChartComponent implements OnInit {
               type: data.graphType,
               name: seriesCategory,
               data: dataset,
-              dataLabels: {
-                enabled: true,
-                style: {
-                  fontSize: '10px',
-                  fontWeight: '400',
-                },
-              },
             });
           }
         }
@@ -784,15 +777,12 @@ export class ChartComponent implements OnInit {
             groupPadding: 0.1,
           },
           pie: {
+            allowPointSelect: true,
+            cursor: 'pointer',
+            borderRadius: 5,
             dataLabels: {
               enabled: true,
               format: '<b">{point.name}</b><br>{point.percentage:.1f} %',
-              distance: -50,
-              filter: {
-                property: 'percentage',
-                operator: '>',
-                value: 4,
-              },
               style: {
                 fontSize: '12px',
                 fontWeight: '400',

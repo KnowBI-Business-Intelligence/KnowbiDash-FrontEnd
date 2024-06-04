@@ -53,7 +53,7 @@ export class LoginScreenComponent implements OnInit {
 
     setTimeout(() => {
       this.isLoading = false;
-    }, 1000); // padrão: 3000
+    }, 1000);
   }
 
   defaultOrAdm(isAdmin: boolean): void {

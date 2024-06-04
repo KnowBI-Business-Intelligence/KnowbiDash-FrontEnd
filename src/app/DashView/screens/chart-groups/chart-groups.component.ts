@@ -6,6 +6,7 @@ import { ChartsService } from '../../../core/services/charts/charts.service';
 import { LocalstorageService } from '../../../core/services/local-storage/local-storage.service';
 import { StorageService } from '../../../core/services/user/storage.service';
 import {
+  faArrowLeft,
   faChartPie,
   faMagnifyingGlass,
 } from '@fortawesome/free-solid-svg-icons';
@@ -27,13 +28,17 @@ export class ChartGroupsComponent implements OnInit {
   icons = {
     dash: faChartPie,
     search: faMagnifyingGlass,
+    backDash: faArrowLeft,
   };
   searchTerm: string = '';
+  pathName: string = '';
   listpages: any;
   filteredItems: any;
   groups: Group[] = [];
   chartgroups: { [key: string]: any[] } = {};
   selectedChartPath: any;
+
+  isLoading: boolean = false;
 
   constructor(
     private router: Router,
@@ -44,6 +49,7 @@ export class ChartGroupsComponent implements OnInit {
 
   ngOnInit(): void {
     this.getChartGroups();
+    this.isLoading = true;
   }
 
   getChartGroups(): void {
@@ -54,6 +60,9 @@ export class ChartGroupsComponent implements OnInit {
 
     this.chartService.getChartGroup(headers).subscribe({
       next: (data) => {
+        setTimeout(() => {
+          this.isLoading = false;
+        }, 500);
         this.initData(data);
       },
     });
@@ -61,17 +70,19 @@ export class ChartGroupsComponent implements OnInit {
 
   initData(data: any) {
     this.selectedChartPath = JSON.parse(
-      this.localStorage.getDecryptedItem('selectedChartPathUser') || 'null'
+      this.localStorage.getDecryptedItem('selectedChartPathUser')
     );
-
+    this.pathName = this.selectedChartPath.name;
     data.forEach((dataItem: any) => {
-      const group: any[] = [];
-      if (dataItem.chartPath.id == this.selectedChartPath) {
-        group.push(dataItem);
-        this.chartgroups[dataItem.name] = group;
-        this.groups.push(dataItem);
-        this.filteredItems = this.groups;
-      }
+      dataItem.chartPath.forEach((path: any) => {
+        const group: any[] = [];
+        if (path.id == this.selectedChartPath.id) {
+          group.push(dataItem);
+          this.chartgroups[dataItem.name] = group;
+          this.groups.push(dataItem);
+          this.filteredItems = this.groups;
+        }
+      });
     });
   }
 
@@ -84,8 +95,6 @@ export class ChartGroupsComponent implements OnInit {
       this.filteredItems = this.groups;
       return;
     }
-
-    console.log(this.filteredItems);
 
     this.filteredItems = this.groups.filter((group: Group) =>
       group.name.toLowerCase().includes(searchTerm)

@@ -153,9 +153,7 @@
             <span class="mat-menu-item">
               Perfil:
               {{
-                user?.profiles.length > 0
-                  ? user?.profiles[0].name
-                  : "Sem perfil"
+                profilesData.length > 0 ? profilesData[0].name : "Sem perfil"
               }}
             </span>
           </button>
@@ -168,7 +166,7 @@
         </mat-menu>
 
         <mat-menu #profile="matMenu" yPosition="above">
-          <button mat-menu-item *ngFor="let profile of user?.profiles">
+          <button mat-menu-item *ngFor="let profile of profilesData">
             <span class="mat-menu-item">{{ profile.name }}</span>
           </button>
           <button

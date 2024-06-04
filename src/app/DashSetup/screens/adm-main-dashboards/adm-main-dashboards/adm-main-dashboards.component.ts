@@ -7,6 +7,7 @@ import { HttpHeaders } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
+  faArrowLeft,
   faChartPie,
   faMagnifyingGlass,
 } from '@fortawesome/free-solid-svg-icons';
@@ -28,6 +29,7 @@ export class AdmMainDashboardsComponent implements OnInit {
   icons = {
     dash: faChartPie,
     search: faMagnifyingGlass,
+    backDash: faArrowLeft,
   };
   searchTerm: string = '';
   pathName: string = '';
@@ -36,6 +38,8 @@ export class AdmMainDashboardsComponent implements OnInit {
   groups: Group[] = [];
   chartgroups: { [key: string]: any[] } = {};
   selectedChartPath: any;
+
+  isLoading: boolean = false;
 
   constructor(
     private router: Router,
@@ -46,6 +50,7 @@ export class AdmMainDashboardsComponent implements OnInit {
 
   ngOnInit(): void {
     this.getChartGroups();
+    this.isLoading = true;
   }
 
   getChartGroups(): void {
@@ -56,6 +61,9 @@ export class AdmMainDashboardsComponent implements OnInit {
 
     this.chartService.getChartGroup(headers).subscribe({
       next: (data) => {
+        setTimeout(() => {
+          this.isLoading = false;
+        }, 500);
         this.initData(data);
       },
     });
@@ -88,8 +96,6 @@ export class AdmMainDashboardsComponent implements OnInit {
       this.filteredItems = this.groups;
       return;
     }
-
-    console.log(this.filteredItems);
 
     this.filteredItems = this.groups.filter((group: Group) =>
       group.name.toLowerCase().includes(searchTerm)

@@ -8,7 +8,7 @@ import { StorageService } from '../../../core/services/user/storage.service';
 import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
-import { ChartsService } from '../../../core/services/charts/charts.service';
+import { ProfilesService } from '../../../core/services/profiles/profiles.service';
 
 @Component({
   selector: 'app-main-screen',
@@ -23,6 +23,8 @@ export class MainScreenComponent implements OnInit {
   };
   searchTerm: string = '';
   profiles: any[] = [];
+  profilesData: any[] = [];
+  filteredItems: any;
   pathsByProfile: { [key: string]: any[] } = {};
   private user = this.storageService.getUser();
   headers = new HttpHeaders({
@@ -33,6 +35,7 @@ export class MainScreenComponent implements OnInit {
     private authService: AuthService,
     private storageService: StorageService,
     private localStorage: LocalstorageService,
+    private profilesService: ProfilesService,
     private router: Router
   ) {}
 
@@ -43,14 +46,29 @@ export class MainScreenComponent implements OnInit {
   getUserById(id: number, token: any) {
     this.authService.getById(id, this.headers).subscribe({
       next: (data: any) => {
-        this.processData(data);
+        this.getProfilesData(data.id);
       },
     });
-    console.log(this.user);
+  }
+
+  getProfilesData(data: string) {
+    this.profilesService.getProfiles(this.headers).subscribe({
+      next: (value: any) => {
+        value.map((profileData: any) => {
+          profileData.users.map((userData: any) => {
+            if (userData.id == data) {
+              this.profilesData.push(profileData);
+            }
+          });
+        });
+        this.processData(this.profilesData);
+        console.log(this.profilesData);
+      },
+    });
   }
 
   processData(data: any) {
-    data.perfis.forEach((profile: any) => {
+    data.forEach((profile: any) => {
       const paths: string[] = [];
       if (profile && profile.chartPaths) {
         profile.chartPaths.forEach((chartPath: any) => {
@@ -59,26 +77,42 @@ export class MainScreenComponent implements OnInit {
       }
       this.pathsByProfile[profile.name] = paths;
       this.profiles.push({ name: profile.name, paths: paths });
-      console.log(this.pathsByProfile);
+      this.filteredItems = this.profiles;
+      console.log(this.filteredItems);
     });
   }
 
-  applyFilter(term: string) {
-    return (profile: any) => {
-      const lowercaseTerm = term.toLowerCase();
-      return (
-        profile.name.toLowerCase().includes(lowercaseTerm) ||
-        profile.paths.some((path: any) =>
-          path.name.toLowerCase().includes(lowercaseTerm)
-        )
-      );
-    };
+  onInputChange(event: Event) {
+    const searchTerm = (event.target as HTMLInputElement).value
+      .trim()
+      .toLowerCase();
+
+    if (searchTerm === '') {
+      this.filteredItems = this.profiles;
+      return;
+    }
+
+    this.filteredItems = this.profiles
+      .map((profile: any) => {
+        const filteredPaths = profile.paths.filter((path: any) =>
+          path.name.toLowerCase().includes(searchTerm)
+        );
+        if (filteredPaths.length > 0) {
+          return {
+            ...profile,
+            paths: filteredPaths,
+          };
+        }
+        return null;
+      })
+      .filter((profile: any) => profile !== null);
   }
 
   openChartGroup(pathObj: any) {
+    console.log(pathObj);
     this.localStorage.setEncryptedItem(
       'selectedChartPathUser',
-      JSON.stringify(pathObj.id)
+      JSON.stringify(pathObj)
     );
     this.router.navigate(['content/main/chartgroup']);
   }

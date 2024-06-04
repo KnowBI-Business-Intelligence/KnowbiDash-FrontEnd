@@ -19,6 +19,7 @@
               type="text"
               [(ngModel)]="searchTerm"
               placeholder="Pesquisar pasta"
+              (input)="onInputChange($event)"
             />
           </span>
         </div>
@@ -27,7 +28,7 @@
   </div>
 
   <div class="content-main-container">
-    <div *ngFor="let perfil of profiles">
+    <div *ngFor="let perfil of filteredItems">
       <div class="container-path-body-profile-label">
         <span
           >Do perfil <strong>{{ perfil.name }}</strong></span
@@ -48,5 +49,12 @@
         </div>
       </div>
     </div>
+    <ng-container
+      *ngIf="filteredItems == undefined || filteredItems.length == 0"
+    >
+      <div class="container-path-no-result">
+        <h2>Sem Resultado</h2>
+      </div>
+    </ng-container>
   </div>
 </div>

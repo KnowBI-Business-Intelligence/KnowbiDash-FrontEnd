@@ -22,6 +22,8 @@ import { BreadrumbsService } from '../../../core/services/breadcrumb/breadrumbs.
 import { EventSearchService } from '../../../core/services/event/event-search.service';
 import { StorageService } from '../../../core/services/user/storage.service';
 import { BreadcrumbsComponent } from '../../../shared/breadcrumbs/breadcrumbs.component';
+import { ProfilesService } from '../../../core/services/profiles/profiles.service';
+import { HttpHeaders } from '@angular/common/http';
 
 @Component({
   selector: 'app-side-bar',
@@ -54,6 +56,7 @@ export class SideBarComponent implements OnInit {
   aliasName?: string;
   user: any;
   userFirstName: any;
+  profilesData: any[] = [];
 
   icons = {
     logout: faRightFromBracket,
@@ -67,6 +70,11 @@ export class SideBarComponent implements OnInit {
     profile: faCaretDown,
   };
 
+  private userReq = this.tokenService.getUser();
+  headers = new HttpHeaders({
+    Authorization: `Bearer ${this.userReq.token}`,
+  });
+
   showInitials: boolean = true;
 
   constructor(
@@ -74,6 +82,7 @@ export class SideBarComponent implements OnInit {
     private eventSearch: EventSearchService,
     private authService: AuthService,
     private router: Router,
+    private profilesService: ProfilesService,
     private elementRef: ElementRef
   ) {}
 
@@ -97,6 +106,22 @@ export class SideBarComponent implements OnInit {
 
     this.eventSearch.on('logout', () => {
       this.logout();
+    });
+    console.log(this.user);
+    this.getProfilesData(this.user.id);
+  }
+
+  getProfilesData(data: string) {
+    this.profilesService.getProfiles(this.headers).subscribe({
+      next: (value: any) => {
+        value.map((profileData: any) => {
+          profileData.users.map((userData: any) => {
+            if (userData.id == data) {
+              this.profilesData.push(profileData);
+            }
+          });
+        });
+      },
     });
   }
 
