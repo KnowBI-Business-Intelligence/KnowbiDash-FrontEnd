@@ -18,18 +18,8 @@
         ariaCurrentWhenActive="page"
         [routerLinkActiveOptions]="{ exact: true }"
       >
-        <div (click)="toggleCollapsed()" class="container-icon-icon">
-          <div class="container-icon" *ngIf="!isExpanded">
-            <fa-icon
-              class="icon"
-              [icon]="icons.home"
-              [size]="'xl'"
-              title="Início"
-            ></fa-icon>
-          </div>
-        </div>
         <div (click)="toggleCollapsed()" class="container-icon-span">
-          <div class="container-text" *ngIf="isExpanded">
+          <div class="container-text">
             <fa-icon
               class="icon"
               [icon]="icons.home"
@@ -48,18 +38,8 @@
         ariaCurrentWhenActive="page"
         [routerLinkActiveOptions]="{ exact: true }"
       >
-        <div (click)="toggleCollapsed()" class="container-icon-icon">
-          <div class="container-icon" *ngIf="!isExpanded">
-            <fa-icon
-              class="icon"
-              title="Assistente"
-              [icon]="icons.assistant"
-              [size]="'xl'"
-            ></fa-icon>
-          </div>
-        </div>
         <div (click)="toggleCollapsed()" class="container-icon-span">
-          <div class="container-text" *ngIf="isExpanded">
+          <div class="container-text">
             <fa-icon
               class="icon"
               title="Assistente"
@@ -78,18 +58,8 @@
         ariaCurrentWhenActive="page"
         [routerLinkActiveOptions]="{ exact: true }"
       >
-        <div (click)="toggleCollapsed()" class="container-icon-icon">
-          <div class="container-icon" *ngIf="!isExpanded">
-            <fa-icon
-              class="icon"
-              title="Usuário"
-              [icon]="icons.user"
-              [size]="'xl'"
-            ></fa-icon>
-          </div>
-        </div>
         <div (click)="toggleCollapsed()" class="container-icon-span">
-          <div class="container-text" *ngIf="isExpanded">
+          <div class="container-text">
             <fa-icon
               class="icon"
               [icon]="icons.user"
@@ -136,7 +106,7 @@
           <button
             *ngIf="showPanelUser"
             mat-menu-item
-            [routerLink]="['default_user']"
+            [routerLink]="['settings']"
           >
             <span class="mat-menu-item"> Meu Cadastro </span>
           </button>

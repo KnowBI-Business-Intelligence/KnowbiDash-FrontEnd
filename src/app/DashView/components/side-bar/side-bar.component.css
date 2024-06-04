@@ -16,11 +16,11 @@
 }
 
 .mat-sidenav {
-  box-shadow: 6px 7px 10px -1px #e1e1e1bf;
   background-color: #220351;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  transition: 0.5s;
 }
 
 .container-icon-icon {
@@ -96,9 +96,6 @@
   background-color: transparent;
   height: 46px;
   background-color: #ffffff;
-  box-shadow: -1px 0px 5px 1px rgba(211, 211, 211, 0.51);
-  -webkit-box-shadow: -1px 0px 5px 1px rgba(211, 211, 211, 0.51);
-  -moz-box-shadow: -1px 0px 5px 1px rgba(211, 211, 211, 0.51);
 }
 
 .content-toolbar {
@@ -171,4 +168,9 @@
   min-height: 2.2rem !important;
   font-size: 0.8rem;
   color: #08051c;
+}
+
+.mdc-list-item {
+  padding-left: 8px;
+  padding-right: 16px;
 }

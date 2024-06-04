@@ -273,31 +273,3 @@
   <fa-icon class="icon" [icon]="icons.dash" [size]="'xl'"></fa-icon>
   <span>Dashboard: {{ groupName }}</span>
 </div>
-<div class="message">
-  <p-toast [life]="3500"></p-toast>
-</div>
-
-<div
-  class="modal-exclude"
-  *ngIf="showModal"
-  id="modalExclude"
-  [style.display]="showModal ? 'flex' : 'none'"
->
-  <div class="modal-exclude-content">
-    <span class="modal-exclude-close" (click)="closeModalExclude()"
-      >&times;</span
-    >
-    <div>
-      <h2>Tem certeza que deseja excluir este item?</h2>
-      <p>Esta ação não poderá ser desfeita</p>
-      <div class="modal-exclude-buttons">
-        <button class="modal-exclude-cancel" (click)="closeModalExclude()">
-          Cancelar
-        </button>
-        <button class="modal-exclude-exclude" (click)="excludeItem()">
-          <span>Excluir</span>
-        </button>
-      </div>
-    </div>
-  </div>
-</div>

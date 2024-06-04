@@ -1,3 +1,7 @@
+const globalUrlMainAPI = 'http://localhost:8080';
+const globalUrlBOT = 'http://localhost:8080';
+const globalUrlServerBot = 'http://localhost:8080';
+
 // Variáveis de serviço do bot
 export const API_CHAT = 'http://localhost:5005/webhooks/rest/webhook';
 

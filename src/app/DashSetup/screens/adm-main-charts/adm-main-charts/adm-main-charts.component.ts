@@ -82,9 +82,6 @@ import { LocalstorageService } from '../../../../core/services/local-storage/loc
 
 _moment.locale('pt-br');
 registerLocaleData(localePt);
-interface ExtendedOptions extends Highcharts.Options {
-  filters?: any;
-}
 
 @Component({
   selector: 'app-adm-main-charts',
@@ -123,7 +120,7 @@ interface ExtendedOptions extends Highcharts.Options {
     '../../../../core/globalStyle/toast.css',
   ],
 })
-export class AdmMainChartsComponent implements OnInit, OnDestroy {
+export class AdmMainChartsComponent implements OnInit {
   @ViewChildren(CdkMenuTrigger) menuTriggers!: QueryList<CdkMenuTrigger>;
   @ViewChild('chartContainer') chartContainer!: ElementRef;
   @ViewChild(KtdGridComponent, { static: true }) grid!: KtdGridComponent;
@@ -162,9 +159,6 @@ export class AdmMainChartsComponent implements OnInit, OnDestroy {
 
   isEditingIndex: number | null = null;
 
-  private layoutId: any;
-  private itemId: any;
-  private itemtype: any;
   chartConfig: { [key: string]: Highcharts.Options } = {};
   charts: { [key: string]: Highcharts.Chart } = {};
   currentView: any;
@@ -1149,100 +1143,6 @@ export class AdmMainChartsComponent implements OnInit, OnDestroy {
         console.log('erro ao atualizar card', err);
       },
     });
-  }
-
-  openModalEdit(layoutId: any, itemId: any, type: any) {
-    this.dataService.setData(itemId);
-    switch (type) {
-      case 'chart':
-        this.chartGroupService.setCurrentView('ChartComponent');
-        break;
-      case 'table':
-        this.chartGroupService.setCurrentView('TableComponent');
-        break;
-      case 'card':
-        this.chartGroupService.setCurrentView('CardsComponent');
-        break;
-      default:
-        break;
-    }
-  }
-
-  openModalExclude(layoutId: any, itemId: any, type: any): void {
-    this.menuTriggers.forEach((trigger) => trigger.close());
-    this.showModal = true;
-    this.layoutId = layoutId;
-    this.itemId = itemId;
-    this.itemtype = type;
-  }
-
-  closeModalExclude(): void {
-    this.showModal = false;
-  }
-
-  excludeItem() {
-    switch (this.itemtype) {
-      case 'card':
-        this.chartsService.deleteCards(this.headers, this.itemId).subscribe({
-          next: (value) => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Sucesso',
-              detail: 'Card Excluído',
-            });
-            this.removeItem(this.layoutId);
-          },
-          error: (err) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Erro',
-              detail: 'Não foi possível concluir esta ação',
-            });
-          },
-        });
-        break;
-      case 'chart':
-        this.chartsService.deleteCharts(this.headers, this.itemId).subscribe({
-          next: (value) => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Sucesso',
-              detail: 'Gráfico Excluído',
-            });
-            this.removeItem(this.layoutId);
-          },
-          error: (err) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Erro',
-              detail: 'Não foi possível concluir esta ação',
-            });
-          },
-        });
-        break;
-      case 'table':
-        this.chartsService.deleteTables(this.headers, this.itemId).subscribe({
-          next: (value) => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Sucesso',
-              detail: 'Tabela Excluída',
-            });
-            this.removeItem(this.layoutId);
-          },
-          error: (err) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Erro',
-              detail: 'Não foi possível concluir esta ação',
-            });
-          },
-        });
-        break;
-      default:
-        break;
-    }
-    this.closeModalExclude();
   }
 
   formatterResultWhenDecimal(result: number): string {

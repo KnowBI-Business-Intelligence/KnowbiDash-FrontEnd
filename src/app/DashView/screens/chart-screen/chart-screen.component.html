@@ -1,144 +1,247 @@
 <div class="container-nav-line">
   <span>Início > Dashboards > {{ groupName }}</span>
-  <button (click)="backScreen()">
+  <button (click)="backScreenDash()">
     <span> x </span>
   </button>
 </div>
-<div class="container">
-  <div class="filter">
-    <div class="filter-button">
-      <div class="filter-group-buttons">
-        <button (click)="openModal()">
-          <fa-icon
-            class="iconSearch"
-            [icon]="icons.arrowLeft"
-            [size]="'xl'"
-          ></fa-icon>
-        </button>
-        <button (click)="openModal()">
-          <fa-icon
-            class="iconOpenFilter"
-            [icon]="icons.filter"
-            [size]="'xl'"
-          ></fa-icon>
-          <span>Filtros</span>
-        </button>
+<div class="container-estructure">
+  <span> Dashboards </span>
+  <div>
+    <button (click)="backScreenDash()">
+      <fa-icon class="iconview" [icon]="icons.backDash" [size]="'xl'"></fa-icon
+      >Voltar
+    </button>
+  </div>
+</div>
+<div class="container-save-disposition">
+  <span> Ações </span>
+  <div>
+    <button (click)="updateCombinedLayout()">
+      <fa-icon class="iconview" [icon]="icons.back" [size]="'xl'"></fa-icon
+      >Reordenar
+    </button>
+  </div>
+</div>
+<div class="container-data">
+  <span> Dados </span>
+  <div>
+    <button (click)="openModal()">
+      <fa-icon class="iconview" [icon]="icons.filter" [size]="'xl'"></fa-icon
+      >Filtros
+    </button>
+  </div>
+</div>
+<div class="filter">
+  <div class="filter-button">
+    <button (click)="openModal()">
+      <p>Filtro</p>
+      <span class="material-symbols-outlined filter-icon"> filter_alt </span>
+    </button>
+  </div>
+  <div class="filter-container">
+    <div class="filter-filters" *ngFor="let filter of filters">
+      <div class="filter-filters-data">
+        <h3>{{ filter.identifiers }}</h3>
+        <span [title]="filter.values">{{ filter.values }}</span>
       </div>
     </div>
-    <!--<div class="filter-container">
-      <div class="filter-filters" *ngFor="let filter of filters">
-        <div class="filter-filters-data">
-          <h3>{{ filter.identifiers }}</h3>
-          <span [title]="filter.values">{{ filter.values }}</span>
-        </div>
-      </div>
-    </div>-->
   </div>
-
-  <div class="main-content">
-    <div class="bound-box" #myBounds>
-      <div class="container-charts">
-        <div class="left">
-          <div
-            *ngFor="let chartConfig of chartGroupsData"
-            class="chart-container"
-            ngResizable
-            ngDraggable
-            rzHandles="all"
-            [rzMinWidth]="350"
-            [rzMinHeight]="250"
-            (mouseup)="newPosition($event); resizeChart()"
-          >
-            <highcharts-chart
-              style="width: 100%; height: 100%"
-              [Highcharts]="Highcharts"
-              [options]="chartConfig"
-            ></highcharts-chart>
-          </div>
-          <div
-            *ngFor="let cardData of cardGroupsData"
-            class="card"
-            ngResizable
-            ngDraggable
-            rzHandles="all"
-            [rzMinWidth]="200"
-            [rzMinHeight]="83"
-            (mouseup)="newPosition($event); resizeChart()"
-          >
-            <div class="card-header">
-              {{ cardData.title }}
-            </div>
-            <div class="card-body">
-              <p>{{ cardData.content }}</p>
-            </div>
-          </div>
+</div>
+<div class="main-container">
+  <div class="playground-container">
+    <div class="grid-container" #gridContainer>
+      <ktd-grid
+        [cols]="cols"
+        [rowHeight]="rowHeight"
+        [layout]="layout"
+        [gap]="6"
+        [compactType]="compactType"
+        [preventCollision]="preventCollision"
+        [scrollableParent]="gridContainer"
+        scrollSpeed="2"
+        (dragStarted)="onDragStarted($event)"
+        (resizeStarted)="onResizeStarted($event)"
+        (dragEnded)="onDragEnded($event)"
+        (resizeEnded)="onResizeEnded($event)"
+        (layoutUpdated)="onLayoutUpdated($event)"
+      >
+        <ktd-grid-item
+          *ngFor="let item of layout; trackBy: trackById"
+          [id]="item.id"
+          [transition]="currentTransition"
+          [dragStartThreshold]="dragStartThreshold"
+          [draggable]="!disableDrag"
+          [resizable]="!disableResize"
+        >
           <section
-            *ngFor="let tableGroup of tableGroupsData"
-            class="table-container mat-elevation-z8"
-            tabindex="0"
-            ngResizable
-            ngDraggable
-            rzHandles="all"
-            [rzMinWidth]="350"
-            [rzMinHeight]="250"
-            (mouseup)="newPosition($event); resizeChart()"
+            *ngIf="item.type == 'card'"
+            style="width: 100%; height: 100%"
+            class="menu-container"
           >
-            <h2>{{ tableGroup.title }}</h2>
-            <section class="table-container-overflow">
-              <table mat-table [dataSource]="tableGroup.rows" matSort>
-                <ng-container
-                  *ngFor="let column of tableGroup.columns"
-                  [matColumnDef]="column"
-                >
-                  <th mat-header-cell *matHeaderCellDef mat-sort-header>
-                    {{ column }}
-                  </th>
-                  <td mat-cell *matCellDef="let row">{{ row[column] }}</td>
-                </ng-container>
-                <tr
-                  mat-header-row
-                  *matHeaderRowDef="tableGroup.columns; sticky: true"
-                ></tr>
-                <tr
-                  mat-header-row
-                  *matRowDef="let row; columns: tableGroup.columns"
-                ></tr>
-              </table>
-            </section>
+            <div class="card">
+              <div class="card-header">
+                {{ item.title }}
+              </div>
+              <div class="card-body">
+                <p>{{ item.content }}</p>
+              </div>
+            </div>
           </section>
-        </div>
-      </div>
+          <section
+            *ngIf="item.type == 'table'"
+            class="table-container mat-elevation-z8 menu-container"
+            tabindex="0"
+          >
+            <h2>{{ item.title }}</h2>
+            <div style="overflow: auto">
+              <p-table
+                matSort
+                class="mat-elevation-z8 demo-table"
+                selectionMode="single"
+                [value]="item.showTableData"
+                (matSortChange)="announceSortChange($event)"
+                [resizableColumns]="true"
+                [scrollable]="true"
+                scrollHeight="100%"
+                [tableStyle]="{ 'min-width': '20rem' }"
+                scrollHeight="300px"
+                styleClass="p-datatable-gridlines"
+                [globalFilterFields]="item.showTableColumns"
+              >
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th
+                      *ngFor="let column of item.showTableColumns"
+                      pResizableColumn
+                      [pSortableColumn]="column.field"
+                      style="min-width: 12rem"
+                    >
+                      <div class="flex align-items-center">
+                        {{ column.header }}
+                      </div>
+                    </th>
+                  </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-rowData>
+                  <tr
+                    #tr
+                    pSelectableRow="rowData"
+                    pContextMenuRow="rowData"
+                    [pSelectableRow]="rowData"
+                  >
+                    <td *ngFor="let column of item.showTableColumns">
+                      {{ rowData[column.field] }}
+                    </td>
+                  </tr>
+                </ng-template>
+
+                <ng-template pTemplate="emptymessage">
+                  <tr>
+                    <td colspan="7">Sem registros encontrados</td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </div>
+          </section>
+          <div
+            *ngIf="item.type == 'chart'"
+            class="chart-container menu-container"
+          >
+            <section *ngFor="let itemchart of chartGroupsData">
+              <highcharts-chart
+                *ngIf="item.itemId === itemchart.id"
+                [Highcharts]="Highcharts"
+                [options]="itemchart.data"
+                style="
+                  width: 100%;
+                  height: 100%;
+                  display: block;
+                  position: absolute;
+                "
+                [update]="true"
+              ></highcharts-chart>
+            </section>
+          </div>
+        </ktd-grid-item>
+      </ktd-grid>
     </div>
   </div>
-
-  <div
-    class="modal"
-    *ngIf="showModal"
-    id="modal"
-    [style.display]="showModal ? 'flex' : 'none'"
-    ngDraggable
-    rzHandles="all"
-  >
+  <div class="modal" id="modal">
     <div class="modal-content">
       <div class="modal-header">
         <h2>Filtros</h2>
-        <span class="close" (click)="closeModal()"
+        <span class="close" (click)="showFilters()"
           ><span class="material-symbols-outlined close-icon">
             close
           </span></span
         >
       </div>
       <div class="modal-body">
-        <div class="modal-fields" *ngFor="let filter of filters">
-          <label for="filter.column">{{ filter.identifiers }}</label>
+        <div class="modal-fields" *ngFor="let filter of filters; let i = index">
+          <div>
+            <label
+              class="filter-label"
+              *ngIf="isEditingIndex !== i"
+              [attr.for]="filter.identifiers"
+              >{{ filter.identifiers[0] || "editar" }}</label
+            >
+          </div>
           <div class="dropdown">
-            <button class="dropbtn">
-              {{ selectedFilters[filter.column] || "Todos" }}
-            </button>
-            <div class="dropdown-content">
+            <ng-container *ngIf="filter.type == 'numeric'">
+              <div class="custom-slider">
+                <ngx-slider
+                  [(value)]="filter.values[0]"
+                  [(highValue)]="filter.values[1]"
+                  [options]="options"
+                ></ngx-slider>
+              </div>
+            </ng-container>
+
+            <ng-container *ngIf="filter.type == 'timestamp'">
+              <div class="dropdown-date">
+                <mat-date-range-input [rangePicker]="picker">
+                  <input
+                    matStartDate
+                    [placeholder]="filter.values[0]"
+                    [(ngModel)]="filter.values[0]"
+                    (dateChange)="updateDate('startDate', filter, $event.value)"
+                  />
+                  <input
+                    matEndDate
+                    [placeholder]="
+                      filter.values[1] != undefined
+                        ? filter.values[1]
+                        : filter.values[0]
+                    "
+                    [(ngModel)]="filter.values[1]"
+                    (dateChange)="updateDate('endDate', filter, $event.value)"
+                  />
+                </mat-date-range-input>
+                <mat-datepicker-toggle
+                  matIconSuffix
+                  [for]="picker"
+                ></mat-datepicker-toggle>
+                <mat-date-range-picker #picker></mat-date-range-picker>
+                <mat-date-range-picker #picker></mat-date-range-picker>
+              </div>
+            </ng-container>
+
+            <ng-container
+              *ngIf="filter.type != 'timestamp' && filter.type != 'numeric'"
+            >
+              <button class="dropbtn" (click)="showContentFilter(i)">
+                {{
+                  selectedFilters[filter.column] ||
+                    allfilters(filter.values, filter.allfilters)
+                }}
+              </button>
+            </ng-container>
+            <div class="dropdown-content" *ngIf="showContentFilterSwitch[i]">
               <div class="dropdown-cl" *ngFor="let value of filter.allfilters">
                 <div>
                   <input
+                    class="checkbox"
                     type="checkbox"
                     [checked]="isChecked(filter.column, value)"
                     (change)="onCheckboxChange(filter.column, value)"
@@ -154,7 +257,7 @@
       </div>
       <div>
         <div class="modal-buttons">
-          <button class="exclude">
+          <button class="exclude" (click)="executeFilter()">
             <span *ngIf="!isLoginLoading">Filtrar</span>
             <span *ngIf="isLoginLoading"
               ><div class="login-spinner"></div
@@ -164,4 +267,8 @@
       </div>
     </div>
   </div>
+</div>
+<div class="groupname">
+  <fa-icon class="icon" [icon]="icons.dash" [size]="'xl'"></fa-icon>
+  <span>Dashboard: {{ groupName }}</span>
 </div>

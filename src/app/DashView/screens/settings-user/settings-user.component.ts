@@ -167,7 +167,7 @@ export class SettingsUserComponent implements OnInit {
           return 'Moderador';
 
         default:
-          return 'Comun';
+          return 'Usuário';
       }
     } catch (error) {
       switch (roles) {
@@ -178,7 +178,7 @@ export class SettingsUserComponent implements OnInit {
           return 'Moderador';
 
         default:
-          return 'Comun';
+          return 'Usuário';
       }
     }
   }
@@ -200,63 +200,6 @@ export class SettingsUserComponent implements OnInit {
     }
   }
 
-  // onSubmit() {
-  //   const user = this.getUser();
-
-  //   if (!user || !user.token) {
-  //     console.error('Token não disponível');
-  //     return;
-  //   }
-
-  //   const headers = new HttpHeaders({
-  //     Authorization: `Bearer ${user.token}`,
-  //   });
-
-  //   const {
-  //     fullusername,
-  //     username,
-  //     password,
-  //     email,
-  //     occupation,
-  //     access_level,
-  //     profile,
-  //   } = this.form;
-
-  //   this.authService
-  //     .edit(
-  //       this.infoUsersStorage?.id,
-  //       !username ? this.infoUsersStorage?.userName : username,
-  //       !occupation ? this.infoUsersData?.cargo : occupation,
-  //       !email ? this.infoUsersStorage?.email : email,
-  //       !fullusername ? this.infoUsersStorage?.fullUserName : fullusername,
-  //       !password ? this.infoUsersStorage?.password : password,
-  //       !access_level
-  //         ? this.getRolesUp(this.infoUsersStorage?.roles?.[0])
-  //         : access_level.id,
-  //       profile,
-  //       headers
-  //     )
-  //     .subscribe({
-  //       next: (data) => {
-  //         this.messageService.add({
-  //           severity: 'success',
-  //           summary: 'Sucesso',
-  //           detail: 'Usuário Atualizado!',
-  //         });
-  //         this.onEditCancel();
-  //       },
-  //       error: (err) => {
-  //         this.messageService.add({
-  //           severity: 'error',
-  //           summary: 'Erro',
-  //           detail:
-  //             'Ocorreu um erro durante a atualização. Verifique os campos',
-  //         });
-  //         throw err;
-  //       },
-  //     });
-  // }
-
   removeProfile(profile: any) {
     const index = this.profiles.indexOf(profile);
 
@@ -266,6 +209,7 @@ export class SettingsUserComponent implements OnInit {
       this.announcer.announce(`Removed ${profile}`);
     }
   }
+
   private _filter(value: string): string[] {
     const filterValue = value.toLowerCase();
 
