@@ -307,9 +307,11 @@
     </div>
     <div *ngIf="!showPreviewButton" class="chart-container">
       <highcharts-chart
-        style="width: 100%; height: 25rem; margin: 5px"
+        *ngFor="let key of chartKeys()"
         [Highcharts]="Highcharts"
-        [options]="chartConfig"
+        [options]="chartConfig[key]"
+        style="width: 100%; height: 25rem; margin: 5px"
+        [update]="true"
       ></highcharts-chart>
     </div>
     <div class="chart-container-buttons">

@@ -125,7 +125,8 @@ export class ChartComponent implements OnInit {
   yaxisIdentifiers: { [key: string]: string } = {};
   Highcharts: typeof Highcharts = Highcharts;
   chart!: Highcharts.Chart;
-  chartConfig!: Highcharts.Options;
+  chartConfig: { [key: string]: Highcharts.Options } = {};
+  charts: { [key: string]: Highcharts.Chart } = {};
   group: any;
 
   chartButtons = chartButtonsData;
@@ -359,45 +360,51 @@ export class ChartComponent implements OnInit {
     }
 
     for (let i = 0; i < this.xaxis.length; i++) {
+      console.log(this.xaxis);
       const xAxisItem = this.xaxis[i].value;
       const xAxisidentifiers = this.rmTimeStamp(this.xaxis[i].name);
       this.buildData.push({ name: xAxisItem, identifiers: xAxisidentifiers });
     }
 
     for (let i = 0; i < this.series.length; i++) {
+      console.log(this.series);
       const seriesItem = this.series[i].value;
       const seriesidentifiers = this.rmTimeStamp(this.series[i].name);
       this.buildData.push({ name: seriesItem, identifiers: seriesidentifiers });
     }
 
-    if (this.itemId == undefined) {
-      this.sql = 'SELECT ';
-      if (this.buildData.length > 0) {
-        const selectClauses = this.buildData.map((item) => {
-          return `${item.name} AS ${item.identifiers}`;
-        });
-        this.sql += selectClauses.join(', ');
-      }
+    this.sql = 'SELECT ';
+    if (this.buildData.length > 0) {
+      const selectClauses = this.buildData.map((item) => {
+        return `${item.name} AS ${item.identifiers}`;
+      });
+      this.sql += selectClauses.join(', ');
+    }
 
-      if (this.buildData.length > 0) {
-        this.sql += ` FROM ${this.tableName}`;
-      }
+    if (this.buildData.length > 0) {
+      this.sql += ` FROM ${this.tableName}`;
     }
   }
 
   dataRepo() {
-    this.xAxisValues = this.xaxis.map((axis) => {
-      if (this.isTimestampField(axis.name)) {
-        return this.formatTimestampField(axis.name);
-      }
-      return this.rmTimeStamp(axis.name);
-    });
-
     this.seriesValues = this.series.map((series) =>
       this.rmTimeStamp(series.value)
     );
 
-    this.groupData = [...this.xAxisValues, ...this.seriesValues];
+    if (this.chartType != 'pie') {
+      console.log(this.chartType);
+      this.xAxisValues = this.xaxis.map((axis) => {
+        if (this.isTimestampField(axis.name)) {
+          return this.formatTimestampField(axis.name);
+        }
+        return this.rmTimeStamp(axis.name);
+      });
+
+      this.groupData = [...this.xAxisValues, ...this.seriesValues];
+    } else {
+      this.xAxisValues = [];
+      this.groupData = [...this.seriesValues];
+    }
 
     this.yAxisColumns = this.yaxis.map((axis) => {
       return {
@@ -497,6 +504,7 @@ export class ChartComponent implements OnInit {
   createChart(chartData: any) {
     this.chartsService.createCharts(this.headers, chartData).subscribe({
       next: (data) => {
+        console.log(data);
         this.messageService.add({
           severity: 'success',
           summary: 'Sucesso',
@@ -538,8 +546,8 @@ export class ChartComponent implements OnInit {
         id: this.dashBoard.id,
       },
     };
-
-    console.log(chartData);
+    this.chartConfig = {};
+    console.log(JSON.stringify(chartData, null, 2));
 
     if (this.chartId == null) {
       this.chartId = this.itemId;
@@ -551,12 +559,12 @@ export class ChartComponent implements OnInit {
       .updateCharts(this.headers, chartData, this.chartId)
       .subscribe({
         next: (data) => {
+          console.log(data);
           this.messageService.add({
             severity: 'success',
             summary: 'Sucesso',
             detail: 'Informações do gráfico atualizadas',
           });
-          this.chartConfig = {};
           this.chartPreView(data);
         },
         error: (err) => {
@@ -587,6 +595,7 @@ export class ChartComponent implements OnInit {
 
   chartPreView(data: any) {
     console.log(data);
+
     const categories: string[] =
       data.xAxisColumns.length > 0
         ? Array.from(new Set(data.xAxisColumns[0].data))
@@ -595,7 +604,7 @@ export class ChartComponent implements OnInit {
 
     let highchartsSeries: Highcharts.SeriesColumnOptions[] = [];
 
-    if (data.series.length == 0) {
+    if (data.series.length === 0) {
       highchartsSeries = [
         {
           type: data.graphType,
@@ -633,7 +642,7 @@ export class ChartComponent implements OnInit {
               y: y,
             })
           );
-          if (data.graphType == 'pie') {
+          if (data.graphType === 'pie') {
             highchartsSeries.push({
               type: data.graphType,
               name: data.series[0].name,
@@ -645,55 +654,64 @@ export class ChartComponent implements OnInit {
               type: data.graphType,
               name: seriesCategory,
               data: dataset,
+              dataLabels: {
+                enabled: true,
+                style: {
+                  fontSize: '10px',
+                  fontWeight: '400',
+                },
+              },
             });
           }
         }
       }
     }
 
-    if (this.chartConfig && Highcharts.charts[0]) {
-      const chart = Highcharts.charts[0];
+    if (!this.charts) {
+      this.charts = {};
+    }
 
-      if (chart) {
-        while (chart.series.length > 0) {
-          chart.series[0].remove(false);
-        }
-        highchartsSeries.forEach((series) => {
-          chart.addSeries(series, false);
-        });
-        chart.xAxis[0].setCategories(categories, false);
-        chart.update(
-          {
-            title: {
-              text: data.title,
-            },
-            chart: {
-              type: data.graphType,
-            },
-            xAxis:
-              data.graphType === 'pie'
-                ? undefined
-                : {
-                    title: {
-                      text: data.xAxisColumns[0].name[0],
-                    },
-                  },
-            yAxis:
-              data.graphType === 'pie'
-                ? undefined
-                : {
-                    title: {
-                      text: data.yAxisColumns[0].name[0],
-                    },
-                  },
-            series: highchartsSeries,
-          },
-          false
-        );
-        chart.redraw();
+    if (this.charts[data.id]) {
+      const chart = this.charts[data.id];
+      console.log(this.charts);
+      while (chart.series.length > 0) {
+        chart.series[0].remove(true);
       }
+      highchartsSeries.forEach((series) => {
+        chart.addSeries(series, false);
+      });
+      chart.xAxis[0].setCategories(categories, false);
+      chart.update(
+        {
+          title: {
+            text: data.title,
+          },
+          chart: {
+            type: data.graphType,
+          },
+          xAxis:
+            data.graphType === 'pie'
+              ? undefined
+              : {
+                  title: {
+                    text: data.xAxisColumns[0].name[0],
+                  },
+                },
+          yAxis:
+            data.graphType === 'pie'
+              ? undefined
+              : {
+                  title: {
+                    text: data.yAxisColumns[0].name[0],
+                  },
+                },
+          series: highchartsSeries,
+        },
+        true
+      );
+      chart.redraw();
     } else {
-      this.chartConfig = {
+      this.chartConfig[data.id] = {
         chart: {
           type: data.graphType,
         },
@@ -747,6 +765,57 @@ export class ChartComponent implements OnInit {
           column: {
             pointPadding: 0.2,
             borderWidth: 0,
+            dataLabels: {
+              enabled: true,
+              style: {
+                fontSize: '10px',
+                fontWeight: '400',
+              },
+            },
+          },
+          bar: {
+            dataLabels: {
+              enabled: true,
+              style: {
+                fontSize: '10px',
+                fontWeight: '400',
+              },
+            },
+            groupPadding: 0.1,
+          },
+          pie: {
+            dataLabels: {
+              enabled: true,
+              format: '<b">{point.name}</b><br>{point.percentage:.1f} %',
+              distance: -50,
+              filter: {
+                property: 'percentage',
+                operator: '>',
+                value: 4,
+              },
+              style: {
+                fontSize: '12px',
+                fontWeight: '400',
+              },
+            },
+          },
+          area: {
+            dataLabels: {
+              enabled: true,
+              style: {
+                fontSize: '10px',
+                fontWeight: '400',
+              },
+            },
+          },
+          line: {
+            dataLabels: {
+              enabled: true,
+              style: {
+                fontSize: '10px',
+                fontWeight: '400',
+              },
+            },
           },
           series: {
             cursor: 'pointer',
@@ -768,7 +837,11 @@ export class ChartComponent implements OnInit {
         },
       };
     }
-    console.log(this.chartConfig);
+    console.log(this.charts[data.id]);
+  }
+
+  chartKeys() {
+    return Object.keys(this.chartConfig);
   }
 
   selectChartButton(label: string, value: string) {
@@ -834,14 +907,14 @@ export class ChartComponent implements OnInit {
         name: axis.agregator[0],
         identifiers: axis.name[0],
         value: axis.column[0],
-        type: axis.type[0],
+        type: this.returnValueEdit(axis),
       };
     });
     const xaxis = value.xAxisColumns.map((axis: any) => {
       return {
         name: axis.agregator[0],
         identifiers: axis.name[0],
-        value: axis.column[0],
+        value: this.returnValueEdit(axis),
         type: axis.type[0],
       };
     });
@@ -850,11 +923,11 @@ export class ChartComponent implements OnInit {
         name: axis.agregator[0],
         identifiers: axis.name[0],
         value: axis.column[0],
-        type: axis.type[0],
+        type: this.returnValueEdit(axis),
       };
     });
-    console.log(columnFilterNames);
-    console.log(value);
+    console.log(series);
+    console.log(xaxis);
     const id = value.id;
     this.titulo = value.title;
     this.chartType = value.graphType;
@@ -866,7 +939,30 @@ export class ChartComponent implements OnInit {
     this.series = series;
     this.filters = columnFilterNames;
 
+    if (value.graphType == 'pie') {
+      this.xaxisShow = false;
+    }
+
     this.loadinitialEditChart(id);
+  }
+
+  returnValueEdit(data: any) {
+    const agregator = data.agregator[0].trim();
+    if (data.type[0] === 'timestamp') {
+      if (agregator.includes('(dia)')) {
+        return `DATE_TRUNC('day', ${this.rmTimeStamp(data.column[0])})`;
+      } else if (agregator.includes('(mês)')) {
+        return `mes_por_extenso(DATE_TRUNC('month', ${this.rmTimeStamp(
+          data.column[0]
+        )}))`;
+      } else if (agregator.includes('(ano)')) {
+        return `ano_por_extenso(DATE_TRUNC('year', ${this.rmTimeStamp(
+          data.column[0]
+        )}))`;
+      }
+    }
+
+    return data.column[0];
   }
 
   loadinitialEditChart(id: any) {

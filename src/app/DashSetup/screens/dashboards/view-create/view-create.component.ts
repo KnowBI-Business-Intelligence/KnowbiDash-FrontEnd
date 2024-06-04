@@ -162,7 +162,8 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   private layoutId: any;
   private itemId: any;
   private itemtype: any;
-  chartConfig: any;
+  chartConfig: { [key: string]: Highcharts.Options } = {};
+  charts: { [key: string]: Highcharts.Chart } = {};
   currentView: any;
   groupInfo: any;
 
@@ -269,7 +270,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   startDashboarData() {
     this.encryptedDataSubscription =
       this.chartGroupService.encryptedData$.subscribe((encryptedData) => {
-        console.log(encryptedData);
         this.groupInfo = encryptedData;
         this.getCharts(encryptedData.id);
         this.getCards(encryptedData.id);
@@ -307,7 +307,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     this.filters = [];
     this.cardGroupsData = [];
     cardData.forEach((card: any) => {
-      console.log(card.filters);
       if (card.chartGroup.id == groupId) {
         this.copyDataCardJSON.push(card);
         this.cardFilters.push(card.filters);
@@ -387,110 +386,249 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   }
 
   loadData(chartData: ChartData[], groupId: any) {
+    console.log(chartData);
     this.copydataJSON = [];
     this.filters = [];
     this.chartGroupsData = [];
+
     chartData.forEach((chart: any) => {
       this.copyDataCardJSON.push(chart);
       this.chartFilters.push(chart.filters);
     });
 
-    chartData.forEach((dataItem: any) => {
-      if (dataItem.chartGroup.id === groupId) {
-        this.copydataJSON.push(dataItem);
-        const uniqueCategories: any = Array.from(
-          new Set(dataItem.xAxisColumns[0].data)
-        );
-
-        const uniqueSubgroups = Array.from(new Set(dataItem.series[0].data));
-
-        const seriesData = uniqueSubgroups.map((subgrupo: any) => {
-          const seriesValues: { name: string; y: any }[] = [];
-          dataItem.xAxisColumns[0].data.forEach((date: string, i: number) => {
-            if (dataItem.series[0].data[i] === subgrupo) {
-              seriesValues.push({
-                name: date,
-                y: dataItem.yAxisColumns[0].data[i],
-              });
-            }
-          });
-          return {
-            type: dataItem.graphType,
-            name: subgrupo,
-            height: '20%',
-            data: seriesValues,
-          };
-        });
-        const chartConfig: ExtendedOptions = {
-          chart: {
-            type: dataItem.graphType,
-          },
-          title: {
-            text: dataItem.title,
-            style: {
-              fontSize: '13px',
-              fontWeight: '450',
-            },
-          },
-          xAxis: {
-            categories: uniqueCategories,
-            title: {
-              text: dataItem.xAxisColumns[0].name[0],
-            },
-            labels: {
-              style: {
-                fontSize: '10px',
-              },
-            },
-          },
-          yAxis: {
-            title: {
-              text: dataItem.yAxisColumns[0].name[0],
-            },
-            labels: {
-              style: {
-                fontSize: '10px',
-              },
-            },
-          },
-          series: seriesData,
-          tooltip: {
-            shared: true,
-          },
-          legend: {
-            maxHeight: 65,
-            itemStyle: {
-              fontSize: '10px',
-            },
-          },
-          plotOptions: {
-            series: {
-              cursor: 'pointer',
-              point: {
-                events: {
-                  click: function () {
-                    console.log('Coluna clicada:', this.category, this.y);
-                  },
-                },
-              },
-            },
-          },
-          filters: dataItem.filters,
-        };
-
-        const chartDataFinal = {
-          id: dataItem.id,
-          data: chartConfig,
-          type: 'chart',
-          chartgroup: dataItem.chartGroup,
-          workspace: dataItem.workspace,
-          filters: dataItem.filters,
-        };
-
-        this.chartGroupsData.push(chartDataFinal);
+    chartData.forEach((data: any) => {
+      if (data.chartGroup.id === groupId) {
+        this.copydataJSON.push(data);
+        this.updateChartData(data);
       }
     });
     this.updateCombinedLayout();
+  }
+
+  updateChartData(data: any) {
+    const categories: string[] =
+      data.xAxisColumns.length > 0
+        ? Array.from(new Set(data.xAxisColumns[0].data))
+        : [];
+    const yAxisData: number[] = data.yAxisColumns[0].data;
+
+    let highchartsSeries: Highcharts.SeriesColumnOptions[] = [];
+
+    if (data.series.length === 0) {
+      highchartsSeries = [
+        {
+          type: data.graphType,
+          name: 'Dados',
+          data: yAxisData,
+        },
+      ];
+    } else {
+      const seriesCategories: string[] = data.series[0].data;
+      const seriesData: { [key: string]: { [category: string]: number } } = {};
+
+      for (let i = 0; i < seriesCategories.length; i++) {
+        const seriesCategory = seriesCategories[i];
+        const category =
+          data.xAxisColumns.length > 0 ? data.xAxisColumns[0].data[i] : [];
+        const value = yAxisData[i];
+
+        if (!seriesData[seriesCategory]) {
+          seriesData[seriesCategory] = {};
+        }
+        if (!seriesData[seriesCategory][category]) {
+          seriesData[seriesCategory][category] = 0;
+        }
+        seriesData[seriesCategory][category] += value;
+      }
+
+      for (const seriesCategory in seriesData) {
+        if (seriesData.hasOwnProperty(seriesCategory)) {
+          const dataset: number[] = categories.map(
+            (category) => seriesData[seriesCategory][category] || 0
+          );
+          const pieData = data.yAxisColumns[0].data.map(
+            (y: number, index: number) => ({
+              name: data.series[0].data[index],
+              y: y,
+            })
+          );
+          if (data.graphType === 'pie') {
+            highchartsSeries.push({
+              type: data.graphType,
+              name: data.series[0].name,
+              colorByPoint: true,
+              data: pieData,
+            });
+          } else {
+            highchartsSeries.push({
+              type: data.graphType,
+              name: seriesCategory,
+              data: dataset,
+            });
+          }
+        }
+      }
+    }
+
+    if (!this.charts) {
+      this.charts = {};
+    }
+
+    const chartOptions: Highcharts.Options = {
+      chart: {
+        type: data.graphType,
+      },
+      title: {
+        text: data.title,
+        align: 'center',
+        style: {
+          fontSize: '13px',
+          fontWeight: '450',
+        },
+      },
+      xAxis:
+        data.graphType === 'pie'
+          ? undefined
+          : {
+              categories: categories,
+              crosshair: true,
+              accessibility: {
+                description: 'Categories',
+              },
+              title: {
+                text: data.xAxisColumns[0].name[0],
+                style: {
+                  fontSize: '11px',
+                },
+              },
+              labels: {
+                style: {
+                  fontSize: '10px',
+                },
+              },
+            },
+      yAxis:
+        data.graphType === 'pie'
+          ? undefined
+          : {
+              min: 0,
+              title: {
+                text: data.yAxisColumns[0].name[0],
+                style: {
+                  fontSize: '11px',
+                },
+              },
+              labels: {
+                style: {
+                  fontSize: '10px',
+                },
+              },
+            },
+      plotOptions: {
+        column: {
+          pointPadding: 0.2,
+          borderWidth: 0,
+          dataLabels: {
+            enabled: true,
+            style: {
+              fontSize: '10px',
+              fontWeight: '400',
+            },
+          },
+        },
+        bar: {
+          dataLabels: {
+            enabled: true,
+            style: {
+              fontSize: '10px',
+              fontWeight: '400',
+            },
+          },
+          groupPadding: 0.1,
+        },
+        pie: {
+          allowPointSelect: true,
+          cursor: 'pointer',
+          borderRadius: 5,
+          dataLabels: {
+            enabled: true,
+            format: '<b">{point.name}</b><br>{point.percentage:.1f} %',
+            distance: -50,
+            filter: {
+              property: 'percentage',
+              operator: '>',
+              value: 4,
+            },
+            style: {
+              fontSize: '12px',
+              fontWeight: '400',
+            },
+          },
+        },
+        area: {
+          dataLabels: {
+            enabled: true,
+            style: {
+              fontSize: '10px',
+              fontWeight: '400',
+            },
+          },
+        },
+        line: {
+          dataLabels: {
+            enabled: true,
+            style: {
+              fontSize: '10px',
+              fontWeight: '400',
+            },
+          },
+        },
+        series: {
+          cursor: 'pointer',
+          point: {
+            events: {
+              click: function () {
+                //console.log('Coluna clicada:', this.category, this.y);
+              },
+            },
+          },
+        },
+      },
+      series: highchartsSeries,
+      legend: {
+        maxHeight: 65,
+        itemStyle: {
+          fontSize: '10px',
+        },
+      },
+    };
+
+    if (this.charts[data.id]) {
+      const chart = this.charts[data.id];
+      while (chart.series.length > 0) {
+        chart.series[0].remove(false);
+      }
+      highchartsSeries.forEach((series) => {
+        chart.addSeries(series, false);
+      });
+      chart.xAxis[0].setCategories(categories, false);
+      chart.update(chartOptions, false);
+      chart.redraw();
+    } else {
+      this.chartConfig[data.id] = chartOptions;
+    }
+
+    const chartDataFinal = {
+      id: data.id,
+      data: this.chartConfig[data.id],
+      type: 'chart',
+      chartgroup: data.chartGroup,
+      workspace: data.workspace,
+      filters: data.filters,
+    };
+
+    this.chartGroupsData.push(chartDataFinal);
+    console.log(this.chartGroupsData);
   }
 
   public updateCombinedLayout() {
@@ -698,7 +836,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     this.filters.forEach((filter: any) => {
       filter.values = filterValuesByColumn[filter.column];
     });
-    console.log(this.filters);
   }
 
   showFilters() {
@@ -874,7 +1011,9 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
         data.xAxisColumns,
         data.yAxisColumns,
         data.series,
-        data.filters
+        data.filters,
+        data.group,
+        data.order
       );
     });
   }
@@ -897,7 +1036,9 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     xAxisColumns: any[],
     yAxisColumns: any[],
     series: any[],
-    filters: any[]
+    filters: any[],
+    group: string[],
+    order: string[]
   ) {
     const formattedXAxisColumns = xAxisColumns.map((column) => ({
       name: column.column,
@@ -933,11 +1074,14 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       yAxisColumns: formattedYAxisColumns,
       series: formattedSeries,
       filters: formattedFilters,
+      group: group,
+      order: order,
     };
 
-    console.log(requestData);
+    console.log(id, JSON.stringify(requestData, null, 2));
     this.chartsService.updateCharts(this.headers, requestData, id).subscribe({
       next: (data: any) => {
+        console.log(data);
         this.getCharts(data.chartGroup.id);
       },
       error: (error: any) => {
@@ -965,8 +1109,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       tableData: formattedTableData,
       filters: formattedFilters,
     };
-
-    console.log(JSON.stringify(requestData, null, 2));
 
     this.chartsService.updateTables(this.headers, requestData, id).subscribe({
       next: (data: any) => {
@@ -1006,7 +1148,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   }
 
   openModalEdit(layoutId: any, itemId: any, type: any) {
-    console.log(layoutId, itemId, type);
     this.dataService.setData(itemId);
     switch (type) {
       case 'chart':
@@ -1036,10 +1177,8 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   }
 
   excludeItem() {
-    console.log(this.layoutId, this.itemId, this.itemtype);
     switch (this.itemtype) {
       case 'card':
-        console.log('card');
         this.chartsService.deleteCards(this.headers, this.itemId).subscribe({
           next: (value) => {
             this.messageService.add({
@@ -1059,7 +1198,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
         });
         break;
       case 'chart':
-        console.log('chart');
         this.chartsService.deleteCharts(this.headers, this.itemId).subscribe({
           next: (value) => {
             this.messageService.add({
@@ -1079,7 +1217,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
         });
         break;
       case 'table':
-        console.log('table');
         this.chartsService.deleteTables(this.headers, this.itemId).subscribe({
           next: (value) => {
             this.messageService.add({

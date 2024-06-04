@@ -158,11 +158,20 @@
                 [size]="'xl'"
               ></fa-icon>
             </button>
-            <highcharts-chart
-              style="width: 100%; height: 100%"
-              [Highcharts]="Highcharts"
-              [options]="item.data"
-            ></highcharts-chart>
+            <section *ngFor="let itemchart of chartGroupsData">
+              <highcharts-chart
+                *ngIf="item.itemId === itemchart.id"
+                [Highcharts]="Highcharts"
+                [options]="itemchart.data"
+                style="
+                  width: 100%;
+                  height: 100%;
+                  display: block;
+                  position: absolute;
+                "
+                [update]="true"
+              ></highcharts-chart>
+            </section>
           </div>
 
           <ng-template #menuedit>
@@ -247,7 +256,11 @@
                   />
                   <input
                     matEndDate
-                    [placeholder]="filter.values[1]"
+                    [placeholder]="
+                      filter.values[1] != undefined
+                        ? filter.values[1]
+                        : filter.values[0]
+                    "
                     [(ngModel)]="filter.values[1]"
                     (dateChange)="updateDate('endDate', filter, $event.value)"
                   />
