@@ -182,6 +182,7 @@ export class UsersComponent implements OnInit {
   }
 
   onRowClick(item: any) {
+    console.log(item);
     this.router.navigate(['/admin/users_panel/edit_users'], {
       state: { item: item },
     });

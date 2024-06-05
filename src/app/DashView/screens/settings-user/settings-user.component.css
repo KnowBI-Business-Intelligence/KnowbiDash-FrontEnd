@@ -1,3 +1,19 @@
+.container-nav-line {
+  width: 60%;
+  padding: 5px 10px;
+  position: relative;
+  top: -39px;
+  left: 145px;
+  align-self: baseline;
+  display: flex;
+}
+
+.container-nav-line span {
+  color: #00000074;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
 .conteiner {
   display: flex;
   justify-content: center;
@@ -15,9 +31,9 @@
 }
 
 .edit-user > h2 {
-  font-size: 1.8rem;
+  font-size: 1.3rem;
   font-style: normal;
-  font-weight: 500;
+  font-weight: 400;
   line-height: 3rem;
   margin: 3.5rem 0 2rem 0;
 }
@@ -43,11 +59,24 @@
   width: 20rem;
 }
 
+.mdc-evolution-chip-set__chips {
+  min-width: 100%;
+  flex-wrap: nowrap;
+  overflow: auto;
+}
+
+.form-create-user-profiles {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 130px;
+  font-size: 13px;
+}
+
 .form-edit-user > label {
   color: #2a2d2e;
-  font-size: 1rem;
+  font-size: 13px;
   font-style: normal;
-  font-weight: 500;
   line-height: 1.55rem;
   margin-bottom: 0.2rem;
 }
@@ -55,13 +84,13 @@
 .form-edit-user > input {
   display: flex;
   align-items: center;
-  padding: 0.6rem;
   border: 1px solid gainsboro;
-  border-radius: 0.4rem;
-  font-size: 1rem;
+  border-radius: 3px;
+  font-size: 13px;
   width: 20rem;
   border-radius: 0.25rem;
-  background-color: #eaeaea;
+  outline: none;
+  padding: 5px 10px;
 }
 
 .button-form {
@@ -130,12 +159,36 @@
   cursor: pointer;
 }
 
-.confirm {
-  border: 0.25rem solid #a5cac8;
-  background-color: #a5cac8;
+:host ::ng-deep .p-dropdown {
+  font-size: 13px;
+  width: 100%;
+  height: 33px;
+  border-radius: 5px !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.cancel {
-  border: 0.25rem solid #d64a1f;
-  background-color: #d64a1f;
+:host ::ng-deep .p-dropdown .p-dropdown-label.p-placeholder {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+:host ::ng-deep .p-dropdown .p-dropdown-label {
+  font-size: 12px;
+}
+
+:host ::ng-deep span {
+  font-size: 12px;
+}
+
+:host
+  ::ng-deep
+  .p-dropdown-panel
+  .p-dropdown-items
+  .p-dropdown-item.p-highlight.p-focus
+  .p-dropdown-panel
+  .p-dropdown-items
+  .p-dropdown-item {
+  padding: 10px;
 }

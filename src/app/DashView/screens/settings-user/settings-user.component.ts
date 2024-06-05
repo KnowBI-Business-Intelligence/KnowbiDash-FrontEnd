@@ -25,6 +25,7 @@ import { Roles } from '../../../core/modules/interfaces';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { StorageService } from '../../../core/services/user/storage.service';
 import { UserService } from '../../../core/services/user/user.service';
+import { ProfilesService } from '../../../core/services/profiles/profiles.service';
 
 @Component({
   selector: 'app-settings-user',
@@ -95,10 +96,9 @@ export class SettingsUserComponent implements OnInit {
   announcer = inject(LiveAnnouncer);
 
   constructor(
-    private authService: AuthService,
     private storageService: StorageService,
     private userService: UserService,
-    private messageService: MessageService
+    private profileService: ProfilesService
   ) {}
 
   ngOnInit(): void {
@@ -108,6 +108,7 @@ export class SettingsUserComponent implements OnInit {
       { id: 'admin', name: 'Usuário Administrador' },
     ];
     this.getUserData();
+    this.getProfiles();
   }
 
   onEditCancel() {
@@ -131,12 +132,6 @@ export class SettingsUserComponent implements OnInit {
 
   getUserData() {
     const user = this.getUser();
-
-    if (!user || !user.token) {
-      console.error('Token não disponível');
-      return;
-    }
-
     const headers = new HttpHeaders({
       Authorization: `Bearer ${user.token}`,
     });
@@ -153,6 +148,24 @@ export class SettingsUserComponent implements OnInit {
       },
       error: (error) => {
         console.error('ErrgetInformations:', error);
+      },
+    });
+  }
+
+  getProfiles() {
+    const user = this.getUser();
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${user.token}`,
+    });
+    this.profileService.getProfiles(headers).subscribe({
+      next: (data: any) => {
+        data.map((profileData: any) => {
+          profileData.users.map((userData: any) => {
+            if (this.infoUsersData!.id == userData.id) {
+              this.profiles.push(profileData.name);
+            }
+          });
+        });
       },
     });
   }
@@ -198,24 +211,6 @@ export class SettingsUserComponent implements OnInit {
     } catch (error) {
       throw error;
     }
-  }
-
-  removeProfile(profile: any) {
-    const index = this.profiles.indexOf(profile);
-
-    if (index >= 0) {
-      this.profiles.splice(index, 1);
-
-      this.announcer.announce(`Removed ${profile}`);
-    }
-  }
-
-  private _filter(value: string): string[] {
-    const filterValue = value.toLowerCase();
-
-    return this.allProfiles.filter((profiles) =>
-      profiles.toLowerCase().includes(filterValue)
-    );
   }
 
   selectedProfiles($event: MatAutocompleteSelectedEvent) {

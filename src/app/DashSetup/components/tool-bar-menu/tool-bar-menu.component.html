@@ -175,8 +175,31 @@
 
           <mat-divider></mat-divider>
 
+          <button mat-menu-item (click)="onProfileClick()">
+            <span class="mat-menu-item"> Meu Perfil</span>
+          </button>
+
+          <button mat-menu-item [matMenuTriggerFor]="profile">
+            <span class="mat-menu-item">
+              Perfil:
+              {{
+                profilesData.length > 0 ? profilesData[0].name : "Sem perfil"
+              }}
+            </span>
+          </button>
+
+          <mat-divider></mat-divider>
           <button mat-menu-item (click)="logout()">
             <span class="mat-menu-item">Sair</span>
+          </button>
+        </mat-menu>
+
+        <mat-menu #profile="matMenu" yPosition="above">
+          <button mat-menu-item *ngFor="let profile of profilesData">
+            <span class="mat-menu-item">{{ profile.name }}</span>
+          </button>
+          <button mat-menu-item *ngIf="profilesData.length === 0">
+            <span class="mat-menu-item">Sem perfil</span>
           </button>
         </mat-menu>
       </div>

@@ -1,3 +1,6 @@
+<div class="container-nav-line">
+  <span>Usuários</span>
+</div>
 <div class="conteiner">
   <div class="edit-user">
     <h2>Informações do Perfil</h2>
@@ -19,7 +22,7 @@
         </div>
 
         <div class="form-edit-user">
-          <label for="username">Nome de usuário: </label>
+          <label for="username">usuário: </label>
           <input
             autocomplete="off"
             [disabled]="disabled"
@@ -62,7 +65,7 @@
             #occupation="ngModel"
             [ngClass]="{ 'is-invalid': f.submitted && occupation.errors }"
             [disabled]="disabled"
-            [placeholder]="infoUsersData?.cargo || 'Calma'"
+            [placeholder]="infoUsersData?.cargo"
           />
         </div>
 
@@ -97,11 +100,11 @@
           ></p-dropdown>
         </div>
 
-        <mat-form-field class="form-edit-user">
-          <mat-label>Adicione um perfil</mat-label>
+        <mat-form-field class="form-create-user-profiles">
+          <mat-label>Perfis</mat-label>
           <mat-chip-grid #chipGrid aria-label="Profile selection">
             @for (profile of profiles; track profile) {
-            <mat-chip-row (removed)="removeProfile(profile)">
+            <mat-chip-row>
               {{ profile }}
               <button matChipRemove [attr.aria-label]="'remover ' + profile">
                 <mat-icon>cancel</mat-icon>

@@ -108,7 +108,7 @@
             mat-menu-item
             [routerLink]="['settings']"
           >
-            <span class="mat-menu-item"> Meu Cadastro </span>
+            <span class="mat-menu-item"> Meu Perfil</span>
           </button>
 
           <button
@@ -139,10 +139,7 @@
           <button mat-menu-item *ngFor="let profile of profilesData">
             <span class="mat-menu-item">{{ profile.name }}</span>
           </button>
-          <button
-            mat-menu-item
-            *ngIf="!user?.profiles || user?.profiles.length === 0"
-          >
+          <button mat-menu-item *ngIf="profilesData.length === 0">
             <span class="mat-menu-item">Sem perfil</span>
           </button>
         </mat-menu>

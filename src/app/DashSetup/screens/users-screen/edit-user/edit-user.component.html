@@ -99,9 +99,8 @@
             [ngClass]="{ 'is-invalid': f.submitted && access_level.errors }"
           ></p-dropdown>
         </div>
-
         <mat-form-field class="form-create-user-profiles">
-          <mat-label>Adicione perfis</mat-label>
+          <mat-label>Perfis</mat-label>
           <mat-chip-grid #chipGrid aria-label="Profile selection">
             @for (profile of profiles; track profile) {
             <mat-chip-row (removed)="removeProfile(profile)">

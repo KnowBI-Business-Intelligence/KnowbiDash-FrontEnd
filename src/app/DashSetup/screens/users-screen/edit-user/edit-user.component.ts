@@ -49,7 +49,7 @@ import { StorageService } from '../../../../core/services/user/storage.service';
   ],
   providers: [MessageService],
   templateUrl: './edit-user.component.html',
-  styleUrl: './edit-user.component.css',
+  styleUrl: '../create-user/create-user.component.css',
 })
 export class EditUserComponent implements OnInit {
   @ViewChild('f') f!: NgForm;
@@ -77,7 +77,11 @@ export class EditUserComponent implements OnInit {
   allProfiles: { name: string; id: string }[] = [];
   profilesCtrl = new FormControl('');
   placeholder: string = '';
+  userId: any;
   user = this.storageService.getUser();
+  headers = new HttpHeaders({
+    Authorization: `Bearer ${this.user.token}`,
+  });
 
   constructor(
     private authService: AuthService,
@@ -98,6 +102,7 @@ export class EditUserComponent implements OnInit {
 
   ngOnInit(): void {
     this.item = history.state.item;
+    console.log(this.item);
     this.loadUserData(this.item.id);
     this.getProfiles();
     this.rolesOptions = [
@@ -198,15 +203,6 @@ export class EditUserComponent implements OnInit {
       access_level,
     } = this.form;
 
-    if (!this.user || !this.user.token) {
-      console.error('Token não disponível');
-      return;
-    }
-
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${this.user.token}`,
-    });
-
     const profileIds = this.profileIds.map((profileIds) => profileIds);
     console.log(profileIds);
 
@@ -222,7 +218,7 @@ export class EditUserComponent implements OnInit {
 
     console.log(userData);
 
-    this.authService.edit(id, userData, headers).subscribe({
+    this.authService.edit(id, userData, this.headers).subscribe({
       next: () => {
         this.messageService.add({
           severity: 'success',
@@ -233,7 +229,6 @@ export class EditUserComponent implements OnInit {
           this.router.navigate(['/admin/users_panel']);
           this.isLoginLoading = false;
         }, 2000);
-        this.f.reset();
       },
       error: (err) => {
         this.messageService.add({
@@ -248,16 +243,7 @@ export class EditUserComponent implements OnInit {
   }
 
   loadUserData(id: number) {
-    if (!this.user || !this.user.token) {
-      console.error('Token não disponível');
-      return;
-    }
-
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${this.user.token}`,
-    });
-
-    this.authService.getById(id, headers).subscribe({
+    this.authService.getById(id, this.headers).subscribe({
       next: (userData: any) => {
         this.form.fullusername = userData.fullUserName;
         this.form.username = userData.userName;
@@ -273,15 +259,6 @@ export class EditUserComponent implements OnInit {
           this.placeholder = 'Usuário Administrador';
           this.form.access_level = 'admin';
         }
-
-        if (userData.perfis && userData.perfis.length > 0) {
-          this.profiles = userData.perfis.map((perfil: any) => perfil.name);
-          this.profileIds = userData.perfis.map((perfil: any) => perfil.id);
-        } else {
-          this.profiles = [];
-          this.profileIds = [];
-        }
-        console.log(this.form.access_level);
       },
       error: (error) => {
         console.error('Erro ao carregar dados do usuário:', error);
@@ -290,18 +267,20 @@ export class EditUserComponent implements OnInit {
   }
 
   getProfiles() {
-    const user = this.storageService.getUser();
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${user.token}`,
-    });
-
-    this.profileService.getProfiles(headers).subscribe({
+    this.profileService.getProfiles(this.headers).subscribe({
       next: (data: any) => {
+        data.map((profileData: any) => {
+          profileData.users.map((userData: any) => {
+            if (this.item.id == userData.id) {
+              this.profiles.push(profileData.name);
+              this.profileIds.push(profileData.id);
+            }
+          });
+        });
         this.allProfiles = data.map((item: any) => ({
           name: item.name,
           id: item.id,
         }));
-
         this.filteredProfiles = this.profilesCtrl.valueChanges.pipe(
           startWith(null),
           map((profile: string | null) =>

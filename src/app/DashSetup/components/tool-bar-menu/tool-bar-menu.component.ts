@@ -31,6 +31,8 @@ import { BreadrumbsService } from '../../../core/services/breadcrumb/breadrumbs.
 import { StorageService } from '../../../core/services/user/storage.service';
 import { BreadcrumbsComponent } from '../../../shared/breadcrumbs/breadcrumbs.component';
 import { CustomerService } from '../../screens/users-screen/users/data/costumer-data';
+import { ProfilesService } from '../../../core/services/profiles/profiles.service';
+import { HttpHeaders } from '@angular/common/http';
 
 interface SideNavTogle {
   screenWidth: number;
@@ -64,6 +66,7 @@ export class ToolBarMenuComponent implements OnInit {
   collapsed = false;
   screenWidth = 0;
   private roles: string[] = [];
+  profilesData: any[] = [];
 
   isLoggedIn: boolean = false;
   showInitials: boolean = true;
@@ -74,6 +77,11 @@ export class ToolBarMenuComponent implements OnInit {
   userFirstName: any;
 
   menuAtivo: any;
+
+  private userReq = this.token.getUser();
+  headers = new HttpHeaders({
+    Authorization: `Bearer ${this.userReq.token}`,
+  });
 
   icons = {
     home: faHome,
@@ -89,7 +97,8 @@ export class ToolBarMenuComponent implements OnInit {
     private auth: AuthService,
     private token: StorageService,
     private router: Router,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
+    private profilesService: ProfilesService
   ) {}
 
   ngOnInit(): void {
@@ -104,6 +113,22 @@ export class ToolBarMenuComponent implements OnInit {
       this.icon!.style.color = '#5F65A5';
       this.item!.style.color = '#5F65A5';
     }
+
+    this.getProfilesData(this.user.id);
+  }
+
+  getProfilesData(data: string) {
+    this.profilesService.getProfiles(this.headers).subscribe({
+      next: (value: any) => {
+        value.map((profileData: any) => {
+          profileData.users.map((userData: any) => {
+            if (userData.id == data) {
+              this.profilesData.push(profileData);
+            }
+          });
+        });
+      },
+    });
   }
 
   initials() {
@@ -119,9 +144,14 @@ export class ToolBarMenuComponent implements OnInit {
     }
   }
 
+  onProfileClick() {
+    this.router.navigate(['/admin/users_panel/edit_users'], {
+      state: { item: this.user },
+    });
+  }
+
   toggleMenuAtivo(item: string) {
     this.menuAtivo = item;
-    console.log(this.menuAtivo);
     this.toggleClose();
   }
 

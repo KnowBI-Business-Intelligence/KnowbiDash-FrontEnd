@@ -1,33 +1,31 @@
 const globalUrlMainAPI = 'http://localhost:8080';
-const globalUrlBOT = 'http://localhost:8080';
-const globalUrlServerBot = 'http://localhost:8080';
+const globalUrlBOT = 'http://localhost:5005';
 
 // Variáveis de serviço do bot
-export const API_CHAT = 'http://localhost:5005/webhooks/rest/webhook';
+export const API_CHAT = `${globalUrlBOT}/webhooks/rest/webhook`;
 
 // Variáveis de serviço do banco tasy
-export const API_ORACLE_DATABASE = 'http://localhost:8080/config/oracle';
+export const API_ORACLE_DATABASE = `${globalUrlMainAPI}/config/oracle`;
 
 // Variável para execução do SQL
-export const API_ECXECUTE_SQL = 'http://localhost:8080/script/execute-sql';
+export const API_ECXECUTE_SQL = `${globalUrlMainAPI}/script/execute-sql`;
 
 // Variável para criação de gráficos e grupos de gráficos
-export const API_CHARTS = 'http://localhost:8080/api/charts';
-export const API_CARDS = 'http://localhost:8080/api/cards';
-export const API_TABLES = 'http://localhost:8080/api/tabledata';
-export const API_WORKSPACE = 'http://localhost:8080/api/workspace';
-export const API_CHARTGROUP = 'http://localhost:8080/api/chartgroup';
-export const API_CHARTPATH = 'http://localhost:8080/api/chartpath';
+export const API_CHARTS = `${globalUrlMainAPI}/api/charts`;
+export const API_CARDS = `${globalUrlMainAPI}/api/cards`;
+export const API_TABLES = `${globalUrlMainAPI}/api/tabledata`;
+export const API_WORKSPACE = `${globalUrlMainAPI}/api/workspace`;
+export const API_CHARTGROUP = `${globalUrlMainAPI}/api/chartgroup`;
+export const API_CHARTPATH = `${globalUrlMainAPI}/api/chartpath`;
 
 // Variável para criação de gráficos e grupos de gráficos
-export const API_PROFILES = 'http://localhost:8080/api/profiles';
+export const API_PROFILES = `${globalUrlMainAPI}/api/profiles`;
 
-//  Variáveis de manipulção do usuário
-export const AUTH_API = 'http://localhost:8080/api/auth';
-export const TEST_API = 'http://localhost:8080/api/test';
-export const USERS_API = 'http://localhost:8080/api/users';
+// Variáveis de manipulação do usuário
+export const AUTH_API = `${globalUrlMainAPI}/api/auth`;
+export const TEST_API = `${globalUrlMainAPI}/api/test`;
+export const USERS_API = `${globalUrlMainAPI}/api/users`;
 
 // Variáveis
-export const FILTER_API = 'http://localhost:8080/api/get/filterdate';
-export const ATENDIMENTO_API =
-  'http://localhost:8080/api/get/atendimentopaciente';
+export const FILTER_API = `${globalUrlMainAPI}/api/get/filterdate`;
+export const ATENDIMENTO_API = `${globalUrlMainAPI}/api/get/atendimentopaciente`;

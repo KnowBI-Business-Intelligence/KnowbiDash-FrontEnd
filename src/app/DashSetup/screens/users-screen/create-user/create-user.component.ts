@@ -254,7 +254,6 @@ export class CreateUserComponent implements OnInit {
           summary: 'Sucesso',
           detail: 'Usuário Cadastrado!',
         });
-        this.f.reset();
         setTimeout(() => {
           this.router.navigate(['/admin/users_panel']);
           this.isLoginLoading = false;
