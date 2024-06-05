@@ -467,7 +467,6 @@ textarea {
 .content-sql {
   display: flex;
   flex-direction: column;
-  margin: 1rem 0;
   width: 100%;
 }
 
@@ -482,6 +481,18 @@ textarea {
 .content-sql_header h2 {
   font-size: 14px;
   font-weight: 400;
+}
+
+.content-sql_body {
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+}
+
+.content-sql-info {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .content-sql_buttons {
@@ -532,12 +543,6 @@ textarea {
 
 .content-sql_buttons-action button span {
   font-size: 20px;
-}
-
-.content-sql_body {
-  display: flex;
-  flex-direction: column;
-  margin-top: 1rem;
 }
 
 .sql-body_code textarea {

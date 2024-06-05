@@ -94,6 +94,7 @@ export class CreateDashsComponent implements OnInit {
   isLoadingRun: boolean = false;
   isLoadingTable: boolean = false;
   isReadOnly: boolean = false;
+  isInformations: boolean = false;
 
   dataSource: any;
   chartPaths: any;
@@ -105,6 +106,8 @@ export class CreateDashsComponent implements OnInit {
 
   selectedTab: string = '---';
   searchValue?: string;
+  scriptStatus: string = '';
+  scriptDataExecute: string = '';
   resultsLength: number = 0;
   selectedRow!: DashboardTable | null;
   selectedRowChartGroup: any;
@@ -165,9 +168,12 @@ export class CreateDashsComponent implements OnInit {
     this.charts.getChartsTableData(id, this.headers).subscribe({
       next: (value: any) => {
         console.log(value);
+        this.scriptStatus = value.executionStatus;
+        this.scriptDataExecute = value.executedIn;
         this.tableColumns = value.columns;
         this.tableData = value.data;
         this.isLoadingTable = false;
+        this.isInformations = true;
       },
       error: (err) => {
         console.log(err);
@@ -467,6 +473,8 @@ export class CreateDashsComponent implements OnInit {
             detail: 'SQL Atualizado',
           });
           this.isLoadingRun = false;
+          this.isInformations = true;
+          this.showTable();
         },
         error: (err) => {
           console.log(err);
@@ -475,7 +483,9 @@ export class CreateDashsComponent implements OnInit {
             summary: 'Erro',
             detail: err.error,
           });
+          this.isInformations = true;
           this.isLoadingRun = false;
+          this.showTable();
         },
       });
     }
@@ -488,6 +498,7 @@ export class CreateDashsComponent implements OnInit {
   }
 
   onRowDoubleClick(row: DashboardTable) {
+    this.isInformations = false;
     this.isSQL = true;
     this.chartGroupID = row.id;
     this.sqlPlaceholder = row.sql;

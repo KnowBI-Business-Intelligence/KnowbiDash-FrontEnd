@@ -483,8 +483,12 @@
         >
         </textarea>
       </div>
-
-      <div class="sql-body_result">
+      <div class="content-sql-info" *ngIf="isInformations">
+        <span>Total de linhas: {{ tableData.length }}</span>
+        <span>Status: {{ scriptStatus }}</span>
+        <span>ultima execução em: {{ scriptDataExecute }}</span>
+      </div>
+      <div class="sql-body_result" *ngIf="isInformations">
         <div class="paths">
           <div
             style="
@@ -500,10 +504,15 @@
               selectionMode="single"
               [value]="tableData"
               (matSortChange)="announceSortChange($event)"
+              [rows]="10"
+              [paginator]="true"
               [resizableColumns]="true"
               [scrollable]="true"
-              scrollHeight="230px"
+              scrollHeight="200px"
               styleClass="p-datatable-gridlines"
+              currentPageReportTemplate="Exibindo de {first} a {last} de {totalRecords} registros"
+              [showCurrentPageReport]="true"
+              [rowsPerPageOptions]="[10, 25, 50]"
               [globalFilterFields]="tableColumns"
               [tableStyle]="{ 'min-width': '75rem' }"
             >
@@ -542,7 +551,6 @@
           </div>
         </div>
       </div>
-      <span>Total de linhas: {{ tableData.length }}</span>
     </div>
   </div>
 
