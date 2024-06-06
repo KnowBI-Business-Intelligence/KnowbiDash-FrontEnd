@@ -10,7 +10,7 @@
           src="assets/icons/Logo_principal_horizontal.svg"
           alt=""
         />
-        <span class="version">V0.0.1</span>
+        <span class="version">V1.1.1</span>
       </div>
       <form name="form" #f="ngForm" novalidate>
         <div class="form-group">
@@ -38,6 +38,57 @@
             [ngClass]="{ 'is-invalid': f.submitted && password.errors }"
           />
         </div>
+
+        <p-button (click)="showDialog()" label="Aviso de cookies" />
+        <p-dialog
+          header="Valorizamos sua privacidade"
+          [modal]="true"
+          [(visible)]="visible"
+          [style]="{ width: '50rem' }"
+          [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+          [maximizable]="true"
+          [draggable]="false"
+        >
+          <p class="mb-5">
+            Utilizamos cookies para melhorar sua experiência em nosso sistema.
+            Ao continuar navegando, você concorda com nossa Política de Cookies.
+          </p>
+          <h3 class="mb-5">O que são cookies?</h3>
+          <p class="mb-5">
+            Cookies são pequenos arquivos de texto armazenados no seu
+            dispositivo quando você visita uma plataforma web. Eles ajudam a
+            melhorar o funcionamento e a fornecer uma experiência personalizada.
+          </p>
+          <h3 class="mb-5">Para que utilizamos os cookies?</h3>
+          <ul class="mb-5">
+            <li>
+              Cookies Estritamente Necessários: Esses cookies são essenciais
+              para que o site funcione corretamente.
+            </li>
+            <li>
+              Cookies de Desempenho: Coletam informações sobre como os
+              visitantes utilizam o site, permitindo-nos melhorar seu
+              desempenho.
+            </li>
+            <li>
+              Cookies de Funcionalidade: Permitem que o site lembre suas
+              escolhas (como seu nome de usuário, idioma ou região) para
+              proporcionar uma experiência mais personalizada.
+            </li>
+          </ul>
+          <h3 class="mb-5">Gerenciamento de Cookies</h3>
+          <p class="mb-5">
+            Você pode gerenciar seus cookies através das configurações do seu
+            navegador. No entanto, a desativação de alguns cookies pode afetar a
+            funcionalidade do sistema. Reservamo-nos o direito de corrigir o
+            conteúdo do Aviso de Cookies e os cookies contidos nas listas a
+            qualquer momento e sem notificação. O novo Aviso de Cookies entrará
+            em vigor após a publicação. Se você não concordar com a versão
+            revisada, deverá alterar suas preferências. Ao continuar a acessar
+            ou fazer uso do sistema após as mudanças entrarem em vigor, você
+            concorda com os termos do Aviso de Cookies revisado.
+          </p>
+        </p-dialog>
 
         <div class="form-button">
           <button

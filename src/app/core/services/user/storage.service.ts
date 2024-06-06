@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
+import * as CryptoJS from 'crypto-js';
 
 const TOKEN_KEY = 'auth-token';
 const REFRESHTOKEN_KEY = 'auth-refreshtoken';
 const USER_KEY = 'auth-user';
+const SECRET_KEY = 'mH#9@k3&!aDwFg2^';
 
 @Injectable({
   providedIn: 'root',
@@ -13,8 +15,9 @@ export class StorageService {
   }
 
   public saveToken(token: string): void {
+    const encryptedToken = CryptoJS.AES.encrypt(token, SECRET_KEY).toString();
     window.sessionStorage.removeItem(TOKEN_KEY);
-    window.sessionStorage.setItem(TOKEN_KEY, token);
+    window.sessionStorage.setItem(TOKEN_KEY, encryptedToken);
 
     const user = this.getUser();
     if (user.id) {
@@ -28,11 +31,13 @@ export class StorageService {
         console.error('window.sessionStorage indisponível');
         return null;
       }
-      const token = window.sessionStorage.getItem(TOKEN_KEY);
-      if (token === null) {
-        console.warn('Nenhum token encontrado.');
+      const encryptedToken = window.sessionStorage.getItem(TOKEN_KEY);
+      if (encryptedToken === null) {
+        return null;
       }
-      return token || '';
+      const bytes = CryptoJS.AES.decrypt(encryptedToken, SECRET_KEY);
+      const token = bytes.toString(CryptoJS.enc.Utf8);
+      return token || null;
     } catch (error) {
       console.error('Erro ao obter o token:', error);
       return null;
@@ -40,26 +45,37 @@ export class StorageService {
   }
 
   public saveRefreshToken(token: string): void {
+    const encryptedToken = CryptoJS.AES.encrypt(token, SECRET_KEY).toString();
     window.sessionStorage.removeItem(REFRESHTOKEN_KEY);
-    window.sessionStorage.setItem(REFRESHTOKEN_KEY, token);
+    window.sessionStorage.setItem(REFRESHTOKEN_KEY, encryptedToken);
   }
 
   public getRefreshToken(): string | null {
-    return window.sessionStorage.getItem(REFRESHTOKEN_KEY);
+    const encryptedToken = window.sessionStorage.getItem(REFRESHTOKEN_KEY);
+    if (encryptedToken) {
+      const bytes = CryptoJS.AES.decrypt(encryptedToken, SECRET_KEY);
+      const token = bytes.toString(CryptoJS.enc.Utf8);
+      return token;
+    }
+    return null;
   }
 
   public saveUser(user: any): void {
+    const encryptedUser = CryptoJS.AES.encrypt(
+      JSON.stringify(user),
+      SECRET_KEY
+    ).toString();
     window.sessionStorage.removeItem(USER_KEY);
-    window.sessionStorage.setItem(USER_KEY, JSON.stringify(user));
+    window.sessionStorage.setItem(USER_KEY, encryptedUser);
   }
 
   public getUser(): any {
-    const user = window.sessionStorage.getItem(USER_KEY);
-
-    if (user) {
-      return JSON.parse(user);
+    const encryptedUser = window.sessionStorage.getItem(USER_KEY);
+    if (encryptedUser) {
+      const bytes = CryptoJS.AES.decrypt(encryptedUser, SECRET_KEY);
+      const user = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+      return user;
     }
-
     return {};
   }
 }

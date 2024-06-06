@@ -9,6 +9,8 @@ import { ToastModule } from 'primeng/toast';
 import { AuthService } from '../../core/services/auth/auth.service';
 import { StorageService } from '../../core/services/user/storage.service';
 import { BreadcrumbsComponent } from '../breadcrumbs/breadcrumbs.component';
+import { DialogModule } from 'primeng/dialog';
+import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'app-login-screen',
@@ -21,6 +23,8 @@ import { BreadcrumbsComponent } from '../breadcrumbs/breadcrumbs.component';
     ToastModule,
     BreadcrumbsComponent,
     BreadcrumbModule,
+    DialogModule,
+    ButtonModule,
   ],
   providers: [MessageService],
   templateUrl: './login-screen.component.html',
@@ -30,6 +34,7 @@ export class LoginScreenComponent implements OnInit {
   isADM!: boolean;
   isLoading: boolean = true;
   isModal: boolean = true;
+  visible: boolean = false;
   isLoginLoading: boolean = false;
 
   form: any = {
@@ -53,7 +58,11 @@ export class LoginScreenComponent implements OnInit {
 
     setTimeout(() => {
       this.isLoading = false;
-    }, 1000);
+    }, 2000);
+  }
+
+  showDialog() {
+    this.visible = true;
   }
 
   defaultOrAdm(isAdmin: boolean): void {
@@ -69,12 +78,12 @@ export class LoginScreenComponent implements OnInit {
       setTimeout(() => {
         this.routes.navigate(['admin']);
         this.isLoginLoading = false;
-      }, 1000); // padrão: 2000
+      }, 1000);
     } else if (isAdmin == false) {
       setTimeout(() => {
         this.routes.navigate(['content']);
         this.isLoginLoading = false;
-      }, 1000); // padrão: 2000
+      }, 1000);
     }
   }
 

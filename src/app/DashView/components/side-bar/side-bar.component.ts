@@ -107,7 +107,6 @@ export class SideBarComponent implements OnInit {
     this.eventSearch.on('logout', () => {
       this.logout();
     });
-    console.log(this.user);
     this.getProfilesData(this.user.id);
   }
 
@@ -131,9 +130,7 @@ export class SideBarComponent implements OnInit {
         this.tokenService.signOut();
         this.router.navigate(['/login']);
       },
-      error: (e) => {
-        console.error('erro logout', e);
-      },
+      error: (e) => {},
     });
   }
 
