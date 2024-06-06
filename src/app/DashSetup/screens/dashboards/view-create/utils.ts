@@ -1,4 +1,4 @@
-import { MatDateFormats } from '@angular/material/core';
+import { MatDateFormats, NativeDateAdapter } from '@angular/material/core';
 
 export function ktdArrayRemoveItem<T>(
   array: T[],
@@ -43,3 +43,24 @@ export const MY_FORMATS: MatDateFormats = {
     monthYearA11yLabel: 'MMMM YYYY',
   },
 };
+
+export class CustomDateAdapter extends NativeDateAdapter {
+  override getDayOfWeekNames(style: 'long' | 'short' | 'narrow'): string[] {
+    switch (style) {
+      case 'long':
+        return [
+          'domingo',
+          'segunda-feira',
+          'terça-feira',
+          'quarta-feira',
+          'quinta-feira',
+          'sexta-feira',
+          'sábado',
+        ];
+      case 'short':
+        return ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'];
+      case 'narrow':
+        return ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+    }
+  }
+}

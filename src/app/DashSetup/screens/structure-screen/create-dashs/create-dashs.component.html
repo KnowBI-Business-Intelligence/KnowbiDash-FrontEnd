@@ -456,9 +456,12 @@
             <span *ngIf="isLoadingRun"><div class="login-spinner"></div></span>
           </button>
           <button (click)="showTable()" title="Exibir tabela">
-            <span *ngIf="!isLoadingTable" class="material-symbols-outlined">
-              table
-            </span>
+            <fa-icon
+              *ngIf="!isLoadingTable"
+              class="iconTable"
+              [icon]="icons.table"
+              [size]="'xl'"
+            ></fa-icon>
             <span *ngIf="isLoadingTable"
               ><div class="login-spinner"></div
             ></span>

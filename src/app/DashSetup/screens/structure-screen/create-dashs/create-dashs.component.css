@@ -517,6 +517,10 @@ textarea {
   border: 1px solid #e5e5e5;
 }
 
+.iconTable {
+  font-size: 11px;
+}
+
 .content-sql_buttons-action button {
   display: flex;
   align-items: center;

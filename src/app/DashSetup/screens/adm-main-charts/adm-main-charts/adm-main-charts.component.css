@@ -46,7 +46,7 @@
 }
 
 .container-save-disposition {
-  right: 110px;
+  right: 130px;
   top: 46px;
 }
 
@@ -81,10 +81,11 @@
   border: solid 1px #ffffff;
   background-color: #ffffff;
   padding: 4px 9px;
+  margin: 3px;
   font-size: 10px;
   color: #0000007c;
   transition: 0.5s;
-  width: 75px;
+  width: 88px;
   border-radius: 3px;
 }
 
@@ -508,6 +509,12 @@ td {
   display: flex;
   margin-top: 25px;
   border-top: solid 0.2px #e6e6e6;
+}
+
+.contentFS:fullscreen {
+  width: 100%;
+  height: 100%;
+  background-color: #fafafa;
 }
 
 .groupname {

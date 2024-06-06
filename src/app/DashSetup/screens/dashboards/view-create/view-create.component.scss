@@ -88,6 +88,11 @@
     overflow-x: hidden;
   }
 
+  .full-height {
+    height: 100vh !important;
+    max-height: 100vh !important;
+  }
+
   .grid-container {
     overflow-x: auto; // let available scroll horizontal with overflowing x
     max-height: 82vh;

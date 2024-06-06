@@ -16,6 +16,14 @@
 <div class="container-save-disposition">
   <span> Ações </span>
   <div>
+    <button (click)="toggleFullScreen()">
+      <fa-icon
+        class="iconview"
+        [icon]="icons.fullScreen"
+        [size]="'xl'"
+      ></fa-icon
+      >Tela cheia
+    </button>
     <button (click)="updateCombinedLayout()">
       <fa-icon class="iconview" [icon]="icons.back" [size]="'xl'"></fa-icon
       >Reordenar
@@ -47,9 +55,13 @@
     </div>
   </div>
 </div>
-<div class="main-container">
+<div class="main-container contentFS" #fullScreenDiv>
   <div class="playground-container">
-    <div class="grid-container" #gridContainer>
+    <div
+      class="grid-container"
+      #gridContainer
+      [class.full-height]="isFullScreen"
+    >
       <ktd-grid
         [cols]="cols"
         [rowHeight]="rowHeight"
@@ -268,6 +280,7 @@
     </div>
   </div>
 </div>
+
 <div class="groupname">
   <fa-icon class="icon" [icon]="icons.dash" [size]="'xl'"></fa-icon>
   <span>Dashboard: {{ groupName }}</span>

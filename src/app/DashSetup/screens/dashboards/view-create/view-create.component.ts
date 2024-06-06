@@ -4,8 +4,6 @@ import {
   Component,
   ElementRef,
   Inject,
-  LOCALE_ID,
-  NgZone,
   OnDestroy,
   OnInit,
   QueryList,
@@ -23,7 +21,12 @@ import {
   KtdResizeStart,
   ktdTrackById,
 } from '@katoid/angular-grid-layout';
-import { MY_FORMATS, generateLayout2, ktdArrayRemoveItem } from './utils';
+import {
+  CustomDateAdapter,
+  MY_FORMATS,
+  generateLayout2,
+  ktdArrayRemoveItem,
+} from './utils';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -47,6 +50,7 @@ import {
   faEllipsisVertical,
   faPenToSquare,
   faTrash,
+  faExpand,
 } from '@fortawesome/free-solid-svg-icons';
 import { TableModule } from 'primeng/table';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
@@ -67,11 +71,9 @@ import {
   MAT_DATE_LOCALE,
   DateAdapter,
   MAT_DATE_FORMATS,
-  MatDateFormats,
 } from '@angular/material/core';
 import { registerLocaleData } from '@angular/common';
 import localePt from '@angular/common/locales/pt';
-import * as _moment from 'moment';
 import 'moment/locale/pt-br';
 import { CdkMenu, CdkMenuItem, CdkMenuTrigger } from '@angular/cdk/menu';
 import { MatDivider } from '@angular/material/divider';
@@ -79,11 +81,7 @@ import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { DataService } from '../../../../core/services/dashboard/data.service';
 
-_moment.locale('pt-br');
 registerLocaleData(localePt);
-interface ExtendedOptions extends Highcharts.Options {
-  filters?: any;
-}
 
 @Component({
   selector: 'app-view-create',
@@ -109,7 +107,7 @@ interface ExtendedOptions extends Highcharts.Options {
     ToastModule,
   ],
   providers: [
-    { provide: LOCALE_ID, useValue: 'pt' },
+    { provide: DateAdapter, useClass: CustomDateAdapter },
     { provide: MAT_DATE_LOCALE, useValue: 'pt-BR' },
     { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: true } },
     { provide: MAT_DATE_FORMATS, useValue: MY_FORMATS },
@@ -126,6 +124,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   @ViewChildren(CdkMenuTrigger) menuTriggers!: QueryList<CdkMenuTrigger>;
   @ViewChild('chartContainer') chartContainer!: ElementRef;
   @ViewChild(KtdGridComponent, { static: true }) grid!: KtdGridComponent;
+  @ViewChild('fullScreenDiv') fullScreenDiv!: ElementRef;
   private encryptedDataSubscription: Subscription | undefined;
 
   icons = {
@@ -135,6 +134,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     menu: faEllipsisVertical,
     edit: faPenToSquare,
     delete: faTrash,
+    fullScreen: faExpand,
   };
 
   cols: number = 50;
@@ -201,6 +201,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   showModal: boolean = false;
   isShowFilterModal: boolean = false;
   isLoginLoading: boolean = false;
+  isFullScreen: boolean = false;
   showContentFilterSwitch: boolean[] = [];
 
   minValue: number = 100;
@@ -235,13 +236,16 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     private datePipe: DatePipe,
     private messageService: MessageService,
     private dataService: DataService,
+    private dateAdapter: DateAdapter<Date>,
     @Inject(DOCUMENT) public document: Document
   ) {
+    this.dateAdapter.setLocale('pt-BR');
     this.currentView = null;
   }
 
   ngOnInit(): void {
     this.startDashboarData();
+    this.showFullScreen();
     this.filters.forEach((filter, index) => {
       this.showContentFilterSwitch[index] = false;
     });
@@ -256,11 +260,10 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.grid.resize();
       });
-
-    this.layout = this.layoutService.getLayout();
   }
 
   ngOnDestroy() {
+    this.hiddenFullscreen();
     this.resizeSubscription.unsubscribe();
     if (this.encryptedDataSubscription) {
       this.encryptedDataSubscription.unsubscribe();
@@ -1257,6 +1260,82 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
 
   onResizeEnded(event: KtdResizeEnd) {
     this.isResizing = false;
+  }
+
+  toggleFullScreen() {
+    const elem = this.fullScreenDiv.nativeElement;
+    if (!document.fullscreenElement) {
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+      } else if (elem.mozRequestFullScreen) {
+        elem.mozRequestFullScreen();
+      } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen();
+      } else if (elem.msRequestFullscreen) {
+        elem.msRequestFullscreen();
+      }
+      this.isFullScreen = true;
+    } else if (document.fullscreenElement) {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if ((document as any).mozCancelFullScreen) {
+        (document as any).mozCancelFullScreen();
+      } else if ((document as any).webkitExitFullscreen) {
+        (document as any).webkitExitFullscreen();
+      } else if ((document as any).msExitFullscreen) {
+        (document as any).msExitFullscreen();
+      }
+      this.isFullScreen = false;
+    }
+  }
+
+  onFullScreenChange() {
+    this.isFullScreen = !!document.fullscreenElement;
+    if (this.isFullScreen) {
+      this.rowHeight = 117;
+    } else {
+      this.rowHeight = 79;
+    }
+    console.log(this.isFullScreen);
+  }
+
+  showFullScreen() {
+    this.layout = this.layoutService.getLayout();
+    document.addEventListener(
+      'fullscreenchange',
+      this.onFullScreenChange.bind(this)
+    );
+    document.addEventListener(
+      'webkitfullscreenchange',
+      this.onFullScreenChange.bind(this)
+    );
+    document.addEventListener(
+      'mozfullscreenchange',
+      this.onFullScreenChange.bind(this)
+    );
+    document.addEventListener(
+      'MSFullscreenChange',
+      this.onFullScreenChange.bind(this)
+    );
+  }
+
+  hiddenFullscreen() {
+    document.removeEventListener(
+      'fullscreenchange',
+      this.onFullScreenChange.bind(this)
+    );
+    document.removeEventListener(
+      'webkitfullscreenchange',
+      this.onFullScreenChange.bind(this)
+    );
+    document.removeEventListener(
+      'mozfullscreenchange',
+      this.onFullScreenChange.bind(this)
+    );
+    document.removeEventListener(
+      'MSFullscreenChange',
+      this.onFullScreenChange.bind(this)
+    );
   }
 
   stopEventPropagation(event: Event) {

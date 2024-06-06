@@ -1,6 +1,14 @@
 <div class="container-save-disposition">
   <span> Ações </span>
   <div>
+    <button (click)="toggleFullScreen()">
+      <fa-icon
+        class="iconview"
+        [icon]="icons.fullScreen"
+        [size]="'xl'"
+      ></fa-icon
+      >Tela cheia
+    </button>
     <button (click)="updateCombinedLayout()">
       <fa-icon class="iconview" [icon]="icons.back" [size]="'xl'"></fa-icon
       >Reordenar
@@ -36,9 +44,17 @@
     </div>
   </div>
 </div>
-<div class="main-container" (click)="saveFilterLabel()">
+<div
+  class="main-container contentFS"
+  (click)="saveFilterLabel()"
+  #fullScreenDiv
+>
   <div class="playground-container">
-    <div class="grid-container" #gridContainer>
+    <div
+      class="grid-container"
+      #gridContainer
+      [class.full-height]="isFullScreen"
+    >
       <ktd-grid
         [cols]="cols"
         [rowHeight]="rowHeight"
@@ -67,7 +83,11 @@
             style="width: 100%; height: 100%"
             class="menu-container"
           >
-            <button [cdkMenuTriggerFor]="menuedit" class="buttonMenu">
+            <button
+              [cdkMenuTriggerFor]="menuedit"
+              [class.hidden]="isFullScreen"
+              class="buttonMenu"
+            >
               <fa-icon
                 class="iconmenu"
                 [icon]="icons.menu"
@@ -88,7 +108,11 @@
             class="table-container mat-elevation-z8 menu-container"
             tabindex="0"
           >
-            <button [cdkMenuTriggerFor]="menuedit" class="buttonMenu">
+            <button
+              [cdkMenuTriggerFor]="menuedit"
+              [class.hidden]="isFullScreen"
+              class="buttonMenu"
+            >
               <fa-icon
                 class="iconmenu"
                 [icon]="icons.menu"
@@ -151,7 +175,11 @@
             *ngIf="item.type == 'chart'"
             class="chart-container menu-container"
           >
-            <button [cdkMenuTriggerFor]="menuedit" class="buttonMenu">
+            <button
+              [cdkMenuTriggerFor]="menuedit"
+              [class.hidden]="isFullScreen"
+              class="buttonMenu"
+            >
               <fa-icon
                 class="iconmenu"
                 [icon]="icons.menu"

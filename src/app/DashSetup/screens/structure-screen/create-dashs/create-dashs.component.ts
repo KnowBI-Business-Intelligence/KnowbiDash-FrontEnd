@@ -21,7 +21,7 @@ import {
   faClose,
   faFilterCircleXmark,
   faMagnifyingGlass,
-  faTable,
+  faTableCells,
 } from '@fortawesome/free-solid-svg-icons';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 
@@ -47,7 +47,7 @@ export class CreateDashsComponent implements OnInit {
     filter: faFilterCircleXmark,
     closed: faClose,
     search: faMagnifyingGlass,
-    table: faTable,
+    table: faTableCells,
   };
 
   createRegisterForm = this.formBuilder.group({
