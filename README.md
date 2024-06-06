@@ -1,19 +1,17 @@
-# KnowBI - Dashboards
+<div align="center">
+  <img height="150" src="https://github.com/KnowBI-Business-Intelligence/KnowbiDash-FrontEnd/blob/master/src/assets/images/Logo_principal_vertical_negativo.png?raw=true"  />
+</div>
 
-Este projeto foi gerado com a versão 17.0.5.
+###
 
-## Servidor de Desenvolvimento
+<h3 align="center">Koios - Nota de Atualização (v1.1.1)</h3>
 
-Execute `npm start` para um servidor de desenvolvimento. Ao executar, o navegador padrão irá abrir automaticamente em `http://localhost:333`. O aplicativo será recarregado automaticamente se você alterar e salvar algum dos arquivos de origem.
+###
 
-## Scaffolding de Código
+<h5 align="left">Próxima atualização do sistema vão conter as seguintes features:</h5>
 
-Execute `ng gerate componente-name` para gerar um novo componente. Você também pode usar `ng gerate Directive | Pipe | Serviço | Classe | Guard | Interface | Enum`.
+###
 
-## Construção
+<p align="left">No cadastro/edição do usuário serão inseridos os campos:<br>- Data de nascimento <br>- CPF(com validador)<br>- Vínculo de setor(agrupamento)<br>- Vínculo de instituição (agrupamento)<br><br>Será incluída uma nova ferramenta no menu lateral chamada (empresa) onde vão poder ser realizado os cadastros da instituição como os dados da instituição, e setores</p>
 
-Execute `ng build` para construir o projeto. Os artefatos de construção serão armazenados no diretório `dist/`.
-
-## Informações Adicionais
-
-Para obter mais ajuda na CLI angular, use `ng help` ou vá conferir a página [Visão geral da CLI angular](https://angular.io/cli).
+###
