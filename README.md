@@ -15,3 +15,9 @@
 <p align="left">No cadastro/edição do usuário serão inseridos os campos:<br>- Data de nascimento <br>- CPF(com validador)<br>- Vínculo de setor(agrupamento)<br>- Vínculo de instituição (agrupamento)<br><br>Será incluída uma nova ferramenta no menu lateral chamada (empresa) onde vão poder ser realizado os cadastros da instituição como os dados da instituição, e setores</p>
 
 ###
+
+<div align="right">
+  <img height="200" src="https://github.com/KnowBI-Business-Intelligence/KnowbiDash-FrontEnd/blob/master/src/assets/images/Assinatura_negativa_vertical.png?raw=true"  />
+</div>
+
+###
