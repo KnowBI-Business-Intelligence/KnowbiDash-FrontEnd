@@ -17,7 +17,7 @@
 ###
 
 <div align="right">
-  <img height="200" src="https://github.com/KnowBI-Business-Intelligence/KnowbiDash-FrontEnd/blob/master/src/assets/images/Assinatura_negativa_vertical.png?raw=true"  />
+  <img height="150" src="https://github.com/KnowBI-Business-Intelligence/KnowbiDash-FrontEnd/blob/master/src/assets/images/Assinatura_negativa_vertical.png?raw=true"  />
 </div>
 
 ###
