@@ -167,7 +167,6 @@ export class CardsComponent implements OnInit, OnDestroy {
   startEditData() {
     const data = this.dataService.getData();
     this.itemId = data.itemId;
-    console.log('Item ID:', this.itemId);
     if (this.itemId != undefined) {
       this.showPreviewButton = false;
       this.loadCardEdit(this.itemId);
@@ -384,7 +383,6 @@ export class CardsComponent implements OnInit, OnDestroy {
         id: this.dashBoard.id,
       },
     };
-    console.log(cardData);
     this.createCard(cardData);
   }
 
@@ -397,7 +395,6 @@ export class CardsComponent implements OnInit, OnDestroy {
           detail: 'Card criado',
         });
         this.showPreviewButton = false;
-        console.log(data);
         this.cardPreView(data);
         this.cardId = data.id;
       },
@@ -452,8 +449,6 @@ export class CardsComponent implements OnInit, OnDestroy {
       },
     };
 
-    console.log(cardData);
-
     if (this.cardId == null) {
       this.cardId = this.itemId;
     } else if (this.itemId == null) {
@@ -469,7 +464,6 @@ export class CardsComponent implements OnInit, OnDestroy {
             summary: 'Sucesso',
             detail: 'Informações do card atualizadas',
           });
-          console.log(data);
           this.cardPreView(data);
         },
         error: (err) => {
@@ -478,7 +472,6 @@ export class CardsComponent implements OnInit, OnDestroy {
             summary: 'Erro',
             detail: 'Não foi possível concluir esta ação',
           });
-          console.log(err);
         },
       });
   }
@@ -511,11 +504,8 @@ export class CardsComponent implements OnInit, OnDestroy {
     if (this.itemId != undefined) {
       this.returnToCreateView();
     } else {
-      console.log(this.cardId);
       this.chartsService.deleteCards(this.headers, this.cardId).subscribe({
-        next: (data) => {
-          console.log(data);
-        },
+        next: (data) => {},
       });
       setTimeout(() => {
         this.returnToCreateView();
@@ -545,8 +535,6 @@ export class CardsComponent implements OnInit, OnDestroy {
             agregator: filter.agregator[0],
           };
         });
-        console.log(columnNames);
-        console.log(value);
         const result = this.formatterResultWhenDecimal(value.result);
         this.cardTitle = value.title;
         this.cardData = value.prefix + '' + result + ' ' + value.sufix;
@@ -556,9 +544,7 @@ export class CardsComponent implements OnInit, OnDestroy {
         this.sufix = value.sufix;
         this.filters = columnNames;
       },
-      error: (err) => {
-        console.log(err);
-      },
+      error: (err) => {},
     });
   }
 

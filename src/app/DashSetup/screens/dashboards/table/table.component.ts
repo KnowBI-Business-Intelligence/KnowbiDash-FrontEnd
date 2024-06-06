@@ -160,7 +160,6 @@ export class TableComponent implements OnInit {
   startEditData() {
     const data = this.dataService.getData();
     this.itemId = data.itemId;
-    console.log('Item ID:', this.itemId);
     if (this.itemId != undefined) {
       this.showPreviewButton = false;
       this.loadTableEdit(this.itemId);
@@ -261,7 +260,6 @@ export class TableComponent implements OnInit {
 
   extractValue(aggregation: string) {
     if (this.selectedtabledata) {
-      console.log(this.selectedtabledata);
       const tabledataName = this.selectedtabledata.name;
       const columnNameRegex = /^(?:AVG|COUNT|SUM)\(([^)]+)\)$/;
       let columnName;
@@ -307,7 +305,6 @@ export class TableComponent implements OnInit {
   identifiersData() {
     this.buildData = [];
     for (let i = 0; i < this.tabledata.length; i++) {
-      console.log(this.tabledata);
       const tabledataItem = this.tabledata[i].name;
       const tabledataidentifiers = this.tabledata[i].value;
       let identifiersItem = tabledataidentifiers;
@@ -341,7 +338,6 @@ export class TableComponent implements OnInit {
     if (this.buildData.length > 0) {
       this.sql += ` FROM ${this.tableName}`;
     }
-    console.log(this.sql);
   }
 
   dataRepo() {
@@ -456,7 +452,6 @@ export class TableComponent implements OnInit {
           summary: 'Sucesso',
           detail: 'Tabela criada',
         });
-        console.log(data);
         this.showPreviewButton = false;
         this.tablePreView(data);
         this.tableId = data.id;
@@ -499,7 +494,6 @@ export class TableComponent implements OnInit {
             summary: 'Erro',
             detail: 'Não foi possível concluir esta ação',
           });
-          console.log(err);
         },
       });
   }
@@ -543,9 +537,7 @@ export class TableComponent implements OnInit {
       this.returnToCreateView();
     } else {
       this.chartsService.deleteTables(this.headers, this.tableId).subscribe({
-        next: (data) => {
-          console.log(data);
-        },
+        next: (data) => {},
       });
 
       setTimeout(() => {
@@ -626,9 +618,7 @@ export class TableComponent implements OnInit {
       next: (value) => {
         this.tablePreView(value);
       },
-      error(err) {
-        console.log(err);
-      },
+      error(err) {},
     });
   }
 

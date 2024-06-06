@@ -139,9 +139,7 @@ export class CreateDashsComponent implements OnInit {
       next: (value: any) => {
         this.chartPaths = value;
       },
-      error(err: any) {
-        console.error(err);
-      },
+      error(err: any) {},
     });
   }
 
@@ -156,9 +154,7 @@ export class CreateDashsComponent implements OnInit {
 
         this.resultsLength = value?.length;
       },
-      error: (err: any) => {
-        console.error(err);
-      },
+      error: (err: any) => {},
     });
   }
 
@@ -167,7 +163,6 @@ export class CreateDashsComponent implements OnInit {
     this.tableData = [];
     this.charts.getChartsTableData(id, this.headers).subscribe({
       next: (value: any) => {
-        console.log(value);
         this.scriptStatus = value.executionStatus;
         this.scriptDataExecute = value.executedIn;
         this.tableColumns = value.columns;
@@ -176,7 +171,6 @@ export class CreateDashsComponent implements OnInit {
         this.isInformations = true;
       },
       error: (err) => {
-        console.log(err);
         this.messageService.add({
           severity: 'error',
           summary: 'Erro',
@@ -197,7 +191,6 @@ export class CreateDashsComponent implements OnInit {
 
   selectRow(row: DashboardTable) {
     this.selectedRow = row;
-    console.log(this.selectedRow);
     this.dashId = row.id;
     this.deleteButton =
       this.elementRef.nativeElement.querySelector('#deleteButton');
@@ -215,7 +208,6 @@ export class CreateDashsComponent implements OnInit {
     if (event.target.checked) {
       if (!this.requestChartPaths.some((item) => item.id === path)) {
         this.requestChartPaths.push({ id: path });
-        console.log(this.requestChartPaths);
       }
     } else {
       const index = this.requestChartPaths.findIndex(
@@ -223,7 +215,6 @@ export class CreateDashsComponent implements OnInit {
       );
       if (index !== -1) {
         this.requestChartPaths.splice(index, 1);
-        console.log(this.requestChartPaths);
       }
     }
   }
@@ -285,8 +276,6 @@ export class CreateDashsComponent implements OnInit {
       this.selectedRowChartGroup.sql.trim() !== '';
 
     this.isReadOnly = hasColumns && hasSql;
-
-    console.log(this.selectedRowChartGroup);
     this.selectedRowChartGroup.chartPath.forEach((data: any) => {
       this.requestChartPaths.push({ id: data.id });
     });
@@ -329,7 +318,6 @@ export class CreateDashsComponent implements OnInit {
       chartPath: chartPath,
     };
 
-    console.log(object);
     this.charts.createChartGroup(object, this.headers).subscribe({
       next: () => {
         this.messageService.add({
@@ -340,7 +328,6 @@ export class CreateDashsComponent implements OnInit {
         this.cancelRegister();
       },
       error: (err) => {
-        console.log(err);
         this.messageService.add({
           severity: 'error',
           summary: 'Erro',
@@ -443,7 +430,6 @@ export class CreateDashsComponent implements OnInit {
         this.notViewDashInfo();
       },
       error: (err) => {
-        console.log(err);
         this.messageService.add({
           severity: 'error',
           summary: 'Erro',
@@ -466,7 +452,6 @@ export class CreateDashsComponent implements OnInit {
       this.isLoadingRun = true;
       this.charts.updateChartGroupSQL(this.headers, sqlCode, id).subscribe({
         next: (value: any) => {
-          console.log(value);
           this.messageService.add({
             severity: 'success',
             summary: 'Sucesso',
@@ -477,7 +462,6 @@ export class CreateDashsComponent implements OnInit {
           this.showTable();
         },
         error: (err) => {
-          console.log(err);
           this.messageService.add({
             severity: 'error',
             summary: 'Erro',
@@ -502,7 +486,6 @@ export class CreateDashsComponent implements OnInit {
     this.isSQL = true;
     this.chartGroupID = row.id;
     this.sqlPlaceholder = row.sql;
-    console.log(row.sql);
   }
 
   goBack() {

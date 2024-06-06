@@ -161,9 +161,7 @@ export class ToolBarMenuComponent implements OnInit {
         this.token.signOut();
         this.router.navigate(['/login']);
       },
-      error: (e) => {
-        console.error('erro logout', e);
-      },
+      error: (e) => {},
     });
   }
 

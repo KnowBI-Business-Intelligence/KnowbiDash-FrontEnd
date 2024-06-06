@@ -57,7 +57,6 @@ export class AssistantScreenComponent implements AfterViewInit {
       }
     } catch (err) {
       ('');
-      console.error('Erro ao rolar para baixo:', err);
     }
   }
 
@@ -73,8 +72,6 @@ export class AssistantScreenComponent implements AfterViewInit {
 
     this.chatService.sendMessage(this.messageInput).subscribe({
       next: (value: any) => {
-        console.log(value);
-
         self.chatContent = true;
         self.messagesArray.push({
           text: value[0].text,
@@ -86,9 +83,7 @@ export class AssistantScreenComponent implements AfterViewInit {
 
         self.messageInput = '';
       },
-      error(err: any) {
-        console.error('Erro ao enviar mensagem:', err);
-      },
+      error(err: any) {},
     });
     self.scrollToBottom();
 

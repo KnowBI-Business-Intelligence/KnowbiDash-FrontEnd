@@ -100,7 +100,6 @@ export class LoginScreenComponent implements OnInit {
         }
       },
       error: (err) => {
-        console.log(err);
         this.isLoginLoading = false;
         if (!username || !password) {
           this.messageService.add({

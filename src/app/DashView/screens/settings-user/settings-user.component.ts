@@ -146,9 +146,7 @@ export class SettingsUserComponent implements OnInit {
           });
         }
       },
-      error: (error) => {
-        console.error('ErrgetInformations:', error);
-      },
+      error: (error) => {},
     });
   }
 

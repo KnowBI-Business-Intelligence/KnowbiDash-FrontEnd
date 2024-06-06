@@ -9,7 +9,7 @@ import {
 export const chartButtonsData = [
   {
     icon: faChartArea,
-    label: 'Area',
+    label: 'Área',
     value: 'area',
   },
   {

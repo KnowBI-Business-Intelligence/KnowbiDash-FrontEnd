@@ -62,7 +62,6 @@ export class MainScreenComponent implements OnInit {
           });
         });
         this.processData(this.profilesData);
-        console.log(this.profilesData);
       },
     });
   }
@@ -78,7 +77,6 @@ export class MainScreenComponent implements OnInit {
       this.pathsByProfile[profile.name] = paths;
       this.profiles.push({ name: profile.name, paths: paths });
       this.filteredItems = this.profiles;
-      console.log(this.filteredItems);
     });
   }
 
@@ -109,7 +107,6 @@ export class MainScreenComponent implements OnInit {
   }
 
   openChartGroup(pathObj: any) {
-    console.log(pathObj);
     this.localStorage.setEncryptedItem(
       'selectedChartPathUser',
       JSON.stringify(pathObj)

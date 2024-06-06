@@ -186,7 +186,6 @@ export class ChartComponent implements OnInit {
       this.chartGroupService.encryptedData$.subscribe((encryptedData) => {
         this.dashBoard = encryptedData;
         this.loadDataView(this.dashBoard.id);
-        console.log(this.dashBoard);
       });
   }
 
@@ -210,7 +209,6 @@ export class ChartComponent implements OnInit {
   startEditData() {
     const data = this.dataService.getData();
     this.itemId = data.itemId;
-    console.log('Item ID:', this.itemId);
     if (this.itemId != undefined) {
       this.showPreviewButton = false;
       this.loadChartEdit(this.itemId);
@@ -360,14 +358,12 @@ export class ChartComponent implements OnInit {
     }
 
     for (let i = 0; i < this.xaxis.length; i++) {
-      console.log(this.xaxis);
       const xAxisItem = this.xaxis[i].value;
       const xAxisidentifiers = this.rmTimeStamp(this.xaxis[i].name);
       this.buildData.push({ name: xAxisItem, identifiers: xAxisidentifiers });
     }
 
     for (let i = 0; i < this.series.length; i++) {
-      console.log(this.series);
       const seriesItem = this.series[i].value;
       const seriesidentifiers = this.rmTimeStamp(this.series[i].name);
       this.buildData.push({ name: seriesItem, identifiers: seriesidentifiers });
@@ -392,7 +388,6 @@ export class ChartComponent implements OnInit {
     );
 
     if (this.chartType != 'pie') {
-      console.log(this.chartType);
       this.xAxisValues = this.xaxis.map((axis) => {
         if (this.isTimestampField(axis.name)) {
           return this.formatTimestampField(axis.name);
@@ -494,8 +489,6 @@ export class ChartComponent implements OnInit {
       },
     };
 
-    console.log(chartData);
-
     if (this.yaxis.length > 0 && this.chartType != '') {
       this.createChart(chartData);
     }
@@ -504,7 +497,6 @@ export class ChartComponent implements OnInit {
   createChart(chartData: any) {
     this.chartsService.createCharts(this.headers, chartData).subscribe({
       next: (data) => {
-        console.log(data);
         this.messageService.add({
           severity: 'success',
           summary: 'Sucesso',
@@ -547,7 +539,6 @@ export class ChartComponent implements OnInit {
       },
     };
     this.chartConfig = {};
-    console.log(JSON.stringify(chartData, null, 2));
 
     if (this.chartId == null) {
       this.chartId = this.itemId;
@@ -559,7 +550,6 @@ export class ChartComponent implements OnInit {
       .updateCharts(this.headers, chartData, this.chartId)
       .subscribe({
         next: (data) => {
-          console.log(data);
           this.messageService.add({
             severity: 'success',
             summary: 'Sucesso',
@@ -573,7 +563,6 @@ export class ChartComponent implements OnInit {
             summary: 'Erro',
             detail: 'Não foi possível concluir esta ação',
           });
-          console.log(err);
         },
       });
   }
@@ -583,9 +572,7 @@ export class ChartComponent implements OnInit {
       this.returnToCreateView();
     } else {
       this.chartsService.deleteCharts(this.headers, this.chartId).subscribe({
-        next: (data) => {
-          console.log(data);
-        },
+        next: (data) => {},
       });
       setTimeout(() => {
         this.returnToCreateView();
@@ -594,8 +581,6 @@ export class ChartComponent implements OnInit {
   }
 
   chartPreView(data: any) {
-    console.log(data);
-
     const categories: string[] =
       data.xAxisColumns.length > 0
         ? Array.from(new Set(data.xAxisColumns[0].data))
@@ -666,7 +651,6 @@ export class ChartComponent implements OnInit {
 
     if (this.charts[data.id]) {
       const chart = this.charts[data.id];
-      console.log(this.charts);
       while (chart.series.length > 0) {
         chart.series[0].remove(true);
       }
@@ -827,7 +811,6 @@ export class ChartComponent implements OnInit {
         },
       };
     }
-    console.log(this.charts[data.id]);
   }
 
   chartKeys() {
@@ -916,8 +899,6 @@ export class ChartComponent implements OnInit {
         type: this.returnValueEdit(axis),
       };
     });
-    console.log(series);
-    console.log(xaxis);
     const id = value.id;
     this.titulo = value.title;
     this.chartType = value.graphType;
@@ -960,9 +941,7 @@ export class ChartComponent implements OnInit {
       next: (value) => {
         this.chartPreView(value);
       },
-      error(err) {
-        console.log(err);
-      },
+      error(err) {},
     });
   }
 

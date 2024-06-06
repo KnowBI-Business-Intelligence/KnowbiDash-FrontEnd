@@ -123,9 +123,7 @@ export class CreatePathsComponent implements OnInit {
         this.resultsLength = value?.length;
         this.getGroupChart();
       },
-      error(err: any) {
-        console.error(err);
-      },
+      error(err: any) {},
     });
   }
 
@@ -167,13 +165,11 @@ export class CreatePathsComponent implements OnInit {
     if (event.target.checked) {
       if (!this.requestProfiles.some((item) => item.id == path)) {
         this.requestProfiles.push({ id: path });
-        console.log(this.requestProfiles);
       }
     } else {
       const index = this.requestProfiles.findIndex((item) => item.id == path);
       if (index != -1) {
         this.requestProfiles.splice(index, 1);
-        console.log(this.requestProfiles);
       }
     }
   }
@@ -182,13 +178,11 @@ export class CreatePathsComponent implements OnInit {
     if (event.target.checked) {
       if (!this.requestDashboards.some((item) => item.id == path)) {
         this.requestDashboards.push({ id: path });
-        console.log(this.requestDashboards);
       }
     } else {
       const index = this.requestDashboards.findIndex((item) => item.id == path);
       if (index != -1) {
         this.requestDashboards.splice(index, 1);
-        console.log(this.requestDashboards);
       }
     }
   }
@@ -299,9 +293,6 @@ export class CreatePathsComponent implements OnInit {
         this.requestDashboards.push({ id: data.id });
       }
     });
-
-    console.log(this.requestProfiles);
-    console.log(this.requestDashboards);
   }
 
   notViewProfile() {
@@ -316,7 +307,7 @@ export class CreatePathsComponent implements OnInit {
   }
 
   onRowDoubleClick(row: PathTable) {
-    console.log('double click:', row);
+    //console.log('double click:', row);
   }
 
   deleteRegister() {
@@ -411,8 +402,6 @@ export class CreatePathsComponent implements OnInit {
       chartGroups: dashboards,
     };
 
-    console.log(requestBody);
-
     this.charts.createChartsPath(requestBody, this.headers).subscribe({
       next: () => {
         this.messageService.add({
@@ -454,7 +443,6 @@ export class CreatePathsComponent implements OnInit {
       chartGroups: dashboards,
     };
 
-    console.log(requestBody);
     this.charts
       .updateChartsPath(this.headers, requestBody, this.pathId)
       .subscribe({

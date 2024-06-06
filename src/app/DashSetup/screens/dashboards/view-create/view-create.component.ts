@@ -386,7 +386,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   }
 
   loadData(chartData: ChartData[], groupId: any) {
-    console.log(chartData);
     this.copydataJSON = [];
     this.filters = [];
     this.chartGroupsData = [];
@@ -622,7 +621,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     };
 
     this.chartGroupsData.push(chartDataFinal);
-    console.log(this.chartGroupsData);
   }
 
   public updateCombinedLayout() {
@@ -631,7 +629,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       ...this.tableGroupsData,
       ...this.chartGroupsData,
     ];
-    console.log(combinedData);
     this.updateLayout(combinedData);
     this.initFilters(this.groupInfo.id, combinedData);
   }
@@ -685,11 +682,9 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
 
     this.originalLayout = JSON.parse(JSON.stringify(this.layout));
     this.saveNewLayoutUpdated = this.layout;
-    console.log(this.layout);
   }
 
   onLayoutUpdated(layout: KtdGridLayout) {
-    console.log('update', layout);
     this.saveNewLayoutUpdated = [];
     this.layout = layout.map((updatedItem: any) => {
       const originalItem = this.originalLayout.find(
@@ -989,10 +984,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       }
     }
 
-    console.log(filteredChartData);
-    console.log(filteredTableData);
-    console.log(filteredCardData);
-
     this.updateChartGroupsData(filteredChartData);
     this.updateTableGroupsData(filteredTableData);
     this.updateCardGroupsData(filteredCardData);
@@ -1076,15 +1067,11 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       order: order,
     };
 
-    console.log(id, JSON.stringify(requestData, null, 2));
     this.chartsService.updateCharts(this.headers, requestData, id).subscribe({
       next: (data: any) => {
-        console.log(data);
         this.getCharts(data.chartGroup.id);
       },
-      error: (error: any) => {
-        console.error('Erro ao atualizar o gráfico:', error);
-      },
+      error: (error: any) => {},
     });
   }
 
@@ -1110,17 +1097,13 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
 
     this.chartsService.updateTables(this.headers, requestData, id).subscribe({
       next: (data: any) => {
-        console.log(data);
         this.getTables(data.chartGroup.id);
       },
-      error: (err: any) => {
-        console.log('erro ao atualizar tabela', err);
-      },
+      error: (err: any) => {},
     });
   }
 
   updateCards(id: string, sql: string, filters: any) {
-    console.log(filters);
     const formattedFilters = filters.map((filter: any) => ({
       column: filter.column,
       operator: filter.operator,
@@ -1133,15 +1116,11 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       filters: formattedFilters,
     };
 
-    console.log(formattedFilters);
     this.chartsService.updateCards(this.headers, requestData, id).subscribe({
       next: (data: any) => {
-        console.log('card: ', data);
         this.getCards(data.chartGroup.id);
       },
-      error(err) {
-        console.log('erro ao atualizar card', err);
-      },
+      error(err) {},
     });
   }
 

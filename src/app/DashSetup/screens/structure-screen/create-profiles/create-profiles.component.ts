@@ -120,9 +120,7 @@ export class CreateProfilesComponent implements OnInit {
         this.resultsLength = value?.length;
         this.getPaths();
       },
-      error: (err: Error) => {
-        console.error(err);
-      },
+      error: (err: Error) => {},
     });
   }
 
@@ -152,7 +150,6 @@ export class CreateProfilesComponent implements OnInit {
       );
       if (index !== -1) {
         this.requestChartPaths.splice(index, 1);
-        console.log(this.requestChartPaths);
       }
     }
   }
@@ -338,7 +335,6 @@ export class CreateProfilesComponent implements OnInit {
       chartPaths,
     };
 
-    console.log(requestBody);
     this.profile.createProfiles(requestBody, this.headers).subscribe({
       next: () => {
         this.messageService.add({
@@ -360,7 +356,6 @@ export class CreateProfilesComponent implements OnInit {
   }
 
   updateProfile() {
-    console.log(this.profileId);
     this.notViewProfile();
     const name = this.editProfilesForm.get('name')?.value as string;
     const observation = this.editProfilesForm.get('observation')
@@ -376,7 +371,6 @@ export class CreateProfilesComponent implements OnInit {
       chartPaths,
     };
 
-    console.log(requestBody);
     this.profile
       .updateProfiles(this.profileId, requestBody, this.headers)
       .subscribe({
