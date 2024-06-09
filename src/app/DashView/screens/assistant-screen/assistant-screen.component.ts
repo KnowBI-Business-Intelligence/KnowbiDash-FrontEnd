@@ -16,15 +16,23 @@ import { StorageService } from '../../../core/services/user/storage.service';
 export class AssistantScreenComponent implements AfterViewInit {
   @ViewChild('chatHistory') chatHistory!: ElementRef;
 
-  messagesArray: { text: string; from: string; hour: string }[] = [];
+  messagesArray: {
+    text: string;
+    from: string;
+    hour: string;
+    isLast: boolean;
+  }[] = [];
   messageInput: string = '';
   username: string = '';
-  chatContent: boolean = true;
+  chatContent: boolean = false;
   isTyping: boolean = false;
+  isTypingDot: boolean = true;
+  showInitials: boolean = true;
   typingSpeed: number = 25;
 
   userStorage: any;
   userFirstName: any;
+  userFirstNameLetter: string;
 
   constructor(
     private chatService: ChatbotService,
@@ -32,6 +40,7 @@ export class AssistantScreenComponent implements AfterViewInit {
   ) {
     this.userStorage = storageService.getUser().fullUserName;
     this.userFirstName = this.userStorage.split(' ')[0];
+    this.userFirstNameLetter = this.userFirstName[0].charAt(0).toUpperCase();
     this.chatService.receiveMessages().subscribe((message) => {
       this.processReceivedMessage(message);
       this.scrollToBottom();
@@ -60,10 +69,14 @@ export class AssistantScreenComponent implements AfterViewInit {
   }
 
   sendMessageRequest(): void {
+    this.chatContent = true;
+    this.isTypingDot = true;
+    this.setLastMessageFlag(false);
     this.messagesArray.push({
       text: this.messageInput,
       from: this.userFirstName,
       hour: this.getCurrentDate(),
+      isLast: true,
     });
     console.log(this.messagesArray);
     this.chatService.sendMessage(this.messageInput);
@@ -81,27 +94,29 @@ export class AssistantScreenComponent implements AfterViewInit {
 
   processReceivedMessage(message: string) {
     const lastMessage = this.messagesArray[this.messagesArray.length - 1];
-    const botName = 'Koios';
+    const botName = 'MirAI';
     const timestamp = this.getCurrentDate();
 
     let newMessage = '';
 
     if (lastMessage && lastMessage.from === botName) {
       newMessage = lastMessage.text + ' ' + message;
-      lastMessage.hour = timestamp; // Atualizar a hora para a mais recente
+      lastMessage.hour = timestamp;
+      lastMessage.isLast = true;
     } else {
-      // Se não, é uma nova mensagem do bot
+      this.setLastMessageFlag(false);
       newMessage = message;
       this.messagesArray.push({
         text: newMessage,
         from: botName,
         hour: timestamp,
+        isLast: true,
       });
     }
-
     this.isTyping = true;
     const typingTimer = setInterval(() => {
       if (newMessage.length > 0) {
+        this.isTypingDot = false;
         this.messagesArray[this.messagesArray.length - 1].text +=
           newMessage.charAt(0);
         newMessage = newMessage.substring(1);
@@ -110,5 +125,11 @@ export class AssistantScreenComponent implements AfterViewInit {
         this.isTyping = false;
       }
     }, this.typingSpeed);
+  }
+
+  setLastMessageFlag(isLast: boolean) {
+    for (const message of this.messagesArray) {
+      message.isLast = isLast;
+    }
   }
 }

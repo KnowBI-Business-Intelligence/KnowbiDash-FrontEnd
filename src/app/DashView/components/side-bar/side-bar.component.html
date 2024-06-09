@@ -104,19 +104,11 @@
           <mat-divider></mat-divider>
           <!--  -->
           <button
-            *ngIf="showPanelUser"
+            *ngIf="showPanelUser || showPanelAdmin"
             mat-menu-item
             [routerLink]="['settings']"
           >
             <span class="mat-menu-item"> Meu Perfil</span>
-          </button>
-
-          <button
-            *ngIf="showPanelModerator"
-            mat-menu-item
-            [routerLink]="['user_moderator']"
-          >
-            <span class="mat-menu-item"> Meu Cadastro </span>
           </button>
 
           <button mat-menu-item [matMenuTriggerFor]="profile">

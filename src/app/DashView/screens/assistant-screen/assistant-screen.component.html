@@ -5,24 +5,24 @@
   <div class="content" *ngIf="!chatContent">
     <div class="greetings">
       <span>✨</span>
-      <h1>Olá, como posso ajudar hoje?</h1>
-      <p>Diga o que está pensando ou escolha uma sugestão.</p>
+      <h1>Olá {{ userFirstName }}</h1>
+      <h2>como posso ajudar hoje?</h2>
     </div>
 
     <div class="suggestion">
       <div class="card-seggestion">
         <p>Entender</p>
         <div class="text-suggestion">
-          <span>Como funciona o financeiro?</span>
-          <span>Como funciona a controladoria?</span>
+          <span>MirAI será sua assistente</span>
+          <span>MirAI ajudará você na busca de informações</span>
         </div>
       </div>
 
       <div class="card-seggestion">
         <p>Explorar</p>
         <div class="text-suggestion">
-          <span>Quantos atendimentos tivemos?</span>
-          <span>Qual o médico com mais atendimentos?</span>
+          <span>Valide e busque informações importates</span>
+          <span>Agilize sua tomada de decisão</span>
         </div>
       </div>
     </div>
@@ -31,19 +31,42 @@
   <div class="chat-history" #chatHistory *ngIf="chatContent">
     <div
       *ngFor="let message of messagesArray"
-      class="message"
+      class="container-message"
       [ngClass]="{
-        'user-message': message.from === getUser(),
-        'bot-message': message.from === 'Koios'
+        'user-message-align': message.from === getUser(),
+        'bot-message-align': message.from === 'MirAI'
       }"
     >
-      <div class="chat-header">
-        <p>{{ message.from }}</p>
-        <span>às {{ message.hour }}</span>
+      <div
+        class="message"
+        [ngClass]="{
+          'user-message': message.from === getUser(),
+          'bot-message': message.from === 'MirAI'
+        }"
+      >
+        <div class="chat-header">
+          <p>{{ message.from }}</p>
+          <span>às {{ message.hour }}</span>
+        </div>
+        <mat-divider></mat-divider>
+        <div class="chat-body">
+          <p>{{ message.text }}</p>
+          <div
+            class="container-dot"
+            *ngIf="message.from === 'MirAI' && isTypingDot && message.isLast"
+          >
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+          </div>
+        </div>
       </div>
-      <mat-divider></mat-divider>
-      <div class="chat-body">
-        <p>{{ message.text }}</p>
+      <div class="button-profile-menu" *ngIf="message.from === getUser()">
+        <div *ngIf="showInitials" class="initials">
+          <p>
+            {{ userFirstNameLetter }}
+          </p>
+        </div>
       </div>
     </div>
   </div>
@@ -57,7 +80,7 @@
         type="text"
         class="questions"
         [(ngModel)]="messageInput"
-        placeholder="Mensagem"
+        placeholder="Digite uma pergunta ou busca"
         (keyup.enter)="sendMessageRequest()"
       />
       <button class="buttonSend" (click)="sendMessageRequest()">
