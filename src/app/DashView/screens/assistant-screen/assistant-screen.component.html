@@ -43,9 +43,7 @@
       </div>
       <mat-divider></mat-divider>
       <div class="chat-body">
-        <p>
-          {{ message.text }}
-        </p>
+        <p>{{ message.text }}</p>
       </div>
     </div>
   </div>
@@ -59,7 +57,7 @@
         type="text"
         class="questions"
         [(ngModel)]="messageInput"
-        placeholder="Digite uma pergunta ou um comando"
+        placeholder="Mensagem"
         (keyup.enter)="sendMessageRequest()"
       />
       <button class="buttonSend" (click)="sendMessageRequest()">

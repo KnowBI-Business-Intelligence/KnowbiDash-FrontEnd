@@ -1,24 +1,51 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { API_CHAT } from '../../../../env/environment';
+import { Subject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ChatbotService {
-  constructor(private http: HttpClient) {}
+  private readonly WEBSOCKET_URL = 'ws://localhost:8000/koios/ws';
+  private socket!: WebSocket;
+  private messageSubject: Subject<string> = new Subject<string>();
 
-  private SERVICE_BOT = API_CHAT;
+  constructor() {
+    this.connect();
+  }
 
-  sendMessage(message: string): Observable<any> {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': 'http://localhost:333',
-    });
+  private connect(): void {
+    this.socket = new WebSocket(this.WEBSOCKET_URL);
 
-    const body = { message: message };
+    this.socket.onopen = (event) => {
+      console.log('WebSocket is open now.', event);
+    };
 
-    return this.http.post(this.SERVICE_BOT, body, { headers: headers });
+    this.socket.onmessage = (event) => {
+      console.log('WebSocket message received:', event);
+      this.messageSubject.next(event.data);
+    };
+
+    this.socket.onclose = (event) => {
+      console.log('WebSocket is closed now.', event);
+    };
+
+    this.socket.onerror = (error) => {
+      console.error('WebSocket error observed:', error);
+    };
+  }
+
+  sendMessage(message: string): void {
+    if (this.socket.readyState === WebSocket.OPEN) {
+      this.socket.send(message);
+    } else {
+      console.error(
+        'WebSocket is not open. Ready state is:',
+        this.socket.readyState
+      );
+    }
+  }
+
+  receiveMessages(): Observable<string> {
+    return this.messageSubject.asObservable();
   }
 }

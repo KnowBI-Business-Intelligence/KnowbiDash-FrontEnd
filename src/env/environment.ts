@@ -1,8 +1,8 @@
 const globalUrlMainAPI = 'http://localhost:8080';
-const globalUrlBOT = 'http://localhost:5005';
+const globalUrlBOT = 'ws://localhost:8000';
 
 // Variáveis de serviço do bot
-export const API_CHAT = `${globalUrlBOT}/webhooks/rest/webhook`;
+export const API_CHAT = `${globalUrlBOT}/ws`;
 
 // Variáveis de serviço do banco tasy
 export const API_ORACLE_DATABASE = `${globalUrlMainAPI}/config/oracle`;

@@ -814,7 +814,6 @@ export class AdmMainChartsComponent implements OnInit {
 
   openModal(): void {
     this.showFilters();
-    console.log(this.filters);
     let filterValuesByColumn: { [key: string]: string[] } = {};
     this.filters.forEach((filter: any) => {
       if (!(filter.column[0] in filterValuesByColumn)) {
@@ -1206,7 +1205,6 @@ export class AdmMainChartsComponent implements OnInit {
     } else {
       this.rowHeight = 79;
     }
-    console.log(this.isFullScreen);
   }
 
   showFullScreen() {

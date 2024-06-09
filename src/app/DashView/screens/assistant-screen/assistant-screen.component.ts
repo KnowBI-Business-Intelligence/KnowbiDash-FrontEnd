@@ -11,14 +11,17 @@ import { StorageService } from '../../../core/services/user/storage.service';
   standalone: true,
   imports: [FontAwesomeModule, FormsModule, CommonModule, MatDivider],
   templateUrl: './assistant-screen.component.html',
-  styleUrl: './assistant-screen.component.css',
+  styleUrls: ['./assistant-screen.component.css'],
 })
 export class AssistantScreenComponent implements AfterViewInit {
   @ViewChild('chatHistory') chatHistory!: ElementRef;
 
   messagesArray: { text: string; from: string; hour: string }[] = [];
   messageInput: string = '';
-  chatContent: boolean = false;
+  username: string = '';
+  chatContent: boolean = true;
+  isTyping: boolean = false;
+  typingSpeed: number = 25;
 
   userStorage: any;
   userFirstName: any;
@@ -29,6 +32,10 @@ export class AssistantScreenComponent implements AfterViewInit {
   ) {
     this.userStorage = storageService.getUser().fullUserName;
     this.userFirstName = this.userStorage.split(' ')[0];
+    this.chatService.receiveMessages().subscribe((message) => {
+      this.processReceivedMessage(message);
+      this.scrollToBottom();
+    });
   }
 
   ngAfterViewInit(): void {
@@ -40,14 +47,6 @@ export class AssistantScreenComponent implements AfterViewInit {
     return this.userStorage.split(' ')[0];
   }
 
-  getCurrentDate() {
-    const date = new Date();
-    const hour = date.getHours();
-    const minutes = date.getMinutes();
-
-    return `${hour}:${minutes}`;
-  }
-
   scrollToBottom(): void {
     try {
       const chatHistory = this.chatHistory;
@@ -56,37 +55,60 @@ export class AssistantScreenComponent implements AfterViewInit {
           chatHistory.nativeElement.scrollHeight;
       }
     } catch (err) {
-      ('');
+      console.error('Scroll error', err);
     }
   }
 
   sendMessageRequest(): void {
-    this.scrollToBottom();
-    const self = this;
-
     this.messagesArray.push({
       text: this.messageInput,
       from: this.userFirstName,
       hour: this.getCurrentDate(),
     });
-
-    this.chatService.sendMessage(this.messageInput).subscribe({
-      next: (value: any) => {
-        self.chatContent = true;
-        self.messagesArray.push({
-          text: value[0].text,
-          from: 'Koios',
-          hour: self.getCurrentDate(),
-        });
-
-        self.scrollToBottom();
-
-        self.messageInput = '';
-      },
-      error(err: any) {},
-    });
-    self.scrollToBottom();
-
+    console.log(this.messagesArray);
+    this.chatService.sendMessage(this.messageInput);
     this.messageInput = '';
+    this.scrollToBottom();
+  }
+
+  getCurrentDate() {
+    const date = new Date();
+    const hour = date.getHours();
+    const minutes = date.getMinutes();
+
+    return `${hour}:${minutes < 10 ? '0' + minutes : minutes}`;
+  }
+
+  processReceivedMessage(message: string) {
+    const lastMessage = this.messagesArray[this.messagesArray.length - 1];
+    const botName = 'Koios';
+    const timestamp = this.getCurrentDate();
+
+    let newMessage = '';
+
+    if (lastMessage && lastMessage.from === botName) {
+      newMessage = lastMessage.text + ' ' + message;
+      lastMessage.hour = timestamp; // Atualizar a hora para a mais recente
+    } else {
+      // Se não, é uma nova mensagem do bot
+      newMessage = message;
+      this.messagesArray.push({
+        text: newMessage,
+        from: botName,
+        hour: timestamp,
+      });
+    }
+
+    this.isTyping = true;
+    const typingTimer = setInterval(() => {
+      if (newMessage.length > 0) {
+        this.messagesArray[this.messagesArray.length - 1].text +=
+          newMessage.charAt(0);
+        newMessage = newMessage.substring(1);
+      } else {
+        clearInterval(typingTimer);
+        this.isTyping = false;
+      }
+    }, this.typingSpeed);
   }
 }

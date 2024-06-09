@@ -72,7 +72,6 @@
   min-width: 22rem;
   max-width: 24rem;
   background: #fcf9f940;
-  box-shadow: 0 6px 12px 0 #afb1c85e;
   backdrop-filter: blur(2px);
   border: 1px solid #ffffff2e;
 }
@@ -113,24 +112,25 @@
   position: absolute;
   column-gap: 1rem;
   bottom: 2.5rem;
+  border: solid 0.5px #f2f0f6;
+  background-color: #fff;
+  border-radius: 80px;
 }
 
 .questions {
   width: 40rem;
   min-width: 40rem;
   max-width: 45rem;
-  padding: 0.8rem 1.2rem;
-  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  font-size: 14px;
   color: grey;
-  border-radius: 1rem;
+  border-radius: 80px;
   border: none;
-  box-shadow: 3px 3px #eaeaf0;
   border-bottom: 1px solid transparent;
 }
 
 .questions:focus {
   outline: none;
-  border-bottom: 1px solid rgb(200, 208, 208);
 }
 
 .buttonSend {
@@ -139,12 +139,11 @@
   align-items: center;
   border: none;
   background-color: #fff;
-  border-radius: 0.8rem;
-  box-shadow: 3px 3px #eaeaf0;
+  border-radius: 80px;
   cursor: pointer;
   font-size: 1rem;
   font-weight: 500;
-  padding: 0.9rem 1.4rem;
+  padding: 0.7rem 1rem;
   color: #3725bb;
   overflow: hidden;
   transition: all 0.2s;
@@ -186,7 +185,7 @@
 
 .info-koios {
   position: absolute;
-  bottom: 0.2rem;
+  bottom: 0.7rem;
   font-size: 0.8rem;
   color: grey;
 }
@@ -198,12 +197,9 @@
   flex-direction: column;
   width: 55vw;
   overflow-y: auto;
-  height: 78vh;
+  height: 75vh;
   border-radius: 5px;
   padding: 10px;
-
-  position: absolute;
-  top: 2rem;
 }
 
 .chat-history::-webkit-scrollbar {
@@ -227,8 +223,8 @@
 }
 
 .chat-header > p {
-  font-size: 1rem;
-  font-weight: bold;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .chat-header > span {
@@ -237,11 +233,14 @@
   padding-right: 0.5rem;
 }
 
+.chat-body > p {
+  font-size: 14px;
+}
+
 .message {
-  margin-bottom: 0.625rem;
-  padding: 1.6rem 1.5rem;
+  margin-bottom: 1.625rem;
+  padding: 1rem;
   border-radius: 0.6rem;
-  box-shadow: 2px 6px 8px -3px #0000001a;
   width: 35rem;
   max-width: 35rem;
   min-width: 20rem;
@@ -251,15 +250,15 @@
   background-color: #b5b9e2;
   color: #1f1d1d;
   align-self: flex-end;
-  width: 55%;
+  width: fit-content;
+  max-width: 66%;
   border-bottom-right-radius: 3px;
-  border-top-right-radius: 2rem;
 }
 
 .bot-message {
   background-color: #f2f0f6;
   color: #2d2d2d;
-  width: 55%;
+  width: 80%;
   border-bottom-left-radius: 3px;
   border-top-left-radius: 2rem;
 }

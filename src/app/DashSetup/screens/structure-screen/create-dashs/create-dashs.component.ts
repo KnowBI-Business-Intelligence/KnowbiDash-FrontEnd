@@ -462,10 +462,26 @@ export class CreateDashsComponent implements OnInit {
           this.showTable();
         },
         error: (err) => {
+          let errorDetail = 'Erro desconhecido';
+          if (err.error && typeof err.error === 'string') {
+            try {
+              const errorObj = JSON.parse(err.error);
+              errorDetail = `Status: ${errorObj.status}, Executado em: ${errorObj.executedIn}`;
+              this.scriptStatus = errorObj.status;
+              this.scriptDataExecute = errorObj.executedIn;
+            } catch (jsonParseError) {
+              errorDetail = err.error;
+            }
+          } else if (err.error && typeof err.error === 'object') {
+            errorDetail = `Status: ${err.error.status}, Executado em: ${err.error.executedIn}`;
+            this.scriptStatus = err.error.status;
+            this.scriptDataExecute = err.error.executedIn;
+          }
+
           this.messageService.add({
             severity: 'error',
             summary: 'Erro',
-            detail: err.error,
+            detail: errorDetail,
           });
           this.isInformations = true;
           this.isLoadingRun = false;
