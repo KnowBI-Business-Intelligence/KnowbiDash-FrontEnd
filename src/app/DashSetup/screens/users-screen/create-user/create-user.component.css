@@ -237,6 +237,15 @@
   font-size: 12px;
 }
 
+.mat-mdc-option.mdc-list-item {
+  font-size: 12px;
+}
+
+.mat-mdc-option {
+  min-height: 32px;
+  border-bottom: solid 0.2px #e6e6e6;
+}
+
 .mat-mdc-chip-remove .mat-icon {
   color: #fff;
 }

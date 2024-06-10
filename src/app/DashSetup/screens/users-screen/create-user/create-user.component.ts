@@ -112,8 +112,6 @@ export class CreateUserComponent implements OnInit {
         this.profiles.push(selectedProfile.name);
         this.profileIds.push(selectedProfile.id);
       }
-      console.log(this.profiles);
-      console.log('id ', this.profileIds);
       const index = this.allProfiles.findIndex(
         (profile) => profile.name === selectedProfile.name
       );
@@ -146,12 +144,6 @@ export class CreateUserComponent implements OnInit {
       };
 
       this.allProfiles.push(removedProfileObject);
-
-      console.log(
-        `Perfil removido: ${removedProfile}, ID: ${removedProfileId}`
-      );
-
-      console.log('adicionado a todos os perfis', removedProfileObject);
 
       this.announcer.announce(`Removed ${profile}`);
 
@@ -186,7 +178,6 @@ export class CreateUserComponent implements OnInit {
           name: item.name,
           id: item.id,
         }));
-        console.log(this.allProfiles);
 
         this.filteredProfiles = this.profilesCtrl.valueChanges.pipe(
           startWith(null),
@@ -228,7 +219,6 @@ export class CreateUserComponent implements OnInit {
     const user = this.storageService.getUser();
 
     if (!user || !user.token) {
-      console.error('Token não disponível');
       return;
     }
 
@@ -265,7 +255,6 @@ export class CreateUserComponent implements OnInit {
           summary: 'Erro',
           detail: 'Ocorreu um erro durante o cadastro do usuário.',
         });
-        console.error(err);
       },
     });
   }

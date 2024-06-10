@@ -102,7 +102,6 @@ export class EditUserComponent implements OnInit {
 
   ngOnInit(): void {
     this.item = history.state.item;
-    console.log(this.item);
     this.loadUserData(this.item.id);
     this.getProfiles();
     this.rolesOptions = [
@@ -120,7 +119,6 @@ export class EditUserComponent implements OnInit {
   }
 
   selectedProfiles($event: MatAutocompleteSelectedEvent) {
-    console.log('teste');
     const selectedProfile = this.allProfiles.find(
       (profile) => profile.name === $event.option.viewValue
     );
@@ -129,8 +127,6 @@ export class EditUserComponent implements OnInit {
         this.profiles.push(selectedProfile.name);
         this.profileIds.push(selectedProfile.id);
       }
-      console.log(this.profiles);
-      console.log('id ', this.profileIds);
       const index = this.allProfiles.findIndex(
         (profile) => profile.name === selectedProfile.name
       );
@@ -164,12 +160,6 @@ export class EditUserComponent implements OnInit {
 
       this.allProfiles.push(removedProfileObject);
 
-      console.log(
-        `Perfil removido: ${removedProfile}, ID: ${removedProfileId}`
-      );
-
-      console.log('adicionado a todos os perfis', removedProfileObject);
-
       this.announcer.announce(`Removed ${profile}`);
 
       this.filteredProfiles = this.profilesCtrl.valueChanges.pipe(
@@ -184,7 +174,6 @@ export class EditUserComponent implements OnInit {
   }
 
   onSubmit() {
-    console.log(this.item.id);
     this.editUser(this.item.id);
   }
 
@@ -204,7 +193,6 @@ export class EditUserComponent implements OnInit {
     } = this.form;
 
     const profileIds = this.profileIds.map((profileIds) => profileIds);
-    console.log(profileIds);
 
     const userData = {
       fullUserName: fullusername,
@@ -215,8 +203,6 @@ export class EditUserComponent implements OnInit {
       roles: [access_level],
       perfis: profileIds,
     };
-
-    console.log(userData);
 
     this.authService.edit(id, userData, this.headers).subscribe({
       next: () => {
@@ -237,7 +223,6 @@ export class EditUserComponent implements OnInit {
           detail:
             'Ocorreu um erro durante a atualização, verifique os campos preenchidos',
         });
-        console.error(err);
       },
     });
   }
@@ -261,7 +246,11 @@ export class EditUserComponent implements OnInit {
         }
       },
       error: (error) => {
-        console.error('Erro ao carregar dados do usuário:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: `Erro ao carregar dados do usuário:', ${error}`,
+        });
       },
     });
   }

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { MatListModule } from '@angular/material/list';
 import { Router, RouterModule } from '@angular/router';
@@ -22,6 +22,7 @@ import { AuthService } from '../../../../core/services/auth/auth.service';
 import { StorageService } from '../../../../core/services/user/storage.service';
 import { UserService } from '../../../../core/services/user/user.service';
 import { CustomerService } from './data/costumer-data';
+import { ProfilesService } from '../../../../core/services/profiles/profiles.service';
 
 @Component({
   selector: 'app-users',
@@ -46,7 +47,12 @@ export class UsersComponent implements OnInit {
   @ViewChild('f') f!: NgForm;
   @ViewChild('customers') tabela!: Table;
 
+  deleteButton: HTMLElement | null = null;
+  seeButton: HTMLElement | null = null;
+
   user = this.storageService.getUser();
+  userId: any;
+  selectedRow: any;
   roles?: any;
   searchValue?: string;
   users!: Observable<any>;
@@ -58,7 +64,14 @@ export class UsersComponent implements OnInit {
   items: MenuItem[] | undefined;
   showModal: boolean = false;
   isLoginLoading: boolean = false;
+  actionButton: boolean = false;
   userName = '';
+
+  userToken = this.storageService.getUser();
+
+  headers = new HttpHeaders({
+    Authorization: `Bearer ${this.userToken.token}`,
+  });
 
   icons = {
     filter: faFilterCircleXmark,
@@ -72,8 +85,10 @@ export class UsersComponent implements OnInit {
     private customerService: CustomerService,
     private storageService: StorageService,
     private messageService: MessageService,
+    private profile: ProfilesService,
     private authService: AuthService,
     private userService: UserService,
+    private elementRef: ElementRef,
     private router: Router
   ) {}
 
@@ -92,18 +107,7 @@ export class UsersComponent implements OnInit {
   }
 
   getInformations() {
-    const user = this.storageService.getUser();
-
-    if (!user || !user.token) {
-      console.error('Token não disponível');
-      return;
-    }
-
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${user.token}`,
-    });
-
-    this.userService.getUsersInfo({ headers: headers }).subscribe({
+    this.userService.getUsersInfo({ headers: this.headers }).subscribe({
       next: (data: any) => {
         this.customerService.processUserData(data);
         this.roles = data.roles;
@@ -111,11 +115,34 @@ export class UsersComponent implements OnInit {
         this.customerService.getCustomersLarge(data).then((users) => {
           this.customers = users;
           this.loading = false;
+          this.getProfiles(users);
         });
       },
-      error: (error) => {
-        console.error('ErrgetInformations:', error);
-      },
+      error: (error) => {},
+    });
+  }
+
+  getProfiles(users: UserData[]) {
+    users.map((userData: UserData) => {
+      this.profile.getProfiles(this.headers).subscribe({
+        next: (value) => {
+          value.map((profiles: any) => {
+            profiles.users.map((profileUserData: any) => {
+              if (userData.id == profileUserData.id) {
+                const customer = this.customers.find(
+                  (c) => c.id === userData.id
+                );
+                if (customer) {
+                  if (!customer.perfis) {
+                    customer.perfis = [];
+                  }
+                  customer.perfis.push(profiles.name);
+                }
+              }
+            });
+          });
+        },
+      });
     });
   }
 
@@ -182,10 +209,17 @@ export class UsersComponent implements OnInit {
   }
 
   onRowClick(item: any) {
-    console.log(item);
-    this.router.navigate(['/admin/users_panel/edit_users'], {
-      state: { item: item },
-    });
+    this.selectedRow = item;
+    this.deleteButton =
+      this.elementRef.nativeElement.querySelector('#deleteButton');
+    this.seeButton = this.elementRef.nativeElement.querySelector('#seeButton');
+    this.userId = item.id;
+    if (this.deleteButton) {
+      this.deleteButton.style.color = '#4f80e1';
+    }
+    if (this.seeButton) {
+      this.seeButton.style.color = '#4f80e1';
+    }
   }
 
   onRowSelect(event: MouseEvent, customer: any) {
@@ -195,15 +229,13 @@ export class UsersComponent implements OnInit {
   }
 
   excludeUser() {
-    const userId = this.selectedCustomers.id;
-    console.log(userId);
+    const userId = this.selectedRow.id;
     this.isLoginLoading = true;
     setTimeout(() => {
       this.isLoginLoading = false;
     }, 2500);
 
     if (!this.user || !this.user.token) {
-      console.error('Token não disponível');
       return;
     }
 
@@ -230,13 +262,22 @@ export class UsersComponent implements OnInit {
           detail: 'Ocorreu um erro durante a exclusão.',
           life: 2500,
         });
-        console.error(err);
       },
     });
   }
 
+  viewProfile() {
+    if (this.selectedRow != undefined) {
+      this.router.navigate(['/admin/users_panel/edit_users'], {
+        state: { item: this.selectedRow },
+      });
+    }
+  }
+
   openModal(): void {
-    this.showModal = true;
+    if (this.selectedRow != undefined) {
+      this.showModal = true;
+    }
   }
 
   closeModal(): void {

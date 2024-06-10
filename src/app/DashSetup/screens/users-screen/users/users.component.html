@@ -4,14 +4,33 @@
 <div class="container">
   <header>
     <span>Usuários</span>
-    <button
-      role="button"
-      class="button-header"
-      routerLink="create_users"
-      routerLinkActive="router-link-active"
-    >
-      Adicionar
-    </button>
+    <div class="container-content-header-button-group" id="groupButton">
+      <button
+        [disabled]="actionButton"
+        class="action-button add"
+        id="addButton"
+        routerLink="create_users"
+        routerLinkActive="router-link-active"
+      >
+        Adicionar
+      </button>
+      <button
+        [disabled]="actionButton"
+        class="action-button"
+        id="deleteButton"
+        (click)="openModal()"
+      >
+        Excluir
+      </button>
+      <button
+        [disabled]="actionButton"
+        class="action-button"
+        id="seeButton"
+        (click)="viewProfile()"
+      >
+        Ver
+      </button>
+    </div>
   </header>
   <div class="content">
     <div class="card">
@@ -132,54 +151,31 @@
             #tr
             [pSelectableRow]="customer"
             (click)="onRowClick(customer)"
-            (contextmenu)="onRowSelect($event, customer)"
-            [routerLink]="['edit_users']"
-            [state]="{ item: customer }"
-            pContextMenuRow="customer"
+            [pSelectableRow]="customer"
           >
             <td>
               {{ customer.id }}
             </td>
             <td [title]="customer.fullUserName">
-              {{
-                customer.fullUserName.length > 35
-                  ? customer.fullUserName.slice(0, 35) + "..."
-                  : customer.fullUserName
-              }}
+              {{ customer.fullUserName }}
             </td>
             <td [title]="customer.userName">
-              {{
-                customer.userName.length > 35
-                  ? customer.userName.slice(0, 35) + "..."
-                  : customer.userName
-              }}
+              {{ customer.userName }}
             </td>
             <td [title]="customer.cargo">
-              {{
-                customer.cargo.length > 35
-                  ? customer.cargo.slice(0, 35) + "..."
-                  : customer.cargo
-              }}
+              {{ customer.cargo }}
             </td>
             <td [title]="customer.email">
-              {{
-                customer.email.toLowerCase().length > 35
-                  ? customer.email.toLowerCase().slice(0, 35) + "..."
-                  : customer.email.toLowerCase()
-              }}
+              {{ customer.email.toLowerCase() }}
             </td>
             <td [title]="customer.perfis">
               {{
-                customer.perfis &&
-                customer.perfis.length > 0 &&
-                customer.perfis[0]?.name.length > 35
-                  ? customer.perfis[0]?.name.slice(0, 35) + "..."
-                  : customer.perfis && customer.perfis.length > 0
-                  ? customer.perfis[0]?.name
+                customer.perfis && customer.perfis.length > 0
+                  ? customer.perfis.length +
+                    (customer.perfis.length === 1 ? " perfil" : " perfis")
                   : "Sem perfil"
               }}
             </td>
-
             <td>
               {{ getRoles(customer.roles[0].name) }}
             </td>

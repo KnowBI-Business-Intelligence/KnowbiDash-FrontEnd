@@ -171,11 +171,7 @@ export class CreateDashsComponent implements OnInit {
         this.isInformations = true;
       },
       error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Este dashboard ainda não tem dados',
-        });
+        this.errorMessageToast('Este dashboard ainda não tem dados');
         this.isLoadingTable = false;
       },
     });
@@ -320,19 +316,11 @@ export class CreateDashsComponent implements OnInit {
 
     this.charts.createChartGroup(object, this.headers).subscribe({
       next: () => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Sucesso',
-          detail: 'Dashboard criado',
-        });
+        this.successMessageToast('Dashboard criado');
         this.cancelRegister();
       },
       error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: err.error.error,
-        });
+        this.errorMessageToast(err.error.error);
       },
     });
   }
@@ -369,19 +357,11 @@ export class CreateDashsComponent implements OnInit {
         .deleteChartGroup(this.headers, this.selectedRow.id)
         .subscribe({
           next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Sucesso',
-              detail: 'Dashboard excluído',
-            });
+            this.successMessageToast('Dashboard excluído');
             this.cancelDelete();
           },
           error: () => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Erro',
-              detail: 'Erro ao excluir',
-            });
+            this.errorMessageToast('Erro ao excluir');
           },
         });
     }
@@ -422,19 +402,11 @@ export class CreateDashsComponent implements OnInit {
 
     this.charts.updateChartGroup(this.headers, object, this.dashId).subscribe({
       next: () => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Sucesso',
-          detail: 'Dashboard atualizado',
-        });
+        this.successMessageToast('Dashboard atualizado');
         this.notViewDashInfo();
       },
       error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: err.error.error,
-        });
+        this.errorMessageToast(err.error.error);
       },
     });
   }
@@ -443,52 +415,70 @@ export class CreateDashsComponent implements OnInit {
     const sqlCode = this.createRegisterForm.get('sql')?.value as any;
     const id = Number(this.chartGroupID);
     if (sqlCode.trim() === '') {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Erro',
-        detail: 'Verifique o código SQL',
-      });
+      this.errorMessageToast('Verifique o código SQL');
+    } else if (this.containsProhibitedSQL(sqlCode)) {
+      this.errorMessageToast(
+        'O script não pode conter instruções diferente de SELECT'
+      );
     } else {
       this.isLoadingRun = true;
       this.charts.updateChartGroupSQL(this.headers, sqlCode, id).subscribe({
         next: (value: any) => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Sucesso',
-            detail: 'SQL Atualizado',
-          });
+          this.successMessageToast('SQL Atualizado');
           this.isLoadingRun = false;
           this.isInformations = true;
           this.showTable();
         },
         error: (err) => {
           let errorDetail = 'Erro desconhecido';
-          if (err.error && typeof err.error === 'string') {
-            try {
-              const errorObj = JSON.parse(err.error);
-              errorDetail = `Status: ${errorObj.status}, Executado em: ${errorObj.executedIn}`;
-              this.scriptStatus = errorObj.status;
-              this.scriptDataExecute = errorObj.executedIn;
-            } catch (jsonParseError) {
-              errorDetail = err.error;
+          if ((err.error = 'jdbcUrl is required with driverClassName.')) {
+            errorDetail = err.error;
+          } else {
+            if (err.error && typeof err.error === 'string') {
+              try {
+                const errorObj = JSON.parse(err.error);
+                errorDetail = `Status: ${errorObj.status}, Executado em: ${errorObj.executedIn}`;
+                this.scriptStatus = errorObj.status;
+                this.scriptDataExecute = errorObj.executedIn;
+              } catch (jsonParseError) {
+                errorDetail = err.error;
+              }
+            } else if (err.error && typeof err.error === 'object') {
+              errorDetail = `Status: ${err.error.status}, Executado em: ${err.error.executedIn}`;
+              this.scriptStatus = err.error.status;
+              this.scriptDataExecute = err.error.executedIn;
             }
-          } else if (err.error && typeof err.error === 'object') {
-            errorDetail = `Status: ${err.error.status}, Executado em: ${err.error.executedIn}`;
-            this.scriptStatus = err.error.status;
-            this.scriptDataExecute = err.error.executedIn;
           }
 
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Erro',
-            detail: errorDetail,
-          });
+          this.errorMessageToast(errorDetail);
           this.isInformations = true;
           this.isLoadingRun = false;
           this.showTable();
         },
       });
     }
+  }
+
+  errorMessageToast(message: string) {
+    return this.messageService.add({
+      severity: 'error',
+      summary: 'Erro',
+      detail: message,
+    });
+  }
+
+  successMessageToast(message: string) {
+    return this.messageService.add({
+      severity: 'success',
+      summary: 'Sucesso',
+      detail: message,
+    });
+  }
+
+  containsProhibitedSQL(sql: string): boolean {
+    const prohibitedKeywords = ['DELETE', 'INSERT', 'UPDATE'];
+    const regex = new RegExp(`\\b(${prohibitedKeywords.join('|')})\\b`, 'i');
+    return regex.test(sql);
   }
 
   showTable() {
