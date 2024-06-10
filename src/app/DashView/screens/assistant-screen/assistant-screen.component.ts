@@ -21,6 +21,7 @@ export class AssistantScreenComponent implements AfterViewInit {
     from: string;
     hour: string;
     isLast: boolean;
+    botText?: string;
   }[] = [];
   messageInput: string = '';
   username: string = '';
@@ -78,10 +79,11 @@ export class AssistantScreenComponent implements AfterViewInit {
       hour: this.getCurrentDate(),
       isLast: true,
     });
-    console.log(this.messagesArray);
     this.chatService.sendMessage(this.messageInput);
     this.messageInput = '';
-    this.scrollToBottom();
+    setTimeout(() => {
+      this.scrollToBottom();
+    }, 70);
   }
 
   getCurrentDate() {
@@ -111,20 +113,13 @@ export class AssistantScreenComponent implements AfterViewInit {
         from: botName,
         hour: timestamp,
         isLast: true,
+        botText: newMessage,
       });
+      this.isTypingDot = false;
+      setTimeout(() => {
+        this.scrollToBottom();
+      }, 70);
     }
-    this.isTyping = true;
-    const typingTimer = setInterval(() => {
-      if (newMessage.length > 0) {
-        this.isTypingDot = false;
-        this.messagesArray[this.messagesArray.length - 1].text +=
-          newMessage.charAt(0);
-        newMessage = newMessage.substring(1);
-      } else {
-        clearInterval(typingTimer);
-        this.isTyping = false;
-      }
-    }, this.typingSpeed);
   }
 
   setLastMessageFlag(isLast: boolean) {

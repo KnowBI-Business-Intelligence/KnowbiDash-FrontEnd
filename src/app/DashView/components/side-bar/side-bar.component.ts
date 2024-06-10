@@ -52,6 +52,7 @@ export class SideBarComponent implements OnInit {
   showPanelUser: boolean = false;
   showPanelAdmin: boolean = false;
   showPanelModerator: boolean = false;
+  showModal: boolean = false;
 
   aliasName?: string;
   user: any;
@@ -152,5 +153,17 @@ export class SideBarComponent implements OnInit {
     } else {
       this.matsidenav!.style.width = '56px';
     }
+  }
+
+  openModal(): void {
+    this.showModal = true;
+  }
+
+  closeModal(): void {
+    this.showModal = false;
+  }
+
+  switchApplication() {
+    this.router.navigate(['admin']);
   }
 }

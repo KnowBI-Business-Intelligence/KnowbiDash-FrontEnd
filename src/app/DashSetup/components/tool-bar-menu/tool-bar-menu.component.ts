@@ -71,6 +71,7 @@ export class ToolBarMenuComponent implements OnInit {
   isLoggedIn: boolean = false;
   showInitials: boolean = true;
   modalView: boolean = false;
+  showModal: boolean = false;
 
   aliasName?: string;
   user: any;
@@ -175,5 +176,17 @@ export class ToolBarMenuComponent implements OnInit {
 
   toggleClose() {
     this.collapsed = false;
+  }
+
+  openModal(): void {
+    this.showModal = true;
+  }
+
+  closeModal(): void {
+    this.showModal = false;
+  }
+
+  switchApplication() {
+    this.router.navigate(['content']);
   }
 }

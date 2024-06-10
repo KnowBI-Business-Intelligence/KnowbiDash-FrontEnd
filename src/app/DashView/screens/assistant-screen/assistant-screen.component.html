@@ -1,5 +1,5 @@
 <div class="container-nav-line">
-  <span>Assistente</span>
+  <span>MirAI</span>
 </div>
 <div class="container">
   <div class="content" *ngIf="!chatContent">
@@ -37,36 +37,61 @@
         'bot-message-align': message.from === 'MirAI'
       }"
     >
-      <div
-        class="message"
-        [ngClass]="{
-          'user-message': message.from === getUser(),
-          'bot-message': message.from === 'MirAI'
-        }"
-      >
-        <div class="chat-header">
-          <p>{{ message.from }}</p>
-          <span>às {{ message.hour }}</span>
+      <div *ngIf="message.from === getUser()" class="container-user-message">
+        <div
+          class="message"
+          [ngClass]="{
+            'user-message': message.from === getUser(),
+          }"
+        >
+          <div class="chat-header">
+            <p>{{ message.from }}</p>
+            <span>às {{ message.hour }}</span>
+          </div>
+          <div class="chat-body">
+            <pre *ngIf="message.from === getUser()">{{ message.text }}</pre>
+          </div>
         </div>
-        <mat-divider></mat-divider>
-        <div class="chat-body">
-          <p>{{ message.text }}</p>
-          <div
-            class="container-dot"
-            *ngIf="message.from === 'MirAI' && isTypingDot && message.isLast"
-          >
-            <div class="dot"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
+        <div class="button-profile-menu-user">
+          <div *ngIf="showInitials" class="initials">
+            <p>
+              {{ userFirstNameLetter }}
+            </p>
           </div>
         </div>
       </div>
-      <div class="button-profile-menu" *ngIf="message.from === getUser()">
-        <div *ngIf="showInitials" class="initials">
-          <p>
-            {{ userFirstNameLetter }}
-          </p>
+      <div *ngIf="message.from == 'MirAI'" class="container-bot-message">
+        <div
+          class="message"
+          [ngClass]="{
+            'bot-message': message.from === 'MirAI'
+          }"
+        >
+          <div class="chat-header">
+            <p>{{ message.from }}</p>
+            <span>às {{ message.hour }}</span>
+          </div>
+          <div class="chat-body">
+            <pre *ngIf="message.from === 'MirAI'">{{ message.botText }}</pre>
+          </div>
         </div>
+        <div class="button-profile-menu-mirai">
+          <div *ngIf="showInitials" class="initials">
+            <p>M</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="waiting-message" *ngIf="isTypingDot">
+      <div class="button-profile-menu-mirai">
+        <div *ngIf="showInitials" class="initials">
+          <p>M</p>
+        </div>
+      </div>
+      <div class="container-dot">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
       </div>
     </div>
   </div>
@@ -105,7 +130,7 @@
   </footer>
 
   <span class="info-koios">
-    Koios pode cometer erros. Considere verificar informações importantes.
+    MirAI pode cometer erros. Considere verificar informações importantes.
   </span>
 </div>
 

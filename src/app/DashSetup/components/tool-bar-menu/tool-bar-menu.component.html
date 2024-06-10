@@ -179,6 +179,10 @@
             <span class="mat-menu-item"> Meu Perfil</span>
           </button>
 
+          <button mat-menu-item (click)="openModal()">
+            <span class="mat-menu-item"> Trocar para usuário</span>
+          </button>
+
           <button mat-menu-item [matMenuTriggerFor]="profile">
             <span class="mat-menu-item">
               Perfil:
@@ -208,3 +212,22 @@
     <router-outlet></router-outlet>
   </mat-sidenav-content>
 </mat-sidenav-container>
+
+<div
+  class="modal"
+  *ngIf="showModal"
+  id="modal"
+  [style.display]="showModal ? 'flex' : 'none'"
+>
+  <div class="modal-content">
+    <span class="close" (click)="closeModal()">&times;</span>
+    <div>
+      <h2>Tem certeza que deseja ir para a aplicação do usuário?</h2>
+      <p>Você será redirecionado para a aplicação ao clicar em "sim"</p>
+      <div class="modal-buttons">
+        <button class="cancel" (click)="closeModal()">cancelar</button>
+        <button class="exclude" (click)="switchApplication()">Sim</button>
+      </div>
+    </div>
+  </div>
+</div>
