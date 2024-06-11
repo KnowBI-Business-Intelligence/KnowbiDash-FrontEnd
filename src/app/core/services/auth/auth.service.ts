@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { Observable, catchError } from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
 import { AUTH_API, USERS_API } from '../../../../env/environment';
 
 const API_USER = USERS_API;
@@ -11,10 +12,14 @@ const API_AUTH = AUTH_API;
 })
 export class AuthService {
   private USER_KEY = 'auth-user';
-  constructor(private http: HttpClient) {}
+
+  constructor(
+    private http: HttpClient,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {}
 
   login(username: string, password: string): Observable<any> {
-    const credentials = this.http
+    return this.http
       .post(`${API_AUTH}/signin`, {
         userName: username,
         passWord: password,
@@ -24,32 +29,18 @@ export class AuthService {
           throw error;
         })
       );
-
-    return credentials;
   }
 
   getUsersInfo(headers: HttpHeaders): Observable<any> {
-    const myHeaders = {
-      headers: headers,
-    };
-
-    return this.http.get(`${API_USER}/get`, myHeaders);
+    return this.http.get(`${API_USER}/get`, { headers });
   }
 
   getById(id: any, headers: HttpHeaders): Observable<any> {
-    const myHeaders = {
-      headers: headers,
-    };
-
-    return this.http.get(`${API_USER}/get/${id}`, myHeaders);
+    return this.http.get(`${API_USER}/get/${id}`, { headers });
   }
 
   register(userData: any, headers: HttpHeaders): Observable<any> {
-    const headersRegister = {
-      headers: headers,
-    };
-
-    return this.http.post(`${API_USER}/create`, userData, headersRegister).pipe(
+    return this.http.post(`${API_USER}/create`, userData, { headers }).pipe(
       catchError((error) => {
         throw error;
       })
@@ -57,11 +48,8 @@ export class AuthService {
   }
 
   edit(id: number, userData: any, headers: any): Observable<any> {
-    const headersRgister = {
-      headers: headers,
-    };
     return this.http
-      .patch(`${API_USER}/update/${id}`, userData, headersRgister)
+      .patch(`${API_USER}/update/${id}`, userData, { headers })
       .pipe(
         catchError((error) => {
           throw error;
@@ -70,24 +58,18 @@ export class AuthService {
   }
 
   delete(id_user: number, headers: any): Observable<any> {
-    const headersRgister = {
-      headers: headers,
-    };
-
-    return this.http
-      .delete(`${API_USER}/delete/${id_user}`, headersRgister)
-      .pipe(
-        catchError((error) => {
-          throw error;
-        })
-      );
+    return this.http.delete(`${API_USER}/delete/${id_user}`, { headers }).pipe(
+      catchError((error) => {
+        throw error;
+      })
+    );
   }
 
   logout(): Observable<any> {
     return this.http.post(`${API_AUTH}/signout`, {});
   }
 
-  refreshToken(token: string) {
+  refreshToken(token: string): Observable<any> {
     return this.http
       .post(`${API_AUTH}/refreshtoken`, { refreshToken: token })
       .pipe(
@@ -98,17 +80,15 @@ export class AuthService {
   }
 
   isAutenticaded(): boolean {
-    try {
-      if (typeof window === 'undefined' || !window.sessionStorage) {
-        console.error('Acesso a window.sessionStorage indisponível.');
+    if (isPlatformBrowser(this.platformId)) {
+      try {
+        const user = window.sessionStorage.getItem(this.USER_KEY);
+        return !!user;
+      } catch (error) {
+        console.error('Erro ao verificar autenticação:', error);
         return false;
       }
-
-      const user = window.sessionStorage.getItem(this.USER_KEY);
-      return !!user;
-    } catch (error) {
-      console.error('Erro ao verificar autenticação:', error);
-      return false;
     }
+    return false;
   }
 }

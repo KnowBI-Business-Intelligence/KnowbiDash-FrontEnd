@@ -9,7 +9,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  animation: fadeOut 2s 3s forwards;
+  animation: fadeOut 3s 3s forwards;
 }
 
 .spinner {

@@ -1,5 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import * as CryptoJS from 'crypto-js';
+import { isPlatformBrowser } from '@angular/common';
 
 const TOKEN_KEY = 'auth-token';
 const REFRESHTOKEN_KEY = 'auth-refreshtoken';
@@ -10,27 +11,40 @@ const SECRET_KEY = 'mH#9@k3&!aDwFg2^';
   providedIn: 'root',
 })
 export class StorageService {
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+
+  private isSessionStorageAvailable(): boolean {
+    return (
+      isPlatformBrowser(this.platformId) &&
+      typeof window.sessionStorage !== 'undefined'
+    );
+  }
+
   signOut(): void {
-    window.sessionStorage.clear();
+    if (this.isSessionStorageAvailable()) {
+      window.sessionStorage.clear();
+    }
   }
 
   public saveToken(token: string): void {
-    const encryptedToken = CryptoJS.AES.encrypt(token, SECRET_KEY).toString();
-    window.sessionStorage.removeItem(TOKEN_KEY);
-    window.sessionStorage.setItem(TOKEN_KEY, encryptedToken);
+    if (this.isSessionStorageAvailable()) {
+      const encryptedToken = CryptoJS.AES.encrypt(token, SECRET_KEY).toString();
+      window.sessionStorage.removeItem(TOKEN_KEY);
+      window.sessionStorage.setItem(TOKEN_KEY, encryptedToken);
 
-    const user = this.getUser();
-    if (user.id) {
-      this.saveUser({ ...user, accessToken: token });
+      const user = this.getUser();
+      if (user.id) {
+        this.saveUser({ ...user, accessToken: token });
+      }
     }
   }
 
   public getToken(): string | null {
+    if (!this.isSessionStorageAvailable()) {
+      return null;
+    }
+
     try {
-      if (typeof window === 'undefined' || !window.sessionStorage) {
-        console.error('window.sessionStorage indisponível');
-        return null;
-      }
       const encryptedToken = window.sessionStorage.getItem(TOKEN_KEY);
       if (encryptedToken === null) {
         return null;
@@ -45,12 +59,18 @@ export class StorageService {
   }
 
   public saveRefreshToken(token: string): void {
-    const encryptedToken = CryptoJS.AES.encrypt(token, SECRET_KEY).toString();
-    window.sessionStorage.removeItem(REFRESHTOKEN_KEY);
-    window.sessionStorage.setItem(REFRESHTOKEN_KEY, encryptedToken);
+    if (this.isSessionStorageAvailable()) {
+      const encryptedToken = CryptoJS.AES.encrypt(token, SECRET_KEY).toString();
+      window.sessionStorage.removeItem(REFRESHTOKEN_KEY);
+      window.sessionStorage.setItem(REFRESHTOKEN_KEY, encryptedToken);
+    }
   }
 
   public getRefreshToken(): string | null {
+    if (!this.isSessionStorageAvailable()) {
+      return null;
+    }
+
     const encryptedToken = window.sessionStorage.getItem(REFRESHTOKEN_KEY);
     if (encryptedToken) {
       const bytes = CryptoJS.AES.decrypt(encryptedToken, SECRET_KEY);
@@ -61,15 +81,21 @@ export class StorageService {
   }
 
   public saveUser(user: any): void {
-    const encryptedUser = CryptoJS.AES.encrypt(
-      JSON.stringify(user),
-      SECRET_KEY
-    ).toString();
-    window.sessionStorage.removeItem(USER_KEY);
-    window.sessionStorage.setItem(USER_KEY, encryptedUser);
+    if (this.isSessionStorageAvailable()) {
+      const encryptedUser = CryptoJS.AES.encrypt(
+        JSON.stringify(user),
+        SECRET_KEY
+      ).toString();
+      window.sessionStorage.removeItem(USER_KEY);
+      window.sessionStorage.setItem(USER_KEY, encryptedUser);
+    }
   }
 
   public getUser(): any {
+    if (!this.isSessionStorageAvailable()) {
+      return {};
+    }
+
     const encryptedUser = window.sessionStorage.getItem(USER_KEY);
     if (encryptedUser) {
       const bytes = CryptoJS.AES.decrypt(encryptedUser, SECRET_KEY);

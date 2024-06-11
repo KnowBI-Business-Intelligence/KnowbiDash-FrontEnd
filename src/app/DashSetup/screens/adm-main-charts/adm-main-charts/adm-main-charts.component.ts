@@ -70,7 +70,6 @@ import {
 import { MAT_DATE_LOCALE, MAT_DATE_FORMATS } from '@angular/material/core';
 import { registerLocaleData } from '@angular/common';
 import localePt from '@angular/common/locales/pt';
-import * as _moment from 'moment';
 import 'moment/locale/pt-br';
 import { CdkMenu, CdkMenuItem, CdkMenuTrigger } from '@angular/cdk/menu';
 import { MatDivider } from '@angular/material/divider';
@@ -78,7 +77,6 @@ import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { LocalstorageService } from '../../../../core/services/local-storage/local-storage.service';
 
-_moment.locale('pt-br');
 registerLocaleData(localePt);
 
 @Component({
