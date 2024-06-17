@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Subject, Observable } from 'rxjs';
+import { API_CHAT } from '../../../../env/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ChatbotService {
-  private readonly WEBSOCKET_URL = 'ws://localhost:8000/koios/ws';
+  private readonly WEBSOCKET_URL = API_CHAT;
   private socket!: WebSocket;
   private messageSubject: Subject<string> = new Subject<string>();
 

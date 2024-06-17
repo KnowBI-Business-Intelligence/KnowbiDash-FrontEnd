@@ -2,7 +2,7 @@ const globalUrlMainAPI = 'http://100.25.3.129:8080';
 const globalUrlBOT = 'ws://100.25.3.129:8000';
 
 // Variáveis de serviço do bot
-export const API_CHAT = `${globalUrlBOT}/ws`;
+export const API_CHAT = `${globalUrlBOT}/koios/ws`;
 
 // Variáveis de serviço do banco tasy
 export const API_ORACLE_DATABASE = `${globalUrlMainAPI}/config/oracle`;
