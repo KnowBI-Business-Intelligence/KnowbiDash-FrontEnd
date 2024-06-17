@@ -1,5 +1,5 @@
-const globalUrlMainAPI = 'http://54.84.96.154:8080';
-const globalUrlBOT = 'ws://54.84.96.154:8000';
+const globalUrlMainAPI = 'http://100.25.4.141:8080';
+const globalUrlBOT = 'ws://100.25.4.141:8000';
 
 // Variáveis de serviço do bot
 export const API_CHAT = `${globalUrlBOT}/ws`;
