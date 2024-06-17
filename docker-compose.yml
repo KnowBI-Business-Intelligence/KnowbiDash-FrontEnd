@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  koios-front:
+    image: koios-front-app
+    container_name: koios-front
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "333:333"
+    command: ng serve --host 0.0.0.0 --port 333
