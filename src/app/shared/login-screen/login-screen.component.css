@@ -194,6 +194,17 @@ ul li {
   font-size: 13px;
 }
 
+.cookies-button {
+  background-color: transparent;
+  color: #2a2d2e;
+  padding: 0;
+  border: none;
+  text-decoration: underline;
+  margin: 0;
+  width: 95px;
+  font-size: 12px;
+}
+
 .form-button {
   display: flex;
   justify-content: center;

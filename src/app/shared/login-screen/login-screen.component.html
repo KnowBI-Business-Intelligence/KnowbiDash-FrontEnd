@@ -39,7 +39,13 @@
           />
         </div>
 
-        <p-button (click)="showDialog()" label="Aviso de cookies" />
+        <button
+          class="cookies-button"
+          (click)="showDialog()"
+          label="Aviso de cookies"
+        >
+          Aviso de cookies
+        </button>
         <p-dialog
           header="Valorizamos sua privacidade"
           [modal]="true"
