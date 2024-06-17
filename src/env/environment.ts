@@ -1,5 +1,5 @@
-const globalUrlMainAPI = 'http://100.25.3.129:8080';
-const globalUrlBOT = 'ws://100.25.3.129:8000';
+const globalUrlMainAPI = 'https://server.koiosbi.com.br:443';
+const globalUrlBOT = 'ws://server.koiosbi.com.br:8000';
 
 // Variáveis de serviço do bot
 export const API_CHAT = `${globalUrlBOT}/koios/ws`;
