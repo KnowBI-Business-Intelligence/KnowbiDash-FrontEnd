@@ -29,12 +29,20 @@ export class ChartgroupService {
     this.encryptedDataSubject.next(data);
   }
 
+  clearEncryptedData() {
+    this.encryptedDataSubject.next(null);
+  }
+
   setCurrentView(componentName: string): void {
     this.currentViewSubject.next(componentName);
   }
 
   getCurrentView(): Observable<string> {
     return this.currentViewSubject.asObservable();
+  }
+
+  clearCurrentView() {
+    this.currentViewSubject.next('ViewCreateComponent');
   }
 
   setData(layoutId: any, itemId: any) {
@@ -44,5 +52,10 @@ export class ChartgroupService {
 
   getData() {
     return { layoutId: this.layoutId, itemId: this.itemId };
+  }
+
+  clearData() {
+    this.layoutId = null;
+    this.itemId = null;
   }
 }

@@ -29,3 +29,7 @@ export const USERS_API = `${globalUrlMainAPI}/api/users`;
 // Variáveis
 export const FILTER_API = `${globalUrlMainAPI}/api/get/filterdate`;
 export const ATENDIMENTO_API = `${globalUrlMainAPI}/api/get/atendimentopaciente`;
+
+export const environment = {
+  production: true,
+};

@@ -9,7 +9,14 @@
     <div class="container-view-groupment">
       <div class="groupname">
         <fa-icon class="icon" [icon]="icons.dash" [size]="'xl'"></fa-icon>
-        <span>Dashboard: {{ groupName }}</span>
+        <span>{{ groupName }}</span>
+        <button (click)="closeDash()" *ngIf="isCloseDash">
+          <fa-icon
+            class="iconDashClose"
+            [icon]="icons.close"
+            [size]="'xl'"
+          ></fa-icon>
+        </button>
       </div>
       <div class="dashview">
         <div class="createview">
@@ -95,7 +102,7 @@
                 </div>
               </details>
             </div>
-            <div *ngIf="!isListContent" class="path-no-result">
+            <div *ngIf="!isListContent" id="listContent" class="path-no-result">
               <span>Sem resultado</span>
             </div>
           </div>

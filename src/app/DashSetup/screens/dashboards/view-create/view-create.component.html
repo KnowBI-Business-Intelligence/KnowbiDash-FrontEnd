@@ -1,7 +1,18 @@
-<div *ngIf="!isDashContent" class="dash-no-result">
-  <span>Este dashboard está vazio</span>
+<div *ngIf="!isDashContent && isDashSelected" class="dash-no-result">
+  <span>Dashboard vazio</span>
 </div>
-<div class="container-save-disposition" *ngIf="isDashContent">
+<div *ngIf="!isDashSelected" class="dash-no-result">
+  <span>Selecione ou crie um dashboard</span>
+  <button (click)="openStructure()">
+    Ir para estrutura
+    <fa-icon
+      class="icontrend"
+      [icon]="icons.arrowTrend"
+      [size]="'xl'"
+    ></fa-icon>
+  </button>
+</div>
+<div class="container-save-disposition" *ngIf="isDashContent && isDashSelected">
   <span> Ações </span>
   <div>
     <button (click)="toggleFullScreen()">
@@ -51,7 +62,7 @@
   class="main-container contentFS"
   (click)="saveFilterLabel()"
   #fullScreenDiv
-  *ngIf="isDashContent"
+  *ngIf="isDashContent && isDashSelected"
 >
   <div class="playground-container">
     <div

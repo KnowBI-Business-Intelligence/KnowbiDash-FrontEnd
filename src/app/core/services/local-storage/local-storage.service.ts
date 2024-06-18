@@ -22,6 +22,10 @@ export class LocalstorageService {
     return null;
   }
 
+  removeItem(key: string): void {
+    localStorage.removeItem(key);
+  }
+
   encryptData(data: any): string {
     const encryptedData = CryptoJS.AES.encrypt(
       JSON.stringify(data),

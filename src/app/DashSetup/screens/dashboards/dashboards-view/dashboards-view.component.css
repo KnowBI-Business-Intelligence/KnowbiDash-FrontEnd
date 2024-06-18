@@ -51,7 +51,7 @@
   display: flex;
   opacity: 1;
   flex-direction: column;
-  width: 0;
+  width: 245px;
   max-height: calc(84vh - 5px);
   border-right: solid 1px #e6e6e6;
   background-color: #fafafa;
@@ -75,6 +75,7 @@
 }
 
 .path-no-result {
+  transition: 1s;
   width: 100%;
   height: 100%;
   display: flex;
@@ -380,6 +381,7 @@ time {
   display: flex;
   justify-content: space-between;
   background-color: #fafafa;
+  height: calc(83vh - 2px);
 }
 
 .iconview {
@@ -416,6 +418,18 @@ time {
   position: fixed;
   bottom: 0;
   width: 100%;
+}
+
+.groupname button {
+  cursor: pointer;
+  border: none;
+  background-color: transparent;
+  height: 18px;
+}
+
+.groupname .iconDashClose {
+  font-size: 11px;
+  color: #212121a3;
 }
 
 .screen {

@@ -51,6 +51,7 @@ import {
   faPenToSquare,
   faTrash,
   faExpand,
+  faArrowTrendUp,
 } from '@fortawesome/free-solid-svg-icons';
 import { TableModule } from 'primeng/table';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
@@ -122,8 +123,8 @@ registerLocaleData(localePt);
 })
 export class ViewCreateComponent implements OnInit, OnDestroy {
   @ViewChildren(CdkMenuTrigger) menuTriggers!: QueryList<CdkMenuTrigger>;
-  @ViewChild('chartContainer') chartContainer!: ElementRef;
   @ViewChild(KtdGridComponent, { static: true }) grid!: KtdGridComponent;
+  @ViewChild('chartContainer') chartContainer!: ElementRef;
   @ViewChild('fullScreenDiv') fullScreenDiv!: ElementRef;
   private encryptedDataSubscription: Subscription | undefined;
 
@@ -135,6 +136,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     edit: faPenToSquare,
     delete: faTrash,
     fullScreen: faExpand,
+    arrowTrend: faArrowTrendUp,
   };
 
   cols: number = 50;
@@ -203,6 +205,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   isLoginLoading: boolean = false;
   isFullScreen: boolean = false;
   isDashContent: boolean = false;
+  isDashSelected: boolean = false;
   showContentFilterSwitch: boolean[] = [];
 
   minValue: number = 100;
@@ -274,10 +277,13 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   startDashboarData() {
     this.encryptedDataSubscription =
       this.chartGroupService.encryptedData$.subscribe((encryptedData) => {
-        this.groupInfo = encryptedData;
-        this.getCharts(encryptedData.id);
-        this.getCards(encryptedData.id);
-        this.getTables(encryptedData.id);
+        if (encryptedData != null) {
+          this.isDashSelected = true;
+          this.groupInfo = encryptedData;
+          this.getCharts(encryptedData.id);
+          this.getCards(encryptedData.id);
+          this.getTables(encryptedData.id);
+        }
       });
   }
 
@@ -633,9 +639,8 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       ...this.tableGroupsData,
       ...this.chartGroupsData,
     ];
-    if (combinedData.length == 0) {
+    if (combinedData.length == 0 || combinedData == null) {
       this.isDashContent = false;
-      console.log(combinedData.length);
     } else {
       this.isDashContent = true;
     }
@@ -1303,7 +1308,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     } else {
       this.rowHeight = 79;
     }
-    console.log(this.isFullScreen);
   }
 
   showFullScreen() {
@@ -1356,5 +1360,9 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       (item: any) => item.id === id
     );
     this.startDashboarData();
+  }
+
+  openStructure() {
+    this.router.navigate(['/admin/structure']);
   }
 }

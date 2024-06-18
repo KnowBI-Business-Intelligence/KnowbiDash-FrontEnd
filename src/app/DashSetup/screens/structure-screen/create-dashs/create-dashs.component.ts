@@ -24,6 +24,8 @@ import {
   faTableCells,
 } from '@fortawesome/free-solid-svg-icons';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { LocalstorageService } from '../../../../core/services/local-storage/local-storage.service';
+import { ChartgroupService } from '../../../../core/services/chartgroup/chartgroup.service';
 
 @Component({
   selector: 'app-create-dashs',
@@ -111,6 +113,7 @@ export class CreateDashsComponent implements OnInit {
   resultsLength: number = 0;
   selectedRow!: DashboardTable | null;
   selectedRowChartGroup: any;
+  inMemoryDash: any;
   private chartGroupID: any;
   sqlPlaceholder: any;
 
@@ -126,12 +129,16 @@ export class CreateDashsComponent implements OnInit {
     private charts: ChartsService,
     private token: StorageService,
     private formBuilder: FormBuilder,
-    private messageService: MessageService
+    private localStorageService: LocalstorageService,
+    private messageService: MessageService,
+    private chartGroupService: ChartgroupService
   ) {}
 
   ngOnInit(): void {
     this.getChartsGroup();
     this.getChartPath();
+    this.inMemoryDash =
+      this.localStorageService.getDecryptedItem('chartGroupview');
   }
 
   private getChartPath() {
@@ -357,6 +364,13 @@ export class CreateDashsComponent implements OnInit {
         .deleteChartGroup(this.headers, this.selectedRow.id)
         .subscribe({
           next: () => {
+            if (this.inMemoryDash != null) {
+              if (this.inMemoryDash.id == this.selectedRow!.id) {
+                this.localStorageService.removeItem('chartGroupview');
+                this.chartGroupService.clearEncryptedData();
+                this.chartGroupService.clearData();
+              }
+            }
             this.successMessageToast('Dashboard excluído');
             this.cancelDelete();
           },
@@ -396,7 +410,7 @@ export class CreateDashsComponent implements OnInit {
 
     const object = {
       name: name,
-      pgTableName: pgTableName + '_',
+      pgTableName: pgTableName,
       chartPath: chartPath,
     };
 
@@ -430,25 +444,12 @@ export class CreateDashsComponent implements OnInit {
           this.showTable();
         },
         error: (err) => {
-          let errorDetail = 'Erro desconhecido';
-          if ((err.error = 'jdbcUrl is required with driverClassName.')) {
-            errorDetail = err.error;
-          } else {
-            if (err.error && typeof err.error === 'string') {
-              try {
-                const errorObj = JSON.parse(err.error);
-                errorDetail = `Status: ${errorObj.status}, Executado em: ${errorObj.executedIn}`;
-                this.scriptStatus = errorObj.status;
-                this.scriptDataExecute = errorObj.executedIn;
-              } catch (jsonParseError) {
-                errorDetail = err.error;
-              }
-            } else if (err.error && typeof err.error === 'object') {
-              errorDetail = `Status: ${err.error.status}, Executado em: ${err.error.executedIn}`;
-              this.scriptStatus = err.error.status;
-              this.scriptDataExecute = err.error.executedIn;
-            }
-          }
+          const errorObj = JSON.parse(err.error);
+          let errorDetail =
+            errorObj.error ||
+            `Status: ${errorObj.status}, Executado em: ${errorObj.executedIn}`;
+          this.scriptStatus = errorObj.status;
+          this.scriptDataExecute = errorObj.executedIn;
 
           this.errorMessageToast(errorDetail);
           this.isInformations = true;

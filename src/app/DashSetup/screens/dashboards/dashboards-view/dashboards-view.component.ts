@@ -67,6 +67,7 @@ export class DashboardsViewComponent implements OnInit {
   currentView: string = '';
 
   lsDashboards: HTMLElement | null = null;
+  lsContent: HTMLElement | null = null;
   paths: { [key: string]: Group[] } = {};
   pathNames: { [key: string]: string } = {};
 
@@ -75,10 +76,13 @@ export class DashboardsViewComponent implements OnInit {
   selectedFilters: any = {};
   checkedValues: any = {};
   selectedGroupId: any = null;
+  isDashValid: any;
   isLoading: boolean = true;
   isShowStructure: boolean = false;
-  isListContent: boolean = true;
+  isListContent: boolean = false;
   isLoginLoading: boolean = false;
+  isCloseDash: boolean = true;
+
   user = this.storageService.getUser();
 
   constructor(
@@ -94,15 +98,17 @@ export class DashboardsViewComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadDataInit();
     const groupIdFromLocalStorage =
       this.localStorageService.getDecryptedItem('chartGroupview');
     const simulatedEvent = {
       currentTarget:
         this.elementRef.nativeElement.querySelector('.selected-group'),
     };
+    this.isDashValid = groupIdFromLocalStorage;
     this.clickPress(groupIdFromLocalStorage, simulatedEvent);
+    this.loadDataInit();
     this.startDashboarData();
+    this.interruptLoadingScreen();
   }
 
   startDashboarData() {
@@ -115,14 +121,27 @@ export class DashboardsViewComponent implements OnInit {
     this.isShowStructure = !this.isShowStructure;
     this.lsDashboards =
       this.elementRef.nativeElement.querySelector('#listDashboards');
+    this.lsContent =
+      this.elementRef.nativeElement.querySelector('#listContent');
     if (this.isShowStructure) {
-      this.lsDashboards!.style.width = '245px';
-    } else {
       this.lsDashboards!.style.width = '0';
+      if (this.isListContent == false) {
+        this.lsContent!.style.display = 'none';
+      }
+    } else {
+      this.lsDashboards!.style.width = '245px';
+      if (this.isListContent == false) {
+        this.lsContent!.style.display = 'none';
+        setTimeout(() => {
+          this.lsContent!.style.display = 'flex';
+        }, 340);
+      }
     }
-    setTimeout(() => {
-      this.viewCreateComponent.updateCombinedLayout();
-    }, 440);
+    if (this.isDashValid != null) {
+      setTimeout(() => {
+        this.viewCreateComponent.updateCombinedLayout();
+      }, 440);
+    }
   }
 
   getCurrentView() {
@@ -151,13 +170,15 @@ export class DashboardsViewComponent implements OnInit {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${this.user.token}`,
     });
-
     this.chartsService.getChartsPath(headers).subscribe({
       next: (data) => {
         this.processData(data);
       },
       error: (err) => {},
     });
+    if (this.isDashValid == null) {
+      this.isCloseDash = false;
+    }
   }
 
   getPathsArray() {
@@ -165,17 +186,18 @@ export class DashboardsViewComponent implements OnInit {
   }
 
   processData(data: any) {
-    data.forEach((path: any) => {
-      if (path != null || path != undefined) {
-        this.isListContent = true;
-      } else {
-        this.isListContent = false;
-      }
-      this.paths[path.id] = [];
-      this.pathNames[path.id] = path.name;
-      this.interruptLoadingScreen();
-    });
-    this.getDashBoards(Object.keys(this.paths));
+    if (data.length != 0) {
+      this.isListContent = true;
+      data.forEach((path: any) => {
+        this.paths[path.id] = [];
+        this.pathNames[path.id] = path.name;
+      });
+      this.getDashBoards(Object.keys(this.paths));
+    } else {
+      this.localStorageService.removeItem('chartGroupview');
+      this.chartGroupService.clearEncryptedData();
+      this.chartGroupService.clearData();
+    }
   }
 
   getDashBoards(dataPath: string[]) {
@@ -209,23 +231,29 @@ export class DashboardsViewComponent implements OnInit {
 
   clickPress(group: any, event: any) {
     this.selectedGroupId = group;
-    const encryptedData = {
-      id: group.id,
-      name: group.name,
-      workSpaces: group.workSpaces,
-    };
+    let encryptedData: any;
+    if (this.selectedGroupId != null) {
+      encryptedData = {
+        id: group.id,
+        name: group.name,
+        workSpaces: group.workSpaces,
+      };
+      this.isCloseDash = true;
+      this.groupName = `Dashboard: ${group.name}`;
+      this.chartGroupService.setEncryptedData(encryptedData);
+      this.localStorageService.setEncryptedItem(
+        'chartGroupview',
+        encryptedData
+      );
+    } else {
+      this.groupName = 'Selecione um dashboard';
+    }
+
     const clickedButton = event ? event.currentTarget : null;
-    const allButtons =
-      this.elementRef.nativeElement.querySelectorAll('.dashboardbtn');
-    allButtons.forEach((button: any) => {
-      button.style.backgroundColor = '';
-    });
     if (clickedButton) {
       clickedButton.style.backgroundColor = '#00000015';
     }
-    this.groupName = group.name;
-    this.chartGroupService.setEncryptedData(encryptedData);
-    this.localStorageService.setEncryptedItem('chartGroupview', encryptedData);
+
     group = [];
     event = [];
   }
@@ -234,5 +262,12 @@ export class DashboardsViewComponent implements OnInit {
     setTimeout(() => {
       this.isLoading = false;
     }, 800);
+  }
+
+  closeDash() {
+    this.localStorageService.removeItem('chartGroupview');
+    this.ngOnInit();
+    this.viewCreateComponent.isDashSelected = false;
+    this.isCloseDash = false;
   }
 }
