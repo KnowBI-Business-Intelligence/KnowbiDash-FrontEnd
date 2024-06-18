@@ -36,14 +36,14 @@ export const routes: Routes = [
   {
     path: 'login',
     component: LoginScreenComponent,
-    title: 'Koios - Login',
+    title: 'Koios',
   },
 
   // ADM
   {
     path: 'admin',
     component: ADMContentScreenComponent,
-    title: 'Koios - Administrador',
+    title: 'Koios',
     data: {
       breadcrumb: 'Início',
     },
@@ -52,7 +52,7 @@ export const routes: Routes = [
       {
         path: '',
         component: ADMMainScreenComponent,
-        title: 'Koios - Administrador',
+        title: 'Koios',
         data: {
           breadcrumb: '',
         },
@@ -60,7 +60,7 @@ export const routes: Routes = [
       {
         path: 'adm_main_dashboard',
         component: AdmMainDashboardsComponent,
-        title: 'Koios - Administrador',
+        title: 'Koios',
         data: {
           breadcrumb: '',
         },
@@ -68,31 +68,31 @@ export const routes: Routes = [
       {
         path: 'adm_main_charts',
         component: AdmMainChartsComponent,
-        title: 'Koios - Administrador',
+        title: 'Koios',
         data: {
           breadcrumb: '',
         },
       },
       {
         path: 'assistant',
-        title: 'Koios - Administrador',
+        title: 'Koios',
         component: AssistantScreenComponent,
         data: {
-          breadcrumb: 'Koios Assistente',
+          breadcrumb: '',
         },
       },
       {
         path: 'cofig_db',
         component: DatabaseScreenComponent,
-        title: 'Koios - Administrador',
+        title: 'Koios',
         data: {
-          breadcrumb: 'Configurar Database',
+          breadcrumb: '',
         },
         children: [
           {
             path: '',
             component: DatabaseComponentComponent,
-            title: 'Koios - Administrador',
+            title: 'Koios',
             data: {
               breadcrumb: '',
             },
@@ -102,49 +102,49 @@ export const routes: Routes = [
       {
         path: 'dashboards',
         component: DashboardsComponent,
-        title: 'Koios - Administrador',
+        title: 'Koios',
         data: {
-          breadcrumb: 'Dashboards',
+          breadcrumb: '',
         },
         children: [
           {
             path: '',
             component: DashboardsViewComponent,
-            title: 'Koios - Dashboards',
+            title: 'Koios',
             data: {
-              breadcrumb: 'Dashboards',
+              breadcrumb: '',
             },
           },
           {
             path: 'view',
             component: ViewCreateComponent,
-            title: 'Koios - view',
+            title: 'Koios',
             data: {
-              breadcrumb: 'Gráficos',
+              breadcrumb: '',
             },
           },
           {
             path: 'chart_view',
             component: ChartComponent,
-            title: 'Koios - Administrador',
+            title: 'Koios',
             data: {
-              breadcrumb: 'Gráficos',
+              breadcrumb: '',
             },
           },
           {
             path: 'card_view',
             component: CardsComponent,
-            title: 'Koios - Administrador',
+            title: 'Koios',
             data: {
-              breadcrumb: 'Cards',
+              breadcrumb: '',
             },
           },
           {
             path: 'table_view',
             component: TableComponent,
-            title: 'Koios - Administrador',
+            title: 'Koios',
             data: {
-              breadcrumb: 'Tables',
+              breadcrumb: '',
             },
           },
         ],
@@ -152,15 +152,15 @@ export const routes: Routes = [
       {
         path: 'users_panel',
         component: UsersScreenComponent,
-        title: 'Koios - Administrador',
+        title: 'Koios',
         data: {
-          breadcrumb: 'Usuários',
+          breadcrumb: '',
         },
         children: [
           {
             path: '',
             component: UsersComponent,
-            title: 'Koios - Administrador',
+            title: 'Koios',
             data: {
               breadcrumb: '',
             },
@@ -168,17 +168,17 @@ export const routes: Routes = [
           {
             path: 'create_users',
             component: CreateUserComponent,
-            title: 'Koios - Administrador',
+            title: 'Koios',
             data: {
-              breadcrumb: 'Adicionar Usuário',
+              breadcrumb: '',
             },
           },
           {
             path: 'edit_users',
             component: EditUserComponent,
-            title: 'Koios - Administrador',
+            title: 'Koios',
             data: {
-              breadcrumb: 'Editar Usuário',
+              breadcrumb: '',
             },
           },
         ],
@@ -186,15 +186,15 @@ export const routes: Routes = [
       {
         path: 'structure',
         component: StructureScreenComponent,
-        title: 'Koios - Administrador',
+        title: 'Koios',
         data: {
-          breadcrumb: 'Estrutura',
+          breadcrumb: '',
         },
         children: [
           {
             path: '',
             component: StructureComponent,
-            title: 'Koios - Administrador',
+            title: 'Koios',
             data: {
               breadcrumb: '',
             },
@@ -208,7 +208,7 @@ export const routes: Routes = [
   {
     path: 'content',
     component: ContentScreenComponent,
-    title: 'Koios - Inicio',
+    title: 'Koios',
     canActivate: [AuthGuard],
     data: {
       breadcrumb: '',
@@ -216,7 +216,7 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        title: 'Koios - Painel',
+        title: 'Koios',
         component: MainScreenComponent,
       },
       {
@@ -224,51 +224,51 @@ export const routes: Routes = [
         children: [
           {
             path: '',
-            title: 'Koios - Painel',
+            title: 'Koios',
             component: MainScreenComponent,
             data: {
-              breadcrumb: 'Main',
+              breadcrumb: '',
             },
           },
           {
             path: 'chartgroup',
-            title: 'Koios - Painel',
+            title: 'Koios',
             component: ChartGroupsComponent,
             data: {
-              breadcrumb: 'Grupos',
+              breadcrumb: '',
             },
           },
           {
             path: 'charts',
-            title: 'Koios - Painel',
+            title: 'Koios',
             component: ChartScreenComponent,
             data: {
-              breadcrumb: 'Gráficos',
+              breadcrumb: '',
             },
           },
         ],
       },
       {
         path: 'settings',
-        title: 'Koios - Painel',
+        title: 'Koios',
         component: SettingsUserComponent,
         data: {
-          breadcrumb: 'Configurações',
+          breadcrumb: '',
         },
       },
       {
         path: 'assistant',
-        title: 'Koios - Painel',
+        title: 'Koios',
         component: AssistantScreenComponent,
         data: {
-          breadcrumb: 'Assistente',
+          breadcrumb: '',
         },
       },
     ],
   },
   {
     path: '**',
-    title: 'Page Not Found! 😥',
+    title: 'Page Not Found',
     component: PageNotFoundComponent,
   },
 ];

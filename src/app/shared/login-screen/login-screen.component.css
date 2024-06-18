@@ -195,13 +195,13 @@ ul li {
 }
 
 .cookies-button {
+  cursor: pointer;
   background-color: transparent;
   color: #2a2d2e;
-  padding: 0;
+  padding: 3px;
   border: none;
   text-decoration: underline;
   margin: 0;
-  width: 95px;
   font-size: 12px;
 }
 

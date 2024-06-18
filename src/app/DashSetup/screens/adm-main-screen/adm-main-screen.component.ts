@@ -21,7 +21,7 @@ export class ADMMainScreenComponent implements OnInit {
   icons = {
     search: faMagnifyingGlass,
   };
-
+  isLoading: boolean = true;
   searchTerm: string = '';
   profiles: any[] = [];
   profilesData: any[] = [];
@@ -47,6 +47,7 @@ export class ADMMainScreenComponent implements OnInit {
   getUserById(id: number, token: any) {
     this.authService.getById(id, this.headers).subscribe({
       next: (data: any) => {
+        this.interruptLoadingScreen();
         this.getProfilesData(data.id);
       },
     });
@@ -113,5 +114,11 @@ export class ADMMainScreenComponent implements OnInit {
       JSON.stringify(pathObj)
     );
     this.router.navigate(['admin/adm_main_dashboard']);
+  }
+
+  interruptLoadingScreen() {
+    setTimeout(() => {
+      this.isLoading = false;
+    }, 500);
   }
 }

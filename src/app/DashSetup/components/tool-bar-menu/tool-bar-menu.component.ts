@@ -111,8 +111,8 @@ export class ToolBarMenuComponent implements OnInit {
     } else {
       this.icon = this.elementRef.nativeElement.querySelector('.icon');
       this.item = this.elementRef.nativeElement.querySelector('.menu-item');
-      this.icon!.style.color = '#5F65A5';
-      this.item!.style.color = '#5F65A5';
+      this.icon!.style.color = '#7B5FA5';
+      this.item!.style.color = '#7B5FA5';
     }
 
     this.getProfilesData(this.user.id);

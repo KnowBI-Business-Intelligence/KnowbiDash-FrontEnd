@@ -202,6 +202,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   isShowFilterModal: boolean = false;
   isLoginLoading: boolean = false;
   isFullScreen: boolean = false;
+  isDashContent: boolean = false;
   showContentFilterSwitch: boolean[] = [];
 
   minValue: number = 100;
@@ -246,7 +247,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.startDashboarData();
     this.showFullScreen();
-    this.filters.forEach((filter, index) => {
+    this.filters.forEach((index) => {
       this.showContentFilterSwitch[index] = false;
     });
     this.resizeSubscription = merge(
@@ -632,6 +633,12 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       ...this.tableGroupsData,
       ...this.chartGroupsData,
     ];
+    if (combinedData.length == 0) {
+      this.isDashContent = false;
+      console.log(combinedData.length);
+    } else {
+      this.isDashContent = true;
+    }
     this.updateLayout(combinedData);
     this.initFilters(this.groupInfo.id, combinedData);
   }

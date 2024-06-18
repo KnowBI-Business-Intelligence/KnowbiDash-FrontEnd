@@ -1,7 +1,10 @@
+<div id="loading-screen" *ngIf="isLoading">
+  <div class="spinner"></div>
+</div>
 <div class="container-nav-line">
   <span>Dashboards</span>
 </div>
-<div class="container">
+<div class="container" *ngIf="!isLoading">
   <div class="views">
     <div class="container-view-groupment">
       <div class="groupname">
@@ -66,7 +69,7 @@
           class="view-create-component"
         >
           <div class="list-dashboards" id="listDashboards">
-            <div class="panel">
+            <div class="panel" *ngIf="isListContent">
               <details *ngFor="let pathId of getPathsArray()">
                 <summary>
                   <ul [title]="pathNames[pathId]">
@@ -91,6 +94,9 @@
                   </div>
                 </div>
               </details>
+            </div>
+            <div *ngIf="!isListContent" class="path-no-result">
+              <span>Sem resultado</span>
             </div>
           </div>
           <app-view-create #viewCreate class="screen"></app-view-create>

@@ -63,7 +63,6 @@ export class DashboardsViewComponent implements OnInit {
   @ViewChild('chartContainer') chartContainer!: ElementRef;
   name = 'Angular';
   position!: string;
-  chartConfig: any;
   groupName: string = '';
   currentView: string = '';
 
@@ -72,12 +71,13 @@ export class DashboardsViewComponent implements OnInit {
   pathNames: { [key: string]: string } = {};
 
   filters: any[] = [];
+  chartConfig: any;
   selectedFilters: any = {};
   checkedValues: any = {};
   selectedGroupId: any = null;
-
+  isLoading: boolean = true;
   isShowStructure: boolean = false;
-
+  isListContent: boolean = true;
   isLoginLoading: boolean = false;
   user = this.storageService.getUser();
 
@@ -156,6 +156,7 @@ export class DashboardsViewComponent implements OnInit {
       next: (data) => {
         this.processData(data);
       },
+      error: (err) => {},
     });
   }
 
@@ -165,8 +166,14 @@ export class DashboardsViewComponent implements OnInit {
 
   processData(data: any) {
     data.forEach((path: any) => {
+      if (path != null || path != undefined) {
+        this.isListContent = true;
+      } else {
+        this.isListContent = false;
+      }
       this.paths[path.id] = [];
       this.pathNames[path.id] = path.name;
+      this.interruptLoadingScreen();
     });
     this.getDashBoards(Object.keys(this.paths));
   }
@@ -221,5 +228,11 @@ export class DashboardsViewComponent implements OnInit {
     this.localStorageService.setEncryptedItem('chartGroupview', encryptedData);
     group = [];
     event = [];
+  }
+
+  interruptLoadingScreen() {
+    setTimeout(() => {
+      this.isLoading = false;
+    }, 800);
   }
 }

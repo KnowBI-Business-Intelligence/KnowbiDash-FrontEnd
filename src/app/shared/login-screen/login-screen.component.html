@@ -1,7 +1,7 @@
 <div *ngIf="isLoading" id="loading-screen">
   <div class="spinner"></div>
 </div>
-<div class="container">
+<div class="container" *ngIf="!isLoading">
   <div class="col-md-12">
     <div class="card card-container" *ngIf="isModal">
       <div class="card-logo">
@@ -16,6 +16,7 @@
         <div class="form-group">
           <label for="username">Usuário</label>
           <input
+            (keyup.enter)="onSubmit()"
             type="text"
             class="form-control"
             name="username"
@@ -28,6 +29,7 @@
         <div class="form-group">
           <label for="password">Senha</label>
           <input
+            (keyup.enter)="onSubmit()"
             type="password"
             class="form-control"
             name="password"
@@ -39,13 +41,13 @@
           />
         </div>
 
-        <button
+        <span
           class="cookies-button"
           (click)="showDialog()"
           label="Aviso de cookies"
         >
           Aviso de cookies
-        </button>
+        </span>
         <p-dialog
           header="Valorizamos sua privacidade"
           [modal]="true"
@@ -99,6 +101,7 @@
         <div class="form-button">
           <button
             (click)="onSubmit()"
+            (keyup.enter)="onSubmit()"
             pButton
             pRipple
             type="button"

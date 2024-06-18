@@ -1,4 +1,7 @@
-<div class="container-save-disposition">
+<div *ngIf="!isDashContent" class="dash-no-result">
+  <span>Este dashboard está vazio</span>
+</div>
+<div class="container-save-disposition" *ngIf="isDashContent">
   <span> Ações </span>
   <div>
     <button (click)="toggleFullScreen()">
@@ -19,7 +22,7 @@
     </button>
   </div>
 </div>
-<div class="container-data">
+<div class="container-data" *ngIf="isDashContent">
   <span> Dados </span>
   <div>
     <button (click)="openModal()">
@@ -48,6 +51,7 @@
   class="main-container contentFS"
   (click)="saveFilterLabel()"
   #fullScreenDiv
+  *ngIf="isDashContent"
 >
   <div class="playground-container">
     <div
