@@ -28,3 +28,30 @@
 :host ::ng-deep a {
   font-size: 12px !important;
 }
+
+:host ::ng-deep .p-paginator-current,
+.p-paginator-rpp-options {
+  font-size: 12px;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-header {
+  border-left: none;
+  border-right: none;
+}
+
+:host ::ng-deep .p-datatable .p-paginator-bottom {
+  padding: 2px;
+}
+
+:host ::ng-deep .p-paginator .p-paginator-pages .p-paginator-page {
+  font-size: 12px;
+}
+
+:host ::ng-deep a {
+  font-size: 12px !important;
+}
+
+:host ::ng-deep .p-toast .p-toast-message.p-toast-message-error,
+:host ::ng-deep .p-toast .p-toast-message.p-toast-message-success {
+  margin-top: 20px !important;
+}

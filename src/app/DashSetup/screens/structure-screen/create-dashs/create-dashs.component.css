@@ -304,8 +304,20 @@ textarea {
   resize: none;
 }
 
+.paths-load {
+  background-color: #fff;
+  width: 100%;
+  height: 260.5px;
+}
+
 .paths {
   width: 100%;
+}
+
+.paths-load-table-span {
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
 }
 
 .paths table {
@@ -468,6 +480,7 @@ textarea {
   display: flex;
   flex-direction: column;
   width: 100%;
+  height: calc(100%);
 }
 
 .content-sql_header {
@@ -486,13 +499,16 @@ textarea {
 .content-sql_body {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   margin-top: 10px;
+  height: 100%;
 }
 
 .content-sql-info {
   display: flex;
   justify-content: space-between;
   width: 100%;
+  margin-top: 5px;
 }
 
 .content-sql_buttons {
@@ -549,9 +565,15 @@ textarea {
   font-size: 20px;
 }
 
+.sql-body_code {
+  height: 50%;
+  display: flex;
+  flex-direction: column;
+}
+
 .sql-body_code textarea {
   width: 100%;
-  height: 12.5rem;
+  height: 100%;
   resize: none;
   border: 1px solid #e5e5e5;
   padding: 0.5rem;
@@ -568,6 +590,9 @@ textarea {
 
 .sql-body_result {
   width: 100%;
+  display: flex;
+  align-items: end;
+  z-index: 1;
 }
 
 .body-sql-result p {
@@ -585,55 +610,6 @@ textarea {
 
 .body-sql-result_columns span {
   margin-right: 0.8rem;
-}
-
-:host ::ng-deep .p-toast .p-toast-message .p-toast-message-content {
-  padding: 1rem;
-  border-width: 0 0 0 6px;
-  font-size: 15px;
-  border-radius: 2px;
-}
-
-:host ::ng-deep .p-toast .p-toast-message .p-toast-icon-close {
-  border-radius: 50%;
-  background: transparent;
-  transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
-  width: 13px;
-  height: 13px;
-  color: #444444;
-}
-
-:host
-  ::ng-deep
-  .p-toast
-  .p-toast-message
-  .p-toast-message-content
-  .p-icon:not(.p-toast-icon-close-icon) {
-  width: 2rem;
-  height: 23px;
-  margin: 0 10px 0 0 !important;
-}
-
-:host ::ng-deep a {
-  font-size: 12px !important;
-}
-
-:host ::ng-deep .p-paginator-current,
-.p-paginator-rpp-options {
-  font-size: 12px;
-}
-
-:host ::ng-deep .p-datatable .p-datatable-header {
-  border-left: none;
-  border-right: none;
-}
-
-:host ::ng-deep .p-datatable .p-paginator-bottom {
-  padding: 2px;
-}
-
-:host ::ng-deep .p-paginator .p-paginator-pages .p-paginator-page {
-  font-size: 12px;
 }
 
 @-webkit-keyframes spin {

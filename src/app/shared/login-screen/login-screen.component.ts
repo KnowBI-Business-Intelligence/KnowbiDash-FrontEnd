@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { MessageService } from 'primeng/api';
@@ -11,6 +11,12 @@ import { StorageService } from '../../core/services/user/storage.service';
 import { BreadcrumbsComponent } from '../breadcrumbs/breadcrumbs.component';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import {
+  IconDefinition,
+  faEye,
+  faEyeSlash,
+} from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-login-screen',
@@ -25,14 +31,15 @@ import { ButtonModule } from 'primeng/button';
     BreadcrumbModule,
     DialogModule,
     ButtonModule,
+    FontAwesomeModule,
   ],
   providers: [MessageService],
   templateUrl: './login-screen.component.html',
   styleUrl: './login-screen.component.css',
 })
-export class LoginScreenComponent implements OnInit {
+export class LoginScreenComponent implements OnInit, AfterViewInit {
+  mainContent: HTMLElement | null = null;
   isADM!: boolean;
-  isLoading: boolean = true;
   isModal: boolean = true;
   visible: boolean = false;
   isLoginLoading: boolean = false;
@@ -42,27 +49,49 @@ export class LoginScreenComponent implements OnInit {
     password: null,
   };
 
-  roles: string[] = [];
+  icons = {
+    eye: faEye,
+    eyeSlash: faEyeSlash,
+  };
 
+  roles: string[] = [];
+  currentIcon: IconDefinition = this.icons.eye;
   constructor(
     private authService: AuthService,
     private storageService: StorageService,
     private routes: Router,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private elementRef: ElementRef
   ) {}
 
   ngOnInit(): void {
     if (this.storageService.getToken()) {
       this.roles = this.storageService.getUser().roles;
     }
+  }
 
+  ngAfterViewInit(): void {
+    this.loadingScreen();
+  }
+
+  loadingScreen() {
+    this.mainContent =
+      this.elementRef.nativeElement.querySelector('.container');
+    this.mainContent?.style.display;
     setTimeout(() => {
-      this.isLoading = false;
+      this.mainContent!.style.display = 'flex';
     }, 2000);
   }
 
   showDialog() {
     this.visible = true;
+  }
+
+  toggleIcon() {
+    this.currentIcon =
+      this.currentIcon === this.icons.eye
+        ? this.icons.eyeSlash
+        : this.icons.eye;
   }
 
   defaultOrAdm(isAdmin: boolean): void {

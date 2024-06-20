@@ -73,7 +73,6 @@ export class DatabaseComponentComponent {
           detail: `Conectado a base de dados`,
           severity: 'success',
         });
-        that.f.reset();
         that.isConected = true;
         this.isLoginLoading = false;
       },

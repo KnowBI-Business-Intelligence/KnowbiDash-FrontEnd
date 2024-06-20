@@ -9,7 +9,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  animation: fadeOut 3s 3s forwards;
+  animation: fadeOut 2s forwards;
 }
 
 .spinner {
@@ -120,13 +120,11 @@
 }
 
 .container {
-  display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  opacity: 0;
   height: 98vh;
-  animation: fadeIn 1.2s ease-in 0.5s forwards;
+  display: none;
 }
 
 .col-md-12 {
@@ -148,6 +146,10 @@
   box-shadow: 0px 0px 2px 0px #abbac0;
 }
 
+form {
+  width: 82%;
+}
+
 .form-group {
   margin-top: 1.5rem;
 }
@@ -166,17 +168,43 @@ label {
   font-weight: 450;
 }
 
+.input-name {
+  border: 1px solid #d0d0d0 !important;
+}
+
 input {
   display: flex;
   gap: 0.625rem;
-  width: 22rem;
+  width: 100%;
   padding: 0.625rem;
   align-items: center;
   border-radius: 0.25rem;
+  border: none;
+  background-color: #ffffff;
+  outline: none;
+}
+
+.password-group {
+  display: flex;
+  background-color: transparent;
+  align-items: center;
   border: 1px solid #d0d0d0;
   background-color: #ffffff;
-  margin-top: 0.5rem;
-  outline: none;
+  border-radius: 0.25rem;
+}
+
+.password-group button {
+  background-color: transparent;
+  width: 5px;
+  padding: 15px;
+  margin: 0px;
+  height: 20px;
+  border: none;
+}
+
+.iconview {
+  color: #7b5fa5;
+  font-size: 11px;
 }
 
 p {
@@ -325,19 +353,17 @@ footer span {
 }
 
 @keyframes fadeOut {
-  from {
-    opacity: 1;
+  0% {
+    display: flex;
   }
-  to {
-    opacity: 0;
+
+  100% {
+    display: none;
   }
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
+@media screen and (max-width: 400px) {
+  .card {
+    width: 20rem;
   }
 }

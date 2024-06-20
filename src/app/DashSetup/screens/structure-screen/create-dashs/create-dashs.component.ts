@@ -26,6 +26,7 @@ import {
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { LocalstorageService } from '../../../../core/services/local-storage/local-storage.service';
 import { ChartgroupService } from '../../../../core/services/chartgroup/chartgroup.service';
+import { SkeletonModule } from 'primeng/skeleton';
 
 @Component({
   selector: 'app-create-dashs',
@@ -40,9 +41,13 @@ import { ChartgroupService } from '../../../../core/services/chartgroup/chartgro
     ToastModule,
     DropdownModule,
     FontAwesomeModule,
+    SkeletonModule,
   ],
   templateUrl: './create-dashs.component.html',
-  styleUrl: './create-dashs.component.css',
+  styleUrls: [
+    './create-dashs.component.css',
+    '../../../../core/globalStyle/toast.css',
+  ],
 })
 export class CreateDashsComponent implements OnInit {
   icons = {
@@ -97,6 +102,8 @@ export class CreateDashsComponent implements OnInit {
   isLoadingTable: boolean = false;
   isReadOnly: boolean = false;
   isInformations: boolean = false;
+  isLoadTable: boolean = true;
+  isStartScript: boolean = false;
 
   dataSource: any;
   chartPaths: any;
@@ -109,6 +116,7 @@ export class CreateDashsComponent implements OnInit {
   selectedTab: string = '---';
   searchValue?: string;
   scriptStatus: string = '';
+  statusExecuting: string = '';
   scriptDataExecute: string = '';
   resultsLength: number = 0;
   selectedRow!: DashboardTable | null;
@@ -170,6 +178,7 @@ export class CreateDashsComponent implements OnInit {
     this.tableData = [];
     this.charts.getChartsTableData(id, this.headers).subscribe({
       next: (value: any) => {
+        this.isLoadTable = false;
         this.scriptStatus = value.executionStatus;
         this.scriptDataExecute = value.executedIn;
         this.tableColumns = value.columns;
@@ -180,6 +189,7 @@ export class CreateDashsComponent implements OnInit {
       error: (err) => {
         this.errorMessageToast('Este dashboard ainda não tem dados');
         this.isLoadingTable = false;
+        this.isLoadTable = false;
       },
     });
   }
@@ -435,12 +445,16 @@ export class CreateDashsComponent implements OnInit {
         'O script não pode conter instruções diferente de SELECT'
       );
     } else {
+      this.isStartScript = true;
+      this.isInformations = false;
       this.isLoadingRun = true;
+      this.scriptStatusExecuting();
       this.charts.updateChartGroupSQL(this.headers, sqlCode, id).subscribe({
         next: (value: any) => {
           this.successMessageToast('SQL Atualizado');
           this.isLoadingRun = false;
           this.isInformations = true;
+          this.isStartScript = false;
           this.showTable();
         },
         error: (err) => {
@@ -454,10 +468,28 @@ export class CreateDashsComponent implements OnInit {
           this.errorMessageToast(errorDetail);
           this.isInformations = true;
           this.isLoadingRun = false;
+          this.isStartScript = false;
           this.showTable();
         },
       });
     }
+  }
+
+  scriptStatusExecuting() {
+    this.statusExecuting =
+      'Executando script SQL na base de dados de origem...';
+
+    setTimeout(async () => {
+      this.statusExecuting = 'Obtendo dados da base de origem...';
+      await this.delay(2000);
+      this.statusExecuting = 'Iniciando Processamento...';
+      await this.delay(2000);
+      this.statusExecuting = 'Copiando dados e finalizando ajustes...';
+    }, 1000);
+  }
+
+  async delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   errorMessageToast(message: string) {
@@ -483,6 +515,7 @@ export class CreateDashsComponent implements OnInit {
   }
 
   showTable() {
+    this.isLoadTable = true;
     const id = Number(this.chartGroupID);
     this.isLoadingTable = true;
     this.getTableData(id);
