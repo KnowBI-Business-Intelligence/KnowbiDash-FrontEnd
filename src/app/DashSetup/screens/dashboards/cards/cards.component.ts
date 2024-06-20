@@ -465,6 +465,7 @@ export class CardsComponent implements OnInit, OnDestroy {
             detail: 'Informações do card atualizadas',
           });
           this.cardPreView(data);
+          console.log(JSON.stringify(data, null, 2));
         },
         error: (err) => {
           this.messageService.add({

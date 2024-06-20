@@ -250,6 +250,11 @@ export class DashboardsViewComponent implements OnInit {
     }
 
     const clickedButton = event ? event.currentTarget : null;
+    const allButtons =
+      this.elementRef.nativeElement.querySelectorAll('.dashboardbtn');
+    allButtons.forEach((button: any) => {
+      button.style.backgroundColor = '';
+    });
     if (clickedButton) {
       clickedButton.style.backgroundColor = '#00000015';
     }

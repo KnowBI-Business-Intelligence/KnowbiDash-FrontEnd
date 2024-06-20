@@ -35,7 +35,10 @@ import {
   ],
   providers: [MessageService],
   templateUrl: './login-screen.component.html',
-  styleUrl: './login-screen.component.css',
+  styleUrls: [
+    './login-screen.component.css',
+    '../../core/globalStyle/toast.css',
+  ],
 })
 export class LoginScreenComponent implements OnInit, AfterViewInit {
   mainContent: HTMLElement | null = null;
@@ -94,7 +97,7 @@ export class LoginScreenComponent implements OnInit, AfterViewInit {
         : this.icons.eye;
   }
 
-  defaultOrAdm(isAdmin: boolean): void {
+  /*defaultOrAdm(isAdmin: boolean): void {
     if (isAdmin) {
       this.redirectUser(isAdmin);
     } else {
@@ -114,7 +117,7 @@ export class LoginScreenComponent implements OnInit, AfterViewInit {
         this.isLoginLoading = false;
       }, 1000);
     }
-  }
+  }*/
 
   onSubmit(): void {
     const { username, password } = this.form;
@@ -128,7 +131,8 @@ export class LoginScreenComponent implements OnInit, AfterViewInit {
         if (this.roles.includes('ROLE_ADMIN')) {
           setTimeout(() => {
             this.isLoginLoading = false;
-            this.isModal = false;
+            ['admin'];
+            this.routes.navigate(['admin']);
           }, 1000);
         } else {
           setTimeout(() => {

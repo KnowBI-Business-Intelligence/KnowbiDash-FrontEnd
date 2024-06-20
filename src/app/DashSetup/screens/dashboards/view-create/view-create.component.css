@@ -718,3 +718,15 @@ td {
   height: 22px !important;
   top: -10px;
 }
+
+::ng-deep .p-progress-spinner {
+  width: 18px !important;
+  height: 14px !important;
+  margin-right: 3px !important;
+  position: relative;
+  top: 2px;
+}
+
+::ng-deep .w-1rem.h-1rem .p-progress-spinner-circle {
+  stroke: #7b5fa5 !important;
+}

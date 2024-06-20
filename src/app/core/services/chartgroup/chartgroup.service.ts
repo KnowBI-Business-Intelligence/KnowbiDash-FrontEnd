@@ -26,6 +26,7 @@ export class ChartgroupService {
   }
 
   setEncryptedData(data: any) {
+    this.clearEncryptedData();
     this.encryptedDataSubject.next(data);
   }
 

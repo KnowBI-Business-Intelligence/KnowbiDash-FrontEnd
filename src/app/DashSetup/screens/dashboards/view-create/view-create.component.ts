@@ -1,5 +1,60 @@
 import { CommonModule, DOCUMENT, DatePipe } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
+import { MatIconModule } from '@angular/material/icon';
+import { Router } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { HighchartsChartModule } from 'highcharts-angular';
+import { SkeletonModule } from 'primeng/skeleton';
+import { Subscription, debounceTime, filter, fromEvent, merge } from 'rxjs';
+import Highcharts from 'highcharts';
+import { ChartsService } from '../../../../core/services/charts/charts.service';
+import { StorageService } from '../../../../core/services/user/storage.service';
+import { ChartgroupService } from '../../../../core/services/chartgroup/chartgroup.service';
+import { TableModule } from 'primeng/table';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { LayoutService } from './layoutservice';
+import { MatInputModule } from '@angular/material/input';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { registerLocaleData } from '@angular/common';
+import localePt from '@angular/common/locales/pt';
+import 'moment/locale/pt-br';
+import { CdkMenu, CdkMenuItem, CdkMenuTrigger } from '@angular/cdk/menu';
+import { MatDivider } from '@angular/material/divider';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+import { DataService } from '../../../../core/services/dashboard/data.service';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import {
+  NgxSliderModule,
+  Options,
+  LabelType,
+} from '@angular-slider/ngx-slider';
+import {
+  MatMomentDateModule,
+  MAT_MOMENT_DATE_ADAPTER_OPTIONS,
+} from '@angular/material-moment-adapter';
+import {
+  MAT_DATE_LOCALE,
+  DateAdapter,
+  MAT_DATE_FORMATS,
+} from '@angular/material/core';
+import {
+  CardData,
+  ChartData,
+  Group,
+  TableRow,
+} from '../../../../core/modules/interfaces';
+import {
+  faRotateLeft,
+  faFloppyDisk,
+  faFilter,
+  faEllipsisVertical,
+  faPenToSquare,
+  faTrash,
+  faExpand,
+  faArrowTrendUp,
+} from '@fortawesome/free-solid-svg-icons';
 import {
   Component,
   ElementRef,
@@ -27,60 +82,6 @@ import {
   generateLayout2,
   ktdArrayRemoveItem,
 } from './utils';
-import { MatIconModule } from '@angular/material/icon';
-import { Router } from '@angular/router';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { HighchartsChartModule } from 'highcharts-angular';
-import { SkeletonModule } from 'primeng/skeleton';
-import { Subscription, debounceTime, filter, fromEvent, merge } from 'rxjs';
-import Highcharts from 'highcharts';
-import { ChartsService } from '../../../../core/services/charts/charts.service';
-import { StorageService } from '../../../../core/services/user/storage.service';
-import { ChartgroupService } from '../../../../core/services/chartgroup/chartgroup.service';
-import {
-  CardData,
-  ChartData,
-  Group,
-  TableRow,
-} from '../../../../core/modules/interfaces';
-import {
-  faRotateLeft,
-  faFloppyDisk,
-  faFilter,
-  faEllipsisVertical,
-  faPenToSquare,
-  faTrash,
-  faExpand,
-  faArrowTrendUp,
-} from '@fortawesome/free-solid-svg-icons';
-import { TableModule } from 'primeng/table';
-import { LiveAnnouncer } from '@angular/cdk/a11y';
-import { LayoutService } from './layoutservice';
-import { MatInputModule } from '@angular/material/input';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import {
-  NgxSliderModule,
-  Options,
-  LabelType,
-} from '@angular-slider/ngx-slider';
-import {
-  MatMomentDateModule,
-  MAT_MOMENT_DATE_ADAPTER_OPTIONS,
-} from '@angular/material-moment-adapter';
-import {
-  MAT_DATE_LOCALE,
-  DateAdapter,
-  MAT_DATE_FORMATS,
-} from '@angular/material/core';
-import { registerLocaleData } from '@angular/common';
-import localePt from '@angular/common/locales/pt';
-import 'moment/locale/pt-br';
-import { CdkMenu, CdkMenuItem, CdkMenuTrigger } from '@angular/cdk/menu';
-import { MatDivider } from '@angular/material/divider';
-import { MessageService } from 'primeng/api';
-import { ToastModule } from 'primeng/toast';
-import { DataService } from '../../../../core/services/dashboard/data.service';
 
 registerLocaleData(localePt);
 
@@ -101,6 +102,7 @@ registerLocaleData(localePt);
     FontAwesomeModule,
     CommonModule,
     SkeletonModule,
+    ProgressSpinnerModule,
     HighchartsChartModule,
     FormsModule,
     TableModule,
@@ -202,10 +204,11 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   originalLayout: any[] = [];
   showModal: boolean = false;
   isShowFilterModal: boolean = false;
-  isLoginLoading: boolean = false;
+  isLoading: boolean = true;
   isFullScreen: boolean = false;
   isDashContent: boolean = false;
   isDashSelected: boolean = false;
+  isSaving: boolean = false;
   showContentFilterSwitch: boolean[] = [];
 
   minValue: number = 100;
@@ -262,7 +265,9 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
         filter(() => this.autoResize)
       )
       .subscribe(() => {
-        this.grid.resize();
+        if (this.grid) {
+          this.grid.resize();
+        }
       });
   }
 
@@ -278,6 +283,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     this.encryptedDataSubscription =
       this.chartGroupService.encryptedData$.subscribe((encryptedData) => {
         if (encryptedData != null) {
+          this.isLoading = true;
           this.isDashSelected = true;
           this.groupInfo = encryptedData;
           this.getCharts(encryptedData.id);
@@ -311,7 +317,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       },
     });
   }
-
   loadCards(cardData: any, groupId: any) {
     this.copyDataCardJSON = [];
     this.filters = [];
@@ -355,7 +360,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     this.filters = [];
     this.tableGroupsData = [];
     tableData.forEach((table: any) => {
-      this.copyDataCardJSON.push(table);
+      this.copyDataTableJSON.push(table);
       this.tableFilters.push(table.filters);
     });
 
@@ -401,7 +406,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     this.chartGroupsData = [];
 
     chartData.forEach((chart: any) => {
-      this.copyDataCardJSON.push(chart);
+      this.copydataJSON.push(chart);
       this.chartFilters.push(chart.filters);
     });
 
@@ -694,7 +699,10 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
         }
       }),
     ];
-
+    setTimeout(() => {
+      this.isLoading = false;
+      this.isSaving = false;
+    }, 1000);
     this.originalLayout = JSON.parse(JSON.stringify(this.layout));
     this.saveNewLayoutUpdated = this.layout;
   }
@@ -733,11 +741,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
           },
         });
     });
-    this.messageService.add({
-      severity: 'success',
-      summary: 'Sucesso',
-      detail: 'Disposição salva',
-    });
+    this.isSaving = true;
   }
 
   updateFilterLabel(index: number): void {
@@ -921,7 +925,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   executeFilter() {
     const flattenIdentifiers = (identifiers: any[]) =>
       identifiers.flat(Infinity);
-
     const filteredChartData = JSON.parse(JSON.stringify(this.copydataJSON));
     for (const chartGroup of filteredChartData) {
       if (chartGroup.filters) {
@@ -937,10 +940,13 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
               filter.identifiers[0] = flattenIdentifiers(data.identifiers);
             }
           });
-          const selectedValue = this.selectedFilters[filter.column[0]];
-          if (selectedValue && selectedValue !== 'Todos') {
+          let selectedValue = this.selectedFilters[filter.column[0]];
+          if (selectedValue == undefined) {
+            selectedValue = 'Todos';
+          }
+          if (selectedValue && selectedValue != 'Todos') {
             filter.value = selectedValue.split(', ');
-          } else if (selectedValue && selectedValue === 'Todos') {
+          } else if (selectedValue && selectedValue == 'Todos') {
             filter.value = [];
           }
         }
@@ -964,10 +970,14 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
               filter.identifiers[0] = flattenIdentifiers(data.identifiers);
             }
           });
-          const selectedValue = this.selectedFilters[filter.column[0]];
-          if (selectedValue && selectedValue !== 'Todos') {
+
+          let selectedValue = this.selectedFilters[filter.column[0]];
+          if (selectedValue == undefined) {
+            selectedValue = 'Todos';
+          }
+          if (selectedValue && selectedValue != 'Todos') {
             filter.value = selectedValue.split(', ');
-          } else if (selectedValue && selectedValue === 'Todos') {
+          } else if (selectedValue && selectedValue == 'Todos') {
             filter.value = [];
           }
         }
@@ -989,16 +999,18 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
               filter.identifiers[0] = flattenIdentifiers(data.identifiers);
             }
           });
-          const selectedValue = this.selectedFilters[filter.column[0]];
-          if (selectedValue && selectedValue !== 'Todos') {
+          let selectedValue = this.selectedFilters[filter.column[0]];
+          if (selectedValue == undefined) {
+            selectedValue = 'Todos';
+          }
+          if (selectedValue && selectedValue != 'Todos') {
             filter.value = selectedValue.split(', ');
-          } else if (selectedValue && selectedValue === 'Todos') {
+          } else if (selectedValue && selectedValue == 'Todos') {
             filter.value = [];
           }
         }
       }
     }
-
     this.updateChartGroupsData(filteredChartData);
     this.updateTableGroupsData(filteredTableData);
     this.updateCardGroupsData(filteredCardData);
@@ -1006,31 +1018,37 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
 
   updateChartGroupsData(filteredChartData: any[]) {
     filteredChartData.forEach((data: any) => {
-      data.xAxisColumns.forEach((dat: any) => {
-        dat.data = [];
-      });
-      this.updateChart(
-        data.id,
-        data.sql,
-        data.xAxisColumns,
-        data.yAxisColumns,
-        data.series,
-        data.filters,
-        data.group,
-        data.order
-      );
+      if (this.groupInfo.id == data.chartGroup.id) {
+        data.xAxisColumns.forEach((dat: any) => {
+          dat.data = [];
+        });
+        this.updateChart(
+          data.id,
+          data.sql,
+          data.xAxisColumns,
+          data.yAxisColumns,
+          data.series,
+          data.filters,
+          data.group,
+          data.order
+        );
+      }
     });
   }
 
   updateTableGroupsData(filteredTableGroupsData: any) {
     filteredTableGroupsData.forEach((data: any) => {
-      this.updateTables(data.id, data.tableData, data.filters);
+      if (this.groupInfo.id == data.chartGroup.id) {
+        this.updateTables(data.id, data.tableData, data.filters);
+      }
     });
   }
 
   updateCardGroupsData(cardGroupsData: any) {
     cardGroupsData.forEach((data: any) => {
-      this.updateCards(data.id, data.sql, data.filters);
+      if (this.groupInfo.id == data.chartGroup.id) {
+        this.updateCards(data.id, data.sql, data.filters);
+      }
     });
   }
 
@@ -1130,7 +1148,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       sql: sql,
       filters: formattedFilters,
     };
-
     this.chartsService.updateCards(this.headers, requestData, id).subscribe({
       next: (data: any) => {
         this.getCards(data.chartGroup.id);

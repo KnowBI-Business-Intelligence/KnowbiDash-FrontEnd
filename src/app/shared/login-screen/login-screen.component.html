@@ -141,31 +141,26 @@
       alt="shape three"
     />
     <img
-      class="four"
-      srcset="../../../../assets/images/four.svg"
-      alt="shape four"
-    />
-    <img
       class="five"
       srcset="../../../../assets/images/five.svg"
       alt="shape five"
     />
 
     <div class="message">
-      <p-toast [life]="2500"></p-toast>
+      <p-toast [life]="3500"></p-toast>
     </div>
   </div>
   <footer>
+    <img
+      class="knowbiIcon"
+      srcset="../../../../assets/icons/Assinatura_positiva_horizontal.svg"
+      alt="shape one"
+    />
     <span>Todos os direitos reservados &copy;2024</span>
+    <img
+      class="koiosIcon"
+      srcset="../../../../assets/icons/Logo_principal_reduzida.svg"
+      alt="shape one"
+    />
   </footer>
-
-  <div class="modal-choice-view" *ngIf="!isModal">
-    <div class="content-modal">
-      <span>Selecione a aplicação</span>
-      <div class="buttons">
-        <button (click)="defaultOrAdm(false)">Usuário</button>
-        <button (click)="defaultOrAdm(true)">Administrador</button>
-      </div>
-    </div>
-  </div>
 </div>

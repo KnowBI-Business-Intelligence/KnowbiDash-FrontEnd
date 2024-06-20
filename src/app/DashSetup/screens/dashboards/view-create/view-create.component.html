@@ -1,3 +1,6 @@
+<div id="loading-screen" *ngIf="isLoading">
+  <div class="spinner"></div>
+</div>
 <div *ngIf="!isDashContent && isDashSelected" class="dash-no-result">
   <span>Dashboard vazio</span>
 </div>
@@ -28,7 +31,19 @@
       >Reordenar
     </button>
     <button (click)="saveLayoutUpdated()">
-      <fa-icon class="iconview" [icon]="icons.save" [size]="'xl'"></fa-icon
+      <p-progressSpinner
+        *ngIf="isSaving"
+        styleClass="w-1rem h-1rem"
+        strokeWidth="8"
+        fill="var(--surface-ground)"
+        animationDuration=".8s"
+      />
+      <fa-icon
+        *ngIf="!isSaving"
+        class="iconview"
+        [icon]="icons.save"
+        [size]="'xl'"
+      ></fa-icon
       >Salvar
     </button>
   </div>
@@ -90,11 +105,46 @@
           [id]="item.id"
           [transition]="currentTransition"
           [dragStartThreshold]="dragStartThreshold"
-          [draggable]="!disableDrag"
-          [resizable]="!disableResize"
+          [draggable]="isLoading ? disableDrag : !disableDrag"
+          [resizable]="isLoading ? disableDrag : !disableResize"
         >
           <section
-            *ngIf="item.type == 'card'"
+            *ngIf="isLoading && item.type == 'card'"
+            style="width: 100%; height: 100%; cursor: progress"
+            class="menu-container"
+          >
+            <p-skeleton
+              width="100%"
+              height="100%"
+              styleClass="mb-2"
+              borderRadius="3px"
+            />
+          </section>
+          <section
+            *ngIf="isLoading && item.type == 'table'"
+            style="width: 100%; height: 100%; cursor: progress"
+          >
+            <p-skeleton
+              width="100%"
+              height="100%"
+              styleClass="mb-2"
+              borderRadius="3px"
+            />
+          </section>
+          <section
+            *ngIf="isLoading && item.type == 'chart'"
+            style="width: 100%; height: 100%; cursor: progress"
+          >
+            <p-skeleton
+              width="100%"
+              height="100%"
+              styleClass="mb-2"
+              borderRadius="3px"
+            />
+          </section>
+
+          <section
+            *ngIf="!isLoading && item.type == 'card'"
             style="width: 100%; height: 100%"
             class="menu-container"
           >
@@ -119,7 +169,7 @@
             </div>
           </section>
           <section
-            *ngIf="item.type == 'table'"
+            *ngIf="!isLoading && item.type == 'table'"
             class="table-container mat-elevation-z8 menu-container"
             tabindex="0"
           >
@@ -187,7 +237,7 @@
             </div>
           </section>
           <div
-            *ngIf="item.type == 'chart'"
+            *ngIf="!isLoading && item.type == 'chart'"
             class="chart-container menu-container"
           >
             <button
@@ -348,17 +398,14 @@
       <div>
         <div class="modal-buttons">
           <button class="exclude" (click)="executeFilter()">
-            <span *ngIf="!isLoginLoading">Filtrar</span>
-            <span *ngIf="isLoginLoading"
-              ><div class="login-spinner"></div
-            ></span>
+            <span>Filtrar</span>
           </button>
         </div>
       </div>
     </div>
   </div>
   <div class="message">
-    <p-toast [life]="3500"></p-toast>
+    <p-toast [life]="2500"></p-toast>
   </div>
 </div>
 

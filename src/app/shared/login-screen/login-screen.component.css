@@ -42,7 +42,7 @@
 }
 
 .content-modal span {
-  font-size: 1.2rem;
+  font-size: 17px;
   color: #090238;
 }
 
@@ -196,8 +196,9 @@ input {
 .password-group button {
   background-color: transparent;
   width: 5px;
-  padding: 15px;
+  padding: 12px;
   margin: 0px;
+  margin-right: 8px;
   height: 20px;
   border: none;
 }
@@ -252,11 +253,16 @@ button {
   font-size: 15px;
   font-style: normal;
   font-weight: 400;
-  line-height: 1.75rem; /* 155.556% */
-  margin-top: 2rem;
+  line-height: 1.75rem;
+  margin-top: 3rem;
   cursor: pointer;
   height: 50px;
   transition: 0.2s;
+}
+
+button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px transparent;
 }
 
 .login-spinner {
@@ -280,58 +286,49 @@ footer {
   bottom: 15px;
 }
 
+footer .knowbiIcon {
+  position: fixed;
+  width: 7rem;
+  left: 0;
+  bottom: -38px;
+  z-index: 10;
+}
+
 footer span {
   color: #424242;
   font-size: 12px;
 }
 
-:host ::ng-deep .p-toast .p-toast-message .p-toast-message-content {
-  padding: 1rem;
-  border-width: 0 0 0 6px;
-  font-size: 15px;
-  border-radius: 2px;
+footer .koiosIcon {
+  position: fixed;
+  width: 6rem;
+  right: -17px;
+  bottom: -25px;
+  z-index: 10;
 }
 
-:host ::ng-deep .p-toast .p-toast-message .p-toast-icon-close {
-  border-radius: 50%;
-  background: transparent;
-  transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
-  width: 13px;
-  height: 13px;
-  color: #444444;
+.buttons-select-app {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 25rem;
 }
 
-:host
-  ::ng-deep
-  .p-toast
-  .p-toast-message
-  .p-toast-message-content
-  .p-icon:not(.p-toast-icon-close-icon) {
-  width: 2rem;
-  height: 23px;
-  margin: 0 10px 0 0 !important;
-}
-
-:host ::ng-deep a {
-  font-size: 12px !important;
-}
-
-:host ::ng-deep .p-paginator-current,
-.p-paginator-rpp-options {
-  font-size: 12px;
-}
-
-:host ::ng-deep .p-datatable .p-datatable-header {
-  border-left: none;
-  border-right: none;
-}
-
-:host ::ng-deep .p-datatable .p-paginator-bottom {
-  padding: 2px;
-}
-
-:host ::ng-deep .p-paginator .p-paginator-pages .p-paginator-page {
-  font-size: 12px;
+.buttons-select-app .button-select {
+  padding: 0.5rem 1.415rem;
+  border: 0.25rem solid #431a7e;
+  border-radius: 3px;
+  width: 169px;
+  background-color: #431a7e;
+  color: #fff;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.75rem;
+  margin-top: 2rem;
+  cursor: pointer;
+  height: 39px;
+  transition: 0.2s;
 }
 
 @-webkit-keyframes spin {

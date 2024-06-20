@@ -25,6 +25,16 @@
   margin: 0 10px 0 0 !important;
 }
 
+:host
+  ::ng-deep
+  .p-toast
+  .p-toast-message.p-toast-message-error
+  .p-toast-message-icon,
+.p-toast .p-toast-message.p-toast-message-error .p-toast-icon-close {
+  position: relative;
+  top: -10px;
+}
+
 :host ::ng-deep a {
   font-size: 12px !important;
 }
