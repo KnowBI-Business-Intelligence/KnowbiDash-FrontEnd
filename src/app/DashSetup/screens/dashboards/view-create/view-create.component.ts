@@ -265,9 +265,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
         filter(() => this.autoResize)
       )
       .subscribe(() => {
-        if (this.grid) {
-          this.grid.resize();
-        }
+        this.grid.resize();
       });
   }
 
@@ -317,6 +315,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       },
     });
   }
+
   loadCards(cardData: any, groupId: any) {
     this.copyDataCardJSON = [];
     this.filters = [];
@@ -639,6 +638,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   }
 
   public updateCombinedLayout() {
+    console.log(JSON.stringify(this.chartGroupsData, null, 2));
     const combinedData = [
       ...this.cardGroupsData,
       ...this.tableGroupsData,

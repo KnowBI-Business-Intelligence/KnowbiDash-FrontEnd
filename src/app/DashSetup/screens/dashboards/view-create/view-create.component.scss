@@ -93,6 +93,12 @@
     max-height: 100vh !important;
   }
 
+  .custom-placeholder-container {
+    width: 100%;
+    height: 100%;
+    opacity: 0.6;
+  }
+
   .grid-container {
     overflow-x: auto; // let available scroll horizontal with overflowing x
     max-height: 82vh;
@@ -107,8 +113,18 @@
     transition: height 500ms ease;
   }
 
-  ktd-grid-item {
-    color: #121212;
+  ktd-grid-item,
+  .custom-placeholder-container {
+    box-sizing: border-box;
+    background: #ccc;
+    color: black;
+
+    &.ktd-grid-item-table {
+      padding: 16px;
+      box-sizing: border-box;
+      border: none;
+      background: transparent;
+    }
   }
 
   .grid-item-content {
