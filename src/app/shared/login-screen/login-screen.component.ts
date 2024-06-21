@@ -122,6 +122,10 @@ export class LoginScreenComponent implements OnInit, AfterViewInit {
   onSubmit(): void {
     const { username, password } = this.form;
     this.isLoginLoading = true;
+    try {
+    } catch (error) {
+      console.error('Erro ao fazer requisição de login:', error);
+    }
     this.authService.login(username, password).subscribe({
       next: (data) => {
         this.storageService.saveToken(data.token);
@@ -156,7 +160,6 @@ export class LoginScreenComponent implements OnInit, AfterViewInit {
             summary: 'Erro',
             detail: 'Usuário ou Senha incorretos',
           });
-          throw err;
         }
       },
     });

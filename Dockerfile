@@ -11,4 +11,4 @@ RUN npm install -g @angular/cli
 
 RUN npm install
 
-CMD ["ng", "serve", "--ssl", "--host", "0.0.0.0", "--port", "443", "--quiet"]
+CMD ["ng", "serve", "--ssl", "--host", "0.0.0.0", "--port", "443"]
