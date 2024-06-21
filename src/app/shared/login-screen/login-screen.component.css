@@ -363,4 +363,17 @@ footer .koiosIcon {
   .card {
     width: 20rem;
   }
+
+  footer .koiosIcon {
+    width: 4rem;
+    right: -12px;
+    bottom: -11px;
+  }
+
+  footer .knowbiIcon {
+    width: 5rem;
+    left: 0;
+    bottom: -22px;
+    z-index: 10;
+  }
 }

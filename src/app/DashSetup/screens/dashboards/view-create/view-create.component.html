@@ -1,10 +1,10 @@
 <div id="loading-screen" *ngIf="isLoading">
   <div class="spinner"></div>
 </div>
-<div *ngIf="!isDashContent && isDashSelected" class="dash-no-result">
+<div *ngIf="isDashvoid" class="dash-no-result">
   <span>Dashboard vazio</span>
 </div>
-<div *ngIf="!isDashSelected" class="dash-no-result">
+<div *ngIf="isDashSelected" class="dash-no-result">
   <span>Selecione ou crie um dashboard</span>
   <button (click)="openStructure()">
     Ir para estrutura
@@ -15,7 +15,7 @@
     ></fa-icon>
   </button>
 </div>
-<div class="container-save-disposition" *ngIf="isDashContent && isDashSelected">
+<div class="container-save-disposition" *ngIf="isDashContent && !isDashvoid">
   <span> Ações </span>
   <div>
     <button (click)="toggleFullScreen()">
@@ -48,7 +48,7 @@
     </button>
   </div>
 </div>
-<div class="container-data" *ngIf="isDashContent">
+<div class="container-data" *ngIf="isDashContent && !isDashvoid">
   <span> Dados </span>
   <div>
     <button (click)="openModal()">
@@ -77,7 +77,7 @@
   class="main-container contentFS"
   (click)="saveFilterLabel()"
   #fullScreenDiv
-  *ngIf="isDashContent && isDashSelected"
+  *ngIf="isDashContent && !isDashvoid"
 >
   <div class="playground-container">
     <div

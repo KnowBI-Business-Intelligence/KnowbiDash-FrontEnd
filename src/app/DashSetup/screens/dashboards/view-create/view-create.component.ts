@@ -82,6 +82,7 @@ import {
   generateLayout2,
   ktdArrayRemoveItem,
 } from './utils';
+import { DashboardsViewComponent } from '../dashboards-view/dashboards-view.component';
 
 registerLocaleData(localePt);
 
@@ -208,6 +209,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   isFullScreen: boolean = false;
   isDashContent: boolean = false;
   isDashSelected: boolean = false;
+  isDashvoid: boolean = false;
   isSaving: boolean = false;
   showContentFilterSwitch: boolean[] = [];
 
@@ -282,11 +284,15 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
       this.chartGroupService.encryptedData$.subscribe((encryptedData) => {
         if (encryptedData != null) {
           this.isLoading = true;
-          this.isDashSelected = true;
+          this.isDashContent = true;
+          this.isDashSelected = false;
           this.groupInfo = encryptedData;
           this.getCharts(encryptedData.id);
           this.getCards(encryptedData.id);
           this.getTables(encryptedData.id);
+        } else {
+          this.isDashSelected = true;
+          this.isDashContent = false;
         }
       });
   }
@@ -638,16 +644,17 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   }
 
   public updateCombinedLayout() {
-    console.log(JSON.stringify(this.chartGroupsData, null, 2));
     const combinedData = [
       ...this.cardGroupsData,
       ...this.tableGroupsData,
       ...this.chartGroupsData,
     ];
     if (combinedData.length == 0 || combinedData == null) {
+      this.isDashvoid = true;
       this.isDashContent = false;
     } else {
       this.isDashContent = true;
+      this.isDashvoid = false;
     }
     this.updateLayout(combinedData);
     this.initFilters(this.groupInfo.id, combinedData);

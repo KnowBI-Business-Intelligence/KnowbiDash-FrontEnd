@@ -111,7 +111,7 @@ export class DashboardsViewComponent implements OnInit {
     this.interruptLoadingScreen();
   }
 
-  startDashboarData() {
+  public startDashboarData() {
     if (this.currentView == 'ViewCreateComponent') {
       this.getCurrentView();
     }
@@ -156,13 +156,18 @@ export class DashboardsViewComponent implements OnInit {
     this.dataService.setData(undefined);
     if (view == 'chart') {
       this.currentView = 'ChartComponent';
+      this.chartGroupService.setCurrentView(this.currentView);
     } else if (view == 'card') {
       this.currentView = 'CardsComponent';
+      this.chartGroupService.setCurrentView(this.currentView);
     } else if (view == 'table') {
       this.currentView = 'TableComponent';
+      this.chartGroupService.setCurrentView(this.currentView);
     } else {
       this.currentView = 'ViewCreateComponent';
+      this.isCloseDash = true;
     }
+    console.log(this.isCloseDash);
   }
 
   loadDataInit() {
@@ -258,7 +263,6 @@ export class DashboardsViewComponent implements OnInit {
     if (clickedButton) {
       clickedButton.style.backgroundColor = '#00000015';
     }
-
     group = [];
     event = [];
   }
@@ -271,8 +275,12 @@ export class DashboardsViewComponent implements OnInit {
 
   closeDash() {
     this.localStorageService.removeItem('chartGroupview');
+    this.chartGroupService.clearCurrentView();
+    console.log(this.chartGroupService);
     this.ngOnInit();
-    this.viewCreateComponent.isDashSelected = false;
+    this.viewCreateComponent.isDashSelected = true;
+    this.viewCreateComponent.isDashContent = false;
+    this.viewCreateComponent.isDashvoid = false;
     this.isCloseDash = false;
   }
 }

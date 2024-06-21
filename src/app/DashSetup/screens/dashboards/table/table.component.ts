@@ -1,5 +1,5 @@
 import { HttpHeaders } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { StorageService } from '../../../../core/services/user/storage.service';
 import { LocalstorageService } from '../../../../core/services/local-storage/local-storage.service';
 import { ChartsService } from '../../../../core/services/charts/charts.service';
@@ -35,6 +35,7 @@ import { TableModule } from 'primeng/table';
 import { DataService } from '../../../../core/services/dashboard/data.service';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
+import { DashboardsViewComponent } from '../dashboards-view/dashboards-view.component';
 
 @Component({
   selector: 'app-table',
@@ -61,6 +62,7 @@ import { MessageService } from 'primeng/api';
   ],
 })
 export class TableComponent implements OnInit {
+  @ViewChild('dashView') dashViewComponent!: DashboardsViewComponent;
   icons = {
     database: faDatabase,
     close: faXmark,
@@ -147,6 +149,16 @@ export class TableComponent implements OnInit {
 
   returnToCreateView(): void {
     this.chartGroupService.setCurrentView('ViewCreateComponent');
+  }
+
+  currentView: string = '';
+
+  getCurrentView() {
+    this.chartGroupService
+      .getCurrentView()
+      .subscribe((componentName: string) => {
+        this.currentView = componentName;
+      });
   }
 
   startDashboarData() {

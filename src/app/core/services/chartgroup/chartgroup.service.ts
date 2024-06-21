@@ -43,6 +43,7 @@ export class ChartgroupService {
   }
 
   clearCurrentView() {
+    this.clearEncryptedData();
     this.currentViewSubject.next('ViewCreateComponent');
   }
 
