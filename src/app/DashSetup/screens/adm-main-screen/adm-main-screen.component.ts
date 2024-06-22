@@ -50,6 +50,9 @@ export class ADMMainScreenComponent implements OnInit {
         this.interruptLoadingScreen();
         this.getProfilesData(data.id);
       },
+      error: () => {
+        this.interruptLoadingScreen();
+      },
     });
   }
 

@@ -54,6 +54,7 @@
   margin: 0 0.5rem;
   color: #a3a7cb;
   font-size: 14px;
+  transition: 0.3s;
 }
 .container-icon span,
 .menu-item:hover,
@@ -69,6 +70,10 @@
 
 .active .icon {
   color: #ece8f2;
+}
+
+.icon {
+  font-size: 12px;
 }
 
 .button {
@@ -145,7 +150,7 @@
   color: #fff;
   width: 100%;
   font-weight: 300;
-  font-size: 20px;
+  font-size: 17px;
   line-height: 1.2rem;
   margin: 10px;
 }
@@ -164,8 +169,8 @@
 }
 
 .mdc-list-item {
-  padding-left: 8px;
-  padding-right: 16px;
+  padding-left: 4px;
+  padding-right: 11px;
 }
 
 .modal {

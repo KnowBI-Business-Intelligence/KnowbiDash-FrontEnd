@@ -1,7 +1,10 @@
 <div class="container-nav-line">
   <span>Início</span>
 </div>
-<div class="container">
+<div id="loading-screen" *ngIf="isLoading">
+  <div class="spinner"></div>
+</div>
+<div class="container" *ngIf="!isLoading">
   <div class="container-path-header">
     <span>Pastas</span>
     <header>
@@ -53,7 +56,7 @@
       *ngIf="filteredItems == undefined || filteredItems.length == 0"
     >
       <div class="container-path-no-result">
-        <h2>Sem Resultado</h2>
+        <h2>Sem resultado</h2>
       </div>
     </ng-container>
   </div>

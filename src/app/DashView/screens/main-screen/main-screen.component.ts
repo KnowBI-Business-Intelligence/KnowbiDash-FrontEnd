@@ -21,6 +21,7 @@ export class MainScreenComponent implements OnInit {
   icons = {
     search: faMagnifyingGlass,
   };
+  isLoading: boolean = true;
   searchTerm: string = '';
   profiles: any[] = [];
   profilesData: any[] = [];
@@ -46,7 +47,11 @@ export class MainScreenComponent implements OnInit {
   getUserById(id: number, token: any) {
     this.authService.getById(id, this.headers).subscribe({
       next: (data: any) => {
+        this.interruptLoadingScreen();
         this.getProfilesData(data.id);
+      },
+      error: () => {
+        this.interruptLoadingScreen();
       },
     });
   }
@@ -112,5 +117,11 @@ export class MainScreenComponent implements OnInit {
       JSON.stringify(pathObj)
     );
     this.router.navigate(['content/main/chartgroup']);
+  }
+
+  interruptLoadingScreen() {
+    setTimeout(() => {
+      this.isLoading = false;
+    }, 500);
   }
 }

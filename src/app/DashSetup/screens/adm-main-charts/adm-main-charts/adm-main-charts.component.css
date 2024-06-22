@@ -27,10 +27,6 @@
   align-items: center;
 }
 
-.groupname {
-  padding: 5px 8px;
-}
-
 .container-estructure,
 .container-save-disposition,
 .container-data {
@@ -43,6 +39,21 @@
 .container-estructure {
   left: 60px;
   top: 46px;
+}
+
+.dash-no-result {
+  width: 100%;
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.dash-no-result span {
+  font-size: 13px;
+  font-weight: 400;
+  color: #00000074;
 }
 
 .container-save-disposition {
@@ -519,7 +530,7 @@ td {
 
 .groupname {
   display: flex;
-  padding: 2px 5px;
+  padding: 5px 8px;
   font-size: 11px;
   border: solid 1px #e6e6e6;
   z-index: 10;

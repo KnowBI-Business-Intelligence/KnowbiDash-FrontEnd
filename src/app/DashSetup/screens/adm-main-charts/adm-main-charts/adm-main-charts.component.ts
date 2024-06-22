@@ -1,5 +1,27 @@
 import { CommonModule, DOCUMENT, DatePipe } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
+import { MatIconModule } from '@angular/material/icon';
+import { Router } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { HighchartsChartModule } from 'highcharts-angular';
+import { SkeletonModule } from 'primeng/skeleton';
+import { Subscription, debounceTime, filter, fromEvent, merge } from 'rxjs';
+import Highcharts from 'highcharts';
+import { ChartsService } from '../../../../core/services/charts/charts.service';
+import { StorageService } from '../../../../core/services/user/storage.service';
+import { TableModule } from 'primeng/table';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { LayoutService } from '../../dashboards/view-create/layoutservice';
+import { MatInputModule } from '@angular/material/input';
+import { DateAdapter, MatNativeDateModule } from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MAT_DATE_LOCALE, MAT_DATE_FORMATS } from '@angular/material/core';
+import { registerLocaleData } from '@angular/common';
+import localePt from '@angular/common/locales/pt';
+import 'moment/locale/pt-br';
+import { CdkMenu, CdkMenuItem, CdkMenuTrigger } from '@angular/cdk/menu';
+import { MatDivider } from '@angular/material/divider';
+import { LocalstorageService } from '../../../../core/services/local-storage/local-storage.service';
 import {
   Component,
   ElementRef,
@@ -26,15 +48,15 @@ import {
   generateLayout2,
   ktdArrayRemoveItem,
 } from '../../dashboards/view-create/utils';
-import { MatIconModule } from '@angular/material/icon';
-import { Router } from '@angular/router';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { HighchartsChartModule } from 'highcharts-angular';
-import { SkeletonModule } from 'primeng/skeleton';
-import { Subscription, debounceTime, filter, fromEvent, merge } from 'rxjs';
-import Highcharts from 'highcharts';
-import { ChartsService } from '../../../../core/services/charts/charts.service';
-import { StorageService } from '../../../../core/services/user/storage.service';
+import {
+  NgxSliderModule,
+  Options,
+  LabelType,
+} from '@angular-slider/ngx-slider';
+import {
+  MatMomentDateModule,
+  MAT_MOMENT_DATE_ADAPTER_OPTIONS,
+} from '@angular/material-moment-adapter';
 import {
   CardData,
   ChartData,
@@ -52,30 +74,6 @@ import {
   faArrowLeft,
   faExpand,
 } from '@fortawesome/free-solid-svg-icons';
-import { TableModule } from 'primeng/table';
-import { LiveAnnouncer } from '@angular/cdk/a11y';
-import { LayoutService } from '../../dashboards/view-create/layoutservice';
-import { MatInputModule } from '@angular/material/input';
-import { DateAdapter, MatNativeDateModule } from '@angular/material/core';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import {
-  NgxSliderModule,
-  Options,
-  LabelType,
-} from '@angular-slider/ngx-slider';
-import {
-  MatMomentDateModule,
-  MAT_MOMENT_DATE_ADAPTER_OPTIONS,
-} from '@angular/material-moment-adapter';
-import { MAT_DATE_LOCALE, MAT_DATE_FORMATS } from '@angular/material/core';
-import { registerLocaleData } from '@angular/common';
-import localePt from '@angular/common/locales/pt';
-import 'moment/locale/pt-br';
-import { CdkMenu, CdkMenuItem, CdkMenuTrigger } from '@angular/cdk/menu';
-import { MatDivider } from '@angular/material/divider';
-import { MessageService } from 'primeng/api';
-import { ToastModule } from 'primeng/toast';
-import { LocalstorageService } from '../../../../core/services/local-storage/local-storage.service';
 
 registerLocaleData(localePt);
 
@@ -100,7 +98,6 @@ registerLocaleData(localePt);
     FormsModule,
     TableModule,
     KtdGridModule,
-    ToastModule,
   ],
   providers: [
     { provide: DateAdapter, useClass: CustomDateAdapter },
@@ -118,8 +115,8 @@ registerLocaleData(localePt);
 })
 export class AdmMainChartsComponent implements OnInit {
   @ViewChildren(CdkMenuTrigger) menuTriggers!: QueryList<CdkMenuTrigger>;
-  @ViewChild('chartContainer') chartContainer!: ElementRef;
   @ViewChild(KtdGridComponent, { static: true }) grid!: KtdGridComponent;
+  @ViewChild('chartContainer') chartContainer!: ElementRef;
   @ViewChild('fullScreenDiv') fullScreenDiv!: ElementRef;
   private encryptedDataSubscription: Subscription | undefined;
   icons = {
@@ -165,6 +162,7 @@ export class AdmMainChartsComponent implements OnInit {
   changeBg: HTMLElement | null = null;
   filterModal: HTMLElement | null = null;
   buttonMenuItem: HTMLElement | null = null;
+  gridContainer: HTMLElement | null = null;
   paths: { [key: string]: Group[] } = {};
   pathNames: { [key: string]: string } = {};
 
@@ -197,6 +195,9 @@ export class AdmMainChartsComponent implements OnInit {
   isShowFilterModal: boolean = false;
   isLoginLoading: boolean = false;
   isFullScreen: boolean = false;
+  isDashContent: boolean = false;
+  isDashvoid: boolean = false;
+  isLoading: boolean = true;
   showContentFilterSwitch: boolean[] = [];
 
   minValue: number = 100;
@@ -228,7 +229,6 @@ export class AdmMainChartsComponent implements OnInit {
     public elementRef: ElementRef,
     private layoutService: LayoutService,
     private datePipe: DatePipe,
-    private messageService: MessageService,
     private localStorage: LocalstorageService,
     private dateAdapter: DateAdapter<Date>,
     @Inject(DOCUMENT) public document: Document
@@ -240,7 +240,7 @@ export class AdmMainChartsComponent implements OnInit {
   ngOnInit(): void {
     this.startDashboarData();
     this.showFullScreen();
-    this.filters.forEach((filter, index) => {
+    this.filters.forEach((index) => {
       this.showContentFilterSwitch[index] = false;
     });
     this.resizeSubscription = merge(
@@ -270,11 +270,17 @@ export class AdmMainChartsComponent implements OnInit {
     const storedChartGroupString =
       this.localStorage.getDecryptedItem('chartGroup');
     const storedChartGroup = JSON.parse(storedChartGroupString);
-    this.getCharts(storedChartGroup.id);
-    this.getCards(storedChartGroup.id);
-    this.getTables(storedChartGroup.id);
-    this.groupName = storedChartGroup.name;
-    this.groupInfo = storedChartGroup;
+    if (storedChartGroup != null) {
+      this.isLoading = true;
+      this.isDashContent = true;
+      this.getCharts(storedChartGroup.id);
+      this.getCards(storedChartGroup.id);
+      this.getTables(storedChartGroup.id);
+      this.groupName = storedChartGroup.name;
+      this.groupInfo = storedChartGroup;
+    } else {
+      this.isDashContent = false;
+    }
   }
 
   getCharts(id: string): void {
@@ -345,7 +351,7 @@ export class AdmMainChartsComponent implements OnInit {
     this.filters = [];
     this.tableGroupsData = [];
     tableData.forEach((table: any) => {
-      this.copyDataCardJSON.push(table);
+      this.copyDataTableJSON.push(table);
       this.tableFilters.push(table.filters);
     });
 
@@ -391,7 +397,7 @@ export class AdmMainChartsComponent implements OnInit {
     this.chartGroupsData = [];
 
     chartData.forEach((chart: any) => {
-      this.copyDataCardJSON.push(chart);
+      this.copydataJSON.push(chart);
       this.chartFilters.push(chart.filters);
     });
 
@@ -629,6 +635,13 @@ export class AdmMainChartsComponent implements OnInit {
       ...this.tableGroupsData,
       ...this.chartGroupsData,
     ];
+    if (combinedData.length == 0 || combinedData == null) {
+      this.isDashvoid = true;
+      this.isDashContent = false;
+    } else {
+      this.isDashContent = true;
+      this.isDashvoid = false;
+    }
     this.updateLayout(combinedData);
     this.initFilters(this.groupInfo.id, combinedData);
   }
@@ -679,7 +692,9 @@ export class AdmMainChartsComponent implements OnInit {
         }
       }),
     ];
-
+    setTimeout(() => {
+      this.isLoading = false;
+    }, 1000);
     this.originalLayout = JSON.parse(JSON.stringify(this.layout));
     this.saveNewLayoutUpdated = this.layout;
   }
@@ -717,11 +732,6 @@ export class AdmMainChartsComponent implements OnInit {
             }, 450);
           },
         });
-    });
-    this.messageService.add({
-      severity: 'success',
-      summary: 'Sucesso',
-      detail: 'Disposição salva',
     });
   }
 
@@ -814,6 +824,8 @@ export class AdmMainChartsComponent implements OnInit {
     this.showFilters();
     let filterValuesByColumn: { [key: string]: string[] } = {};
     this.filters.forEach((filter: any) => {
+      this.checkedValues[filter.column] = filter.values;
+      this.allfilters(filter.values, filter.column);
       if (!(filter.column[0] in filterValuesByColumn)) {
         filterValuesByColumn[filter.column[0]] = [];
       }
@@ -834,14 +846,21 @@ export class AdmMainChartsComponent implements OnInit {
   showFilters() {
     this.isShowFilterModal = !this.isShowFilterModal;
     this.filterModal = this.elementRef.nativeElement.querySelector('#modal');
+    this.gridContainer =
+      this.elementRef.nativeElement.querySelector('.grid-container');
     if (this.isShowFilterModal) {
       this.filterModal!.style.width = '330px';
+      this.gridContainer!.style.overflowX = 'hidden';
     } else {
       this.filterModal!.style.width = '0';
     }
     setTimeout(() => {
       this.updateCombinedLayout();
     }, 440);
+  }
+
+  allfilters(values: string[], column: string) {
+    this.selectedFilters[column] = values;
   }
 
   showContentFilter(index: number) {
@@ -863,8 +882,12 @@ export class AdmMainChartsComponent implements OnInit {
     this.updateDropdownLabel(column);
   }
 
-  isChecked(column: string, value: string): boolean {
-    return this.checkedValues[column]?.includes(value) || false;
+  isChecked(values: string[], allfilters: string): boolean {
+    if (values.includes(allfilters)) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   updateDropdownLabel(column: string) {
@@ -874,16 +897,6 @@ export class AdmMainChartsComponent implements OnInit {
     } else {
       this.selectedFilters[column] = 'Todos';
     }
-  }
-
-  allfilters(values: string[], allfilters: string[]): string | string[] {
-    if (values.length == allfilters.length) {
-      const arraysIguais = values.every((value) => allfilters.includes(value));
-      if (arraysIguais) {
-        return 'Todos';
-      }
-    }
-    return values;
   }
 
   updateDate(
@@ -908,8 +921,17 @@ export class AdmMainChartsComponent implements OnInit {
       identifiers.flat(Infinity);
 
     const filteredChartData = JSON.parse(JSON.stringify(this.copydataJSON));
+    const filteredTableData = JSON.parse(
+      JSON.stringify(this.copyDataTableJSON)
+    );
+    const filteredCardData = JSON.parse(JSON.stringify(this.copyDataCardJSON));
+
+    let processChartData: any[] = [];
+    let processTableData: any[] = [];
+    let processCardData: any[] = [];
+
     for (const chartGroup of filteredChartData) {
-      if (chartGroup.filters) {
+      if (chartGroup.filters && chartGroup.chartGroup.id == this.groupInfo.id) {
         for (const filter of chartGroup.filters) {
           this.filters.map((data) => {
             if (
@@ -922,19 +944,36 @@ export class AdmMainChartsComponent implements OnInit {
               filter.identifiers[0] = flattenIdentifiers(data.identifiers);
             }
           });
-          const selectedValue = this.selectedFilters[filter.column[0]];
-          if (selectedValue && selectedValue !== 'Todos') {
-            filter.value = selectedValue.split(', ');
-          } else if (selectedValue && selectedValue === 'Todos') {
-            filter.value = [];
+          if (filter.type == 'timestamp') {
+            let selectedValue = this.selectedFilters[filter.column[0]];
+            if (selectedValue == undefined) {
+              filter.value = filter.value;
+            } else {
+              filter.value = selectedValue.split(', ');
+            }
+          }
+          if (filter.type == 'character') {
+            let selectedValue;
+            selectedValue = this.checkedValues[filter.column[0]];
+            if (selectedValue == undefined || selectedValue == '') {
+              selectedValue = 'Todos';
+              filter.value = [];
+            } else if (Array.isArray(selectedValue)) {
+              selectedValue = selectedValue.join(', ');
+              filter.value = selectedValue
+                .split(', ')
+                .map((value) => value.trim());
+            } else {
+              filter.value = selectedValue
+                .split(', ')
+                .map((value: string) => value.trim());
+            }
           }
         }
+        processChartData.push(chartGroup);
       }
     }
 
-    const filteredTableData = JSON.parse(
-      JSON.stringify(this.copyDataTableJSON)
-    );
     for (const tableGroup of filteredTableData) {
       if (tableGroup.filters) {
         for (const filter of tableGroup.filters) {
@@ -949,19 +988,40 @@ export class AdmMainChartsComponent implements OnInit {
               filter.identifiers[0] = flattenIdentifiers(data.identifiers);
             }
           });
-          const selectedValue = this.selectedFilters[filter.column[0]];
-          if (selectedValue && selectedValue !== 'Todos') {
-            filter.value = selectedValue.split(', ');
-          } else if (selectedValue && selectedValue === 'Todos') {
-            filter.value = [];
+
+          if (filter.type == 'timestamp') {
+            let selectedValue = this.selectedFilters[filter.column[0]];
+            if (selectedValue == undefined) {
+              filter.value = filter.value;
+            } else {
+              filter.value = selectedValue.split(', ');
+            }
           }
+
+          if (filter.type == 'character') {
+            let selectedValue;
+            selectedValue = this.checkedValues[filter.column[0]];
+            if (selectedValue == undefined || selectedValue == '') {
+              selectedValue = 'Todos';
+              filter.value = [];
+            } else if (Array.isArray(selectedValue)) {
+              selectedValue = selectedValue.join(', ');
+              filter.value = selectedValue
+                .split(', ')
+                .map((value) => value.trim());
+            } else {
+              filter.value = selectedValue
+                .split(', ')
+                .map((value: string) => value.trim());
+            }
+          }
+          processTableData.push(tableGroup);
         }
       }
     }
 
-    const filteredCardData = JSON.parse(JSON.stringify(this.copyDataCardJSON));
     for (const cardGroup of filteredCardData) {
-      if (cardGroup.filters) {
+      if (cardGroup.filters && cardGroup.chartGroup.id == this.groupInfo.id) {
         for (const filter of cardGroup.filters) {
           this.filters.map((data) => {
             if (
@@ -974,48 +1034,77 @@ export class AdmMainChartsComponent implements OnInit {
               filter.identifiers[0] = flattenIdentifiers(data.identifiers);
             }
           });
-          const selectedValue = this.selectedFilters[filter.column[0]];
-          if (selectedValue && selectedValue !== 'Todos') {
-            filter.value = selectedValue.split(', ');
-          } else if (selectedValue && selectedValue === 'Todos') {
-            filter.value = [];
+
+          if (filter.type == 'timestamp') {
+            let selectedValue = this.selectedFilters[filter.column[0]];
+            if (selectedValue == undefined) {
+              filter.value = filter.value;
+            } else {
+              filter.value = selectedValue.split(', ');
+            }
+          }
+
+          if (filter.type == 'character') {
+            let selectedValue;
+            selectedValue = this.checkedValues[filter.column[0]];
+            if (selectedValue == undefined || selectedValue == '') {
+              selectedValue = 'Todos';
+              filter.value = [];
+            } else if (Array.isArray(selectedValue)) {
+              selectedValue = selectedValue.join(', ');
+              filter.value = selectedValue
+                .split(', ')
+                .map((value) => value.trim());
+            } else {
+              filter.value = selectedValue
+                .split(', ')
+                .map((value: string) => value.trim());
+            }
           }
         }
+        processCardData.push(cardGroup);
       }
     }
-
-    this.updateChartGroupsData(filteredChartData);
-    this.updateTableGroupsData(filteredTableData);
-    this.updateCardGroupsData(filteredCardData);
+    this.updateChartGroupsData(processChartData);
+    this.updateTableGroupsData(processTableData);
+    this.updateCardGroupsData(processCardData);
   }
+
+  executeFilterProcess(data: any, type: string) {}
 
   updateChartGroupsData(filteredChartData: any[]) {
     filteredChartData.forEach((data: any) => {
-      data.xAxisColumns.forEach((dat: any) => {
-        dat.data = [];
-      });
-      this.updateChart(
-        data.id,
-        data.sql,
-        data.xAxisColumns,
-        data.yAxisColumns,
-        data.series,
-        data.filters,
-        data.group,
-        data.order
-      );
+      if (this.groupInfo.id == data.chartGroup.id) {
+        data.xAxisColumns.forEach((dat: any) => {
+          dat.data = [];
+        });
+        this.updateChart(
+          data.id,
+          data.sql,
+          data.xAxisColumns,
+          data.yAxisColumns,
+          data.series,
+          data.filters,
+          data.group,
+          data.order
+        );
+      }
     });
   }
 
   updateTableGroupsData(filteredTableGroupsData: any) {
     filteredTableGroupsData.forEach((data: any) => {
-      this.updateTables(data.id, data.tableData, data.filters);
+      if (this.groupInfo.id == data.chartGroup.id) {
+        this.updateTables(data.id, data.tableData, data.filters);
+      }
     });
   }
 
   updateCardGroupsData(cardGroupsData: any) {
     cardGroupsData.forEach((data: any) => {
-      this.updateCards(data.id, data.sql, data.filters);
+      if (this.groupInfo.id == data.chartGroup.id) {
+        this.updateCards(data.id, data.sql, data.filters);
+      }
     });
   }
 
@@ -1069,7 +1158,9 @@ export class AdmMainChartsComponent implements OnInit {
 
     this.chartsService.updateCharts(this.headers, requestData, id).subscribe({
       next: (data: any) => {
-        this.getCharts(data.chartGroup.id);
+        setTimeout(() => {
+          this.getCharts(data.chartGroup.id);
+        }, 800);
       },
       error: (error: any) => {},
     });
@@ -1097,7 +1188,9 @@ export class AdmMainChartsComponent implements OnInit {
 
     this.chartsService.updateTables(this.headers, requestData, id).subscribe({
       next: (data: any) => {
-        this.getTables(data.chartGroup.id);
+        setTimeout(() => {
+          this.getTables(data.chartGroup.id);
+        }, 500);
       },
       error: (err: any) => {},
     });
@@ -1115,7 +1208,6 @@ export class AdmMainChartsComponent implements OnInit {
       sql: sql,
       filters: formattedFilters,
     };
-
     this.chartsService.updateCards(this.headers, requestData, id).subscribe({
       next: (data: any) => {
         this.getCards(data.chartGroup.id);
@@ -1170,6 +1262,8 @@ export class AdmMainChartsComponent implements OnInit {
   }
 
   toggleFullScreen() {
+    this.filterModal = this.elementRef.nativeElement.querySelector('#modal');
+    this.filterModal!.style.width = '0';
     const elem = this.fullScreenDiv.nativeElement;
     if (!document.fullscreenElement) {
       if (elem.requestFullscreen) {
@@ -1194,6 +1288,9 @@ export class AdmMainChartsComponent implements OnInit {
       }
       this.isFullScreen = false;
     }
+    setTimeout(() => {
+      this.updateCombinedLayout();
+    }, 440);
   }
 
   onFullScreenChange() {

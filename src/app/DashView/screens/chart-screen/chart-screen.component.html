@@ -13,7 +13,10 @@
     </button>
   </div>
 </div>
-<div class="container-save-disposition">
+<div class="dash-no-result" *ngIf="isDashvoid">
+  <span>Dashboard vazio</span>
+</div>
+<div class="container-save-disposition" *ngIf="isDashContent && !isDashvoid">
   <span> Ações </span>
   <div>
     <button (click)="toggleFullScreen()">
@@ -30,7 +33,7 @@
     </button>
   </div>
 </div>
-<div class="container-data">
+<div class="container-data" *ngIf="isDashContent && !isDashvoid">
   <span> Dados </span>
   <div>
     <button (click)="openModal()">
@@ -55,7 +58,11 @@
     </div>
   </div>
 </div>
-<div class="main-container contentFS" #fullScreenDiv>
+<div
+  class="main-container contentFS"
+  #fullScreenDiv
+  *ngIf="isDashContent && !isDashvoid"
+>
   <div class="playground-container">
     <div
       class="grid-container"
@@ -82,11 +89,50 @@
           [id]="item.id"
           [transition]="currentTransition"
           [dragStartThreshold]="dragStartThreshold"
-          [draggable]="!disableDrag"
-          [resizable]="!disableResize"
+          [draggable]="isLoading ? disableDrag : !disableDrag"
+          [resizable]="isLoading ? disableDrag : !disableResize"
         >
           <section
-            *ngIf="item.type == 'card'"
+            *ngIf="isLoading && item.type == 'card'"
+            style="width: 100%; height: 100%; cursor: progress"
+            class="menu-container"
+          >
+            <p-skeleton
+              width="100%"
+              height="100%"
+              styleClass="mb-2"
+              borderRadius="3px"
+            />
+          </section>
+          <section
+            *ngIf="isLoading && item.type == 'table'"
+            style="width: 100%; height: 100%; cursor: progress"
+          >
+            <p-skeleton
+              width="100%"
+              height="100%"
+              styleClass="mb-2"
+              borderRadius="3px"
+            />
+          </section>
+          <section
+            *ngIf="isLoading && item.type == 'chart'"
+            style="width: 100%; height: 100%; cursor: progress"
+          >
+            <p-skeleton
+              width="100%"
+              height="100%"
+              styleClass="mb-2"
+              borderRadius="3px"
+            />
+          </section>
+
+          <ng-template ktdGridItemPlaceholder>
+            <div class="custom-placeholder-container"></div>
+          </ng-template>
+
+          <section
+            *ngIf="!isLoading && item.type == 'card'"
             style="width: 100%; height: 100%"
             class="menu-container"
           >
@@ -100,7 +146,7 @@
             </div>
           </section>
           <section
-            *ngIf="item.type == 'table'"
+            *ngIf="!isLoading && item.type == 'table'"
             class="table-container mat-elevation-z8 menu-container"
             tabindex="0"
           >
@@ -157,9 +203,15 @@
             </div>
           </section>
           <div
-            *ngIf="item.type == 'chart'"
+            *ngIf="!isLoading && item.type == 'chart'"
             class="chart-container menu-container"
           >
+            <ng-template
+              *ngFor="let itemchart of chartGroupsData"
+              ktdGridItemPlaceholder
+            >
+              <div class="custom-placeholder-container"></div>
+            </ng-template>
             <section *ngFor="let itemchart of chartGroupsData">
               <highcharts-chart
                 *ngIf="item.itemId === itemchart.id"
@@ -201,7 +253,7 @@
           </div>
           <div class="dropdown">
             <ng-container *ngIf="filter.type == 'numeric'">
-              <div class="custom-slider">
+              <div class="custom-slider" *ngIf="filter.values">
                 <ngx-slider
                   [(value)]="filter.values[0]"
                   [(highValue)]="filter.values[1]"
@@ -210,12 +262,14 @@
               </div>
             </ng-container>
 
-            <ng-container *ngIf="filter.type == 'timestamp'">
+            <ng-container
+              *ngIf="filter.type == 'timestamp' && filter.type != 'character'"
+            >
               <div class="dropdown-date">
                 <mat-date-range-input [rangePicker]="picker">
                   <input
                     matStartDate
-                    [placeholder]="filter.values[0]"
+                    [placeholder]="filter.values ? filter.values[0] : '-'"
                     [(ngModel)]="filter.values[0]"
                     (dateChange)="updateDate('startDate', filter, $event.value)"
                   />
@@ -242,10 +296,16 @@
             <ng-container
               *ngIf="filter.type != 'timestamp' && filter.type != 'numeric'"
             >
-              <button class="dropbtn" (click)="showContentFilter(i)">
+              <button
+                class="dropbtn"
+                (click)="showContentFilter(i)"
+                *ngIf="filter.values && filter.allfilters"
+              >
                 {{
-                  selectedFilters[filter.column] ||
-                    allfilters(filter.values, filter.allfilters)
+                  filter.values.length == filter.allfilters.length ||
+                  filter.values.length == 0
+                    ? "Todos"
+                    : filter.values
                 }}
               </button>
             </ng-container>
@@ -255,7 +315,7 @@
                   <input
                     class="checkbox"
                     type="checkbox"
-                    [checked]="isChecked(filter.column, value)"
+                    [checked]="isChecked(filter.values, value)"
                     (change)="onCheckboxChange(filter.column, value)"
                   />
                 </div>

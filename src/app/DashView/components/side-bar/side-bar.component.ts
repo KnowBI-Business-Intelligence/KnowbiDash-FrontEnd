@@ -149,9 +149,9 @@ export class SideBarComponent implements OnInit {
     this.matsidenav =
       this.elementRef.nativeElement.querySelector('#matsidenav');
     if (this.isExpanded) {
-      this.matsidenav!.style.width = '200px';
+      this.matsidenav!.style.width = '155px';
     } else {
-      this.matsidenav!.style.width = '56px';
+      this.matsidenav!.style.width = '45px';
     }
   }
 
