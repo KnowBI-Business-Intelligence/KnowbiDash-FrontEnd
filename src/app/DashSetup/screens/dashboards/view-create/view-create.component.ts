@@ -82,7 +82,6 @@ import {
   generateLayout2,
   ktdArrayRemoveItem,
 } from './utils';
-import { DashboardsViewComponent } from '../dashboards-view/dashboards-view.component';
 
 registerLocaleData(localePt);
 
@@ -175,6 +174,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   changeBg: HTMLElement | null = null;
   filterModal: HTMLElement | null = null;
   buttonMenuItem: HTMLElement | null = null;
+  gridContainer: HTMLElement | null = null;
   paths: { [key: string]: Group[] } = {};
   pathNames: { [key: string]: string } = {};
 
@@ -840,6 +840,8 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     this.showFilters();
     let filterValuesByColumn: { [key: string]: string[] } = {};
     this.filters.forEach((filter: any) => {
+      this.checkedValues[filter.column] = filter.values;
+      this.allfilters(filter.values, filter.column);
       if (!(filter.column[0] in filterValuesByColumn)) {
         filterValuesByColumn[filter.column[0]] = [];
       }
@@ -860,14 +862,21 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   showFilters() {
     this.isShowFilterModal = !this.isShowFilterModal;
     this.filterModal = this.elementRef.nativeElement.querySelector('#modal');
+    this.gridContainer =
+      this.elementRef.nativeElement.querySelector('.grid-container');
     if (this.isShowFilterModal) {
       this.filterModal!.style.width = '330px';
+      this.gridContainer!.style.overflowX = 'hidden';
     } else {
       this.filterModal!.style.width = '0';
     }
     setTimeout(() => {
       this.updateCombinedLayout();
     }, 440);
+  }
+
+  allfilters(values: string[], column: string) {
+    this.selectedFilters[column] = values;
   }
 
   showContentFilter(index: number) {
@@ -889,8 +898,12 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     this.updateDropdownLabel(column);
   }
 
-  isChecked(column: string, value: string): boolean {
-    return this.checkedValues[column]?.includes(value) || false;
+  isChecked(values: string[], allfilters: string): boolean {
+    if (values.includes(allfilters)) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   updateDropdownLabel(column: string) {
@@ -900,16 +913,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     } else {
       this.selectedFilters[column] = 'Todos';
     }
-  }
-
-  allfilters(values: string[], allfilters: string[]): string | string[] {
-    if (values.length == allfilters.length) {
-      const arraysIguais = values.every((value) => allfilters.includes(value));
-      if (arraysIguais) {
-        return 'Todos';
-      }
-    }
-    return values;
   }
 
   updateDate(
@@ -932,9 +935,19 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   executeFilter() {
     const flattenIdentifiers = (identifiers: any[]) =>
       identifiers.flat(Infinity);
+
     const filteredChartData = JSON.parse(JSON.stringify(this.copydataJSON));
+    const filteredTableData = JSON.parse(
+      JSON.stringify(this.copyDataTableJSON)
+    );
+    const filteredCardData = JSON.parse(JSON.stringify(this.copyDataCardJSON));
+
+    let processChartData: any[] = [];
+    let processTableData: any[] = [];
+    let processCardData: any[] = [];
+
     for (const chartGroup of filteredChartData) {
-      if (chartGroup.filters) {
+      if (chartGroup.filters && chartGroup.chartGroup.id == this.groupInfo.id) {
         for (const filter of chartGroup.filters) {
           this.filters.map((data) => {
             if (
@@ -947,22 +960,36 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
               filter.identifiers[0] = flattenIdentifiers(data.identifiers);
             }
           });
-          let selectedValue = this.selectedFilters[filter.column[0]];
-          if (selectedValue == undefined) {
-            selectedValue = 'Todos';
+          if (filter.type == 'timestamp') {
+            let selectedValue = this.selectedFilters[filter.column[0]];
+            if (selectedValue == undefined) {
+              filter.value = filter.value;
+            } else {
+              filter.value = selectedValue.split(', ');
+            }
           }
-          if (selectedValue && selectedValue != 'Todos') {
-            filter.value = selectedValue.split(', ');
-          } else if (selectedValue && selectedValue == 'Todos') {
-            filter.value = [];
+          if (filter.type == 'character') {
+            let selectedValue;
+            selectedValue = this.checkedValues[filter.column[0]];
+            if (selectedValue == undefined || selectedValue == '') {
+              selectedValue = 'Todos';
+              filter.value = [];
+            } else if (Array.isArray(selectedValue)) {
+              selectedValue = selectedValue.join(', ');
+              filter.value = selectedValue
+                .split(', ')
+                .map((value) => value.trim());
+            } else {
+              filter.value = selectedValue
+                .split(', ')
+                .map((value: string) => value.trim());
+            }
           }
         }
+        processChartData.push(chartGroup);
       }
     }
 
-    const filteredTableData = JSON.parse(
-      JSON.stringify(this.copyDataTableJSON)
-    );
     for (const tableGroup of filteredTableData) {
       if (tableGroup.filters) {
         for (const filter of tableGroup.filters) {
@@ -978,22 +1005,39 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
             }
           });
 
-          let selectedValue = this.selectedFilters[filter.column[0]];
-          if (selectedValue == undefined) {
-            selectedValue = 'Todos';
+          if (filter.type == 'timestamp') {
+            let selectedValue = this.selectedFilters[filter.column[0]];
+            if (selectedValue == undefined) {
+              filter.value = filter.value;
+            } else {
+              filter.value = selectedValue.split(', ');
+            }
           }
-          if (selectedValue && selectedValue != 'Todos') {
-            filter.value = selectedValue.split(', ');
-          } else if (selectedValue && selectedValue == 'Todos') {
-            filter.value = [];
+
+          if (filter.type == 'character') {
+            let selectedValue;
+            selectedValue = this.checkedValues[filter.column[0]];
+            if (selectedValue == undefined || selectedValue == '') {
+              selectedValue = 'Todos';
+              filter.value = [];
+            } else if (Array.isArray(selectedValue)) {
+              selectedValue = selectedValue.join(', ');
+              filter.value = selectedValue
+                .split(', ')
+                .map((value) => value.trim());
+            } else {
+              filter.value = selectedValue
+                .split(', ')
+                .map((value: string) => value.trim());
+            }
           }
+          processTableData.push(tableGroup);
         }
       }
     }
 
-    const filteredCardData = JSON.parse(JSON.stringify(this.copyDataCardJSON));
     for (const cardGroup of filteredCardData) {
-      if (cardGroup.filters) {
+      if (cardGroup.filters && cardGroup.chartGroup.id == this.groupInfo.id) {
         for (const filter of cardGroup.filters) {
           this.filters.map((data) => {
             if (
@@ -1006,22 +1050,43 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
               filter.identifiers[0] = flattenIdentifiers(data.identifiers);
             }
           });
-          let selectedValue = this.selectedFilters[filter.column[0]];
-          if (selectedValue == undefined) {
-            selectedValue = 'Todos';
+
+          if (filter.type == 'timestamp') {
+            let selectedValue = this.selectedFilters[filter.column[0]];
+            if (selectedValue == undefined) {
+              filter.value = filter.value;
+            } else {
+              filter.value = selectedValue.split(', ');
+            }
           }
-          if (selectedValue && selectedValue != 'Todos') {
-            filter.value = selectedValue.split(', ');
-          } else if (selectedValue && selectedValue == 'Todos') {
-            filter.value = [];
+
+          if (filter.type == 'character') {
+            let selectedValue;
+            selectedValue = this.checkedValues[filter.column[0]];
+            if (selectedValue == undefined || selectedValue == '') {
+              selectedValue = 'Todos';
+              filter.value = [];
+            } else if (Array.isArray(selectedValue)) {
+              selectedValue = selectedValue.join(', ');
+              filter.value = selectedValue
+                .split(', ')
+                .map((value) => value.trim());
+            } else {
+              filter.value = selectedValue
+                .split(', ')
+                .map((value: string) => value.trim());
+            }
           }
         }
+        processCardData.push(cardGroup);
       }
     }
-    this.updateChartGroupsData(filteredChartData);
-    this.updateTableGroupsData(filteredTableData);
-    this.updateCardGroupsData(filteredCardData);
+    this.updateChartGroupsData(processChartData);
+    this.updateTableGroupsData(processTableData);
+    this.updateCardGroupsData(processCardData);
   }
+
+  executeFilterProcess(data: any, type: string) {}
 
   updateChartGroupsData(filteredChartData: any[]) {
     filteredChartData.forEach((data: any) => {
@@ -1109,7 +1174,9 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
 
     this.chartsService.updateCharts(this.headers, requestData, id).subscribe({
       next: (data: any) => {
-        this.getCharts(data.chartGroup.id);
+        setTimeout(() => {
+          this.getCharts(data.chartGroup.id);
+        }, 800);
       },
       error: (error: any) => {},
     });
@@ -1137,7 +1204,9 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
 
     this.chartsService.updateTables(this.headers, requestData, id).subscribe({
       next: (data: any) => {
-        this.getTables(data.chartGroup.id);
+        setTimeout(() => {
+          this.getTables(data.chartGroup.id);
+        }, 500);
       },
       error: (err: any) => {},
     });
@@ -1299,6 +1368,8 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   }
 
   toggleFullScreen() {
+    this.filterModal = this.elementRef.nativeElement.querySelector('#modal');
+    this.filterModal!.style.width = '0';
     const elem = this.fullScreenDiv.nativeElement;
     if (!document.fullscreenElement) {
       if (elem.requestFullscreen) {

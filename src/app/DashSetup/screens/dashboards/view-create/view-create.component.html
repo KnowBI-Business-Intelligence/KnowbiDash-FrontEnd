@@ -340,7 +340,7 @@
 
           <div class="dropdown">
             <ng-container *ngIf="filter.type == 'numeric'">
-              <div class="custom-slider">
+              <div class="custom-slider" *ngIf="filter.values">
                 <ngx-slider
                   [(value)]="filter.values[0]"
                   [(highValue)]="filter.values[1]"
@@ -349,12 +349,14 @@
               </div>
             </ng-container>
 
-            <ng-container *ngIf="filter.type == 'timestamp'">
+            <ng-container
+              *ngIf="filter.type == 'timestamp' && filter.type != 'character'"
+            >
               <div class="dropdown-date">
                 <mat-date-range-input [rangePicker]="picker">
                   <input
                     matStartDate
-                    [placeholder]="filter.values[0]"
+                    [placeholder]="filter.values ? filter.values[0] : '-'"
                     [(ngModel)]="filter.values[0]"
                     (dateChange)="updateDate('startDate', filter, $event.value)"
                   />
@@ -381,10 +383,16 @@
             <ng-container
               *ngIf="filter.type != 'timestamp' && filter.type != 'numeric'"
             >
-              <button class="dropbtn" (click)="showContentFilter(i)">
+              <button
+                class="dropbtn"
+                (click)="showContentFilter(i)"
+                *ngIf="filter.values && filter.allfilters"
+              >
                 {{
-                  selectedFilters[filter.column] ||
-                    allfilters(filter.values, filter.allfilters)
+                  filter.values.length == filter.allfilters.length ||
+                  filter.values.length == 0
+                    ? "Todos"
+                    : filter.values
                 }}
               </button>
             </ng-container>
@@ -394,7 +402,7 @@
                   <input
                     class="checkbox"
                     type="checkbox"
-                    [checked]="isChecked(filter.column, value)"
+                    [checked]="isChecked(filter.values, value)"
                     (change)="onCheckboxChange(filter.column, value)"
                   />
                 </div>

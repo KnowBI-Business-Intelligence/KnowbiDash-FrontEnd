@@ -4,6 +4,7 @@ services:
   koios-front:
     image: koios-front-app
     container_name: koios-front
+    restart: always
     build:
       context: .
       dockerfile: Dockerfile
