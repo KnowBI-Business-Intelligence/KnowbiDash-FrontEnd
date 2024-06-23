@@ -288,9 +288,9 @@ footer {
 
 footer .knowbiIcon {
   position: fixed;
-  width: 7rem;
+  width: 4rem;
   left: 0;
-  bottom: -38px;
+  bottom: -9px;
   z-index: 10;
 }
 
@@ -371,9 +371,9 @@ footer .koiosIcon {
   }
 
   footer .knowbiIcon {
-    width: 5rem;
+    width: 3rem;
     left: 0;
-    bottom: -22px;
+    bottom: -3px;
     z-index: 10;
   }
 }
