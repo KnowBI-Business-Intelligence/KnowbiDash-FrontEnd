@@ -22,6 +22,7 @@ import {
 import { MatChipInputEvent, MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { faCircleUser } from '@fortawesome/free-solid-svg-icons';
 import { Router, RouterModule } from '@angular/router';
 import { Message, MessageService } from 'primeng/api';
 import { DropdownModule } from 'primeng/dropdown';
@@ -31,6 +32,7 @@ import { Roles } from '../../../../core/modules/interfaces';
 import { AuthService } from '../../../../core/services/auth/auth.service';
 import { ProfilesService } from '../../../../core/services/profiles/profiles.service';
 import { StorageService } from '../../../../core/services/user/storage.service';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
   selector: 'app-create-user',
@@ -46,14 +48,22 @@ import { StorageService } from '../../../../core/services/user/storage.service';
     MatIconModule,
     MatAutocompleteModule,
     RouterModule,
+    FontAwesomeModule,
   ],
   providers: [MessageService],
   templateUrl: './create-user.component.html',
-  styleUrl: './create-user.component.css',
+  styleUrls: [
+    './create-user.component.css',
+    '../../../../core/globalStyle/toast.css',
+  ],
 })
 export class CreateUserComponent implements OnInit {
   @ViewChild('f') f!: NgForm;
   @ViewChild('profileInput') profileInput!: ElementRef<HTMLInputElement>;
+
+  icons = {
+    user: faCircleUser,
+  };
 
   messages: Message[] = [];
 
@@ -195,13 +205,12 @@ export class CreateUserComponent implements OnInit {
     this.isLoginLoading = true;
     setTimeout(() => {
       this.isLoginLoading = false;
-    }, 2500);
+    }, 1500);
 
     if (this.areRequiredFieldsEmpty()) {
       this.isLoginLoading = false;
       this.messageService.add({
         severity: 'error',
-        summary: '',
         detail: 'Por favor, preencha todos os campos obrigatórios.',
       });
       return;
@@ -241,18 +250,16 @@ export class CreateUserComponent implements OnInit {
       next: () => {
         this.messageService.add({
           severity: 'success',
-          summary: 'Sucesso',
           detail: 'Usuário Cadastrado!',
         });
         setTimeout(() => {
           this.router.navigate(['/admin/users_panel']);
           this.isLoginLoading = false;
-        }, 2500);
+        }, 2000);
       },
       error: (err) => {
         this.messageService.add({
           severity: 'error',
-          summary: 'Erro',
           detail: 'Ocorreu um erro durante o cadastro do usuário.',
         });
       },

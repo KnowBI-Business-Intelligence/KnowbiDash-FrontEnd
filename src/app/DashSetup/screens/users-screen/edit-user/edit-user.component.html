@@ -8,6 +8,12 @@
   <div class="register-user">
     <span class="register-user-label">Editar Usuário</span>
     <div class="forms">
+      <fa-icon
+        class="iconUser"
+        [icon]="icons.user"
+        [size]="'xl'"
+        title="Dashboards"
+      ></fa-icon>
       <form
         autocomplete="off"
         class="form-register"
@@ -15,7 +21,9 @@
         #f="ngForm"
       >
         <div class="form-create-user">
-          <label for="fullnameuser">Nome Completo: </label>
+          <label for="fullnameuser"
+            >Nome <span class="mandatory">*</span></label
+          >
           <input
             autocomplete="off"
             type="text"
@@ -23,12 +31,11 @@
             [(ngModel)]="form.fullusername"
             #fullusername="ngModel"
             [ngClass]="{ 'is-invalid': f.submitted && fullusername.errors }"
-            placeholder="Ex: João da Silva"
           />
         </div>
 
         <div class="form-create-user">
-          <label for="username">Nome de usuário: </label>
+          <label for="username">Usuário <span class="mandatory">*</span></label>
           <input
             autocomplete="off"
             type="text"
@@ -36,12 +43,11 @@
             [(ngModel)]="form.username"
             #username="ngModel"
             [ngClass]="{ 'is-invalid': f.submitted && username.errors }"
-            placeholder="Ex: NomeUsuario"
           />
         </div>
 
         <div class="form-create-user">
-          <label for="password">Senha: </label>
+          <label for="password">Senha <span class="mandatory">*</span></label>
           <input
             autocomplete="off"
             type="password"
@@ -52,12 +58,12 @@
             minlength="6"
             #password="ngModel"
             [ngClass]="{ 'is-invalid': f.submitted && password.errors }"
-            placeholder="******"
+            placeholder="*******"
           />
         </div>
 
         <div class="form-create-user">
-          <label for="occupation">Ocupação: </label>
+          <label for="occupation">Ocupação </label>
           <input
             autocomplete="off"
             type="text"
@@ -67,12 +73,11 @@
             minlength="6"
             #occupation="ngModel"
             [ngClass]="{ 'is-invalid': f.submitted && occupation.errors }"
-            placeholder="Ex: Analista Jr"
           />
         </div>
 
         <div class="form-create-user">
-          <label for="email">E-mail: </label>
+          <label for="email">E-mail </label>
           <input
             autocomplete="off"
             type="email"
@@ -83,12 +88,13 @@
             minlength="6"
             #email="ngModel"
             [ngClass]="{ 'is-invalid': f.submitted && email.errors }"
-            placeholder="Ex: email@email.com"
           />
         </div>
 
         <div class="form-create-user">
-          <label for="access_level">Nível de acesso: </label>
+          <label for="access_level"
+            >Nível de acesso <span class="mandatory">*</span></label
+          >
           <p-dropdown
             name="access_level"
             [options]="rolesOptions"
@@ -99,37 +105,43 @@
             [ngClass]="{ 'is-invalid': f.submitted && access_level.errors }"
           ></p-dropdown>
         </div>
-        <mat-form-field class="form-create-user-profiles">
-          <mat-label>Perfis</mat-label>
-          <mat-chip-grid #chipGrid aria-label="Profile selection">
-            @for (profile of profiles; track profile) {
-            <mat-chip-row (removed)="removeProfile(profile)">
-              {{ profile }}
-              <button matChipRemove [attr.aria-label]="'remover ' + profile">
-                <mat-icon>cancel</mat-icon>
-              </button>
-            </mat-chip-row>
-            }
-          </mat-chip-grid>
-          <input
-            placeholder="Novo perfil..."
-            #profileInput
-            [(ngModel)]="form.profiles"
-            [formControl]="profilesCtrl"
-            [matChipInputFor]="chipGrid"
-            [matAutocomplete]="auto"
-            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-            (matChipInputTokenEnd)="addProfiles($event)"
-          />
-          <mat-autocomplete
-            #auto="matAutocomplete"
-            (optionSelected)="selectedProfiles($event)"
+        <div class="profile-container">
+          <label for="form-create-user-profiles">Perfis</label>
+          <mat-form-field
+            class="form-create-user-profiles"
+            name="form-create-user-profiles"
           >
-            @for (profile of filteredProfiles | async; track profile) {
-            <mat-option [value]="profile">{{ profile }}</mat-option>
-            }
-          </mat-autocomplete>
-        </mat-form-field>
+            <mat-label>Adicione perfis</mat-label>
+            <mat-chip-grid #chipGrid aria-label="Profile selection">
+              @for (profile of profiles; track profile) {
+              <mat-chip-row (removed)="removeProfile(profile)">
+                {{ profile }}
+                <button matChipRemove [attr.aria-label]="'remover ' + profile">
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </mat-chip-row>
+              }
+            </mat-chip-grid>
+            <input
+              placeholder="Novo perfil..."
+              #profileInput
+              [(ngModel)]="form.profiles"
+              [formControl]="profilesCtrl"
+              [matChipInputFor]="chipGrid"
+              [matAutocomplete]="auto"
+              [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+              (matChipInputTokenEnd)="addProfiles($event)"
+            />
+            <mat-autocomplete
+              #auto="matAutocomplete"
+              (optionSelected)="selectedProfiles($event)"
+            >
+              @for (profile of filteredProfiles | async; track profile) {
+              <mat-option [value]="profile">{{ profile }}</mat-option>
+              }
+            </mat-autocomplete>
+          </mat-form-field>
+        </div>
       </form>
     </div>
 
@@ -155,7 +167,7 @@
       </button>
     </div>
     <div class="message">
-      <p-toast [life]="2500"></p-toast>
+      <p-toast [life]="3500"></p-toast>
     </div>
   </div>
 </div>

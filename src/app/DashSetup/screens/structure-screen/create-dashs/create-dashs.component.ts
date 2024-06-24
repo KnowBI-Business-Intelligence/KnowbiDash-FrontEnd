@@ -337,7 +337,7 @@ export class CreateDashsComponent implements OnInit {
         this.cancelRegister();
       },
       error: (err) => {
-        this.errorMessageToast(err.error.error);
+        this.errorMessageToast('Verifique os campos preenchidos');
       },
     });
   }
@@ -495,7 +495,6 @@ export class CreateDashsComponent implements OnInit {
   errorMessageToast(message: string) {
     return this.messageService.add({
       severity: 'error',
-      summary: 'Erro',
       detail: message,
     });
   }
@@ -503,7 +502,6 @@ export class CreateDashsComponent implements OnInit {
   successMessageToast(message: string) {
     return this.messageService.add({
       severity: 'success',
-      summary: 'Sucesso',
       detail: message,
     });
   }

@@ -161,7 +161,7 @@
       <form class="form-search" [formGroup]="createRegisterForm">
         <div class="form-group-input-side">
           <div class="form-group-input">
-            <label for="name">Nome do dashboard</label>
+            <label for="name">Nome <span class="mandatory">*</span></label>
             <input
               type="text"
               class="form-control"
@@ -174,7 +174,9 @@
           </div>
 
           <div class="form-group-input">
-            <label for="pgTableName">Nome da tabela</label>
+            <label for="pgTableName"
+              >Tabela <span class="mandatory">*</span></label
+            >
             <input
               type="text"
               class="form-control"
@@ -275,7 +277,7 @@
 
     <div class="container-add-footer">
       <button id="cancel" (click)="cancelRegister()">Cancelar</button>
-      <button (click)="createRegister()">Concluir</button>
+      <button (click)="createRegister()">Salvar</button>
     </div>
   </div>
 
@@ -287,7 +289,7 @@
       <form class="form-search" [formGroup]="editDashForm">
         <div>
           <div class="form-group-input">
-            <label for="name">Nome do dashboard</label>
+            <label for="name">Nome <span class="mandatory">*</span></label>
             <input
               type="text"
               class="form-control"
@@ -301,7 +303,9 @@
           </div>
 
           <div class="form-group-input">
-            <label for="pgTableName">Nome da tabela</label>
+            <label for="pgTableName"
+              >Tabela <span class="mandatory">*</span></label
+            >
             <input
               type="text"
               class="form-control"

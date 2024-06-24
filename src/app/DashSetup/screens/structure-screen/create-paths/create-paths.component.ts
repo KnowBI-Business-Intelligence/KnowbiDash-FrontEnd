@@ -42,7 +42,10 @@ import { MatTabsModule } from '@angular/material/tabs';
     FontAwesomeModule,
   ],
   templateUrl: './create-paths.component.html',
-  styleUrl: './create-paths.component.css',
+  styleUrls: [
+    './create-paths.component.css',
+    '../../../../core/globalStyle/toast.css',
+  ],
 })
 export class CreatePathsComponent implements OnInit {
   icons = {
@@ -355,7 +358,6 @@ export class CreatePathsComponent implements OnInit {
           next: () => {
             this.messageService.add({
               severity: 'success',
-              summary: 'Sucesso',
               detail: 'Pasta excluída',
             });
             this.cancelDelete();
@@ -363,7 +365,6 @@ export class CreatePathsComponent implements OnInit {
           error: () => {
             this.messageService.add({
               severity: 'error',
-              summary: 'Erro',
               detail: 'Verifique os vinculos da pasta',
             });
           },
@@ -406,7 +407,6 @@ export class CreatePathsComponent implements OnInit {
       next: () => {
         this.messageService.add({
           severity: 'success',
-          summary: 'Sucesso',
           detail: 'Pasta criada',
         });
         this.cancelRegister();
@@ -418,7 +418,6 @@ export class CreatePathsComponent implements OnInit {
       error: () => {
         this.messageService.add({
           severity: 'error',
-          summary: 'Erro',
           detail: 'Verifique os campos preenchidos',
         });
       },
@@ -449,7 +448,6 @@ export class CreatePathsComponent implements OnInit {
         next: () => {
           this.messageService.add({
             severity: 'success',
-            summary: 'Sucesso',
             detail: 'Pasta atualizada',
           });
           this.notViewProfile();
@@ -458,7 +456,6 @@ export class CreatePathsComponent implements OnInit {
         error: () => {
           this.messageService.add({
             severity: 'error',
-            summary: 'Erro',
             detail: 'Verifique os campos preenchidos',
           });
         },

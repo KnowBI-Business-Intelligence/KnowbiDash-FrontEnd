@@ -41,7 +41,10 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
   ],
   providers: [MessageService],
   templateUrl: './create-profiles.component.html',
-  styleUrl: './create-profiles.component.css',
+  styleUrls: [
+    './create-profiles.component.css',
+    '../../../../core/globalStyle/toast.css',
+  ],
 })
 export class CreateProfilesComponent implements OnInit {
   icons = {
@@ -291,7 +294,6 @@ export class CreateProfilesComponent implements OnInit {
         next: () => {
           this.messageService.add({
             severity: 'success',
-            summary: 'Sucesso',
             detail: 'Perfil excluído',
           });
           this.cancelDelete();
@@ -299,7 +301,6 @@ export class CreateProfilesComponent implements OnInit {
         error: () => {
           this.messageService.add({
             severity: 'error',
-            summary: 'Erro',
             detail: 'verifique os vinculos do perfil',
           });
         },
@@ -339,7 +340,6 @@ export class CreateProfilesComponent implements OnInit {
       next: () => {
         this.messageService.add({
           severity: 'success',
-          summary: 'Sucesso',
           detail: 'Perfil criado',
         });
         this.cancelRegister();
@@ -348,7 +348,6 @@ export class CreateProfilesComponent implements OnInit {
       error: () => {
         this.messageService.add({
           severity: 'error',
-          summary: 'Erro',
           detail: 'Verifique os campos preenchidos',
         });
       },
@@ -377,7 +376,6 @@ export class CreateProfilesComponent implements OnInit {
         next: () => {
           this.messageService.add({
             severity: 'success',
-            summary: 'Sucesso',
             detail: 'Perfil atualizado',
           });
           this.cancelRegister();
@@ -386,7 +384,6 @@ export class CreateProfilesComponent implements OnInit {
         error: () => {
           this.messageService.add({
             severity: 'error',
-            summary: 'Erro',
             detail: 'Verifique os campos preenchidos',
           });
         },

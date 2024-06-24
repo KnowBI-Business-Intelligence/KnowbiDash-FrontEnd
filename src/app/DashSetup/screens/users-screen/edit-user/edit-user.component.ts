@@ -22,6 +22,7 @@ import {
 import { MatChipInputEvent, MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { faCircleUser } from '@fortawesome/free-solid-svg-icons';
 import { Router, RouterModule } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { DropdownModule } from 'primeng/dropdown';
@@ -31,6 +32,7 @@ import { Roles } from '../../../../core/modules/interfaces';
 import { AuthService } from '../../../../core/services/auth/auth.service';
 import { ProfilesService } from '../../../../core/services/profiles/profiles.service';
 import { StorageService } from '../../../../core/services/user/storage.service';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @Component({
   selector: 'app-edit-user',
@@ -46,15 +48,23 @@ import { StorageService } from '../../../../core/services/user/storage.service';
     MatIconModule,
     MatAutocompleteModule,
     RouterModule,
+    FontAwesomeModule,
   ],
   providers: [MessageService],
   templateUrl: './edit-user.component.html',
-  styleUrl: '../create-user/create-user.component.css',
+  styleUrls: [
+    '../create-user/create-user.component.css',
+    '../../../../core/globalStyle/toast.css',
+  ],
 })
 export class EditUserComponent implements OnInit {
   @ViewChild('f') f!: NgForm;
   @ViewChild('profileInput') profileInput!: ElementRef<HTMLInputElement>;
   announcer = inject(LiveAnnouncer);
+
+  icons = {
+    user: faCircleUser,
+  };
 
   item: any;
   rolesOptions: Roles[] | undefined;
@@ -208,7 +218,6 @@ export class EditUserComponent implements OnInit {
       next: () => {
         this.messageService.add({
           severity: 'success',
-          summary: 'Sucesso',
           detail: 'Usuário Atualizado',
         });
         setTimeout(() => {
@@ -219,7 +228,6 @@ export class EditUserComponent implements OnInit {
       error: (err) => {
         this.messageService.add({
           severity: 'error',
-          summary: 'Erro',
           detail:
             'Ocorreu um erro durante a atualização, verifique os campos preenchidos',
         });
@@ -248,7 +256,6 @@ export class EditUserComponent implements OnInit {
       error: (error) => {
         this.messageService.add({
           severity: 'error',
-          summary: 'Erro',
           detail: `Erro ao carregar dados do usuário:', ${error}`,
         });
       },

@@ -41,7 +41,10 @@ import { ProfilesService } from '../../../../core/services/profiles/profiles.ser
   ],
   providers: [CustomerService, MessageService],
   templateUrl: './users.component.html',
-  styleUrl: './users.component.css',
+  styleUrls: [
+    './users.component.css',
+    '../../../../core/globalStyle/toast.css',
+  ],
 })
 export class UsersComponent implements OnInit {
   @ViewChild('f') f!: NgForm;

@@ -150,14 +150,12 @@ export class LoginScreenComponent implements OnInit, AfterViewInit {
         if (!username || !password) {
           this.messageService.add({
             severity: 'error',
-            summary: 'Erro',
             detail: 'Por favor, preencha os campos Usuário e Senha',
           });
           return;
         } else {
           this.messageService.add({
             severity: 'error',
-            summary: 'Erro',
             detail: 'Usuário ou Senha incorretos',
           });
         }

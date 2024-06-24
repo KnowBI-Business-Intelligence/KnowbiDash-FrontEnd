@@ -9,6 +9,8 @@ import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { LocalstorageService } from '../../../core/services/local-storage/local-storage.service';
 import { ProfilesService } from '../../../core/services/profiles/profiles.service';
+import { WebsocketDBService } from '../../../core/services/websocket/websocket-db-services';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-adm-main-screen',
@@ -32,16 +34,34 @@ export class ADMMainScreenComponent implements OnInit {
     Authorization: `Bearer ${this.user.token}`,
   });
 
+  streamDataSubscription!: Subscription;
+  streamMessage: any;
+
   constructor(
     private profilesService: ProfilesService,
     private authService: AuthService,
     private storageService: StorageService,
     private localStorage: LocalstorageService,
+    private websocketService: WebsocketDBService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
     this.getUserById(this.user.id, this.user.token);
+    console.log('teste');
+    this.websocketService.streamData();
+    this.streamDataSubscription = this.websocketService.dataModel.subscribe(
+      (data) => {
+        // Aqui você recebe e pode processar as mensagens recebidas
+        this.streamMessage = data; // Atribua a mensagem ao seu componente conforme necessário
+        console.log('Nova mensagem WebSocket recebida:', this.streamMessage);
+      }
+    );
+  }
+
+  ngOnDestroy(): void {
+    // Não se esqueça de desinscrever-se para evitar vazamentos de memória
+    this.streamDataSubscription.unsubscribe();
   }
 
   getUserById(id: number, token: any) {
