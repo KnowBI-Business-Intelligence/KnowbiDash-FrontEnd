@@ -46,16 +46,6 @@ interface Axis {
   value: '';
 }
 
-interface ChartData {
-  xAxisColumns: { data: string[] }[];
-  yAxisColumns: { data: number[] }[];
-  series: { data: string[] }[];
-}
-
-interface ExtendedOptions extends Highcharts.Options {
-  filters?: any;
-}
-
 @Component({
   selector: 'app-chart',
   standalone: true,
@@ -489,8 +479,17 @@ export class ChartComponent implements OnInit {
       },
     };
 
-    if (this.yaxis.length > 0 && this.chartType != '') {
+    if (
+      this.yaxis.length > 0 &&
+      this.xaxis.length > 0 &&
+      this.chartType != ''
+    ) {
       this.createChart(chartData);
+    } else {
+      this.messageService.add({
+        severity: 'warn',
+        detail: 'Por favor, preencha os campos obrigatórios',
+      });
     }
   }
 
@@ -499,7 +498,6 @@ export class ChartComponent implements OnInit {
       next: (data) => {
         this.messageService.add({
           severity: 'success',
-          summary: 'Sucesso',
           detail: 'Gráfico criado',
         });
         this.showPreviewButton = false;
@@ -509,7 +507,6 @@ export class ChartComponent implements OnInit {
       error: (err) => {
         this.messageService.add({
           severity: 'error',
-          summary: 'Erro',
           detail: 'Não foi possível concluir esta ação',
         });
       },
@@ -552,7 +549,6 @@ export class ChartComponent implements OnInit {
         next: (data) => {
           this.messageService.add({
             severity: 'success',
-            summary: 'Sucesso',
             detail: 'Informações do gráfico atualizadas',
           });
           this.chartPreView(data);
@@ -560,7 +556,6 @@ export class ChartComponent implements OnInit {
         error: (err) => {
           this.messageService.add({
             severity: 'error',
-            summary: 'Erro',
             detail: 'Não foi possível concluir esta ação',
           });
         },

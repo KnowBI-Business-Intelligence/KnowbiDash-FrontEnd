@@ -91,7 +91,6 @@ export class CardsComponent implements OnInit, OnDestroy {
   cardTitle: string = '';
   prefix: string = '';
   sufix: string = '';
-  chartType: string = '';
   sql: string = 'SELECT ';
   tableName: string = '';
   identifiers: string = '';
@@ -383,7 +382,15 @@ export class CardsComponent implements OnInit, OnDestroy {
         id: this.dashBoard.id,
       },
     };
-    this.createCard(cardData);
+
+    if (this.yaxis.length > 0) {
+      this.createCard(cardData);
+    } else {
+      this.messageService.add({
+        severity: 'warn',
+        detail: 'Por favor, preencha os campos obrigatórios',
+      });
+    }
   }
 
   createCard(cardData: any) {
@@ -391,7 +398,6 @@ export class CardsComponent implements OnInit, OnDestroy {
       next: (data) => {
         this.messageService.add({
           severity: 'success',
-          summary: 'Sucesso',
           detail: 'Card criado',
         });
         this.showPreviewButton = false;
@@ -401,8 +407,8 @@ export class CardsComponent implements OnInit, OnDestroy {
       error: (err) => {
         this.messageService.add({
           severity: 'error',
-          summary: 'Erro',
-          detail: 'Não foi possível concluir esta ação',
+          detail:
+            'Não foi possível concluir esta ação, verifique o operador da coluna',
         });
       },
     });
@@ -461,7 +467,6 @@ export class CardsComponent implements OnInit, OnDestroy {
         next: (data) => {
           this.messageService.add({
             severity: 'success',
-            summary: 'Sucesso',
             detail: 'Informações do card atualizadas',
           });
           this.cardPreView(data);
@@ -470,7 +475,6 @@ export class CardsComponent implements OnInit, OnDestroy {
         error: (err) => {
           this.messageService.add({
             severity: 'error',
-            summary: 'Erro',
             detail: 'Não foi possível concluir esta ação',
           });
         },

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -13,8 +13,14 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { OrderListModule } from 'primeng/orderlist';
+import { Connections } from '../domain/connections-interfaces';
+import { DividerModule } from 'primeng/divider';
+import { ProductService } from '../service/ProductService';
 import { BreadrumbsService } from '../../../../core/services/breadcrumb/breadrumbs.service';
 import { DatabaseConnectionService } from '../../../../core/services/database/database-connection.service';
+import { StorageService } from '../../../../core/services/user/storage.service';
+import { HttpHeaders } from '@angular/common/http';
 
 @Component({
   selector: 'app-database-component',
@@ -25,13 +31,20 @@ import { DatabaseConnectionService } from '../../../../core/services/database/da
     CommonModule,
     ToastModule,
     RouterModule,
+    OrderListModule,
+    DividerModule,
   ],
-  providers: [MessageService, BreadrumbsService],
+  providers: [MessageService, BreadrumbsService, ProductService],
   templateUrl: './database-component.component.html',
-  styleUrl: './database-component.component.css',
+  styleUrls: [
+    './database-component.component.css',
+    '../../../../core/globalStyle/toast.css',
+  ],
 })
-export class DatabaseComponentComponent {
+export class DatabaseComponentComponent implements OnInit {
   @ViewChild('f') f!: NgForm;
+
+  connections!: Connections[];
 
   form: any = {
     username: null,
@@ -42,6 +55,12 @@ export class DatabaseComponentComponent {
   isConected: any;
   showForm!: boolean;
   isLoginLoading: boolean = false;
+
+  userToken = this.storageService.getUser();
+
+  headers = new HttpHeaders({
+    Authorization: `Bearer ${this.userToken.token}`,
+  });
 
   icons = {
     menu: faBars,
@@ -54,11 +73,17 @@ export class DatabaseComponentComponent {
 
   constructor(
     private messageService: MessageService,
-    private database: DatabaseConnectionService
+    private database: DatabaseConnectionService,
+    private productService: ProductService,
+    private storageService: StorageService
   ) {
     if (this.isConected === true) {
       this.showForm = false;
     }
+  }
+
+  ngOnInit() {
+    this.productService.getDataBasesConnections();
   }
 
   connectDatabase() {
@@ -69,7 +94,6 @@ export class DatabaseComponentComponent {
     this.database.connection(url, username, password).subscribe({
       next: (data) => {
         that.messageService.add({
-          summary: 'Sucesso',
           detail: `Conectado a base de dados`,
           severity: 'success',
         });
@@ -79,7 +103,6 @@ export class DatabaseComponentComponent {
       error: (err) => {
         this.isLoginLoading = false;
         that.messageService.add({
-          summary: 'Erro',
           detail: err.error.erro,
           severity: 'error',
         });

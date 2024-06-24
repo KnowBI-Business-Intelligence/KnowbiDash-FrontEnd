@@ -1,7 +1,12 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpErrorResponse,
+  HttpHeaders,
+} from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
 import {
+  API_DATABASES,
   API_ECXECUTE_SQL,
   API_ORACLE_DATABASE,
 } from '../../../../env/environment';
@@ -14,6 +19,7 @@ export class DatabaseConnectionService {
 
   private SERVICE_DB = API_ORACLE_DATABASE;
   private SERVICE_EXECUTE = API_ECXECUTE_SQL;
+  private SERVICE_DATABASES = API_DATABASES;
 
   connection(url: string, username: string, password: string) {
     const body = {
@@ -27,5 +33,53 @@ export class DatabaseConnectionService {
 
   executeSQL(code: string) {
     return this.http.post(this.SERVICE_EXECUTE, code, { responseType: 'text' });
+  }
+
+  getDataBases(headers: HttpHeaders): Observable<any> {
+    const myHeaders = {
+      headers: headers,
+    };
+
+    return this.http.get(`${this.SERVICE_DATABASES}/get`, myHeaders);
+  }
+
+  getDataBasesById(id: number, headers: any): Observable<any> {
+    return this.http.get(`${this.SERVICE_DATABASES}/get/${id}`, {
+      headers: headers,
+    });
+  }
+
+  createDataBases(headers: HttpHeaders, DataBasesData: any): Observable<any> {
+    const myHeaders = {
+      headers: headers,
+    };
+
+    return this.http.post(
+      `${this.SERVICE_DATABASES}/create`,
+      DataBasesData,
+      myHeaders
+    );
+  }
+
+  updateDataBases(headers: HttpHeaders, DataBasesData: any, id: any) {
+    const options = {
+      headers: headers,
+    };
+
+    return this.http.patch(
+      `${this.SERVICE_DATABASES}/update/${id}`,
+      DataBasesData,
+      options
+    );
+  }
+
+  deleteDataBases(headers: HttpHeaders, id: string): Observable<any> {
+    const myHeaders = {
+      headers: headers,
+    };
+    return this.http.delete(
+      `${this.SERVICE_DATABASES}/delete/${id}`,
+      myHeaders
+    );
   }
 }

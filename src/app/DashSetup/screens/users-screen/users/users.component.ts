@@ -53,7 +53,6 @@ export class UsersComponent implements OnInit {
   deleteButton: HTMLElement | null = null;
   seeButton: HTMLElement | null = null;
 
-  user = this.storageService.getUser();
   userId: any;
   selectedRow: any;
   roles?: any;
@@ -238,15 +237,7 @@ export class UsersComponent implements OnInit {
       this.isLoginLoading = false;
     }, 2500);
 
-    if (!this.user || !this.user.token) {
-      return;
-    }
-
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${this.user.token}`,
-    });
-
-    this.authService.delete(userId, headers).subscribe({
+    this.authService.delete(userId, this.headers).subscribe({
       next: () => {
         this.messageService.add({
           severity: 'success',

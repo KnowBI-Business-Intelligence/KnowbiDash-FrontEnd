@@ -29,7 +29,9 @@
           <input type="text" [(ngModel)]="titulo" />
         </div>
         <div class="series">
-          <span class="serie-label"> Série base: </span>
+          <span class="serie-label">
+            Série base <span class="mandatory">*</span></span
+          >
           <div class="serie-content">
             <div *ngFor="let data of chartButtons">
               <button
@@ -47,7 +49,7 @@
           </div>
         </div>
         <div class="yaxis">
-          <span>Eixo y - Valores</span>
+          <span>Eixo y - Valores <span class="mandatory">*</span></span>
           <div
             id="yaxis"
             cdkDropList
@@ -107,7 +109,7 @@
           </div>
         </div>
         <div class="xaxis" *ngIf="xaxisShow">
-          <span>Eixo x - Rótulos</span>
+          <span>Eixo x - Rótulos <span class="mandatory">*</span></span>
           <div
             id="xaxis"
             cdkDropList

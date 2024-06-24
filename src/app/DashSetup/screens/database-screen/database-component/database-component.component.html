@@ -4,66 +4,97 @@
 <div class="container">
   <header>
     <h2>Configurar conexão</h2>
+    <div class="container-content-header-button-group" id="groupButton">
+      <button class="action-button add" id="addButton">Adicionar</button>
+    </div>
   </header>
-  <form class="form" #f="ngForm" *ngIf="!showForm">
-    <div class="form-origin">
-      <button mat-raised-button disabled>
-        <fa-icon
-          class="icon"
-          [icon]="icons.database"
-          [size]="'xl'"
-          title="Dashboards"
-        ></fa-icon>
-      </button>
-      <input
-        required=""
-        name="username"
-        id="username"
-        type="text"
-        placeholder="Oracle"
-        readonly
-      />
+  <div class="connection-container">
+    <form class="form" #f="ngForm" *ngIf="!showForm">
+      <div class="form-origin">
+        <button mat-raised-button disabled>
+          <fa-icon
+            class="icon"
+            [icon]="icons.database"
+            [size]="'xl'"
+            title="Dashboards"
+          ></fa-icon>
+        </button>
+        <input
+          required=""
+          name="username"
+          id="username"
+          type="text"
+          placeholder="Oracle"
+          readonly
+        />
+      </div>
+      <div class="form-group">
+        <label for="username">Usuário</label>
+        <input
+          required=""
+          name="username"
+          id="username"
+          type="text"
+          [(ngModel)]="form.username"
+          autocomplete="off"
+        />
+      </div>
+      <div class="form-group">
+        <label for="password">Senha</label>
+        <input
+          required=""
+          name="password"
+          id="password"
+          type="password"
+          [(ngModel)]="form.password"
+          autocomplete="off"
+        />
+      </div>
+      <div class="form-group">
+        <label for="url">Host:porta/serviço</label>
+        <input
+          required=""
+          name="url"
+          id="url"
+          type="text"
+          [(ngModel)]="form.url"
+          autocomplete="off"
+        />
+      </div>
+      <div class="buttons">
+        <button (click)="connectDatabase()">
+          <span *ngIf="!isLoginLoading">Conectar</span>
+          <span *ngIf="isLoginLoading"><div class="login-spinner"></div></span>
+        </button>
+      </div>
+    </form>
+    <p-divider layout="vertical" />
+    <div class="card-list">
+      <span>Lista de conexões</span>
+      <p-orderList
+        class="list"
+        [value]="connections"
+        [listStyle]="{ 'max-height': '30rem' }"
+        filterBy="name"
+        filterPlaceholder="Buscar"
+      >
+        <ng-template let-product pTemplate="item">
+          <div class="flex flex-wrap p-2 align-items-center gap-3">
+            <div class="flex-1 flex flex-column gap-2">
+              <span class="font-bold">{{ product.name }}</span>
+              <div class="flex align-items-center gap-2">
+                <i class="pi pi-tag text-sm"></i>
+                <span>{{ product.category }}</span>
+              </div>
+            </div>
+            <span class="font-bold text-900">
+              {{ "$" + product.price }}
+            </span>
+          </div>
+        </ng-template>
+      </p-orderList>
     </div>
-    <div class="form-group">
-      <label for="username">Usuário</label>
-      <input
-        required=""
-        name="username"
-        id="username"
-        type="text"
-        [(ngModel)]="form.username"
-        autocomplete="off"
-      />
-    </div>
-    <div class="form-group">
-      <label for="password">Senha</label>
-      <input
-        required=""
-        name="password"
-        id="password"
-        type="password"
-        [(ngModel)]="form.password"
-        autocomplete="off"
-      />
-    </div>
-    <div class="form-group">
-      <label for="url">Host:porta/serviço</label>
-      <input
-        required=""
-        name="url"
-        id="url"
-        type="text"
-        [(ngModel)]="form.url"
-        autocomplete="off"
-      />
-    </div>
-    <div class="buttons">
-      <button (click)="connectDatabase()">
-        <span *ngIf="!isLoginLoading">Conectar</span>
-        <span *ngIf="isLoginLoading"><div class="login-spinner"></div></span>
-      </button>
-    </div>
-  </form>
+  </div>
   <div class="db-conected" *ngIf="showForm">
     <img
       src="assets/images/database.svg"

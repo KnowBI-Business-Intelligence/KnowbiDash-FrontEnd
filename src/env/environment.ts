@@ -6,6 +6,7 @@ export const API_CHAT = `${globalUrlBOT}/koios/ws`;
 
 // Variáveis de serviço do banco tasy
 export const API_ORACLE_DATABASE = `${globalUrlMainAPI}/config/oracle`;
+export const API_DATABASES = `${globalUrlMainAPI}/api/databases`;
 
 // Variável para execução do SQL
 export const API_ECXECUTE_SQL = `${globalUrlMainAPI}/script/execute-sql`;

@@ -1268,7 +1268,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
           next: (value) => {
             this.messageService.add({
               severity: 'success',
-              summary: 'Sucesso',
               detail: 'Card Excluído',
             });
             this.removeItem(this.layoutId);
@@ -1276,7 +1275,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
           error: (err) => {
             this.messageService.add({
               severity: 'error',
-              summary: 'Erro',
               detail: 'Não foi possível concluir esta ação',
             });
           },
@@ -1287,7 +1285,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
           next: (value) => {
             this.messageService.add({
               severity: 'success',
-              summary: 'Sucesso',
               detail: 'Gráfico Excluído',
             });
             this.removeItem(this.layoutId);
@@ -1295,7 +1292,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
           error: (err) => {
             this.messageService.add({
               severity: 'error',
-              summary: 'Erro',
               detail: 'Não foi possível concluir esta ação',
             });
           },
@@ -1306,7 +1302,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
           next: (value) => {
             this.messageService.add({
               severity: 'success',
-              summary: 'Sucesso',
               detail: 'Tabela Excluída',
             });
             this.removeItem(this.layoutId);
@@ -1314,7 +1309,6 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
           error: (err) => {
             this.messageService.add({
               severity: 'error',
-              summary: 'Erro',
               detail: 'Não foi possível concluir esta ação',
             });
           },

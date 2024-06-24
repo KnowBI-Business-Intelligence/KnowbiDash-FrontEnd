@@ -187,7 +187,7 @@ export class CreateDashsComponent implements OnInit {
         this.isInformations = true;
       },
       error: (err) => {
-        this.errorMessageToast('Este dashboard ainda não tem dados');
+        this.warnMessageToast('Este dashboard ainda não tem dados');
         this.isLoadingTable = false;
         this.isLoadTable = false;
       },
@@ -337,7 +337,7 @@ export class CreateDashsComponent implements OnInit {
         this.cancelRegister();
       },
       error: (err) => {
-        this.errorMessageToast('Verifique os campos preenchidos');
+        this.warnMessageToast('Verifique os campos preenchidos');
       },
     });
   }
@@ -495,6 +495,13 @@ export class CreateDashsComponent implements OnInit {
   errorMessageToast(message: string) {
     return this.messageService.add({
       severity: 'error',
+      detail: message,
+    });
+  }
+
+  warnMessageToast(message: string) {
+    return this.messageService.add({
+      severity: 'warn',
       detail: message,
     });
   }

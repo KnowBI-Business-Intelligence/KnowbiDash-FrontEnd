@@ -59,7 +59,8 @@
 
 :host ::ng-deep .p-toast .p-toast-message.p-toast-message-error,
 :host ::ng-deep .p-toast .p-toast-message.p-toast-message-success,
-:host ::ng-deep .p-toast .p-toast-message.p-toast-message-info {
+:host ::ng-deep .p-toast .p-toast-message.p-toast-message-info,
+:host ::ng-deep .p-toast .p-toast-message.p-toast-message-warn {
   margin-top: 20px !important;
   border: none;
 }

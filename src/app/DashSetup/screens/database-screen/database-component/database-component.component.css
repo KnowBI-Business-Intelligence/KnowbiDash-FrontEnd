@@ -36,8 +36,42 @@ header h2 {
   font-weight: 400;
 }
 
+.container-content-header-button-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.action-button {
+  color: #4f80e1;
+  padding: 0 10px;
+  cursor: pointer;
+}
+
+.add {
+  align-items: center;
+  background-color: #5f65a5;
+  border-radius: 4px;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  display: inline-flex;
+  height: 2rem;
+  justify-content: center;
+  line-height: 1;
+  padding: 0 0.5rem;
+  font-size: 12px;
+}
+
+.connection-container {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
 .form {
   margin-top: 1rem;
+  width: 50%;
 }
 
 .form-group {
@@ -54,8 +88,8 @@ header h2 {
 }
 
 .form input {
-  max-width: 40rem;
-  width: 40rem;
+  max-width: 30rem;
+  width: 30rem;
   padding: 5px 10px;
   border-radius: 3px;
   font-size: 12px;
@@ -126,6 +160,22 @@ button {
   height: 19px;
   -webkit-animation: spin 1s linear infinite;
   animation: spin 1s linear infinite;
+}
+
+.card-list {
+  width: 50%;
+  padding-left: 15px;
+  padding-top: 5px;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-list span {
+  font-size: 12px;
+}
+
+.list {
+  margin-top: 8px;
 }
 
 button::after {
@@ -233,6 +283,54 @@ button svg {
 
 :host ::ng-deep .p-paginator .p-paginator-pages .p-paginator-page {
   font-size: 12px;
+}
+
+:host ::ng-deep .p-orderlist-controls {
+  display: none;
+}
+
+:host ::ng-deep .p-orderlist .p-orderlist-list-container,
+:host ::ng-deep .p-orderlist .p-orderlist-filter-container {
+  background: transparent !important;
+  border: none;
+}
+
+:host ::ng-deep .p-orderlist .p-orderlist-filter-container {
+  display: flex;
+  align-items: baseline;
+  padding: 15px 5px;
+}
+
+:host
+  ::ng-deep.p-orderlist
+  .p-orderlist-filter-container
+  .p-orderlist-filter-input {
+  padding-right: 2rem;
+  width: 300px;
+  height: 36px;
+  border-radius: 50px;
+  border: none;
+  outline: none;
+  font-size: 12px;
+}
+
+:host ::ng-deep .p-orderlist-filter-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px transparent;
+}
+
+:host ::ng-deep .p-orderlist-filter-icon {
+  top: 26%;
+}
+
+:host ::ng-deep .p-orderlist .p-orderlist-list .p-orderlist-item {
+  padding: 0.5rem 1.25rem;
+  margin: 0;
+  border: 0 none;
+  color: #4b5563;
+  background: #fff;
+  transition: box-shadow 0.2s;
+  border-bottom: solid 1px gainsboro;
 }
 
 @-webkit-keyframes spin {

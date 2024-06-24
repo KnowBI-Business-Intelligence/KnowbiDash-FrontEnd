@@ -434,6 +434,11 @@ export class TableComponent implements OnInit {
     };
     if (this.tableData.length > 0) {
       this.createTable(tableData);
+    } else {
+      this.messageService.add({
+        severity: 'warn',
+        detail: 'Por favor, preencha os campos obrigatórios',
+      });
     }
   }
 
@@ -461,7 +466,6 @@ export class TableComponent implements OnInit {
       next: (data) => {
         this.messageService.add({
           severity: 'success',
-          summary: 'Sucesso',
           detail: 'Tabela criada',
         });
         this.showPreviewButton = false;
@@ -471,7 +475,6 @@ export class TableComponent implements OnInit {
       error: (err) => {
         this.messageService.add({
           severity: 'error',
-          summary: 'Erro',
           detail: 'Não foi possível concluir esta ação',
         });
       },
@@ -495,7 +498,6 @@ export class TableComponent implements OnInit {
         next: (data) => {
           this.messageService.add({
             severity: 'success',
-            summary: 'Sucesso',
             detail: 'Informações da tabela atualizadas',
           });
           this.tablePreView(data);
@@ -503,7 +505,6 @@ export class TableComponent implements OnInit {
         error: (err) => {
           this.messageService.add({
             severity: 'error',
-            summary: 'Erro',
             detail: 'Não foi possível concluir esta ação',
           });
         },

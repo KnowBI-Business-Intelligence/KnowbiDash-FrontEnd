@@ -210,7 +210,7 @@ export class CreateUserComponent implements OnInit {
     if (this.areRequiredFieldsEmpty()) {
       this.isLoginLoading = false;
       this.messageService.add({
-        severity: 'error',
+        severity: 'warn',
         detail: 'Por favor, preencha todos os campos obrigatórios.',
       });
       return;

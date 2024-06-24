@@ -347,7 +347,7 @@ export class CreateProfilesComponent implements OnInit {
       },
       error: () => {
         this.messageService.add({
-          severity: 'error',
+          severity: 'warn',
           detail: 'Verifique os campos preenchidos',
         });
       },
@@ -383,7 +383,7 @@ export class CreateProfilesComponent implements OnInit {
         },
         error: () => {
           this.messageService.add({
-            severity: 'error',
+            severity: 'warn',
             detail: 'Verifique os campos preenchidos',
           });
         },
