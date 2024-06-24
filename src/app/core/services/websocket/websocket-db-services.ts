@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import * as Stomp from 'stompjs';
 import SockJS from 'sockjs-client';
 import { BehaviorSubject } from 'rxjs';
+import { API_WEBSOCKET } from '../../../../env/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +11,7 @@ export class WebsocketDBService {
   private _dataMode: BehaviorSubject<string> = new BehaviorSubject<string>('');
   readonly dataModel = this._dataMode.asObservable();
 
-  streamURL: string = 'http://localhost:8080/ws';
+  streamURL = API_WEBSOCKET;
   client: any;
   private isConnected: boolean = false;
 

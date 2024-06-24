@@ -4,6 +4,8 @@ const globalUrlBOT = 'wss://server.koiosbi.com.br:8080';
 // Variáveis de serviço do bot
 export const API_CHAT = `${globalUrlBOT}/koios/ws`;
 
+export const API_WEBSOCKET = `${globalUrlMainAPI}/ws`;
+
 // Variáveis de serviço do banco tasy
 export const API_ORACLE_DATABASE = `${globalUrlMainAPI}/config/oracle`;
 export const API_DATABASES = `${globalUrlMainAPI}/api/databases`;
