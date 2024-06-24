@@ -91,7 +91,7 @@ export class DatabaseComponentComponent implements OnInit {
     this.isLoginLoading = true;
     const { url, username, password } = this.form;
 
-    this.database.connection(url, username, password).subscribe({
+    this.database.connection(url, username, password, this.headers).subscribe({
       next: (data) => {
         that.messageService.add({
           detail: `Conectado a base de dados`,
@@ -101,6 +101,7 @@ export class DatabaseComponentComponent implements OnInit {
         this.isLoginLoading = false;
       },
       error: (err) => {
+        console.log(err);
         this.isLoginLoading = false;
         that.messageService.add({
           detail: err.error.erro,
