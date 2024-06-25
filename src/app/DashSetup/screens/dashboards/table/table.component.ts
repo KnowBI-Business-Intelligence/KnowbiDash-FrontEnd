@@ -3,6 +3,15 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { StorageService } from '../../../../core/services/user/storage.service';
 import { LocalstorageService } from '../../../../core/services/local-storage/local-storage.service';
 import { ChartsService } from '../../../../core/services/charts/charts.service';
+import { ChartgroupService } from '../../../../core/services/chartgroup/chartgroup.service';
+import { Subscription } from 'rxjs';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { Axis, PeriodicElement } from '../../../../core/modules/interfaces';
+import { TableModule } from 'primeng/table';
+import { DataService } from '../../../../core/services/dashboard/data.service';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+import { DashboardsViewComponent } from '../dashboards-view/dashboards-view.component';
 import {
   CdkDrag,
   CdkDragDrop,
@@ -27,15 +36,6 @@ import {
   faXmark,
   faCode,
 } from '@fortawesome/free-solid-svg-icons';
-import { ChartgroupService } from '../../../../core/services/chartgroup/chartgroup.service';
-import { Subscription } from 'rxjs';
-import { LiveAnnouncer } from '@angular/cdk/a11y';
-import { Axis, PeriodicElement } from '../../../../core/modules/interfaces';
-import { TableModule } from 'primeng/table';
-import { DataService } from '../../../../core/services/dashboard/data.service';
-import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
-import { DashboardsViewComponent } from '../dashboards-view/dashboards-view.component';
 
 @Component({
   selector: 'app-table',
@@ -326,7 +326,21 @@ export class TableComponent implements OnInit {
       if (hasAggregation) {
         identifiersItem = this.rmAgregateReplace(identifiersItem);
       }
-      if (this.tabledata[i].type == 'timestamp') {
+      if (
+        this.tabledata[i].type == 'timestamp' &&
+        this.isTimestampField(tabledataItem)
+      ) {
+        this.buildData.push({
+          name: identifiersItem,
+          identifiers: this.rmTimeStamp(tabledataItem),
+        });
+      } else if (
+        this.tabledata[i].type == 'timestamp' &&
+        !this.isTimestampField(tabledataItem)
+      ) {
+        identifiersItem = `TO_CHAR(DATE_TRUNC('month', ${this.rmTimeStamp(
+          tabledataItem
+        )}), 'MM/YYYY')`;
         this.buildData.push({
           name: identifiersItem,
           identifiers: this.rmTimeStamp(tabledataItem),
@@ -355,11 +369,17 @@ export class TableComponent implements OnInit {
   dataRepo() {
     this.groupData = this.tabledata
       .map((data) => {
+        const hasAggregation = /^(?:AVG|COUNT|SUM)\([^)]+\)$/.test(data.name);
         if (data.type !== 'numeric') {
           if (this.isTimestampField(data.name)) {
             return this.formatTimestampField(data.name);
           }
+          if (!this.isTimestampField(data.name) && data.type == 'timestamp') {
+            return this.formatTimestampFieldWithoutAgrr(data.name);
+          }
           return this.rmTimeStamp(data.name);
+        } else if (!hasAggregation) {
+          return data.name;
         }
         return null;
       })
@@ -689,5 +709,9 @@ export class TableComponent implements OnInit {
       )}))`;
     }
     return this.rmTimeStamp(axisName);
+  }
+
+  formatTimestampFieldWithoutAgrr(axisName: string): string {
+    return `DATE_TRUNC('month', ${this.rmTimeStamp(axisName)})`;
   }
 }

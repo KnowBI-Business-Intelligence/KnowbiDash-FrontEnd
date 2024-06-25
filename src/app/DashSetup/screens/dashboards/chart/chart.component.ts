@@ -250,7 +250,6 @@ export class ChartComponent implements OnInit {
             value: value,
             agregator: name,
           };
-          console.log(timestampPart);
           this.database.push(timestampPart);
         });
       }
@@ -388,9 +387,6 @@ export class ChartComponent implements OnInit {
     if (this.buildData.length > 0) {
       this.sql += ` FROM ${this.tableName}`;
     }
-
-    console.log(this.buildData);
-    console.log(this.sql);
   }
 
   dataRepo() {
@@ -400,7 +396,6 @@ export class ChartComponent implements OnInit {
 
     if (this.chartType != 'pie') {
       this.xAxisValues = this.xaxis.map((axis) => {
-        console.log(axis);
         if (this.isTimestampField(axis.name)) {
           return this.formatTimestampField(axis.name);
         }
@@ -415,7 +410,6 @@ export class ChartComponent implements OnInit {
       this.xAxisValues = [];
       this.groupData = [...this.seriesValues];
     }
-    console.log(this.groupData);
     this.yAxisColumns = this.yaxis.map((axis) => {
       return {
         name: [this.rmTimeStamp(axis.value)],
@@ -605,7 +599,6 @@ export class ChartComponent implements OnInit {
   }
 
   chartPreView(data: any) {
-    //console.log(JSON.stringify(data, null, 2));
     const categories: string[] =
       data.xAxisColumns.length > 0
         ? Array.from(new Set(data.xAxisColumns[0].data))

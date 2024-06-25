@@ -1390,7 +1390,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     }
     setTimeout(() => {
       this.updateCombinedLayout();
-    }, 440);
+    }, 5540);
   }
 
   onFullScreenChange() {
