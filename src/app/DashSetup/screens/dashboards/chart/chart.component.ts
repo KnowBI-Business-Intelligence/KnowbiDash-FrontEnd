@@ -241,7 +241,6 @@ export class ChartComponent implements OnInit {
               setData.name
             )}))`;
           }
-
           const name = `${setData.name}${part}`;
           const identifiers = `${setData.identifiers}${part}`;
           const timestampPart = {
@@ -251,6 +250,7 @@ export class ChartComponent implements OnInit {
             value: value,
             agregator: name,
           };
+          console.log(timestampPart);
           this.database.push(timestampPart);
         });
       }
@@ -348,13 +348,31 @@ export class ChartComponent implements OnInit {
     }
 
     for (let i = 0; i < this.xaxis.length; i++) {
-      const xAxisItem = this.xaxis[i].value;
+      let xAxisItem = this.xaxis[i].value;
+      if (
+        this.xaxis[i].type == 'timestamp' &&
+        !this.isTimestampField(this.xaxis[i].name)
+      ) {
+        this.xaxis[i].value = `TO_CHAR(DATE_TRUNC('month', ${this.rmTimeStamp(
+          this.xaxis[i].name
+        )}), 'MM/YYYY')`;
+        xAxisItem = this.xaxis[i].value;
+      }
       const xAxisidentifiers = this.rmTimeStamp(this.xaxis[i].name);
       this.buildData.push({ name: xAxisItem, identifiers: xAxisidentifiers });
     }
 
     for (let i = 0; i < this.series.length; i++) {
-      const seriesItem = this.series[i].value;
+      let seriesItem = this.series[i].value;
+      if (
+        this.series[i].type == 'timestamp' &&
+        !this.isTimestampField(this.series[i].name)
+      ) {
+        this.series[i].value = `TO_CHAR(DATE_TRUNC('month', ${this.rmTimeStamp(
+          this.series[i].name
+        )}), 'MM/YYYY')`;
+        seriesItem = this.series[i].value;
+      }
       const seriesidentifiers = this.rmTimeStamp(this.series[i].name);
       this.buildData.push({ name: seriesItem, identifiers: seriesidentifiers });
     }
@@ -370,6 +388,9 @@ export class ChartComponent implements OnInit {
     if (this.buildData.length > 0) {
       this.sql += ` FROM ${this.tableName}`;
     }
+
+    console.log(this.buildData);
+    console.log(this.sql);
   }
 
   dataRepo() {
@@ -379,8 +400,12 @@ export class ChartComponent implements OnInit {
 
     if (this.chartType != 'pie') {
       this.xAxisValues = this.xaxis.map((axis) => {
+        console.log(axis);
         if (this.isTimestampField(axis.name)) {
           return this.formatTimestampField(axis.name);
+        }
+        if (!this.isTimestampField(axis.name) && axis.type == 'timestamp') {
+          return this.formatTimestampFieldWithoutAgrr(axis.name);
         }
         return this.rmTimeStamp(axis.name);
       });
@@ -390,7 +415,7 @@ export class ChartComponent implements OnInit {
       this.xAxisValues = [];
       this.groupData = [...this.seriesValues];
     }
-
+    console.log(this.groupData);
     this.yAxisColumns = this.yaxis.map((axis) => {
       return {
         name: [this.rmTimeStamp(axis.value)],
@@ -460,7 +485,9 @@ export class ChartComponent implements OnInit {
     this.identifierData();
     this.dataRepo();
     const groupSelector =
-      this.xAxisValues.length != 0 ? this.xAxisValues : this.seriesValues;
+      this.xAxisValues.length != 0
+        ? [...this.seriesValues, ...this.xAxisValues]
+        : this.seriesValues;
     const chartData = {
       title: this.titulo,
       graphType: this.chartType.toLowerCase(),
@@ -517,7 +544,9 @@ export class ChartComponent implements OnInit {
     this.identifierData();
     this.dataRepo();
     const groupSelector =
-      this.xAxisValues.length != 0 ? this.xAxisValues : this.seriesValues;
+      this.xAxisValues.length != 0
+        ? [...this.seriesValues, ...this.xAxisValues]
+        : this.seriesValues;
     const chartData = {
       title: this.titulo,
       graphType: this.chartType.toLowerCase(),
@@ -576,6 +605,7 @@ export class ChartComponent implements OnInit {
   }
 
   chartPreView(data: any) {
+    //console.log(JSON.stringify(data, null, 2));
     const categories: string[] =
       data.xAxisColumns.length > 0
         ? Array.from(new Set(data.xAxisColumns[0].data))
@@ -974,5 +1004,9 @@ export class ChartComponent implements OnInit {
       )}))`;
     }
     return this.rmTimeStamp(axisName);
+  }
+
+  formatTimestampFieldWithoutAgrr(axisName: string): string {
+    return `DATE_TRUNC('month', ${this.rmTimeStamp(axisName)})`;
   }
 }

@@ -83,7 +83,15 @@ export class DatabaseComponentComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.productService.getDataBasesConnections();
+    this.productService.getDataBasesConnections().subscribe({
+      next: (value) => {
+        this.connections = value;
+        console.log(this.connections);
+      },
+      error: (err) => {
+        console.error('Error fetching connections:', err);
+      },
+    });
   }
 
   connectDatabase() {
@@ -109,5 +117,13 @@ export class DatabaseComponentComponent implements OnInit {
         });
       },
     });
+  }
+
+  truncate(text: string, limit: number): string {
+    return text.length > limit ? text.slice(0, limit) + '...' : text;
+  }
+
+  formatPassword(password: string): string {
+    return '•'.repeat(password.length);
   }
 }
