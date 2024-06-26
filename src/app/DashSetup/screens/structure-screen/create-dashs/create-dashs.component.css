@@ -365,6 +365,7 @@ textarea {
   width: 18px;
   height: 18px;
 }
+
 .modal {
   display: none;
   position: fixed;
@@ -537,7 +538,7 @@ textarea {
   border: 1px solid #e5e5e5;
 }
 
-.iconTable {
+.iconActions {
   font-size: 11px;
 }
 
@@ -559,8 +560,8 @@ textarea {
   border: 3px solid #4f80e1;
   border-radius: 50%;
   border-top: 3px solid transparent;
-  width: 19px;
-  height: 19px;
+  width: 16px;
+  height: 16px;
   -webkit-animation: spin 1s linear infinite;
   animation: spin 1s linear infinite;
 }

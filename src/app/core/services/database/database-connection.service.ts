@@ -21,23 +21,16 @@ export class DatabaseConnectionService {
   private SERVICE_EXECUTE = API_ECXECUTE_SQL;
   private SERVICE_DATABASES = API_DATABASES;
 
-  connection(
-    url: string,
-    username: string,
-    password: string,
-    headers: HttpHeaders
-  ) {
-    const body = {
-      url,
-      username,
-      password,
-    };
-
+  connection(headers: HttpHeaders, DatabasesData: any) {
     const myHeaders = {
       headers: headers,
     };
 
-    return this.http.post(`${this.SERVICE_DB}/connect`, body, myHeaders);
+    return this.http.post(
+      `${this.SERVICE_DB}/connect`,
+      DatabasesData,
+      myHeaders
+    );
   }
 
   executeSQL(code: string) {

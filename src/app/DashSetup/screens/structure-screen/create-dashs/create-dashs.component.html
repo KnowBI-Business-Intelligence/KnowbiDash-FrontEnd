@@ -450,15 +450,18 @@
       <div class="content-sql_buttons">
         <div class="content-sql_buttons-action">
           <button (click)="updateRegisterSql()" title="Executar">
-            <span *ngIf="!isLoadingRun" class="material-symbols-outlined">
-              play_circle
-            </span>
+            <fa-icon
+              *ngIf="!isLoadingRun"
+              class="iconActions"
+              [icon]="icons.play"
+              [size]="'xl'"
+            ></fa-icon>
             <span *ngIf="isLoadingRun"><div class="login-spinner"></div></span>
           </button>
           <button (click)="showTable()" title="Exibir tabela">
             <fa-icon
               *ngIf="!isLoadingTable"
-              class="iconTable"
+              class="iconActions"
               [icon]="icons.table"
               [size]="'xl'"
             ></fa-icon>
@@ -467,7 +470,12 @@
             ></span>
           </button>
           <button (click)="clearSQL()" title="Limpar">
-            <span class="material-symbols-outlined"> delete </span>
+            <fa-icon
+              style="font-size: 10px !important"
+              class="iconActions"
+              [icon]="icons.delete"
+              [size]="'xl'"
+            ></fa-icon>
           </button>
         </div>
         <button (click)="goBack()">Voltar</button>

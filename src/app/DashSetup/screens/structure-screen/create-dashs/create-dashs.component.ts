@@ -22,6 +22,8 @@ import {
   faFilterCircleXmark,
   faMagnifyingGlass,
   faTableCells,
+  faCirclePlay,
+  faTrash,
 } from '@fortawesome/free-solid-svg-icons';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { LocalstorageService } from '../../../../core/services/local-storage/local-storage.service';
@@ -55,6 +57,8 @@ export class CreateDashsComponent implements OnInit {
     closed: faClose,
     search: faMagnifyingGlass,
     table: faTableCells,
+    play: faCirclePlay,
+    delete: faTrash,
   };
 
   createRegisterForm = this.formBuilder.group({

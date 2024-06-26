@@ -4,10 +4,16 @@
 <div class="container">
   <header>
     <h2>Configurar conexão</h2>
+    <button class="action-button add" (click)="addToList()">
+      <span>Adicionar</span>
+    </button>
   </header>
   <div class="connection-container">
-    <form class="form" #f="ngForm" *ngIf="!showForm">
-      <div class="form-origin">
+    <div class="atual-connection-disconected" *ngIf="showForm">
+      <span>Aguardando conexão</span>
+    </div>
+    <div class="atual-connection" *ngIf="!showForm">
+      <div class="atual-connection-origin">
         <button mat-raised-button disabled>
           <fa-icon
             class="icon"
@@ -17,108 +23,235 @@
           ></fa-icon>
         </button>
         <input
-          required=""
-          name="username"
-          id="username"
+          class="atual-connection-origin-input"
           type="text"
           placeholder="Oracle"
-          readonly
+          disabled
         />
       </div>
-      <div class="form-group">
+      <div class="atual-connection-group">
         <label for="username">Nome da conexão</label>
-        <input
-          required=""
-          name="connection"
-          id="connection"
-          type="text"
-          [(ngModel)]="form.connection"
-          autocomplete="off"
-        />
+        <input type="text" disabled />
       </div>
-      <div class="form-group">
+      <div class="atual-connection-group">
         <label for="username">Usuário</label>
-        <input
-          required=""
-          name="username"
-          id="username"
-          type="text"
-          [(ngModel)]="form.username"
-          autocomplete="off"
-        />
+        <input type="text" disabled />
       </div>
-      <div class="form-group">
+      <div class="atual-connection-group">
         <label for="password">Senha</label>
-        <input
-          required=""
-          name="password"
-          id="password"
-          type="password"
-          [(ngModel)]="form.password"
-          autocomplete="off"
-        />
+        <input type="password" disabled />
       </div>
-      <div class="form-group">
+      <div class="atual-connection-group">
         <label for="url">Host:porta/serviço</label>
-        <input
-          required=""
-          name="url"
-          id="url"
-          type="text"
-          [(ngModel)]="form.url"
-          autocomplete="off"
-        />
+        <input type="text" disabled />
       </div>
-      <div class="buttons">
-        <button (click)="connectDatabase()" class="action-button add">
-          <span *ngIf="!isLoginLoading">Adicionar</span>
-          <span *ngIf="isLoginLoading"><div class="login-spinner"></div></span>
-        </button>
-      </div>
-    </form>
+    </div>
     <p-divider layout="vertical" />
-    <div class="card-list">
+    <div class="card-list" *ngIf="isAdding">
+      <span>Adicionar conexão</span>
+      <form class="form" [formGroup]="form">
+        <div>
+          <div class="form-origin">
+            <button mat-raised-button disabled>
+              <fa-icon
+                class="icon"
+                [icon]="icons.database"
+                [size]="'xl'"
+              ></fa-icon>
+            </button>
+            <input
+              required=""
+              name="username"
+              id="username"
+              type="text"
+              placeholder="Oracle"
+              readonly
+            />
+          </div>
+          <div class="form-group">
+            <label for="username"
+              >Nome da conexão <span class="mandatory">*</span></label
+            >
+            <input
+              required
+              name="connection"
+              id="connection"
+              type="text"
+              formControlName="dbname"
+              autocomplete="off"
+              maxlength="120"
+            />
+          </div>
+          <div class="form-group">
+            <label for="username"
+              >Usuário <span class="mandatory">*</span></label
+            >
+            <input
+              required
+              name="username"
+              id="username"
+              type="text"
+              formControlName="username"
+              autocomplete="off"
+              maxlength="120"
+            />
+          </div>
+          <div class="form-group">
+            <label for="password">Senha <span class="mandatory">*</span></label>
+            <input
+              required=""
+              name="password"
+              id="password"
+              type="password"
+              formControlName="password"
+              autocomplete="off"
+              maxlength="120"
+            />
+          </div>
+          <div class="form-group">
+            <label for="url"
+              >Host:porta/serviço <span class="mandatory">*</span></label
+            >
+            <input
+              required=""
+              name="url"
+              id="url"
+              type="text"
+              formControlName="service"
+              autocomplete="off"
+            />
+          </div>
+        </div>
+      </form>
+      <div class="container-add-footer">
+        <button (click)="cancelAdd()">Cancelar</button>
+        <button (click)="createConnection()">Salvar</button>
+      </div>
+    </div>
+    <div class="card-list" *ngIf="!isAdding">
       <span>Lista de conexões</span>
       <p-orderList
         class="list"
         [value]="connections"
         [listStyle]="{ 'max-height': '30rem' }"
-        filterBy="name"
+        filterBy="dbname"
         filterPlaceholder="Buscar"
       >
         <ng-template let-connections pTemplate="item" class="card-list-item">
-          <div class="flex flex-wrap p-2 align-items-center gap-3">
-            <div class="flex-1 flex flex-column gap-2">
-              <span>{{ connections.username }}</span>
-              <div class="flex align-items-center gap-2">
-                <i class="pi pi-tag text-sm"></i>
-                <span>{{ formatPassword(connections.password) }}</span>
-              </div>
-            </div>
-            <span [title]="connections.service">
-              {{ truncate(connections.service, 60) }}
-            </span>
-          </div>
           <div>
-            <button (click)="connectDatabase()" class="connect-button">
-              <span *ngIf="!isLoginLoading">Conectar</span>
-              <span *ngIf="isLoginLoading"
-                ><div class="login-spinner"></div
-              ></span>
-            </button>
+            <div>
+              <span *ngIf="isLoadingConnectionContent; else content">
+                <p-skeleton
+                  width="100px"
+                  height="13px"
+                  styleClass="mb-2"
+                ></p-skeleton>
+              </span>
+              <ng-template #content>
+                <span
+                  ><strong>{{ connections.dbname }} </strong></span
+                >
+              </ng-template>
+              <!--<div>
+                <span>{{ connections.username }}</span>
+              </div>
+              <div>
+                <span>{{ formatPassword(connections.password) }}</span>
+              </div>-->
+            </div>
+            <span *ngIf="isLoadingConnectionContent; else contentService">
+              <p-skeleton
+                width="250px"
+                height="13px"
+                styleClass="mb-2"
+              ></p-skeleton>
+            </span>
+            <ng-template #contentService>
+              <span [title]="connections.service">{{
+                truncate(connections.service, 60)
+              }}</span>
+            </ng-template>
+          </div>
+          <div class="button-actions">
+            <span *ngIf="isLoadingConnectionContent; else btnConnect">
+              <p-skeleton
+                width="20px"
+                height="13px"
+                styleClass="mb-2"
+              ></p-skeleton>
+            </span>
+            <ng-template #btnConnect>
+              <button
+                (click)="connectDatabase(connections)"
+                class="connect-button"
+              >
+                <fa-icon
+                  *ngIf="!connections.isLoading"
+                  class="iconConnect"
+                  [icon]="icons.play"
+                  [size]="'xl'"
+                ></fa-icon>
+                <span *ngIf="connections.isLoading"
+                  ><div class="login-spinner"></div
+                ></span>
+              </button>
+            </ng-template>
+            <span *ngIf="isLoadingConnectionContent; else btnEdit">
+              <p-skeleton
+                width="20px"
+                height="13px"
+                styleClass="mb-2"
+              ></p-skeleton>
+            </span>
+            <ng-template #btnEdit
+              ><button>
+                <fa-icon
+                  class="iconEdit"
+                  [icon]="icons.edit"
+                  [size]="'xl'"
+                ></fa-icon></button
+            ></ng-template>
+            <span *ngIf="isLoadingConnectionContent; else btnDelete">
+              <p-skeleton
+                width="20px"
+                height="13px"
+                styleClass="mb-2"
+              ></p-skeleton>
+            </span>
+            <ng-template #btnDelete
+              ><button (click)="callDeleteModal(connections.id)">
+                <fa-icon
+                  class="iconDelete"
+                  [icon]="icons.delete"
+                  [size]="'xl'"
+                ></fa-icon></button
+            ></ng-template>
           </div>
         </ng-template>
       </p-orderList>
     </div>
   </div>
-  <div class="db-conected" *ngIf="showForm">
-    <img
-      src="assets/images/database.svg"
-      alt="Imagem banco de dados conectado"
-    />
-    <h2>O banco está conectado!</h2>
+</div>
+<div
+  class="modal"
+  *ngIf="isDeleteModal"
+  id="modal"
+  [style.display]="isDeleteModal ? 'flex' : 'none'"
+>
+  <div class="modal-content">
+    <span class="close" (click)="cancelDelete()">&times;</span>
+    <div>
+      <h2>Tem certeza de que deseja excluir a base de dados?</h2>
+      <p>Esta ação não pode ser desfeita</p>
+      <div class="modal-buttons">
+        <button class="cancel" (click)="cancelDelete()">cancelar</button>
+        <button class="exclude" (click)="confirmDelete()">
+          <span>Excluir</span>
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 <div class="message">
-  <p-toast [life]="2500"></p-toast>
+  <p-toast [life]="3500"></p-toast>
 </div>

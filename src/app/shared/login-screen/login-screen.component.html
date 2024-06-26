@@ -12,11 +12,10 @@
         />
         <span class="version">V1.1.1</span>
       </div>
-      <form name="form" #f="ngForm" novalidate>
+      <form name="form" #f="ngForm" novalidate (keyup.enter)="onSubmit()">
         <div class="form-group">
           <label for="username">Usuário</label>
           <input
-            (keyup.enter)="onSubmit()"
             type="text"
             class="form-control input-name"
             name="username"
@@ -30,7 +29,6 @@
           <label for="password">Senha</label>
           <div class="password-group">
             <input
-              (keyup.enter)="onSubmit()"
               [type]="currentIcon === icons.eye ? 'password' : 'text'"
               class="form-control"
               name="password"
@@ -40,7 +38,7 @@
               #password="ngModel"
               [ngClass]="{ 'is-invalid': f.submitted && password.errors }"
             />
-            <button (click)="toggleIcon()">
+            <button type="button" (click)="toggleIcon()">
               <fa-icon
                 class="iconview"
                 [icon]="currentIcon"
