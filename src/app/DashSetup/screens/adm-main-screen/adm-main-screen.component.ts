@@ -48,20 +48,13 @@ export class ADMMainScreenComponent implements OnInit {
 
   ngOnInit(): void {
     this.getUserById(this.user.id, this.user.token);
-    console.log('teste');
-    this.websocketService.streamData();
+    /*this.websocketService.streamData();
     this.streamDataSubscription = this.websocketService.dataModel.subscribe(
       (data) => {
-        // Aqui você recebe e pode processar as mensagens recebidas
-        this.streamMessage = data; // Atribua a mensagem ao seu componente conforme necessário
+        this.streamMessage = data;
         console.log('Nova mensagem WebSocket recebida:', this.streamMessage);
       }
-    );
-  }
-
-  ngOnDestroy(): void {
-    // Não se esqueça de desinscrever-se para evitar vazamentos de memória
-    this.streamDataSubscription.unsubscribe();
+    );*/
   }
 
   getUserById(id: number, token: any) {

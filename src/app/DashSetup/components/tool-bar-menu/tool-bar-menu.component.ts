@@ -99,11 +99,13 @@ export class ToolBarMenuComponent implements OnInit {
     private token: StorageService,
     private router: Router,
     private elementRef: ElementRef,
-    private profilesService: ProfilesService
+    private profilesService: ProfilesService,
+    private messageService: MessageService
   ) {}
 
   ngOnInit(): void {
     this.isLoggedIn = !!this.token.getToken();
+    this.successMessageToast('teste');
 
     this.initials();
     if (this.menuAtivo == '') {
@@ -188,5 +190,27 @@ export class ToolBarMenuComponent implements OnInit {
 
   switchApplication() {
     this.router.navigate(['content']);
+  }
+
+  errorMessageToast(message: string) {
+    return this.messageService.add({
+      severity: 'error',
+      detail: message,
+    });
+  }
+
+  warnMessageToast(message: string) {
+    return this.messageService.add({
+      severity: 'warn',
+      detail: message,
+    });
+  }
+
+  successMessageToast(message: string) {
+    return this.messageService.add({
+      severity: 'success',
+      detail: message,
+      life: 80000,
+    });
   }
 }

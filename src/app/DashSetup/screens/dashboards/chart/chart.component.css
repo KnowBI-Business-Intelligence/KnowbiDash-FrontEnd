@@ -212,7 +212,6 @@
   width: 60%;
 }
 
-.data-list,
 .serie-list {
   border: solid 1px #ccc;
   min-height: 24.5px;
@@ -221,6 +220,20 @@
   overflow: hidden;
   display: block;
   margin: 10px 2px;
+  max-height: 37%;
+  overflow: auto;
+}
+
+.data-list {
+  border: solid 1px #ccc;
+  min-height: 24.5px;
+  background: #ffffff54;
+  border-radius: 3px;
+  overflow: hidden;
+  display: block;
+  margin: 10px 2px;
+  max-height: 80%;
+  overflow: auto;
 }
 
 .icon {

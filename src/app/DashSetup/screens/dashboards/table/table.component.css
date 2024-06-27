@@ -242,7 +242,6 @@ td {
   color: red;
 }
 
-.data-list,
 .serie-list {
   border: solid 1px #ccc;
   min-height: 24.5px;
@@ -251,6 +250,18 @@ td {
   overflow: hidden;
   display: block;
   margin: 10px 2px;
+}
+
+.data-list {
+  border: solid 1px #ccc;
+  min-height: 24.5px;
+  background: #ffffff54;
+  border-radius: 3px;
+  overflow: hidden;
+  display: block;
+  margin: 10px 2px;
+  max-height: 80%;
+  overflow: auto;
 }
 
 .icon {
