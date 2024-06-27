@@ -33,6 +33,30 @@ export class DatabaseConnectionService {
     );
   }
 
+  desconnection(headers: HttpHeaders) {
+    const myHeaders = {
+      headers: headers,
+    };
+
+    return this.http.post(`${this.SERVICE_DB}/disconnect`, {}, myHeaders);
+  }
+
+  desconnectionAll(headers: HttpHeaders) {
+    const myHeaders = {
+      headers: headers,
+    };
+
+    return this.http.post(`${this.SERVICE_DB}/disconnect-all`, {}, myHeaders);
+  }
+
+  getConnection(headers: HttpHeaders) {
+    const myHeaders = {
+      headers: headers,
+    };
+
+    return this.http.get(`${this.SERVICE_DB}/connection-info`, myHeaders);
+  }
+
   executeSQL(code: string) {
     return this.http.post(this.SERVICE_EXECUTE, code, { responseType: 'text' });
   }

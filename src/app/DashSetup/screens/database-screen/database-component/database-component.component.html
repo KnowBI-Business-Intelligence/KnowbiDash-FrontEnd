@@ -10,46 +10,53 @@
   </header>
   <div class="connection-container">
     <div class="atual-connection-disconected" *ngIf="showForm">
-      <span>Aguardando conexão</span>
+      <div *ngIf="isConnectionLoading" class="is-connect-loading">
+        <div class="card flex justify-content-center">
+          <p-progressSpinner
+            styleClass="w-1rem h-1rem"
+            strokeWidth="4"
+            fill="var(--surface-ground)"
+            animationDuration="8s"
+          />
+        </div>
+        <span>Conectando a {{ isConnectingDbName }}...</span>
+      </div>
+      <span *ngIf="!isConnectionLoading" [innerHTML]="isConnectingDbName">{{
+        isConnectingDbName
+      }}</span>
     </div>
     <div class="atual-connection" *ngIf="!showForm">
-      <div class="atual-connection-origin">
-        <button mat-raised-button disabled>
-          <fa-icon
-            class="icon"
-            [icon]="icons.database"
-            [size]="'xl'"
-            title="Dashboards"
-          ></fa-icon>
-        </button>
-        <input
-          class="atual-connection-origin-input"
-          type="text"
-          placeholder="Oracle"
-          disabled
-        />
-      </div>
-      <div class="atual-connection-group">
-        <label for="username">Nome da conexão</label>
-        <input type="text" disabled />
-      </div>
-      <div class="atual-connection-group">
-        <label for="username">Usuário</label>
-        <input type="text" disabled />
-      </div>
-      <div class="atual-connection-group">
-        <label for="password">Senha</label>
-        <input type="password" disabled />
-      </div>
-      <div class="atual-connection-group">
-        <label for="url">Host:porta/serviço</label>
-        <input type="text" disabled />
+      <span>Conexão atual</span>
+      <div class="atual-connection-container">
+        <!--<div class="atual-connection-origin">
+          <img src="../../../../../assets/icons/oracle.svg" alt="" />
+        </div>-->
+        <div class="connection-status">
+          <div>
+            <fa-icon
+              class="iconServer"
+              [icon]="icons.server"
+              [size]="'xl'"
+            ></fa-icon>
+            <span>Conectado</span>
+          </div>
+        </div>
+        <div>
+          <div class="atual-connection-group">
+            <label for="username">Nome da conexão</label>
+            <input type="text" disabled value="{{ connectedDbName }}" />
+          </div>
+          <div class="atual-connection-group">
+            <label for="url">Host:porta/serviço</label>
+            <input type="text" disabled value="{{ connectedService }}" />
+          </div>
+        </div>
       </div>
     </div>
     <p-divider layout="vertical" />
     <div class="card-list" *ngIf="isAdding">
       <span>Adicionar conexão</span>
-      <form class="form" [formGroup]="form">
+      <form class="form" [formGroup]="form" (keyup.enter)="createConnection()">
         <div>
           <div class="form-origin">
             <button mat-raised-button disabled>
@@ -80,6 +87,7 @@
               formControlName="dbname"
               autocomplete="off"
               maxlength="120"
+              autofocus
             />
           </div>
           <div class="form-group">
@@ -128,7 +136,101 @@
         <button (click)="createConnection()">Salvar</button>
       </div>
     </div>
-    <div class="card-list" *ngIf="!isAdding">
+
+    <div class="card-list" *ngIf="isEditing">
+      <span>Editar conexão</span>
+      <form
+        class="form"
+        [formGroup]="formEdit"
+        (keyup.enter)="editConnection()"
+      >
+        <div>
+          <div class="form-origin">
+            <button mat-raised-button disabled>
+              <fa-icon
+                class="icon"
+                [icon]="icons.database"
+                [size]="'xl'"
+              ></fa-icon>
+            </button>
+            <input type="text" placeholder="Oracle" readonly />
+          </div>
+          <div class="form-group">
+            <label for="id">Id</label>
+            <input
+              class="idField"
+              required
+              name="id"
+              id="id"
+              type="text"
+              formControlName="id"
+              autocomplete="off"
+              maxlength="120"
+              readonly
+            />
+          </div>
+          <div class="form-group">
+            <label for="connection"
+              >Nome da conexão <span class="mandatory">*</span></label
+            >
+            <input
+              required
+              name="connection"
+              id="connection"
+              type="text"
+              formControlName="dbname"
+              autocomplete="off"
+              maxlength="120"
+              autofocus
+            />
+          </div>
+          <div class="form-group">
+            <label for="username"
+              >Usuário <span class="mandatory">*</span></label
+            >
+            <input
+              required
+              name="username"
+              id="username"
+              type="text"
+              formControlName="username"
+              autocomplete="off"
+              maxlength="120"
+            />
+          </div>
+          <div class="form-group">
+            <label for="password">Senha <span class="mandatory">*</span></label>
+            <input
+              required=""
+              name="password"
+              id="password"
+              type="password"
+              formControlName="password"
+              autocomplete="off"
+              maxlength="120"
+            />
+          </div>
+          <div class="form-group">
+            <label for="url"
+              >Host:porta/serviço <span class="mandatory">*</span></label
+            >
+            <input
+              required=""
+              name="url"
+              id="url"
+              type="text"
+              formControlName="service"
+              autocomplete="off"
+            />
+          </div>
+        </div>
+      </form>
+      <div class="container-add-footer">
+        <button (click)="cancelAdd()">Cancelar</button>
+        <button (click)="editConnection()">Atualizar</button>
+      </div>
+    </div>
+    <div class="card-list" *ngIf="!isAdding && !isEditing">
       <span>Lista de conexões</span>
       <p-orderList
         class="list"
@@ -182,14 +284,26 @@
             </span>
             <ng-template #btnConnect>
               <button
-                (click)="connectDatabase(connections)"
+                (click)="
+                  connections.connected
+                    ? disconnectDatabase(connections)
+                    : connectDatabase(connections)
+                "
                 class="connect-button"
+                [disabled]="getDisabledState(connections)"
               >
                 <fa-icon
                   *ngIf="!connections.isLoading"
                   class="iconConnect"
-                  [icon]="icons.play"
+                  [icon]="connections.connected ? icons.stop : icons.play"
                   [size]="'xl'"
+                  [ngStyle]="{
+                    color:
+                      activeConnectionId === connections.id &&
+                      connections.connected
+                        ? '#57cc99'
+                        : '#765B9F'
+                  }"
                 ></fa-icon>
                 <span *ngIf="connections.isLoading"
                   ><div class="login-spinner"></div
@@ -204,7 +318,7 @@
               ></p-skeleton>
             </span>
             <ng-template #btnEdit
-              ><button>
+              ><button (click)="editDatabase(connections)">
                 <fa-icon
                   class="iconEdit"
                   [icon]="icons.edit"
@@ -219,11 +333,23 @@
               ></p-skeleton>
             </span>
             <ng-template #btnDelete
-              ><button (click)="callDeleteModal(connections.id)">
+              ><button
+                (click)="callDeleteModal(connections.id)"
+                [disabled]="
+                  activeConnectionId === connections.id && connections.connected
+                "
+              >
                 <fa-icon
                   class="iconDelete"
                   [icon]="icons.delete"
                   [size]="'xl'"
+                  [ngStyle]="{
+                    color:
+                      activeConnectionId === connections.id &&
+                      connections.connected
+                        ? '#b0b0b0'
+                        : '#ff5757'
+                  }"
                 ></fa-icon></button
             ></ng-template>
           </div>

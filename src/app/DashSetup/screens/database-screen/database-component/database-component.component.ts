@@ -1,5 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  NgZone,
+  OnInit,
+  Renderer2,
+  ViewChild,
+} from '@angular/core';
 import {
   FormBuilder,
   FormsModule,
@@ -10,16 +18,15 @@ import {
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
-  faArrowRightFromBracket,
-  faBars,
   faDatabase,
-  faStar,
-  faUserGear,
   faXmark,
-  faTrash,
+  faTrashCan,
   faPenToSquare,
   faPlug,
   faPlay,
+  faServer,
+  faMinus,
+  faPause,
 } from '@fortawesome/free-solid-svg-icons';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
@@ -33,6 +40,7 @@ import { StorageService } from '../../../../core/services/user/storage.service';
 import { HttpHeaders } from '@angular/common/http';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { Subscription, interval } from 'rxjs';
 
 @Component({
   selector: 'app-database-component',
@@ -62,25 +70,43 @@ export class DatabaseComponentComponent implements OnInit {
   connections!: Connections[];
 
   form = this.formBuilder.group({
+    id: ['', Validators.required],
     dbname: ['', Validators.required],
     username: ['', Validators.required],
     password: ['', Validators.required],
     service: ['', Validators.required],
   });
 
-  connectbtn: HTMLElement | null = null;
+  formEdit = this.formBuilder.group({
+    id: ['', Validators.required],
+    dbname: ['', Validators.required],
+    username: ['', Validators.required],
+    password: ['', Validators.required],
+    service: ['', Validators.required],
+  });
+
   isConected: any;
   databaseId: any;
+  formEditRequest: any;
   showForm: boolean = true;
-  isLoginLoading: boolean = false;
+  isConnectionLoading: boolean = false;
+  isConnectingDbName: string = 'Aguardando conexão';
   isAdding: boolean = false;
+  isEditing: boolean = false;
   isDeleteModal: boolean = false;
+  isDisconnected: boolean = true;
   isLoadingConnectionContent: boolean = true;
+  public activeConnectionId: string | null = null;
+  private intervalSubscription!: Subscription;
 
+  id!: string;
   dbname!: string;
   username!: string;
   password!: string;
   service!: string;
+
+  connectedDbName!: string;
+  connectedService!: string;
 
   userToken = this.storageService.getUser();
 
@@ -89,16 +115,15 @@ export class DatabaseComponentComponent implements OnInit {
   });
 
   icons = {
-    menu: faBars,
-    favorite: faStar,
-    user: faUserGear,
-    logout: faArrowRightFromBracket,
     database: faDatabase,
     close: faXmark,
-    delete: faTrash,
+    delete: faTrashCan,
     edit: faPenToSquare,
     connect: faPlug,
     play: faPlay,
+    server: faServer,
+    minus: faMinus,
+    stop: faPause,
   };
 
   constructor(
@@ -106,8 +131,8 @@ export class DatabaseComponentComponent implements OnInit {
     private database: DatabaseConnectionService,
     private productService: ProductService,
     private storageService: StorageService,
-    private elementRef: ElementRef,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private ngZone: NgZone
   ) {
     if (this.isConected === true) {
       this.showForm = false;
@@ -120,45 +145,59 @@ export class DatabaseComponentComponent implements OnInit {
 
   callConnections() {
     this.isLoadingConnectionContent = true;
+    this.initDataConnections();
+  }
+
+  initDataConnections() {
     this.productService.getDataBasesConnections().subscribe({
       next: (value) => {
         this.connections = value;
-        console.log(this.connections);
+        this.sortConnections();
         setTimeout(() => {
           this.isLoadingConnectionContent = false;
-        }, 1500);
+        }, 1300);
+        this.ngZone.run(() => {
+          this.connections = [...this.connections];
+        });
+        this.initConnectedOrNot(value);
       },
       error: (err) => {
-        console.error('Error fetching connections:', err);
+        this.errorMessageToast(
+          'Erro ao obter dados do servidor, verifique sua conexão com a rede'
+        );
       },
     });
   }
 
-  addToList() {
-    this.isAdding = true;
-    this.form.reset();
+  initConnectedOrNot(value: any) {
+    console.log(value);
+    value.map((data: any) => {
+      if (data.connected) {
+        console.log(data);
+        this.activeConnectionId = data.id;
+        this.connectedDbName = data.dbname;
+        this.connectedService = data.service;
+        this.showForm = false;
+      }
+    });
   }
 
-  cancelAdd() {
-    this.isAdding = false;
-    this.callConnections();
-  }
-
-  getData() {
-    this.dbname = this.form.get('dbname')?.value as string;
-    this.username = this.form.get('username')?.value as string;
-    this.password = this.form.get('password')?.value as string;
-    this.service = this.form.get('service')?.value as string;
+  getDisabledState(connection: any): boolean {
+    if (connection.connected) {
+      return false;
+    } else {
+      return this.connections.some((conn) => conn.connected);
+    }
   }
 
   createConnection() {
     this.getData();
-
     const dbInfo = {
       dbname: this.dbname,
       username: this.username,
       password: this.password,
       service: this.service,
+      connected: false,
     };
 
     if (!this.dbname || !this.username || !this.password || !this.service) {
@@ -181,11 +220,51 @@ export class DatabaseComponentComponent implements OnInit {
     }
   }
 
+  editConnection() {
+    this.getEditData();
+    console.log(this.databaseId);
+    console.log(this.formEditRequest);
+    if (!this.getEditData()) {
+      this.warnMessageToast('Por favor, preencha todos os campos.');
+      return;
+    } else {
+      this.database
+        .updateDataBases(this.headers, this.formEditRequest, this.databaseId)
+        .subscribe({
+          next: (value) => {
+            console.log(value);
+            this.isEditing = false;
+            this.successMessageToast(
+              `A base de dados '${this.dbname}' foi atualizada`
+            );
+            this.databaseId = '';
+            this.callConnections();
+          },
+          error: (err) => {
+            this.errorMessageToast(
+              'Ocorreu um erro ao atualizar a base de dados'
+            );
+          },
+        });
+    }
+  }
+
+  editConnectionById(connection: boolean, id: any) {
+    const connectiondb = {
+      connected: connection,
+    };
+    this.database.updateDataBases(this.headers, connectiondb, id).subscribe({
+      next: (value) => {
+        console.log(value);
+      },
+    });
+  }
+
   connectDatabase(connections: any) {
-    this.connectbtn =
-      this.elementRef.nativeElement.querySelector('.connect-button');
-    this.connectbtn!.style.backgroundColor = '#fff';
+    this.isConnectionLoading = true;
     connections.isLoading = true;
+    this.isConnectingDbName = connections.dbname;
+    this.activeConnectionId = connections.id;
 
     const dbInfo = {
       username: connections.username,
@@ -198,16 +277,193 @@ export class DatabaseComponentComponent implements OnInit {
     this.database.connection(this.headers, dbInfo).subscribe({
       next: (data) => {
         this.successMessageToast(
-          `Conectado a base de dados ${connections.dbname}`
+          `Conectado a base de dados '${connections.dbname}'`
         );
         this.isConected = true;
+        this.isConnectionLoading = false;
+        this.showForm = false;
         connections.isLoading = false;
+        connections.isConnected = true;
+        this.activeConnectionId = connections.id;
+        this.sortConnections();
+        this.editConnectionById(true, this.activeConnectionId);
+        setTimeout(() => {
+          this.initDataConnections();
+        }, 300);
+
+        this.intervalSubscription = interval(35000).subscribe(() => {
+          this.getConnectionDatabase(connections);
+        });
+
+        this.ngZone.run(() => {
+          this.connections = [...this.connections];
+        });
       },
       error: (err) => {
         connections.isLoading = false;
+        connections.isConnected = false;
+        this.isConnectionLoading = false;
+        this.isConnectingDbName = `Tentativa de conectar a <strong>${connections.dbname}</strong>:<br>${err.error.erro}`;
         this.errorMessageToast(err.error.erro);
+        this.activeConnectionId = null;
       },
     });
+  }
+
+  getConnectionDatabase(connections: any) {
+    this.database.getConnection(this.headers).subscribe({
+      next: (value) => {
+        const response = value as { isConnected: boolean; error: string };
+        console.log(response.isConnected);
+        if (response.isConnected == false) {
+          console.log('false');
+          if (this.intervalSubscription) {
+            this.intervalSubscription.unsubscribe();
+          }
+          this.warnMessageToast(
+            'A conexão com a base de dados foi perdida, desconectando...'
+          );
+          this.disconnectDatabaseLoseConnection(connections);
+        }
+      },
+    });
+  }
+
+  disconnectDatabaseLoseConnection(connections: any) {
+    connections.isLoading = true;
+    this.database.desconnectionAll(this.headers).subscribe({
+      next: (value) => {
+        this.isConnectingDbName = 'Aguardando conexão';
+        this.warnMessageToast('A base de dados foi desconectada');
+        connections.isLoading = false;
+        connections.isConnected = false;
+        this.activeConnectionId = null;
+        this.showForm = true;
+        this.sortConnections();
+        this.editConnectionById(false, connections.id);
+        setTimeout(() => {
+          this.initDataConnections();
+        }, 300);
+
+        this.ngZone.run(() => {
+          this.connections = [...this.connections];
+        });
+        console.log(value);
+      },
+    });
+  }
+
+  disconnectDatabase(connections: any) {
+    if (this.intervalSubscription) {
+      this.intervalSubscription.unsubscribe();
+    }
+    connections.isLoading = true;
+    console.log(connections);
+    this.database.desconnection(this.headers).subscribe({
+      next: (data) => {
+        this.isConnectingDbName = 'Aguardando conexão';
+        this.successMessageToast(
+          `Desconectado da base de dados '${connections.dbname}'`
+        );
+        connections.isLoading = false;
+        connections.isConnected = false;
+        this.activeConnectionId = null;
+        this.showForm = true;
+        this.sortConnections();
+        this.editConnectionById(false, connections.id);
+        setTimeout(() => {
+          this.initDataConnections();
+        }, 300);
+
+        this.ngZone.run(() => {
+          this.connections = [...this.connections];
+        });
+      },
+      error: (err) => {
+        console.log(err);
+        this.errorMessageToast(err.error.error);
+        this.disconnectDatabaseLoseConnection(connections);
+        connections.isLoading = false;
+        connections.isConnected = false;
+      },
+    });
+  }
+
+  sortConnections() {
+    this.connections.sort((a, b) => {
+      return (b.connected ? 1 : 0) - (a.connected ? 1 : 0);
+    });
+  }
+
+  confirmDelete() {
+    this.database.deleteDataBases(this.headers, this.databaseId).subscribe({
+      next: (value) => {
+        this.successMessageToast('Base de dados excluída');
+        this.isDeleteModal = false;
+        this.callConnections();
+      },
+      error: (err) => {
+        this.errorMessageToast(
+          'Ocorreu um erro ao tentar excluir a base de dados'
+        );
+      },
+    });
+    this.databaseId = '';
+  }
+
+  addToList() {
+    this.isAdding = true;
+    this.form.reset();
+  }
+
+  editDatabase(connections: any) {
+    console.log(connections);
+    this.isEditing = true;
+    this.formEdit.patchValue({
+      id: connections.id,
+      dbname: connections.dbname,
+      username: connections.username,
+      password: connections.password,
+      service: connections.service,
+    });
+  }
+
+  getData() {
+    this.id = this.form.get('id')?.value as string;
+    this.dbname = this.form.get('dbname')?.value as string;
+    this.username = this.form.get('username')?.value as string;
+    this.password = this.form.get('password')?.value as string;
+    this.service = this.form.get('service')?.value as string;
+  }
+
+  getEditData(): boolean {
+    const id = this.formEdit.get('id')?.value as string;
+    const dbname = this.formEdit.get('dbname')?.value;
+    const username = this.formEdit.get('username')?.value;
+    const password = this.formEdit.get('password')?.value;
+    const service = this.formEdit.get('service')?.value;
+
+    if (!id || !dbname || !username || !password || !service) {
+      return false;
+    }
+
+    this.databaseId = id;
+    this.dbname = dbname;
+
+    this.formEditRequest = {
+      dbname: dbname,
+      username: username,
+      password: password,
+      service: service,
+    };
+
+    return true;
+  }
+
+  cancelAdd() {
+    this.isAdding = false;
+    this.isEditing = false;
+    this.callConnections();
   }
 
   truncate(text: string, limit: number): string {
@@ -226,21 +482,6 @@ export class DatabaseComponentComponent implements OnInit {
 
   cancelDelete() {
     this.isDeleteModal = false;
-  }
-
-  confirmDelete() {
-    this.database.deleteDataBases(this.headers, this.databaseId).subscribe({
-      next: (value) => {
-        this.successMessageToast('Base de dados excluída');
-        this.isDeleteModal = false;
-        this.callConnections();
-      },
-      error: (err) => {
-        this.errorMessageToast(
-          'Ocorreu um erro ao tentar excluir a base de dados'
-        );
-      },
-    });
   }
 
   errorMessageToast(message: string) {

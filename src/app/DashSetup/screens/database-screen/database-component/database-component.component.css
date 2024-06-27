@@ -77,6 +77,12 @@ header h2 {
   align-items: center;
 }
 
+.is-connect-loading {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
 .atual-connection-disconected span {
   font-size: 13px;
   font-weight: 400;
@@ -84,32 +90,42 @@ header h2 {
 }
 
 .atual-connection {
-  margin-top: 1rem;
   width: 50%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-top: 5px;
+}
+
+.atual-connection span {
+  font-size: 12px;
+}
+
+.atual-connection-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  margin-bottom: 120px;
 }
 
 .atual-connection-origin {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  margin-bottom: 10px;
-  padding: 10px;
   border-radius: 3px;
   width: 16em;
-  height: 30px;
-  cursor: default;
-  background-color: #d7d7d7;
-}
-
-.atual-connection-origin button {
   cursor: default;
 }
 
-.atual-connection-origin-input {
-  border: solid 1px #b4b4b4 !important;
-  background-color: transparent;
-  height: 23px;
-  margin-left: 10px;
-  cursor: not-allowed;
+.atual-connection-origin .iconDB {
+  font-size: 15px;
+  color: #57cc99;
+}
+
+.atual-connection-origin span {
+  color: #4b5563;
 }
 
 .atual-connection-group {
@@ -136,6 +152,23 @@ header h2 {
   outline: none;
 }
 
+.connection-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 35px;
+}
+
+.connection-status .iconServer {
+  color: #57cc99;
+  font-size: 14px;
+}
+
+.connection-status div,
+.connection-status div span {
+  margin-left: 8px;
+}
+
 .form {
   margin-top: 2rem;
   width: 100%;
@@ -150,6 +183,11 @@ header h2 {
   align-items: start;
   flex-direction: column;
   margin-bottom: 1.2rem;
+}
+
+.idField {
+  width: 80px !important;
+  background-color: #fafafa !important;
 }
 
 .mandatory {
@@ -217,15 +255,10 @@ button {
   cursor: pointer;
 }
 
-.connect-button span {
-  font-size: 10px !important;
-  font-weight: 450 !important;
-  color: #765b9f;
-}
-
 .iconConnect {
-  color: #765b9f;
+  color: #57cc99;
   font-size: 9px;
+  transition: 0.5s;
 }
 
 .iconEdit {
@@ -236,13 +269,14 @@ button {
 .iconDelete {
   color: #ff5757;
   font-size: 9px;
+  transition: 0.5s;
 }
 
 .login-spinner {
   transform: translate(-50%, -50%);
   border: 3px solid #f3f3f3;
   border-radius: 50%;
-  border-top: 3px solid #765b9f;
+  border-top: 3px solid #57cc99;
   width: 11px;
   height: 11px;
   -webkit-animation: spin 1s linear infinite;
@@ -518,6 +552,18 @@ strong {
 
 :host ::ng-deep .p-skeleton {
   margin: 7.3px 0;
+}
+
+::ng-deep .p-progress-spinner {
+  width: 80px !important;
+  height: 40px !important;
+  margin-right: 3px !important;
+  position: relative;
+  top: 2px;
+}
+
+::ng-deep .w-1rem.h-1rem .p-progress-spinner-circle {
+  stroke: #7b5fa5 !important;
 }
 
 @-webkit-keyframes spin {

@@ -3,5 +3,8 @@ export interface Connections {
   password?: string;
   service?: string;
   username?: string;
+  connected?: boolean;
   isLoading?: boolean;
+  isConnected: boolean;
+  isBlocked?: boolean;
 }
