@@ -72,7 +72,7 @@
               "buildTarget": "KnowbiDash-FrontEnd:build:development",
               "sslKey": "./server.key",
               "sslCert": "./server.crt",
-              "ssl": true
+              "ssl": false
             }
           },
           "defaultConfiguration": "development"

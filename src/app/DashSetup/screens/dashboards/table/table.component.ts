@@ -1,7 +1,6 @@
 import { HttpHeaders } from '@angular/common/http';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { StorageService } from '../../../../core/services/user/storage.service';
-import { LocalstorageService } from '../../../../core/services/local-storage/local-storage.service';
 import { ChartsService } from '../../../../core/services/charts/charts.service';
 import { ChartgroupService } from '../../../../core/services/chartgroup/chartgroup.service';
 import { Subscription } from 'rxjs';
@@ -12,6 +11,7 @@ import { DataService } from '../../../../core/services/dashboard/data.service';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { DashboardsViewComponent } from '../dashboards-view/dashboards-view.component';
+import { DividerModule } from 'primeng/divider';
 import {
   CdkDrag,
   CdkDragDrop,
@@ -54,6 +54,7 @@ import {
     CdkMenuItem,
     TableModule,
     ToastModule,
+    DividerModule,
   ],
   templateUrl: './table.component.html',
   styleUrls: [
@@ -97,6 +98,9 @@ export class TableComponent implements OnInit {
 
   showPreviewButton: boolean = true;
   showModal: boolean = false;
+  isDatabaseContent: boolean = true;
+  isLoading: boolean = true;
+  isEditing: boolean = false;
 
   modal: HTMLElement | undefined;
   selectedtabledata: Axis = { name: '', type: '', identifiers: '', value: '' };
@@ -113,7 +117,6 @@ export class TableComponent implements OnInit {
   constructor(
     private _liveAnnouncer: LiveAnnouncer,
     private storageService: StorageService,
-    private localStorageService: LocalstorageService,
     private chartsService: ChartsService,
     private chartGroupService: ChartgroupService,
     private dataService: DataService,
@@ -174,6 +177,7 @@ export class TableComponent implements OnInit {
     this.itemId = data.itemId;
     if (this.itemId != undefined) {
       this.showPreviewButton = false;
+      this.isEditing = true;
       this.loadTableEdit(this.itemId);
     }
   }
@@ -255,6 +259,12 @@ export class TableComponent implements OnInit {
         });
       }
     });
+    if (this.database.length <= 0) {
+      this.isDatabaseContent = false;
+    }
+    setTimeout(() => {
+      this.isLoading = false;
+    }, 1000);
   }
 
   removeItem(list: string, index: number) {

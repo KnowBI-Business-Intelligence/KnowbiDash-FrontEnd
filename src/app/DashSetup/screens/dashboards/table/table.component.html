@@ -1,4 +1,11 @@
-<div class="container">
+<div id="loading-screen" *ngIf="isLoading">
+  <div class="spinner"></div>
+</div>
+<div class="container no-data" *ngIf="!isDatabaseContent">
+  <h3>Ainda não há dados neste dashboard</h3>
+  <button (click)="returnToCreateView()">Voltar ao Workspace</button>
+</div>
+<div class="container" *ngIf="isDatabaseContent">
   <div cdkDropListGroup class="container-data-group">
     <div class="container-data">
       <span>Dados</span>
@@ -199,7 +206,7 @@
       </section>
     </div>
 
-    <div class="chart-container-buttons">
+    <div class="chart-container-buttons" *ngIf="!isEditing">
       <div>
         <button (click)="openModal()">
           <p>Cancelar</p>
@@ -211,6 +218,13 @@
           <p>Concluir</p>
         </button>
       </div>
+    </div>
+
+    <div class="edit-container-buttons" *ngIf="isEditing">
+      <button (click)="updateData()"><p>Atualizar</p></button>
+      <button (click)="returnToCreateView()" class="conclude">
+        <p>Concluir</p>
+      </button>
     </div>
   </div>
   <div class="message">

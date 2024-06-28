@@ -1,13 +1,5 @@
 import { CommonModule } from '@angular/common';
-import {
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  NgZone,
-  OnInit,
-  Renderer2,
-  ViewChild,
-} from '@angular/core';
+import { Component, NgZone, OnInit, ViewChild } from '@angular/core';
 import {
   FormBuilder,
   FormsModule,
@@ -95,7 +87,7 @@ export class DatabaseComponentComponent implements OnInit {
   isEditing: boolean = false;
   isDeleteModal: boolean = false;
   isDisconnected: boolean = true;
-  isListNotNull!: boolean;
+  isListNotNull: boolean = true;
   isLoadingConnectionContent: boolean = true;
   public activeConnectionId: string | null = null;
   private intervalSubscription!: Subscription;

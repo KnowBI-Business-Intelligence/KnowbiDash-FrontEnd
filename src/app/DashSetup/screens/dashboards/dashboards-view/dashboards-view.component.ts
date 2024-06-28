@@ -104,6 +104,7 @@ export class DashboardsViewComponent implements OnInit {
       currentTarget:
         this.elementRef.nativeElement.querySelector('.selected-group'),
     };
+    this.chartGroupService.setCurrentView('ViewCreateComponent');
     this.isDashValid = groupIdFromLocalStorage;
     this.clickPress(groupIdFromLocalStorage, simulatedEvent);
     this.loadDataInit();
