@@ -160,6 +160,8 @@ export class DatabaseComponentComponent implements OnInit {
         console.log(this.connections.length);
         if (this.connections.length > 0) {
           this.isListNotNull = true;
+        } else {
+          this.isListNotNull = false;
         }
         this.sortConnections();
         setTimeout(() => {
@@ -169,11 +171,6 @@ export class DatabaseComponentComponent implements OnInit {
           this.connections = [...this.connections];
         });
         this.initConnectedOrNot(value);
-      },
-      error: (err) => {
-        this.errorMessageToast(
-          'Erro ao obter dados do servidor, verifique sua conexão com a rede'
-        );
       },
     });
   }

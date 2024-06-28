@@ -132,6 +132,33 @@ export class ToolBarMenuComponent implements OnInit {
     });
   }
 
+  getProfilesData(data: string) {
+    this.profilesService.getProfiles(this.headers).subscribe({
+      next: (value: any) => {
+        value.map((profileData: any) => {
+          profileData.users.map((userData: any) => {
+            if (userData.id == data) {
+              this.profilesData.push(profileData);
+            }
+          });
+        });
+      },
+    });
+  }
+
+  initials() {
+    if (this.isLoggedIn) {
+      this.user = this.token.getUser();
+      this.roles = this.user.roles;
+      this.aliasName = this.user.aliasName;
+    }
+
+    if (this.user) {
+      const name = this.user.fullUserName.split(' ');
+      this.userFirstName = name[0].charAt(0).toUpperCase();
+    }
+  }
+
   initDataConnections() {
     this.database.getDataBases(this.headers).subscribe({
       next: (value) => {
@@ -152,11 +179,6 @@ export class ToolBarMenuComponent implements OnInit {
           }
           this.connections = [];
         }
-      },
-      error: (err) => {
-        this.errorMessageToast(
-          'Erro ao obter dados do servidor, verifique sua conexão com a rede'
-        );
       },
     });
   }
@@ -198,33 +220,6 @@ export class ToolBarMenuComponent implements OnInit {
         this.database.notifyDisconnectionSuccessful();
       },
     });
-  }
-
-  getProfilesData(data: string) {
-    this.profilesService.getProfiles(this.headers).subscribe({
-      next: (value: any) => {
-        value.map((profileData: any) => {
-          profileData.users.map((userData: any) => {
-            if (userData.id == data) {
-              this.profilesData.push(profileData);
-            }
-          });
-        });
-      },
-    });
-  }
-
-  initials() {
-    if (this.isLoggedIn) {
-      this.user = this.token.getUser();
-      this.roles = this.user.roles;
-      this.aliasName = this.user.aliasName;
-    }
-
-    if (this.user) {
-      const name = this.user.fullUserName.split(' ');
-      this.userFirstName = name[0].charAt(0).toUpperCase();
-    }
   }
 
   onProfileClick() {

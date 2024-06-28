@@ -191,7 +191,8 @@ export class DashboardsViewComponent implements OnInit {
   }
 
   processData(data: any) {
-    if (data.length != 0) {
+    console.log(data.length);
+    if (data.length > 0) {
       this.isListContent = true;
       data.forEach((path: any) => {
         this.paths[path.id] = [];

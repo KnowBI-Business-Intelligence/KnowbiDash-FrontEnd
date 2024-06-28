@@ -72,6 +72,7 @@ export class ADMMainScreenComponent implements OnInit {
   getProfilesData(data: string) {
     this.profilesService.getProfiles(this.headers).subscribe({
       next: (value: any) => {
+        console.log(value);
         value.map((profileData: any) => {
           profileData.users.map((userData: any) => {
             if (userData.id == data) {
@@ -86,6 +87,7 @@ export class ADMMainScreenComponent implements OnInit {
 
   processData(data: any) {
     data.forEach((profile: any) => {
+      console.log(profile);
       const paths: string[] = [];
       if (profile && profile.chartPaths) {
         profile.chartPaths.forEach((chartPath: any) => {
