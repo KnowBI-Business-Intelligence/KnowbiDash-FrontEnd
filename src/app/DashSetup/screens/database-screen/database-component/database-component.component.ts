@@ -90,11 +90,12 @@ export class DatabaseComponentComponent implements OnInit {
   formEditRequest: any;
   showForm: boolean = true;
   isConnectionLoading: boolean = false;
-  isConnectingDbName: string = 'Aguardando conexão';
+  isConnectingDbName: string = 'Aguardando conexão...';
   isAdding: boolean = false;
   isEditing: boolean = false;
   isDeleteModal: boolean = false;
   isDisconnected: boolean = true;
+  isListNotNull!: boolean;
   isLoadingConnectionContent: boolean = true;
   public activeConnectionId: string | null = null;
   private intervalSubscription!: Subscription;
@@ -141,6 +142,10 @@ export class DatabaseComponentComponent implements OnInit {
 
   ngOnInit() {
     this.callConnections();
+    this.database.disconnectionSuccessful$.subscribe(() => {
+      this.callConnections();
+      this.showForm = true;
+    });
   }
 
   callConnections() {
@@ -152,6 +157,10 @@ export class DatabaseComponentComponent implements OnInit {
     this.productService.getDataBasesConnections().subscribe({
       next: (value) => {
         this.connections = value;
+        console.log(this.connections.length);
+        if (this.connections.length > 0) {
+          this.isListNotNull = true;
+        }
         this.sortConnections();
         setTimeout(() => {
           this.isLoadingConnectionContent = false;
@@ -170,10 +179,8 @@ export class DatabaseComponentComponent implements OnInit {
   }
 
   initConnectedOrNot(value: any) {
-    console.log(value);
     value.map((data: any) => {
       if (data.connected) {
-        console.log(data);
         this.activeConnectionId = data.id;
         this.connectedDbName = data.dbname;
         this.connectedService = data.service;
@@ -204,16 +211,13 @@ export class DatabaseComponentComponent implements OnInit {
       this.warnMessageToast('Por favor, preencha todos os campos.');
       return;
     } else {
-      console.log(JSON.stringify(dbInfo, null, 2));
       this.database.createDataBases(this.headers, dbInfo).subscribe({
         next: (value) => {
           this.isAdding = false;
           this.callConnections();
-          console.log(value);
           this.successMessageToast('Base de dados adicionada');
         },
         error: (err) => {
-          console.log(err);
           this.errorMessageToast('Ocorreu um erro ao inserir a base de dados');
         },
       });
@@ -222,8 +226,6 @@ export class DatabaseComponentComponent implements OnInit {
 
   editConnection() {
     this.getEditData();
-    console.log(this.databaseId);
-    console.log(this.formEditRequest);
     if (!this.getEditData()) {
       this.warnMessageToast('Por favor, preencha todos os campos.');
       return;
@@ -232,7 +234,6 @@ export class DatabaseComponentComponent implements OnInit {
         .updateDataBases(this.headers, this.formEditRequest, this.databaseId)
         .subscribe({
           next: (value) => {
-            console.log(value);
             this.isEditing = false;
             this.successMessageToast(
               `A base de dados '${this.dbname}' foi atualizada`
@@ -254,9 +255,7 @@ export class DatabaseComponentComponent implements OnInit {
       connected: connection,
     };
     this.database.updateDataBases(this.headers, connectiondb, id).subscribe({
-      next: (value) => {
-        console.log(value);
-      },
+      next: (value) => {},
     });
   }
 
@@ -271,8 +270,6 @@ export class DatabaseComponentComponent implements OnInit {
       password: connections.password,
       url: connections.service,
     };
-
-    console.log(dbInfo);
 
     this.database.connection(this.headers, dbInfo).subscribe({
       next: (data) => {
@@ -289,6 +286,7 @@ export class DatabaseComponentComponent implements OnInit {
         this.editConnectionById(true, this.activeConnectionId);
         setTimeout(() => {
           this.initDataConnections();
+          this.database.notifyConnectionSuccessful();
         }, 300);
 
         this.intervalSubscription = interval(35000).subscribe(() => {
@@ -314,9 +312,7 @@ export class DatabaseComponentComponent implements OnInit {
     this.database.getConnection(this.headers).subscribe({
       next: (value) => {
         const response = value as { isConnected: boolean; error: string };
-        console.log(response.isConnected);
         if (response.isConnected == false) {
-          console.log('false');
           if (this.intervalSubscription) {
             this.intervalSubscription.unsubscribe();
           }
@@ -333,7 +329,7 @@ export class DatabaseComponentComponent implements OnInit {
     connections.isLoading = true;
     this.database.desconnectionAll(this.headers).subscribe({
       next: (value) => {
-        this.isConnectingDbName = 'Aguardando conexão';
+        this.isConnectingDbName = 'Aguardando conexão...';
         this.warnMessageToast('A base de dados foi desconectada');
         connections.isLoading = false;
         connections.isConnected = false;
@@ -348,7 +344,6 @@ export class DatabaseComponentComponent implements OnInit {
         this.ngZone.run(() => {
           this.connections = [...this.connections];
         });
-        console.log(value);
       },
     });
   }
@@ -358,10 +353,9 @@ export class DatabaseComponentComponent implements OnInit {
       this.intervalSubscription.unsubscribe();
     }
     connections.isLoading = true;
-    console.log(connections);
     this.database.desconnection(this.headers).subscribe({
       next: (data) => {
-        this.isConnectingDbName = 'Aguardando conexão';
+        this.isConnectingDbName = 'Aguardando conexão...';
         this.successMessageToast(
           `Desconectado da base de dados '${connections.dbname}'`
         );
@@ -373,6 +367,7 @@ export class DatabaseComponentComponent implements OnInit {
         this.editConnectionById(false, connections.id);
         setTimeout(() => {
           this.initDataConnections();
+          this.database.notifyConnectionSuccessful();
         }, 300);
 
         this.ngZone.run(() => {
@@ -380,7 +375,6 @@ export class DatabaseComponentComponent implements OnInit {
         });
       },
       error: (err) => {
-        console.log(err);
         this.errorMessageToast(err.error.error);
         this.disconnectDatabaseLoseConnection(connections);
         connections.isLoading = false;
@@ -417,7 +411,6 @@ export class DatabaseComponentComponent implements OnInit {
   }
 
   editDatabase(connections: any) {
-    console.log(connections);
     this.isEditing = true;
     this.formEdit.patchValue({
       id: connections.id,
@@ -476,7 +469,6 @@ export class DatabaseComponentComponent implements OnInit {
 
   callDeleteModal(id: string) {
     this.databaseId = id;
-    console.log(this.databaseId);
     this.isDeleteModal = true;
   }
 

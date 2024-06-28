@@ -233,6 +233,7 @@
     <div class="card-list" *ngIf="!isAdding && !isEditing">
       <span>Lista de conexões</span>
       <p-orderList
+        *ngIf="isListNotNull"
         class="list"
         [value]="connections"
         [listStyle]="{ 'max-height': '30rem' }"
@@ -355,6 +356,14 @@
           </div>
         </ng-template>
       </p-orderList>
+      <div *ngIf="!isListNotNull" class="add-new-connection">
+        <div>
+          <span>Ainda nao há conexões</span>
+          <button class="action-button add" (click)="addToList()">
+            Adicionar
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>

@@ -5,7 +5,6 @@ import {
   EventEmitter,
   OnInit,
   Output,
-  ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -33,6 +32,9 @@ import { BreadcrumbsComponent } from '../../../shared/breadcrumbs/breadcrumbs.co
 import { CustomerService } from '../../screens/users-screen/users/data/costumer-data';
 import { ProfilesService } from '../../../core/services/profiles/profiles.service';
 import { HttpHeaders } from '@angular/common/http';
+import { DatabaseConnectionService } from '../../../core/services/database/database-connection.service';
+import { Connections } from '../../screens/database-screen/domain/connections-interfaces';
+import { Subscription, interval } from 'rxjs';
 
 interface SideNavTogle {
   screenWidth: number;
@@ -57,7 +59,10 @@ interface SideNavTogle {
   ],
   providers: [MessageService, BreadrumbsService, CustomerService],
   templateUrl: './tool-bar-menu.component.html',
-  styleUrl: './tool-bar-menu.component.css',
+  styleUrls: [
+    './tool-bar-menu.component.css',
+    '../../../core/globalStyle/toast.css',
+  ],
 })
 export class ToolBarMenuComponent implements OnInit {
   @Output() onToggleSideNav: EventEmitter<SideNavTogle> = new EventEmitter();
@@ -67,6 +72,7 @@ export class ToolBarMenuComponent implements OnInit {
   screenWidth = 0;
   private roles: string[] = [];
   profilesData: any[] = [];
+  connections!: Connections[];
 
   isLoggedIn: boolean = false;
   showInitials: boolean = true;
@@ -76,8 +82,10 @@ export class ToolBarMenuComponent implements OnInit {
   aliasName?: string;
   user: any;
   userFirstName: any;
+  dbId: any;
 
   menuAtivo: any;
+  private intervalSubscription!: Subscription;
 
   private userReq = this.token.getUser();
   headers = new HttpHeaders({
@@ -100,13 +108,12 @@ export class ToolBarMenuComponent implements OnInit {
     private router: Router,
     private elementRef: ElementRef,
     private profilesService: ProfilesService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private database: DatabaseConnectionService
   ) {}
 
   ngOnInit(): void {
     this.isLoggedIn = !!this.token.getToken();
-    this.successMessageToast('teste');
-
     this.initials();
     if (this.menuAtivo == '') {
       this.menuAtivo = 'home';
@@ -118,6 +125,79 @@ export class ToolBarMenuComponent implements OnInit {
     }
 
     this.getProfilesData(this.user.id);
+    this.initDataConnections();
+
+    this.database.connectionSuccessful$.subscribe(() => {
+      this.initDataConnections();
+    });
+  }
+
+  initDataConnections() {
+    this.database.getDataBases(this.headers).subscribe({
+      next: (value) => {
+        const hasActiveConnection = value.some((data: any) => data.connected);
+        if (hasActiveConnection) {
+          this.getConnectionDatabase(value);
+          this.connections = value.filter((data: any) => data.connected);
+          if (!this.intervalSubscription || this.intervalSubscription.closed) {
+            this.intervalSubscription = interval(45000).subscribe(() => {
+              console.log('Intervalo ativo');
+              this.getConnectionDatabase(value);
+            });
+          }
+        } else {
+          console.log('Nenhuma conexão ativa.');
+          if (this.intervalSubscription) {
+            this.intervalSubscription.unsubscribe();
+          }
+          this.connections = [];
+        }
+      },
+      error: (err) => {
+        this.errorMessageToast(
+          'Erro ao obter dados do servidor, verifique sua conexão com a rede'
+        );
+      },
+    });
+  }
+
+  getConnectionDatabase(connections: any) {
+    connections.map((data: any) => {
+      if (data.connected) {
+        this.dbId = data;
+      }
+    });
+    this.database.getConnection(this.headers).subscribe({
+      next: (value) => {
+        const response = value as { isConnected: boolean; error: string };
+        if (response.isConnected == false) {
+          if (this.intervalSubscription) {
+            this.intervalSubscription.unsubscribe();
+          }
+          this.disconnectDatabaseLoseConnection(this.dbId);
+        }
+      },
+    });
+  }
+
+  disconnectDatabaseLoseConnection(connections: any) {
+    this.database.desconnectionAll(this.headers).subscribe({
+      next: (value) => {
+        this.warnMessageToast('A conexão com a base de dados foi perdida');
+        this.editConnectionById(false, connections.id);
+      },
+    });
+  }
+
+  editConnectionById(connection: boolean, id: any) {
+    const connectiondb = {
+      connected: connection,
+    };
+    this.database.updateDataBases(this.headers, connectiondb, id).subscribe({
+      next: (value) => {
+        this.database.notifyDisconnectionSuccessful();
+      },
+    });
   }
 
   getProfilesData(data: string) {
@@ -210,7 +290,6 @@ export class ToolBarMenuComponent implements OnInit {
     return this.messageService.add({
       severity: 'success',
       detail: message,
-      life: 80000,
     });
   }
 }

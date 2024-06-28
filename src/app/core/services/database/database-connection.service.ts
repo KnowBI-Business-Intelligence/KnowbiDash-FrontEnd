@@ -4,7 +4,7 @@ import {
   HttpHeaders,
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, throwError } from 'rxjs';
+import { catchError, Observable, Subject, throwError } from 'rxjs';
 import {
   API_DATABASES,
   API_ECXECUTE_SQL,
@@ -15,11 +15,24 @@ import {
   providedIn: 'root',
 })
 export class DatabaseConnectionService {
+  private connectionSuccessfulSubject = new Subject<void>();
+  private disconnectionSuccessfulSubject = new Subject<void>();
+
+  connectionSuccessful$ = this.connectionSuccessfulSubject.asObservable();
+  disconnectionSuccessful$ = this.disconnectionSuccessfulSubject.asObservable();
   constructor(private http: HttpClient) {}
 
   private SERVICE_DB = API_ORACLE_DATABASE;
   private SERVICE_EXECUTE = API_ECXECUTE_SQL;
   private SERVICE_DATABASES = API_DATABASES;
+
+  notifyConnectionSuccessful() {
+    this.connectionSuccessfulSubject.next();
+  }
+
+  notifyDisconnectionSuccessful() {
+    this.disconnectionSuccessfulSubject.next();
+  }
 
   connection(headers: HttpHeaders, DatabasesData: any) {
     const myHeaders = {
