@@ -469,7 +469,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
         data.graphType = 'pie';
         this.isDonut = true;
       } else {
-        console.log(false);
+        this.isDonut = false;
       }
 
       if (data.graphType === 'pie') {
@@ -580,7 +580,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
         pie: {
           allowPointSelect: true,
           cursor: 'pointer',
-          innerSize: this.isDonut ? '50%' : '0',
+          innerSize: this.isDonut ? '50%' : '0%',
           showInLegend: true,
           borderRadius: 5,
           dataLabels: {
@@ -757,7 +757,9 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
         .subscribe({
           next: (value) => {
             console.log;
-            this.startDashboarData();
+            setTimeout(() => {
+              this.startDashboarData();
+            }, 440);
           },
         });
     });

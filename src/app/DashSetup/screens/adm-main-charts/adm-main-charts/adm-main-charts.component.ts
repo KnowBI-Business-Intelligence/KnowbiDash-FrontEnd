@@ -198,6 +198,7 @@ export class AdmMainChartsComponent implements OnInit {
   isDashContent: boolean = false;
   isDashvoid: boolean = false;
   isLoading: boolean = true;
+  isDonut: boolean = false;
   showContentFilterSwitch: boolean[] = [];
 
   minValue: number = 100;
@@ -446,6 +447,14 @@ export class AdmMainChartsComponent implements OnInit {
         seriesData[seriesCategory][category] += value;
       }
 
+      if (data.graphType == 'donut') {
+        console.log(true);
+        data.graphType = 'pie';
+        this.isDonut = true;
+      } else {
+        this.isDonut = false;
+      }
+
       if (data.graphType === 'pie') {
         const pieData = data.yAxisColumns[0].data.map(
           (y: number, index: number) => ({
@@ -555,6 +564,7 @@ export class AdmMainChartsComponent implements OnInit {
           allowPointSelect: true,
           cursor: 'pointer',
           borderRadius: 5,
+          innerSize: this.isDonut ? '50%' : '0%',
           showInLegend: true,
           dataLabels: {
             enabled: true,

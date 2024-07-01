@@ -200,6 +200,7 @@ export class ChartScreenComponent implements OnInit {
   isDashContent: boolean = false;
   isDashvoid: boolean = false;
   isLoading: boolean = true;
+  isDonut: boolean = false;
   showContentFilterSwitch: boolean[] = [];
 
   minValue: number = 100;
@@ -449,6 +450,14 @@ export class ChartScreenComponent implements OnInit {
         seriesData[seriesCategory][category] += value;
       }
 
+      if (data.graphType == 'donut') {
+        console.log(true);
+        data.graphType = 'pie';
+        this.isDonut = true;
+      } else {
+        this.isDonut = false;
+      }
+
       if (data.graphType === 'pie') {
         const pieData = data.yAxisColumns[0].data.map(
           (y: number, index: number) => ({
@@ -557,6 +566,7 @@ export class ChartScreenComponent implements OnInit {
         pie: {
           allowPointSelect: true,
           cursor: 'pointer',
+          innerSize: this.isDonut ? '50%' : '0%',
           borderRadius: 5,
           showInLegend: true,
           dataLabels: {

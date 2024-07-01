@@ -700,6 +700,8 @@ export class ChartComponent implements OnInit {
       if (data.graphType == 'donut') {
         data.graphType = 'pie';
         this.isDonut = true;
+      } else {
+        this.isDonut = false;
       }
 
       if (data.graphType === 'pie') {
@@ -850,7 +852,7 @@ export class ChartComponent implements OnInit {
             allowPointSelect: true,
             cursor: 'pointer',
             borderRadius: 5,
-            innerSize: this.isDonut ? '50%' : '0',
+            innerSize: this.isDonut ? '50%' : '0%',
             showInLegend: true,
             dataLabels: {
               enabled: true,
