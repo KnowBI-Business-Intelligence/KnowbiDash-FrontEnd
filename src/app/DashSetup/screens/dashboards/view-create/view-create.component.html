@@ -189,7 +189,7 @@
               ></fa-icon>
             </button>
             <h2>{{ item.title }}</h2>
-            <div style="overflow: auto">
+            <div class="table-wrapper">
               <p-table
                 matSort
                 class="mat-elevation-z8 demo-table"
@@ -198,9 +198,6 @@
                 (matSortChange)="announceSortChange($event)"
                 [resizableColumns]="true"
                 [scrollable]="true"
-                scrollHeight="100%"
-                [tableStyle]="{ 'min-width': '20rem' }"
-                scrollHeight="300px"
                 styleClass="p-datatable-gridlines"
                 [globalFilterFields]="item.showTableColumns"
               >

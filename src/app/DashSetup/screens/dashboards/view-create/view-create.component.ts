@@ -1272,7 +1272,9 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
               severity: 'success',
               detail: 'Card Excluído',
             });
-            this.removeItem(this.layoutId);
+            setTimeout(() => {
+              this.removeItem(this.layoutId);
+            }, 80);
           },
           error: (err) => {
             this.messageService.add({
@@ -1289,7 +1291,9 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
               severity: 'success',
               detail: 'Gráfico Excluído',
             });
-            this.removeItem(this.layoutId);
+            setTimeout(() => {
+              this.removeItem(this.layoutId);
+            }, 80);
           },
           error: (err) => {
             this.messageService.add({
@@ -1306,7 +1310,9 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
               severity: 'success',
               detail: 'Tabela Excluída',
             });
-            this.removeItem(this.layoutId);
+            setTimeout(() => {
+              this.removeItem(this.layoutId);
+            }, 80);
           },
           error: (err) => {
             this.messageService.add({

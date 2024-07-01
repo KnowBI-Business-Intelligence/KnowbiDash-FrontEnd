@@ -249,11 +249,11 @@
 .table-container {
   height: 100%;
   min-width: 100px;
-  min-height: 50%;
   outline: none;
   background-color: #fff;
   border-radius: 5px;
   padding: 5px;
+  overflow: auto;
 }
 
 .table-container h2 {
@@ -268,6 +268,16 @@
   max-height: 93%;
   max-width: 99%;
   overflow: auto;
+}
+
+.table-wrapper {
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.p-datatable-wrapper {
+  height: 100%;
+  overflow-y: auto;
 }
 
 th {
