@@ -144,6 +144,32 @@ export class ChartComponent implements OnInit {
         event.currentIndex
       );
     } else {
+      const item = event.previousContainer.data[event.previousIndex] as any;
+      if (
+        (event.previousContainer.id === 'data-list' &&
+          event.container.id === 'legend' &&
+          item.type === 'numeric') ||
+        (event.previousContainer.id === 'data-list' &&
+          event.container.id === 'xaxis' &&
+          item.type === 'numeric')
+      ) {
+        this.warnMessageToast(
+          'Colunas do tipo "numeric" não pode ser inseridas em Legenda ou Eixo X - Rótulos.'
+        );
+        return;
+      }
+
+      if (
+        event.previousContainer.id === 'data-list' &&
+        event.container.id === 'yaxis' &&
+        item.type !== 'numeric'
+      ) {
+        this.warnMessageToast(
+          'Por favor, use apenas colunas do tipo numeric no campo Eixo y - Rótulos'
+        );
+        return;
+      }
+
       copyArrayItem(
         event.previousContainer.data,
         event.container.data,
@@ -503,31 +529,35 @@ export class ChartComponent implements OnInit {
       },
     };
 
-    if (
-      this.yaxis.length > 0 &&
-      this.xaxis.length > 0 &&
-      this.chartType != ''
-    ) {
-      this.isEditing = true;
-      this.createChart(chartData);
-    } else if (
-      this.yaxis.length > 0 &&
-      this.xaxis.length > 0 &&
-      this.chartType == ''
-    ) {
-      this.messageService.add({
-        severity: 'warn',
-        detail: 'Por favor, informe uma série base',
-      });
+    if (this.chartType != 'pie') {
+      if (
+        this.yaxis.length > 0 &&
+        this.xaxis.length > 0 &&
+        this.chartType != ''
+      ) {
+        this.isEditing = true;
+        this.createChart(chartData);
+      } else if (
+        this.yaxis.length > 0 &&
+        this.xaxis.length > 0 &&
+        this.chartType == ''
+      ) {
+        this.warnMessageToast('Por favor, informe uma série base');
+      } else {
+        this.warnMessageToast('Por favor, preencha os campos obrigatórios');
+      }
     } else {
-      this.messageService.add({
-        severity: 'warn',
-        detail: 'Por favor, preencha os campos obrigatórios',
-      });
+      if (this.yaxis.length > 0 && this.series.length > 0) {
+        this.isEditing = true;
+        this.createChart(chartData);
+      } else {
+        this.warnMessageToast('Por favor, preencha os campos obrigatórios');
+      }
     }
   }
 
   createChart(chartData: any) {
+    console.log(JSON.stringify(chartData, null, 2));
     this.chartsService.createCharts(this.headers, chartData).subscribe({
       next: (data) => {
         this.showPreviewButton = false;
@@ -536,71 +566,74 @@ export class ChartComponent implements OnInit {
         this.chartId = data.id;
       },
       error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          detail: 'Não foi possível concluir esta ação',
-        });
+        this.errorMessageToast('Não foi possível concluir esta ação');
       },
     });
   }
 
   updateChart() {
-    if (
-      this.yaxis.length > 0 &&
-      this.xaxis.length > 0 &&
-      this.chartType != ''
-    ) {
-      this.identifierData();
-      this.dataRepo();
-      const groupSelector =
-        this.xAxisValues.length != 0
-          ? [...this.seriesValues, ...this.xAxisValues]
-          : this.seriesValues;
-      const chartData = {
-        title: this.titulo,
-        graphType: this.chartType.toLowerCase(),
-        sql: this.sql,
-        yAxisColumns: this.yAxisColumns,
-        xAxisColumns: this.xAxisColumns,
-        series: this.seriesData,
-        filters: this.filtersData,
-        group: this.groupData,
-        order: this.order.length
-          ? this.order.map((order) => this.rmTimeStamp(order.name))
-          : groupSelector,
-        orderInfo: this.order.length ? this.orderInfo : [],
-        chartGroup: {
-          id: this.dashBoard.id,
-        },
-      };
-      this.chartConfig = {};
+    this.identifierData();
+    this.dataRepo();
+    const groupSelector =
+      this.xAxisValues.length != 0
+        ? [...this.seriesValues, ...this.xAxisValues]
+        : this.seriesValues;
+    const chartData = {
+      title: this.titulo,
+      graphType: this.chartType.toLowerCase(),
+      sql: this.sql,
+      yAxisColumns: this.yAxisColumns,
+      xAxisColumns: this.xAxisColumns,
+      series: this.seriesData,
+      filters: this.filtersData,
+      group: this.groupData,
+      order: this.order.length
+        ? this.order.map((order) => this.rmTimeStamp(order.name))
+        : groupSelector,
+      orderInfo: this.order.length ? this.orderInfo : [],
+      chartGroup: {
+        id: this.dashBoard.id,
+      },
+    };
 
-      if (this.chartId == null) {
-        this.chartId = this.itemId;
-      } else if (this.itemId == null) {
-        this.chartId = this.chartId;
+    this.chartConfig = {};
+
+    if (this.chartId == null) {
+      this.chartId = this.itemId;
+    } else if (this.itemId == null) {
+      this.chartId = this.chartId;
+    }
+
+    if (this.chartType != 'pie') {
+      if (
+        this.yaxis.length > 0 &&
+        this.xaxis.length > 0 &&
+        this.chartType != ''
+      ) {
+        this.isEditing = true;
+        this.updateChartData(chartData);
+      } else if (
+        this.yaxis.length > 0 &&
+        this.xaxis.length > 0 &&
+        this.chartType == ''
+      ) {
+        this.warnMessageToast('Por favor, informe uma série base');
+      } else {
+        this.warnMessageToast('Por favor, preencha os campos obrigatórios');
       }
-      this.isEditing = true;
-      this.updateChartData(chartData);
-    } else if (
-      this.yaxis.length > 0 &&
-      this.xaxis.length > 0 &&
-      this.chartType == ''
-    ) {
-      this.messageService.add({
-        severity: 'warn',
-        detail: 'Por favor, informe uma série base',
-      });
     } else {
-      this.messageService.add({
-        severity: 'warn',
-        detail: 'Por favor, preencha os campos obrigatórios',
-      });
+      if (this.yaxis.length > 0 && this.series.length > 0) {
+        this.isEditing = true;
+        this.updateChartData(chartData);
+      } else {
+        this.warnMessageToast('Por favor, preencha os campos obrigatórios');
+      }
     }
   }
 
   updateChartData(chartData: any) {
-    console.log(chartData);
+    console.log(JSON.stringify(chartData, null, 2));
+    console.log(this.chartId);
     this.chartsService
       .updateCharts(this.headers, chartData, this.chartId)
       .subscribe({
@@ -609,10 +642,7 @@ export class ChartComponent implements OnInit {
           this.isEditing = false;
         },
         error: (err) => {
-          this.messageService.add({
-            severity: 'error',
-            detail: 'Não foi possível concluir esta ação',
-          });
+          this.errorMessageToast('Não foi possível concluir esta ação');
         },
       });
   }
@@ -930,7 +960,7 @@ export class ChartComponent implements OnInit {
         name: axis.agregator[0],
         identifiers: axis.name[0],
         value: axis.column[0],
-        type: this.returnValueEdit(axis),
+        type: axis.type[0],
       };
     });
     const xaxis = value.xAxisColumns.map((axis: any) => {
@@ -959,6 +989,10 @@ export class ChartComponent implements OnInit {
     this.xaxis = xaxis;
     this.series = series;
     this.filters = columnFilterNames;
+
+    console.log(this.yaxis);
+    console.log(this.xaxis);
+    console.log(this.series);
 
     if (value.graphType == 'pie') {
       this.xaxisShow = false;
@@ -1033,5 +1067,26 @@ export class ChartComponent implements OnInit {
 
   formatTimestampFieldWithoutAgrr(axisName: string): string {
     return `DATE_TRUNC('month', ${this.rmTimeStamp(axisName)})`;
+  }
+
+  errorMessageToast(message: string) {
+    return this.messageService.add({
+      severity: 'error',
+      detail: message,
+    });
+  }
+
+  warnMessageToast(message: string) {
+    return this.messageService.add({
+      severity: 'warn',
+      detail: message,
+    });
+  }
+
+  successMessageToast(message: string) {
+    return this.messageService.add({
+      severity: 'success',
+      detail: message,
+    });
   }
 }

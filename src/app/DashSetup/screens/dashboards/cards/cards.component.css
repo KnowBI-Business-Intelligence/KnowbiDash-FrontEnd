@@ -270,7 +270,7 @@
 
 .serie-list {
   border: solid 1px #ccc;
-  min-height: 24.5px;
+  min-height: 40px;
   background: #ffffff54;
   border-radius: 3px;
   overflow: hidden;
@@ -294,6 +294,10 @@
   font-size: 8px;
 }
 
+.iconCode {
+  color: #fafafa;
+}
+
 .example-box,
 .series-box {
   padding: 2px 3px;
@@ -306,7 +310,6 @@
   cursor: grab;
   background: white;
   font-size: 12px;
-  max-height: 23px;
 }
 
 .example-box span {
@@ -316,8 +319,36 @@
   max-width: 151px;
 }
 
+.example-box .labels {
+  display: flex;
+  flex-direction: column;
+}
+
+.example-box .labels span:nth-child(2) {
+  font-size: 10px;
+  color: #989898;
+}
+
 .series-box {
   justify-content: space-between;
+}
+
+.series-box span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 60%;
+}
+
+.series-box .labels {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.series-box .labels span:nth-child(2) {
+  font-size: 10px;
+  color: #989898;
 }
 
 .series-buttons {

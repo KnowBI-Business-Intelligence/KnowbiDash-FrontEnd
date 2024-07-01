@@ -23,7 +23,10 @@
             [size]="'xl'"
             title="Dashboards"
           ></fa-icon>
-          <span [title]="item.name">{{ item?.name }}</span>
+          <div class="labels">
+            <span [title]="item.name">{{ item?.name }}</span>
+            <span [title]="item.name">{{ item?.type }}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -71,13 +74,18 @@
               cdkDragLockAxis="y"
               cdkDragBoundary=".y"
             >
-              <div>
-                <fa-icon
-                  class="icon"
-                  [icon]="icons.database"
-                  [size]="'xl'"
-                ></fa-icon>
-                {{ selectedAggregation ? selectedAggregation : item?.name }}
+              <fa-icon
+                class="icon"
+                [icon]="icons.database"
+                [size]="'xl'"
+              ></fa-icon>
+              <div class="labels">
+                <span>
+                  {{
+                    selectedAggregation ? selectedAggregation : item?.name
+                  }}</span
+                >
+                <span>{{ item?.type }}</span>
               </div>
               <div class="series-buttons">
                 <button
@@ -130,15 +138,14 @@
               cdkDragLockAxis="y"
               cdkDragBoundary=".x"
             >
-              <div>
-                <fa-icon
-                  class="icon"
-                  [icon]="icons.database"
-                  [size]="'xl'"
-                ></fa-icon>
-                <span>
-                  {{ item.name }}
-                </span>
+              <fa-icon
+                class="icon"
+                [icon]="icons.database"
+                [size]="'xl'"
+              ></fa-icon>
+              <div class="labels">
+                <span> {{ item?.name }}</span>
+                <span>{{ item?.type }}</span>
               </div>
               <div class="series-buttons">
                 <button
@@ -164,7 +171,10 @@
           </div>
         </div>
         <div class="seriesdata">
-          <span>Legenda</span>
+          <span
+            >Legenda
+            <span *ngIf="chartType == 'pie'" class="mandatory">*</span></span
+          >
           <div
             id="legend"
             cdkDropList
@@ -179,13 +189,14 @@
               cdkDragLockAxis="y"
               cdkDragBoundary=".s"
             >
-              <div>
-                <fa-icon
-                  class="icon"
-                  [icon]="icons.database"
-                  [size]="'xl'"
-                ></fa-icon>
-                {{ item.name }}
+              <fa-icon
+                class="icon"
+                [icon]="icons.database"
+                [size]="'xl'"
+              ></fa-icon>
+              <div class="labels">
+                <span> {{ item?.name }}</span>
+                <span>{{ item?.type }}</span>
               </div>
               <div class="series-buttons">
                 <button
@@ -213,7 +224,7 @@
         <div class="filters">
           <span>Filtros</span>
           <div
-            id="legend"
+            id="filters"
             cdkDropList
             [cdkDropListData]="filters"
             class="serie-list f"
@@ -226,13 +237,14 @@
               cdkDragLockAxis="y"
               cdkDragBoundary=".f"
             >
-              <div>
-                <fa-icon
-                  class="icon"
-                  [icon]="icons.database"
-                  [size]="'xl'"
-                ></fa-icon>
-                {{ item.name }}
+              <fa-icon
+                class="icon"
+                [icon]="icons.database"
+                [size]="'xl'"
+              ></fa-icon>
+              <div class="labels">
+                <span> {{ item?.name }}</span>
+                <span>{{ item?.type }}</span>
               </div>
               <div class="series-buttons">
                 <button
@@ -260,6 +272,7 @@
         <div class="order">
           <span>Ordenação</span>
           <div
+            id="order"
             cdkDropList
             [cdkDropListData]="order"
             class="serie-list o"
@@ -272,13 +285,14 @@
               cdkDragLockAxis="y"
               cdkDragBoundary=".o"
             >
-              <div>
-                <fa-icon
-                  class="icon"
-                  [icon]="icons.database"
-                  [size]="'xl'"
-                ></fa-icon>
-                {{ item.name }}
+              <fa-icon
+                class="icon"
+                [icon]="icons.database"
+                [size]="'xl'"
+              ></fa-icon>
+              <div class="labels">
+                <span> {{ item?.name }}</span>
+                <span>{{ item?.type }}</span>
               </div>
               <div class="series-buttons">
                 <button

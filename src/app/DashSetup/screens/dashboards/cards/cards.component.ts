@@ -6,9 +6,7 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
 import { StorageService } from '../../../../core/services/user/storage.service';
-import { LocalstorageService } from '../../../../core/services/local-storage/local-storage.service';
 import { ChartsService } from '../../../../core/services/charts/charts.service';
 import {
   CdkDrag,
@@ -142,6 +140,17 @@ export class CardsComponent implements OnInit, OnDestroy {
       );
     } else {
       if (event.container.id === 'yaxis' && event.container.data.length >= 1) {
+        return;
+      }
+      const item = event.previousContainer.data[event.previousIndex] as any;
+      if (
+        event.previousContainer.id === 'data-list' &&
+        event.container.id === 'yaxis' &&
+        item.type !== 'numeric'
+      ) {
+        this.warnMessageToast(
+          'Por favor, use apenas colunas do tipo numeric no campo Valores'
+        );
         return;
       }
       copyArrayItem(
@@ -399,10 +408,7 @@ export class CardsComponent implements OnInit, OnDestroy {
       this.createCard(cardData);
       this.isEditing = true;
     } else {
-      this.messageService.add({
-        severity: 'warn',
-        detail: 'Por favor, preencha os campos obrigatórios',
-      });
+      this.warnMessageToast('Por favor, preencha os campos obrigatórios');
     }
   }
 
@@ -415,11 +421,9 @@ export class CardsComponent implements OnInit, OnDestroy {
         this.cardId = data.id;
       },
       error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          detail:
-            'Não foi possível concluir esta ação, verifique o operador da coluna',
-        });
+        this.errorMessageToast(
+          'Não foi possível concluir esta ação, verifique o operador da coluna'
+        );
       },
     });
   }
@@ -474,10 +478,7 @@ export class CardsComponent implements OnInit, OnDestroy {
       }
       this.updateCardData(cardData);
     } else {
-      this.messageService.add({
-        severity: 'warn',
-        detail: 'Por favor, preencha os campos obrigatórios',
-      });
+      this.warnMessageToast('Por favor, preencha os campos obrigatórios');
     }
   }
 
@@ -490,10 +491,7 @@ export class CardsComponent implements OnInit, OnDestroy {
           this.cardPreView(data);
         },
         error: (err) => {
-          this.messageService.add({
-            severity: 'error',
-            detail: 'Não foi possível concluir esta ação',
-          });
+          this.errorMessageToast('Não foi possível concluir esta ação');
         },
       });
   }
@@ -604,5 +602,26 @@ export class CardsComponent implements OnInit, OnDestroy {
       )}))`;
     }
     return this.rmTimeStamp(axisName);
+  }
+
+  errorMessageToast(message: string) {
+    return this.messageService.add({
+      severity: 'error',
+      detail: message,
+    });
+  }
+
+  warnMessageToast(message: string) {
+    return this.messageService.add({
+      severity: 'warn',
+      detail: message,
+    });
+  }
+
+  successMessageToast(message: string) {
+    return this.messageService.add({
+      severity: 'success',
+      detail: message,
+    });
   }
 }

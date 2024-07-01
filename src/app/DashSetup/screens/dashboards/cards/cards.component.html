@@ -23,7 +23,10 @@
             [size]="'xl'"
             title="Dashboards"
           ></fa-icon>
-          <span>{{ item?.name }}</span>
+          <div class="labels">
+            <span [title]="item.name">{{ item?.name }}</span>
+            <span [title]="item.name">{{ item?.type }}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -41,7 +44,7 @@
             <div>
               <button class="button-switch-code">
                 <fa-icon
-                  class="icon"
+                  class="iconCode"
                   [icon]="icons.code"
                   [size]="'xl'"
                 ></fa-icon>
@@ -62,13 +65,18 @@
                 cdkDragLockAxis="y"
                 cdkDragBoundary=".y"
               >
-                <div>
-                  <fa-icon
-                    class="icon"
-                    [icon]="icons.database"
-                    [size]="'xl'"
-                  ></fa-icon>
-                  {{ selectedAggregation ? selectedAggregation : item?.name }}
+                <fa-icon
+                  class="icon"
+                  [icon]="icons.database"
+                  [size]="'xl'"
+                ></fa-icon>
+                <div class="labels">
+                  <span>
+                    {{
+                      selectedAggregation ? selectedAggregation : item?.name
+                    }}</span
+                  >
+                  <span>{{ item?.type }}</span>
                 </div>
                 <div class="series-buttons">
                   <button
@@ -121,13 +129,14 @@
               cdkDragLockAxis="y"
               cdkDragBoundary=".f"
             >
-              <div>
-                <fa-icon
-                  class="icon"
-                  [icon]="icons.database"
-                  [size]="'xl'"
-                ></fa-icon>
-                {{ item.name }}
+              <fa-icon
+                class="icon"
+                [icon]="icons.database"
+                [size]="'xl'"
+              ></fa-icon>
+              <div class="labels">
+                <span> {{ item?.name }}</span>
+                <span>{{ item?.type }}</span>
               </div>
               <div class="series-buttons">
                 <button
