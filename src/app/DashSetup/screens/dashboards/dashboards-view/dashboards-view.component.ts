@@ -167,6 +167,7 @@ export class DashboardsViewComponent implements OnInit {
     } else {
       this.currentView = 'ViewCreateComponent';
       this.isCloseDash = true;
+      this.viewCreateComponent.updateCombinedLayout();
     }
     console.log(this.isCloseDash);
   }

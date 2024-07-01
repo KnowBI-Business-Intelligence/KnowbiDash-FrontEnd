@@ -36,6 +36,7 @@ import {
   faXmark,
   faCode,
 } from '@fortawesome/free-solid-svg-icons';
+import { SkeletonModule } from 'primeng/skeleton';
 
 @Component({
   selector: 'app-table',
@@ -55,6 +56,7 @@ import {
     TableModule,
     ToastModule,
     DividerModule,
+    SkeletonModule,
   ],
   templateUrl: './table.component.html',
   styleUrls: [
@@ -177,7 +179,6 @@ export class TableComponent implements OnInit {
     this.itemId = data.itemId;
     if (this.itemId != undefined) {
       this.showPreviewButton = false;
-      this.isEditing = true;
       this.loadTableEdit(this.itemId);
     }
   }
@@ -463,6 +464,7 @@ export class TableComponent implements OnInit {
       },
     };
     if (this.tableData.length > 0) {
+      this.isEditing = true;
       this.createTable(tableData);
     } else {
       this.messageService.add({
@@ -473,31 +475,42 @@ export class TableComponent implements OnInit {
   }
 
   updateData() {
-    this.showPreviewButton = false;
-    this.identifiersData();
-    this.dataRepo();
-    const tableData = {
-      title: this.tableTitle,
-      sql: this.sql,
-      tableData: this.tableData,
-      filters: this.filtersData,
-      group: this.groupData,
-      order: this.groupData,
-      chartGroup: {
-        id: this.dashBoard.id,
-      },
-    };
+    if (this.tabledata.length > 0) {
+      this.isEditing = true;
+      this.showPreviewButton = false;
+      this.identifiersData();
+      this.dataRepo();
+      const tableData = {
+        title: this.tableTitle,
+        sql: this.sql,
+        tableData: this.tableData,
+        filters: this.filtersData,
+        group: this.groupData,
+        order: this.groupData,
+        chartGroup: {
+          id: this.dashBoard.id,
+        },
+      };
 
-    this.updateChart(tableData);
+      if (this.tableId == null) {
+        this.tableId = this.itemId;
+      } else if (this.itemId == null) {
+        this.tableId = this.tableId;
+      }
+
+      this.updateChart(tableData);
+    } else {
+      this.messageService.add({
+        severity: 'warn',
+        detail: 'Por favor, preencha os campos obrigatórios',
+      });
+    }
   }
 
   createTable(chartData: any) {
     this.chartsService.createTables(this.headers, chartData).subscribe({
       next: (data) => {
-        this.messageService.add({
-          severity: 'success',
-          detail: 'Tabela criada',
-        });
+        this.isEditing = false;
         this.showPreviewButton = false;
         this.tablePreView(data);
         this.tableId = data.id;
@@ -512,24 +525,11 @@ export class TableComponent implements OnInit {
   }
 
   updateChart(chartData: any) {
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${this.user.token}`,
-    });
-
-    if (this.tableId == null) {
-      this.tableId = this.itemId;
-    } else if (this.itemId == null) {
-      this.tableId = this.tableId;
-    }
-
     this.chartsService
-      .updateTables(headers, chartData, this.tableId)
+      .updateTables(this.headers, chartData, this.tableId)
       .subscribe({
         next: (data) => {
-          this.messageService.add({
-            severity: 'success',
-            detail: 'Informações da tabela atualizadas',
-          });
+          this.isEditing = false;
           this.tablePreView(data);
         },
         error: (err) => {

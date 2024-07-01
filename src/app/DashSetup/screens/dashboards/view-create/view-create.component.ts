@@ -25,6 +25,8 @@ import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { DataService } from '../../../../core/services/dashboard/data.service';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import exporting from 'highcharts/modules/exporting';
+import exportData from 'highcharts/modules/export-data';
 import {
   NgxSliderModule,
   Options,
@@ -49,7 +51,7 @@ import {
   faRotateLeft,
   faFloppyDisk,
   faFilter,
-  faEllipsisVertical,
+  faBars,
   faPenToSquare,
   faTrash,
   faExpand,
@@ -134,7 +136,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
     back: faRotateLeft,
     save: faFloppyDisk,
     filter: faFilter,
-    menu: faEllipsisVertical,
+    menu: faBars,
     edit: faPenToSquare,
     delete: faTrash,
     fullScreen: faExpand,

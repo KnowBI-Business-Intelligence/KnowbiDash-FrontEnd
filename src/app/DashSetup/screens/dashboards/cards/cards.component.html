@@ -1,4 +1,11 @@
-<div class="container">
+<div id="loading-screen" *ngIf="isLoading">
+  <div class="spinner"></div>
+</div>
+<div class="container no-data" *ngIf="!isDatabaseContent">
+  <h3>Ainda não há dados neste dashboard</h3>
+  <button (click)="returnToCreateView()">Voltar ao Workspace</button>
+</div>
+<div class="container" *ngIf="isDatabaseContent">
   <div cdkDropListGroup class="container-data-group">
     <div class="container-data">
       <span>Dados</span>
@@ -168,17 +175,22 @@
         </div>
       </div>
       <div *ngIf="!showPreviewButton" class="chart-container">
-        <div class="card">
-          <div class="card-header">
-            {{ cardTitle }}
+        <span *ngIf="isEditing; else content">
+          <p-skeleton width="100%" height="8rem" styleClass="mb-2"></p-skeleton>
+        </span>
+        <ng-template #content
+          ><div class="card">
+            <div class="card-header">
+              {{ cardTitle }}
+            </div>
+            <div class="card-body">
+              <p>{{ cardData }}</p>
+            </div>
           </div>
-          <div class="card-body">
-            <p>{{ cardData }}</p>
-          </div>
-        </div>
+        </ng-template>
       </div>
     </div>
-    <div class="chart-container-buttons">
+    <div class="chart-container-buttons" *ngIf="!showPreviewButton">
       <div>
         <button (click)="openModal()">
           <p>Cancelar</p>
@@ -191,9 +203,6 @@
         </button>
       </div>
     </div>
-  </div>
-  <div class="message">
-    <p-toast [life]="3500"></p-toast>
   </div>
 </div>
 <ng-template #menuautosum>

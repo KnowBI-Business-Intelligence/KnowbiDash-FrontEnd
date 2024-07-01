@@ -60,7 +60,7 @@
 :host {
   display: block;
   width: 100%;
-  padding: 0 5px;
+  padding: 0 1px;
   box-sizing: border-box;
 
   .grids-container {
@@ -100,9 +100,8 @@
   }
 
   .grid-container {
-    overflow-x: auto; // let available scroll horizontal with overflowing x
-    max-height: 82vh;
-    height: 82vh;
+    overflow-x: hidden; // let available scroll horizontal with overflowing x
+    height: 98%;
     ktd-grid {
       width: 100%;
       max-width: 500%;

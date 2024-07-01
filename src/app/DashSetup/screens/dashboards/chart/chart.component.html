@@ -1,4 +1,11 @@
-<div class="container">
+<div id="loading-screen" *ngIf="isLoading">
+  <div class="spinner"></div>
+</div>
+<div class="container no-data" *ngIf="!isDatabaseContent">
+  <h3>Ainda não há dados neste dashboard</h3>
+  <button (click)="returnToCreateView()">Voltar ao Workspace</button>
+</div>
+<div class="container" *ngIf="isDatabaseContent">
   <div cdkDropListGroup class="container-data-group">
     <div class="container-data">
       <span>Dados</span>
@@ -55,7 +62,6 @@
             cdkDropList
             [cdkDropListData]="yaxis"
             class="serie-list y"
-            [cdkDropListConnectedTo]="['data-list']"
             (cdkDropListDropped)="drop($event)"
           >
             <div
@@ -115,7 +121,6 @@
             cdkDropList
             [cdkDropListData]="xaxis"
             class="serie-list x"
-            [cdkDropListConnectedTo]="['data-list']"
             (cdkDropListDropped)="drop($event)"
           >
             <div
@@ -161,6 +166,7 @@
         <div class="seriesdata">
           <span>Legenda</span>
           <div
+            id="legend"
             cdkDropList
             [cdkDropListData]="series"
             class="serie-list s"
@@ -207,6 +213,7 @@
         <div class="filters">
           <span>Filtros</span>
           <div
+            id="legend"
             cdkDropList
             [cdkDropListData]="filters"
             class="serie-list f"
@@ -308,15 +315,26 @@
       </button>
     </div>
     <div *ngIf="!showPreviewButton" class="chart-container">
-      <highcharts-chart
-        *ngFor="let key of chartKeys()"
-        [Highcharts]="Highcharts"
-        [options]="chartConfig[key]"
-        style="width: 100%; height: 25rem; margin: 5px"
-        [update]="true"
-      ></highcharts-chart>
+      <span *ngIf="isEditing; else content">
+        <p-skeleton width="102%" height="25rem" styleClass="mb-2"></p-skeleton>
+      </span>
+      <ng-template #content>
+        <highcharts-chart
+          #content
+          *ngFor="let key of chartKeys()"
+          [Highcharts]="Highcharts"
+          [options]="chartConfig[key]"
+          style="
+            width: 100%;
+            height: 25rem;
+            margin: 5px;
+            border: solid 1px gainsboro;
+          "
+          [update]="true"
+        ></highcharts-chart>
+      </ng-template>
     </div>
-    <div class="chart-container-buttons">
+    <div class="chart-container-buttons" *ngIf="!showPreviewButton">
       <div>
         <button (click)="openModal()"><p>Cancelar</p></button>
         <button (click)="updateChart()"><p>Atualizar</p></button>
@@ -327,9 +345,6 @@
         </button>
       </div>
     </div>
-  </div>
-  <div class="message">
-    <p-toast [life]="3500"></p-toast>
   </div>
 </div>
 <ng-template #menuautosum>

@@ -16,13 +16,7 @@ import {
 } from '@angular/cdk/menu';
 import { CommonModule } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
-import {
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  OnInit,
-  Output,
-} from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -30,7 +24,6 @@ import { faDatabase, faGear, faXmark } from '@fortawesome/free-solid-svg-icons';
 import Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { ChartsService } from '../../../../core/services/charts/charts.service';
-import { LocalstorageService } from '../../../../core/services/local-storage/local-storage.service';
 import { StorageService } from '../../../../core/services/user/storage.service';
 import { chartButtonsData } from './chartbuttons';
 import { Subscription } from 'rxjs';
@@ -38,6 +31,7 @@ import { ChartgroupService } from '../../../../core/services/chartgroup/chartgro
 import { DataService } from '../../../../core/services/dashboard/data.service';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { SkeletonModule } from 'primeng/skeleton';
 
 interface Axis {
   name: string;
@@ -64,6 +58,7 @@ interface Axis {
     CdkMenuItemRadio,
     CdkMenuItem,
     ToastModule,
+    SkeletonModule,
   ],
   templateUrl: './chart.component.html',
   styleUrls: [
@@ -107,6 +102,9 @@ export class ChartComponent implements OnInit {
   xaxisShow: boolean = true;
   showPreviewButton: boolean = true;
   showModal: boolean = false;
+  isDatabaseContent: boolean = true;
+  isLoading: boolean = true;
+  isEditing: boolean = false;
   modal: HTMLElement | undefined;
   selectedYAxis: Axis = { name: '', type: '', identifiers: '', value: '' };
   buildData: { name: any; identifiers: any }[] = [];
@@ -128,12 +126,10 @@ export class ChartComponent implements OnInit {
   constructor(
     private router: Router,
     private storageService: StorageService,
-    private localStorageService: LocalstorageService,
     private chartsService: ChartsService,
     private chartGroupService: ChartgroupService,
     private dataService: DataService,
-    private messageService: MessageService,
-    private cdr: ChangeDetectorRef
+    private messageService: MessageService
   ) {}
 
   ngOnInit(): void {
@@ -254,6 +250,12 @@ export class ChartComponent implements OnInit {
         });
       }
     });
+    if (this.database.length <= 0) {
+      this.isDatabaseContent = false;
+    }
+    setTimeout(() => {
+      this.isLoading = false;
+    }, 1000);
   }
 
   removeItem(list: string, index: number) {
@@ -482,6 +484,7 @@ export class ChartComponent implements OnInit {
       this.xAxisValues.length != 0
         ? [...this.seriesValues, ...this.xAxisValues]
         : this.seriesValues;
+
     const chartData = {
       title: this.titulo,
       graphType: this.chartType.toLowerCase(),
@@ -505,7 +508,17 @@ export class ChartComponent implements OnInit {
       this.xaxis.length > 0 &&
       this.chartType != ''
     ) {
+      this.isEditing = true;
       this.createChart(chartData);
+    } else if (
+      this.yaxis.length > 0 &&
+      this.xaxis.length > 0 &&
+      this.chartType == ''
+    ) {
+      this.messageService.add({
+        severity: 'warn',
+        detail: 'Por favor, informe uma série base',
+      });
     } else {
       this.messageService.add({
         severity: 'warn',
@@ -517,11 +530,8 @@ export class ChartComponent implements OnInit {
   createChart(chartData: any) {
     this.chartsService.createCharts(this.headers, chartData).subscribe({
       next: (data) => {
-        this.messageService.add({
-          severity: 'success',
-          detail: 'Gráfico criado',
-        });
         this.showPreviewButton = false;
+        this.isEditing = false;
         this.chartPreView(data);
         this.chartId = data.id;
       },
@@ -535,46 +545,68 @@ export class ChartComponent implements OnInit {
   }
 
   updateChart() {
-    this.identifierData();
-    this.dataRepo();
-    const groupSelector =
-      this.xAxisValues.length != 0
-        ? [...this.seriesValues, ...this.xAxisValues]
-        : this.seriesValues;
-    const chartData = {
-      title: this.titulo,
-      graphType: this.chartType.toLowerCase(),
-      sql: this.sql,
-      yAxisColumns: this.yAxisColumns,
-      xAxisColumns: this.xAxisColumns,
-      series: this.seriesData,
-      filters: this.filtersData,
-      group: this.groupData,
-      order: this.order.length
-        ? this.order.map((order) => this.rmTimeStamp(order.name))
-        : groupSelector,
-      orderInfo: this.order.length ? this.orderInfo : [],
-      chartGroup: {
-        id: this.dashBoard.id,
-      },
-    };
-    this.chartConfig = {};
+    if (
+      this.yaxis.length > 0 &&
+      this.xaxis.length > 0 &&
+      this.chartType != ''
+    ) {
+      this.identifierData();
+      this.dataRepo();
+      const groupSelector =
+        this.xAxisValues.length != 0
+          ? [...this.seriesValues, ...this.xAxisValues]
+          : this.seriesValues;
+      const chartData = {
+        title: this.titulo,
+        graphType: this.chartType.toLowerCase(),
+        sql: this.sql,
+        yAxisColumns: this.yAxisColumns,
+        xAxisColumns: this.xAxisColumns,
+        series: this.seriesData,
+        filters: this.filtersData,
+        group: this.groupData,
+        order: this.order.length
+          ? this.order.map((order) => this.rmTimeStamp(order.name))
+          : groupSelector,
+        orderInfo: this.order.length ? this.orderInfo : [],
+        chartGroup: {
+          id: this.dashBoard.id,
+        },
+      };
+      this.chartConfig = {};
 
-    if (this.chartId == null) {
-      this.chartId = this.itemId;
-    } else if (this.itemId == null) {
-      this.chartId = this.chartId;
+      if (this.chartId == null) {
+        this.chartId = this.itemId;
+      } else if (this.itemId == null) {
+        this.chartId = this.chartId;
+      }
+      this.isEditing = true;
+      this.updateChartData(chartData);
+    } else if (
+      this.yaxis.length > 0 &&
+      this.xaxis.length > 0 &&
+      this.chartType == ''
+    ) {
+      this.messageService.add({
+        severity: 'warn',
+        detail: 'Por favor, informe uma série base',
+      });
+    } else {
+      this.messageService.add({
+        severity: 'warn',
+        detail: 'Por favor, preencha os campos obrigatórios',
+      });
     }
+  }
 
+  updateChartData(chartData: any) {
+    console.log(chartData);
     this.chartsService
       .updateCharts(this.headers, chartData, this.chartId)
       .subscribe({
         next: (data) => {
-          this.messageService.add({
-            severity: 'success',
-            detail: 'Informações do gráfico atualizadas',
-          });
           this.chartPreView(data);
+          this.isEditing = false;
         },
         error: (err) => {
           this.messageService.add({

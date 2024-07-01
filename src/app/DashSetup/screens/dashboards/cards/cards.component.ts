@@ -39,6 +39,7 @@ import { Subscription } from 'rxjs';
 import { DataService } from '../../../../core/services/dashboard/data.service';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
+import { SkeletonModule } from 'primeng/skeleton';
 
 interface Axis {
   name: string;
@@ -63,6 +64,7 @@ interface Axis {
     CdkMenuGroup,
     CdkMenuItem,
     ToastModule,
+    SkeletonModule,
   ],
   templateUrl: './cards.component.html',
   styleUrls: [
@@ -98,6 +100,9 @@ export class CardsComponent implements OnInit, OnDestroy {
   selectedChartButton: string = '';
   showPreviewButton: boolean = true;
   showModal: boolean = false;
+  isDatabaseContent: boolean = true;
+  isLoading: boolean = true;
+  isEditing: boolean = false;
   modal: HTMLElement | undefined;
   selectedYAxis: Axis = { name: '', type: '', identifiers: '', value: '' };
   buildData: { name: any; identifiers: any }[] = [];
@@ -249,6 +254,13 @@ export class CardsComponent implements OnInit, OnDestroy {
         });
       }
     });
+    if (this.database.length <= 0) {
+      this.isDatabaseContent = false;
+    }
+    setTimeout(() => {
+      this.isLoading = false;
+    }, 1000);
+    console.log(this.yaxis);
   }
 
   removeItem(list: string, index: number) {
@@ -385,6 +397,7 @@ export class CardsComponent implements OnInit, OnDestroy {
 
     if (this.yaxis.length > 0) {
       this.createCard(cardData);
+      this.isEditing = true;
     } else {
       this.messageService.add({
         severity: 'warn',
@@ -396,10 +409,7 @@ export class CardsComponent implements OnInit, OnDestroy {
   createCard(cardData: any) {
     this.chartsService.createCards(this.headers, cardData).subscribe({
       next: (data) => {
-        this.messageService.add({
-          severity: 'success',
-          detail: 'Card criado',
-        });
+        this.isEditing = false;
         this.showPreviewButton = false;
         this.cardPreView(data);
         this.cardId = data.id;
@@ -415,62 +425,69 @@ export class CardsComponent implements OnInit, OnDestroy {
   }
 
   updateChart() {
-    this.identifierData();
-    this.showPreviewButton = false;
-    const cardData = {
-      title: this.cardTitle,
-      prefix: this.prefix,
-      sufix: this.sufix,
-      column: this.yaxis,
-      sql: this.sql,
-      filters: this.filters.map((filter) => {
-        let operator;
-        let idenfiersOpt;
-        if (filter.type === 'timestamp' || filter.type === 'numeric') {
-          operator = 'BETWEEN';
-        } else {
-          operator = 'IN';
-        }
+    if (this.yaxis.length > 0) {
+      this.isEditing = true;
+      this.identifierData();
+      this.showPreviewButton = false;
+      const cardData = {
+        title: this.cardTitle,
+        prefix: this.prefix,
+        sufix: this.sufix,
+        column: this.yaxis,
+        sql: this.sql,
+        filters: this.filters.map((filter) => {
+          let operator;
+          let idenfiersOpt;
+          if (filter.type === 'timestamp' || filter.type === 'numeric') {
+            operator = 'BETWEEN';
+          } else {
+            operator = 'IN';
+          }
 
-        if (filter.type == 'numeric' && filter.identifiers == undefined) {
-          idenfiersOpt = this.rmTimeStamp(filter.name);
-        } else {
-          idenfiersOpt = filter.identifiers;
-        }
+          if (filter.type == 'numeric' && filter.identifiers == undefined) {
+            idenfiersOpt = this.rmTimeStamp(filter.name);
+          } else {
+            idenfiersOpt = filter.identifiers;
+          }
 
-        return {
-          column: [this.rmTimeStamp(filter.name)],
-          operator: [operator],
-          value: [],
-          agregator: [filter.name != undefined ? filter.name : filter.column],
-          identifiers: [
-            idenfiersOpt == ''
-              ? this.rmTimeStamp(filter.name)
-              : filter.identifiers,
-          ],
-        };
-      }),
-      chartGroup: {
-        id: this.dashBoard.id,
-      },
-    };
+          return {
+            column: [this.rmTimeStamp(filter.name)],
+            operator: [operator],
+            value: [],
+            agregator: [filter.name != undefined ? filter.name : filter.column],
+            identifiers: [
+              idenfiersOpt == ''
+                ? this.rmTimeStamp(filter.name)
+                : filter.identifiers,
+            ],
+          };
+        }),
+        chartGroup: {
+          id: this.dashBoard.id,
+        },
+      };
 
-    if (this.cardId == null) {
-      this.cardId = this.itemId;
-    } else if (this.itemId == null) {
-      this.cardId = this.cardId;
+      if (this.cardId == null) {
+        this.cardId = this.itemId;
+      } else if (this.itemId == null) {
+        this.cardId = this.cardId;
+      }
+      this.updateCardData(cardData);
+    } else {
+      this.messageService.add({
+        severity: 'warn',
+        detail: 'Por favor, preencha os campos obrigatórios',
+      });
     }
+  }
 
+  updateCardData(cardData: any) {
     this.chartsService
       .updateCards(this.headers, cardData, Number(this.cardId))
       .subscribe({
         next: (data) => {
-          this.messageService.add({
-            severity: 'success',
-            detail: 'Informações do card atualizadas',
-          });
+          this.isEditing = false;
           this.cardPreView(data);
-          console.log(JSON.stringify(data, null, 2));
         },
         error: (err) => {
           this.messageService.add({
