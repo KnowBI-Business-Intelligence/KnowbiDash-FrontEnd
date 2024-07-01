@@ -449,25 +449,25 @@ export class ChartScreenComponent implements OnInit {
         seriesData[seriesCategory][category] += value;
       }
 
-      for (const seriesCategory in seriesData) {
-        if (seriesData.hasOwnProperty(seriesCategory)) {
-          const dataset: number[] = categories.map(
-            (category) => seriesData[seriesCategory][category] || 0
-          );
-          const pieData = data.yAxisColumns[0].data.map(
-            (y: number, index: number) => ({
-              name: data.series[0].data[index],
-              y: y,
-            })
-          );
-          if (data.graphType === 'pie') {
-            highchartsSeries.push({
-              type: data.graphType,
-              name: data.series[0].name,
-              colorByPoint: true,
-              data: pieData,
-            });
-          } else {
+      if (data.graphType === 'pie') {
+        const pieData = data.yAxisColumns[0].data.map(
+          (y: number, index: number) => ({
+            name: data.series[0].data[index],
+            y: y,
+          })
+        );
+        highchartsSeries.push({
+          type: data.graphType,
+          name: data.series[0].name[0],
+          colorByPoint: true,
+          data: pieData,
+        });
+      } else {
+        for (const seriesCategory in seriesData) {
+          if (seriesData.hasOwnProperty(seriesCategory)) {
+            const dataset: number[] = categories.map(
+              (category) => seriesData[seriesCategory][category] || 0
+            );
             highchartsSeries.push({
               type: data.graphType,
               name: seriesCategory,
@@ -558,6 +558,7 @@ export class ChartScreenComponent implements OnInit {
           allowPointSelect: true,
           cursor: 'pointer',
           borderRadius: 5,
+          showInLegend: true,
           dataLabels: {
             enabled: true,
             format: '<b">{point.name}</b><br>{point.percentage:.1f} %',

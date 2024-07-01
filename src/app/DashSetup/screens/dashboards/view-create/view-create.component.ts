@@ -213,6 +213,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   isDashSelected: boolean = false;
   isDashvoid: boolean = false;
   isSaving: boolean = false;
+  isDonut: boolean = false;
   showContentFilterSwitch: boolean[] = [];
 
   minValue: number = 100;
@@ -427,6 +428,7 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
   }
 
   updateChartData(data: any) {
+    console.log(data);
     const categories: string[] =
       data.xAxisColumns.length > 0
         ? Array.from(new Set(data.xAxisColumns[0].data))
@@ -462,25 +464,33 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
         seriesData[seriesCategory][category] += value;
       }
 
-      for (const seriesCategory in seriesData) {
-        if (seriesData.hasOwnProperty(seriesCategory)) {
-          const dataset: number[] = categories.map(
-            (category) => seriesData[seriesCategory][category] || 0
-          );
-          const pieData = data.yAxisColumns[0].data.map(
-            (y: number, index: number) => ({
-              name: data.series[0].data[index],
-              y: y,
-            })
-          );
-          if (data.graphType === 'pie') {
-            highchartsSeries.push({
-              type: data.graphType,
-              name: data.series[0].name,
-              colorByPoint: true,
-              data: pieData,
-            });
-          } else {
+      if (data.graphType == 'donut') {
+        console.log(true);
+        data.graphType = 'pie';
+        this.isDonut = true;
+      } else {
+        console.log(false);
+      }
+
+      if (data.graphType === 'pie') {
+        const pieData = data.yAxisColumns[0].data.map(
+          (y: number, index: number) => ({
+            name: data.series[0].data[index],
+            y: y,
+          })
+        );
+        highchartsSeries.push({
+          type: data.graphType,
+          name: data.series[0].name[0],
+          colorByPoint: true,
+          data: pieData,
+        });
+      } else {
+        for (const seriesCategory in seriesData) {
+          if (seriesData.hasOwnProperty(seriesCategory)) {
+            const dataset: number[] = categories.map(
+              (category) => seriesData[seriesCategory][category] || 0
+            );
             highchartsSeries.push({
               type: data.graphType,
               name: seriesCategory,
@@ -570,6 +580,8 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
         pie: {
           allowPointSelect: true,
           cursor: 'pointer',
+          innerSize: this.isDonut ? '50%' : '0',
+          showInLegend: true,
           borderRadius: 5,
           dataLabels: {
             enabled: true,
@@ -744,9 +756,8 @@ export class ViewCreateComponent implements OnInit, OnDestroy {
         .updateWorkspace(this.headers, requestUpdateData, data.id)
         .subscribe({
           next: (value) => {
-            setTimeout(() => {
-              this.startDashboarData();
-            }, 450);
+            console.log;
+            this.startDashboarData();
           },
         });
     });

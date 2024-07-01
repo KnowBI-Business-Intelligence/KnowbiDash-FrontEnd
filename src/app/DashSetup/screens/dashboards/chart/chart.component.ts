@@ -105,6 +105,7 @@ export class ChartComponent implements OnInit {
   isDatabaseContent: boolean = true;
   isLoading: boolean = true;
   isEditing: boolean = false;
+  isDonut: boolean = false;
   modal: HTMLElement | undefined;
   selectedYAxis: Axis = { name: '', type: '', identifiers: '', value: '' };
   buildData: { name: any; identifiers: any }[] = [];
@@ -529,7 +530,7 @@ export class ChartComponent implements OnInit {
       },
     };
 
-    if (this.chartType != 'pie') {
+    if (this.chartType != 'pie' && this.chartType != 'donut') {
       if (
         this.yaxis.length > 0 &&
         this.xaxis.length > 0 &&
@@ -604,7 +605,7 @@ export class ChartComponent implements OnInit {
       this.chartId = this.chartId;
     }
 
-    if (this.chartType != 'pie') {
+    if (this.chartType != 'pie' && this.chartType != 'donut') {
       if (
         this.yaxis.length > 0 &&
         this.xaxis.length > 0 &&
@@ -696,25 +697,30 @@ export class ChartComponent implements OnInit {
         seriesData[seriesCategory][category] += value;
       }
 
-      for (const seriesCategory in seriesData) {
-        if (seriesData.hasOwnProperty(seriesCategory)) {
-          const dataset: number[] = categories.map(
-            (category) => seriesData[seriesCategory][category] || 0
-          );
-          const pieData = data.yAxisColumns[0].data.map(
-            (y: number, index: number) => ({
-              name: data.series[0].data[index],
-              y: y,
-            })
-          );
-          if (data.graphType === 'pie') {
-            highchartsSeries.push({
-              type: data.graphType,
-              name: data.series[0].name,
-              colorByPoint: true,
-              data: pieData,
-            });
-          } else {
+      if (data.graphType == 'donut') {
+        data.graphType = 'pie';
+        this.isDonut = true;
+      }
+
+      if (data.graphType === 'pie') {
+        const pieData = data.yAxisColumns[0].data.map(
+          (y: number, index: number) => ({
+            name: data.series[0].data[index],
+            y: y,
+          })
+        );
+        highchartsSeries.push({
+          type: data.graphType,
+          name: data.series[0].name[0],
+          colorByPoint: true,
+          data: pieData,
+        });
+      } else {
+        for (const seriesCategory in seriesData) {
+          if (seriesData.hasOwnProperty(seriesCategory)) {
+            const dataset: number[] = categories.map(
+              (category) => seriesData[seriesCategory][category] || 0
+            );
             highchartsSeries.push({
               type: data.graphType,
               name: seriesCategory,
@@ -844,9 +850,11 @@ export class ChartComponent implements OnInit {
             allowPointSelect: true,
             cursor: 'pointer',
             borderRadius: 5,
+            innerSize: this.isDonut ? '50%' : '0',
+            showInLegend: true,
             dataLabels: {
               enabled: true,
-              format: '<b">{point.name}</b><br>{point.percentage:.1f} %',
+              format: '<p>{point.name}</p><br>{point.percentage:.1f} %',
               style: {
                 fontSize: '12px',
                 fontWeight: '400',
@@ -898,7 +906,7 @@ export class ChartComponent implements OnInit {
   }
 
   selectChartButton(label: string, value: string) {
-    if (value == 'pie') {
+    if (value == 'pie' || value == 'donut') {
       this.xaxisShow = false;
       this.xaxis = [];
     } else {
@@ -941,6 +949,8 @@ export class ChartComponent implements OnInit {
           return 'Linha';
         case 'pie':
           return 'Pizza';
+        case 'donut':
+          return 'Donut';
         default:
           return 'Unknown';
       }
@@ -994,7 +1004,7 @@ export class ChartComponent implements OnInit {
     console.log(this.xaxis);
     console.log(this.series);
 
-    if (value.graphType == 'pie') {
+    if (value.graphType == 'pie' || value.graphType == 'donut') {
       this.xaxisShow = false;
     }
 

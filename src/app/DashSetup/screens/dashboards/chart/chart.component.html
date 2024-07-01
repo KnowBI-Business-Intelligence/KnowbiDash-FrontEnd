@@ -173,7 +173,11 @@
         <div class="seriesdata">
           <span
             >Legenda
-            <span *ngIf="chartType == 'pie'" class="mandatory">*</span></span
+            <span
+              *ngIf="chartType == 'pie' || chartType == 'donut'"
+              class="mandatory"
+              >*</span
+            ></span
           >
           <div
             id="legend"
